@@ -1,0 +1,7 @@
+{
+  "llm": {
+    "input_cost_per_1m_tokens": 1.0,
+    "output_cost_per_1m_tokens": 2.0,
+    "cost_pricing_source": "unit_test"
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "bootstrap_samples": 10000,
+  "seed": 42,
+  "delta_direction": "topology_aware_fusion_top6 minus hybrid_bm25_top6",
+  "regimes": [
+    {
+      "regime": "operational_budget_120",
+      "windows": 500,
+      "bm25": {
+        "precision": 1.0,
+        "recall": 0.34,
+        "f1": 0.507463,
+        "false_positive_rate": 0.0,
+        "accuracy": 0.868,
+        "route_alerts": 34,
+        "manual_reviews": 443,
+        "manual_review_rate": 0.886,
+        "manual_review_reasons": {
+          "llm_budget_exhausted": 369,
+          "llm_valid": 10,
+          "llm_valid_missing_evidence": 64
+        }
+      },
+      "topology": {
+        "precision": 0.582278,
+        "recall": 0.46,
+        "f1": 0.513966,
+        "false_positive_rate": 0.0825,
+        "accuracy": 0.826,
+        "route_alerts": 79,
+        "manual_reviews": 384,
+        "manual_review_rate": 0.768,
+        "manual_review_reasons": {
+          "llm_budget_exhausted": 369,
+          "llm_valid": 15
+        }
+      },
+      "delta": {
+        "precision": -0.417722,
+        "recall": 0.12,
+        "f1": 0.006503,
+        "false_positive_rate": 0.0825,
+        "accuracy": -0.042
+      },
+      "paired_bootstrap_95ci": {
+        "precision": {
+          "lower": -0.53012,
+          "upper": -0.310811
+        },
+        "recall": {
+          "lower": 0.020202,
+          "upper": 0.222222
+        },
+        "f1": {
+          "lower": -0.098064,
+          "upper": 0.11342
+        },
+        "false_positive_rate": {
+          "lower": 0.056993,
+          "upper": 0.110276
+        },
+        "accuracy": {
+          "lower": -0.072,
+          "upper": -0.012
+        }
+      },
+      "mcnemar_all_windows": {
+        "windows": 500,
+        "bm25_correct_topology_wrong": 41,
+        "bm25_wrong_topology_correct": 20,
+        "discordant": 61,
+        "exact_p_value": 0.009853448195259264
+      },
+      "mcnemar_true_alert_windows": {
+        "windows": 100,
+        "bm25_correct_topology_wrong": 8,
+        "bm25_wrong_topology_correct": 20,
+        "discordant": 28,
+        "exact_p_value": 0.03569813817739487
+      },
+      "mcnemar_normal_windows": {
+        "windows": 400,
+        "bm25_correct_topology_wrong": 33,
+        "bm25_wrong_topology_correct": 0,
+        "discordant": 33,
+        "exact_p_value": 2.3283064365386963e-10
+      }
+    },
+    {
+      "regime": "quality_full_budget",
+      "windows": 500,
+      "bm25": {
+        "precision": 0.892308,
+        "recall": 0.58,
+        "f1": 0.70303,
+        "false_positive_rate": 0.0175,
+        "accuracy": 0.902,
+        "route_alerts": 65,
+        "manual_reviews": 391,
+        "manual_review_rate": 0.782,
+        "manual_review_reasons": {
+          "llm_valid": 22,
+          "llm_valid_missing_evidence": 369
+        }
+      },
+      "topology": {
+        "precision": 0.350711,
+        "recall": 0.74,
+        "f1": 0.475884,
+        "false_positive_rate": 0.3425,
+        "accuracy": 0.674,
+        "route_alerts": 211,
+        "manual_reviews": 110,
+        "manual_review_rate": 0.22,
+        "manual_review_reasons": {
+          "llm_valid": 110
+        }
+      },
+      "delta": {
+        "precision": -0.541597,
+        "recall": 0.16,
+        "f1": -0.227146,
+        "false_positive_rate": 0.325,
+        "accuracy": -0.228
+      },
+      "paired_bootstrap_95ci": {
+        "precision": {
+          "lower": -0.626738,
+          "upper": -0.455327
+        },
+        "recall": {
+          "lower": 0.045974,
+          "upper": 0.273684
+        },
+        "f1": {
+          "lower": -0.320988,
+          "upper": -0.131959
+        },
+        "false_positive_rate": {
+          "lower": 0.277108,
+          "upper": 0.373433
+        },
+        "accuracy": {
+          "lower": -0.276,
+          "upper": -0.18
+        }
+      },
+      "mcnemar_all_windows": {
+        "windows": 500,
+        "bm25_correct_topology_wrong": 143,
+        "bm25_wrong_topology_correct": 29,
+        "discordant": 172,
+        "exact_p_value": 2.6136442465653027e-19
+      },
+      "mcnemar_true_alert_windows": {
+        "windows": 100,
+        "bm25_correct_topology_wrong": 10,
+        "bm25_wrong_topology_correct": 26,
+        "discordant": 36,
+        "exact_p_value": 0.011330984183587134
+      },
+      "mcnemar_normal_windows": {
+        "windows": 400,
+        "bm25_correct_topology_wrong": 133,
+        "bm25_wrong_topology_correct": 3,
+        "discordant": 136,
+        "exact_p_value": 9.62796454058168e-36
+      }
+    }
+  ]
+}

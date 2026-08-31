@@ -1,0 +1,30 @@
+{
+  "dataset_root": "data\\Nezha",
+  "fault_count": 101,
+  "metric_files": 112,
+  "metric_rows": 95660,
+  "metric_labeled_rows": 527,
+  "metric_skipped_rows": 0,
+  "log_events": 5921,
+  "trace_events": 5775,
+  "context_events": 11696,
+  "feature_columns": [
+    "cpu",
+    "memory",
+    "network",
+    "latency",
+    "workload",
+    "success_rate_drop"
+  ],
+  "label_rule": {
+    "same_pod": true,
+    "before_seconds": 60,
+    "after_seconds": 360
+  },
+  "context_filter_rule": {
+    "near_fault_windows": true,
+    "before_seconds": 300,
+    "after_seconds": 600,
+    "max_context_events_per_fault_per_source": 80
+  }
+}

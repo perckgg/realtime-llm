@@ -1,0 +1,61 @@
+{
+  "experiment": {
+    "name": "nezha_phase3_smoke_hybrid",
+    "mode": "hybrid"
+  },
+  "data": {
+    "metric_path": "nezha_setup/processed/metrics.csv",
+    "log_path": "nezha_setup/processed/logs.jsonl"
+  },
+  "preprocessing": {
+    "window_size": 120,
+    "stride": 60,
+    "normalization": "zscore"
+  },
+  "detector": {
+    "name": "isolation_forest",
+    "contamination": 0.05,
+    "threshold": 0.95,
+    "n_estimators": 100,
+    "random_state": 42,
+    "fit_strategy": "warmup",
+    "warmup_windows": 1000,
+    "train_on_normal_only": false,
+    "min_fit_windows": 20
+  },
+  "retrieval": {
+    "vector_db": "local",
+    "embedding_model": "hashing",
+    "embedding_dimensions": 512,
+    "top_k": 8,
+    "search_k": 400,
+    "time_margin_minutes": 8,
+    "semantic_weight": 0.45,
+    "time_weight": 0.25,
+    "metadata_weight": 0.2,
+    "signal_weight": 0.1
+  },
+  "llm_gate": {
+    "enabled": true,
+    "low_threshold": 0.8,
+    "high_threshold": 0.98,
+    "high_score_action": "call_llm",
+    "max_llm_calls_per_minute": 20,
+    "max_total_calls": 20
+  },
+  "llm": {
+    "provider": "mock",
+    "model": "mock-judge",
+    "temperature": 0,
+    "max_output_tokens": 512
+  },
+  "decision": {
+    "confidence_threshold": 0.8
+  },
+  "evaluation": {
+    "output_dir": "nezha_setup\\outputs\\phase3_smoke\\ablation",
+    "audit_dir": "nezha_setup\\outputs\\phase3_smoke\\ablation\\audit",
+    "max_windows": 200,
+    "max_llm_calls": 20
+  }
+}

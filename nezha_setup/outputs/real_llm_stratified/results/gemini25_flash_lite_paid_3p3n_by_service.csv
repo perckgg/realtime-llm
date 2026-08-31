@@ -1,0 +1,7 @@
+service_id,precision,recall,f1,false_positive_rate,tp,fp,tn,fn,windows,candidate_alerts,llm_calls
+frontend,1.0,1.0,1.0,0.0,1,0,0,0,1,1,1
+ts-basic-service,1.0,1.0,1.0,0.0,1,0,0,0,1,1,1
+ts-cancel-service,0.0,0.0,0.0,0.0,0,0,1,0,1,1,1
+ts-food-service,1.0,1.0,1.0,0.0,1,0,0,0,1,1,1
+ts-station-food-service,0.0,0.0,0.0,1.0,0,1,0,0,1,1,1
+ts-station-service,0.0,0.0,0.0,1.0,0,1,0,0,1,1,1

@@ -1,0 +1,634 @@
+{
+  "generated_at": "2026-05-18T09:59:15.393005+00:00",
+  "cloud_monitoring": {
+    "raw_root": "data\\cloud-monitoring-dataset",
+    "data_root": "data\\cloud-monitoring-dataset\\data",
+    "inventory": {
+      "exists": true,
+      "file_count": 153,
+      "bytes": 9947683,
+      "mb": 9.487,
+      "by_suffix": {
+        ".csv": 60,
+        ".json": 60,
+        ".sample": 14,
+        "<none>": 13,
+        ".md": 3,
+        ".idx": 1,
+        ".pack": 1,
+        ".rev": 1
+      }
+    },
+    "csv_files": 60,
+    "metadata_files": 60,
+    "summary": {
+      "series_count": 60,
+      "point_count": 225403,
+      "anomaly_point_count": 4553,
+      "skipped_point_count": 42,
+      "value_min": 0.0,
+      "value_max": 3081259.55,
+      "first_timestamp": "2017-11-01T00:00:00+00:00",
+      "last_timestamp": "2018-07-18T00:00:00+00:00",
+      "anomaly_rate": 0.020199376228355433,
+      "value_mean": 197660.48869161072
+    },
+    "domains": {
+      "application-crash-rate-1": {
+        "series_count": 9,
+        "point_count": 5462,
+        "anomaly_point_count": 746,
+        "skipped_point_count": 42,
+        "value_min": 0.0,
+        "value_max": 5518.0,
+        "first_timestamp": "2018-06-19T00:00:00+00:00",
+        "last_timestamp": "2018-07-18T00:00:00+00:00",
+        "anomaly_rate": 0.1365800073233248,
+        "value_mean": 94.87019406810693
+      },
+      "application-crash-rate-2": {
+        "series_count": 10,
+        "point_count": 11141,
+        "anomaly_point_count": 574,
+        "skipped_point_count": 0,
+        "value_min": 0.0,
+        "value_max": 76.5,
+        "first_timestamp": "2018-05-10T00:00:00+00:00",
+        "last_timestamp": "2018-06-25T00:00:00+00:00",
+        "anomaly_rate": 0.05152140741405619,
+        "value_mean": 0.26994881276064214
+      },
+      "consumer-purchase-rate": {
+        "series_count": 6,
+        "point_count": 7488,
+        "anomaly_point_count": 171,
+        "skipped_point_count": 0,
+        "value_min": 0.0,
+        "value_max": 48398.0,
+        "first_timestamp": "2018-03-15T00:00:00+00:00",
+        "last_timestamp": "2018-05-05T23:00:00+00:00",
+        "anomaly_rate": 0.02283653846153846,
+        "value_mean": 1080.883012820513
+      },
+      "data-ingress-rate": {
+        "series_count": 5,
+        "point_count": 79200,
+        "anomaly_point_count": 1089,
+        "skipped_point_count": 0,
+        "value_min": 0.0,
+        "value_max": 3081259.55,
+        "first_timestamp": "2018-04-25T00:00:00+00:00",
+        "last_timestamp": "2018-05-05T23:59:00+00:00",
+        "anomaly_rate": 0.01375,
+        "value_mean": 561164.1349046702
+      },
+      "ecommerce-api-incoming-rps": {
+        "series_count": 1,
+        "point_count": 6192,
+        "anomaly_point_count": 120,
+        "skipped_point_count": 0,
+        "value_min": 1.63694444444444,
+        "value_max": 391.411944444444,
+        "first_timestamp": "2017-11-01T00:00:00+00:00",
+        "last_timestamp": "2018-07-16T23:00:00+00:00",
+        "anomaly_rate": 0.01937984496124031,
+        "value_mean": 72.22628382500727
+      },
+      "middle-tier-api-dependency-latency": {
+        "series_count": 23,
+        "point_count": 16560,
+        "anomaly_point_count": 553,
+        "skipped_point_count": 0,
+        "value_min": 0.0,
+        "value_max": 19804.0,
+        "first_timestamp": "2018-06-17T00:00:00+00:00",
+        "last_timestamp": "2018-07-16T23:00:00+00:00",
+        "anomaly_rate": 0.03339371980676328,
+        "value_mean": 139.14449224463795
+      },
+      "mongodb-application-rps": {
+        "series_count": 4,
+        "point_count": 63360,
+        "anomaly_point_count": 1098,
+        "skipped_point_count": 0,
+        "value_min": 17.4333324,
+        "value_max": 11527.5333333333,
+        "first_timestamp": "2018-04-25T00:00:00+00:00",
+        "last_timestamp": "2018-05-05T23:59:00+00:00",
+        "anomaly_rate": 0.017329545454545455,
+        "value_mean": 1295.5572074577008
+      },
+      "mongodb-machine-rps": {
+        "series_count": 1,
+        "point_count": 20160,
+        "anomaly_point_count": 202,
+        "skipped_point_count": 0,
+        "value_min": 0.0,
+        "value_max": 2914.0,
+        "first_timestamp": "2018-06-13T00:00:00+00:00",
+        "last_timestamp": "2018-06-26T23:59:00+00:00",
+        "anomaly_rate": 0.01001984126984127,
+        "value_mean": 774.5457837301587
+      },
+      "service-unavailable": {
+        "series_count": 1,
+        "point_count": 15840,
+        "anomaly_point_count": 0,
+        "skipped_point_count": 0,
+        "value_min": 0.0,
+        "value_max": 1.0,
+        "first_timestamp": "2018-04-25T00:00:00+00:00",
+        "last_timestamp": "2018-05-05T23:59:00+00:00",
+        "anomaly_rate": 0.0,
+        "value_mean": 0.00012626262626262626
+      }
+    },
+    "metadata_note_examples": [
+      "This dataset marks unusual increases in application crash rates relative to baseline.  Crash rates are normalized to application launch counts.",
+      "This is an example of a dataset with no anomalies.  While there are events that look like spikes, it is normal activity because the underlying data has low volume.",
+      "This dataset shows count of in-app purchases in a specific market.  Increases in purchases are interesting for business reasons and potentially to detect fraud.  Decreases can indicate issues in the purchase flow.",
+      "This dataset measures data ingress rate into a cloud service.  There is variation expected across the time series in this dataset over time.  There are prominent dips in the ingress rates across the time series that indicate service disruption.",
+      "This dataset measures data ingress rate into a cloud service.  There is variation expected across the time series in this dataset over time.  This time series shows a new scenario coming online at a certain date and gradually increasing.",
+      "This dataset shows incoming request rates to an ecommerce API.  There is a strong interest in tracking elevated request rates in this API."
+    ],
+    "processed": {
+      "path": "cloud_monitor_setup\\processed",
+      "exists": true,
+      "summary": {
+        "dataset_root": "data\\cloud-monitoring-dataset\\data",
+        "series_count": 60,
+        "point_count": 225403,
+        "anomaly_point_count": 4553,
+        "skipped_point_count": 42,
+        "domains": {
+          "application-crash-rate-1": {
+            "series_count": 9,
+            "point_count": 5462,
+            "anomaly_point_count": 746,
+            "skipped_point_count": 42
+          },
+          "application-crash-rate-2": {
+            "series_count": 10,
+            "point_count": 11141,
+            "anomaly_point_count": 574,
+            "skipped_point_count": 0
+          },
+          "consumer-purchase-rate": {
+            "series_count": 6,
+            "point_count": 7488,
+            "anomaly_point_count": 171,
+            "skipped_point_count": 0
+          },
+          "data-ingress-rate": {
+            "series_count": 5,
+            "point_count": 79200,
+            "anomaly_point_count": 1089,
+            "skipped_point_count": 0
+          },
+          "ecommerce-api-incoming-rps": {
+            "series_count": 1,
+            "point_count": 6192,
+            "anomaly_point_count": 120,
+            "skipped_point_count": 0
+          },
+          "middle-tier-api-dependency-latency": {
+            "series_count": 23,
+            "point_count": 16560,
+            "anomaly_point_count": 553,
+            "skipped_point_count": 0
+          },
+          "mongodb-application-rps": {
+            "series_count": 4,
+            "point_count": 63360,
+            "anomaly_point_count": 1098,
+            "skipped_point_count": 0
+          },
+          "mongodb-machine-rps": {
+            "series_count": 1,
+            "point_count": 20160,
+            "anomaly_point_count": 202,
+            "skipped_point_count": 0
+          },
+          "service-unavailable": {
+            "series_count": 1,
+            "point_count": 15840,
+            "anomaly_point_count": 0,
+            "skipped_point_count": 0
+          }
+        }
+      },
+      "metrics": {
+        "exists": true,
+        "rows": 225403,
+        "columns": [
+          "timestamp",
+          "node_id",
+          "service_id",
+          "value",
+          "value_z",
+          "abs_delta_z",
+          "label"
+        ],
+        "bytes": 20293368
+      },
+      "logs": {
+        "exists": true,
+        "rows": 60,
+        "keys": [
+          "timestamp",
+          "node_id",
+          "service_id",
+          "pod_id",
+          "severity",
+          "event_type",
+          "source",
+          "message"
+        ],
+        "bytes": 21437
+      }
+    },
+    "processed_summary": {
+      "dataset_root": "data\\cloud-monitoring-dataset\\data",
+      "series_count": 60,
+      "point_count": 225403,
+      "anomaly_point_count": 4553,
+      "skipped_point_count": 42,
+      "domains": {
+        "application-crash-rate-1": {
+          "series_count": 9,
+          "point_count": 5462,
+          "anomaly_point_count": 746,
+          "skipped_point_count": 42
+        },
+        "application-crash-rate-2": {
+          "series_count": 10,
+          "point_count": 11141,
+          "anomaly_point_count": 574,
+          "skipped_point_count": 0
+        },
+        "consumer-purchase-rate": {
+          "series_count": 6,
+          "point_count": 7488,
+          "anomaly_point_count": 171,
+          "skipped_point_count": 0
+        },
+        "data-ingress-rate": {
+          "series_count": 5,
+          "point_count": 79200,
+          "anomaly_point_count": 1089,
+          "skipped_point_count": 0
+        },
+        "ecommerce-api-incoming-rps": {
+          "series_count": 1,
+          "point_count": 6192,
+          "anomaly_point_count": 120,
+          "skipped_point_count": 0
+        },
+        "middle-tier-api-dependency-latency": {
+          "series_count": 23,
+          "point_count": 16560,
+          "anomaly_point_count": 553,
+          "skipped_point_count": 0
+        },
+        "mongodb-application-rps": {
+          "series_count": 4,
+          "point_count": 63360,
+          "anomaly_point_count": 1098,
+          "skipped_point_count": 0
+        },
+        "mongodb-machine-rps": {
+          "series_count": 1,
+          "point_count": 20160,
+          "anomaly_point_count": 202,
+          "skipped_point_count": 0
+        },
+        "service-unavailable": {
+          "series_count": 1,
+          "point_count": 15840,
+          "anomaly_point_count": 0,
+          "skipped_point_count": 0
+        }
+      }
+    },
+    "fit_for_experiment": [
+      "Detector baseline and anomaly scoring",
+      "Alert candidate generation from labeled time-series points",
+      "Limited RAG/LLM evaluation because the dataset has metadata notes but no operational logs or traces"
+    ]
+  },
+  "nezha": {
+    "raw_root": "data\\Nezha",
+    "inventory": {
+      "exists": true,
+      "file_count": 1280,
+      "bytes": 3401976706,
+      "mb": 3244.378,
+      "by_suffix": {
+        ".csv": 1224,
+        ".sample": 14,
+        "<none>": 13,
+        ".py": 7,
+        ".json": 6,
+        ".log": 4,
+        ".md": 3,
+        ".ini": 2,
+        ".bin": 2,
+        ".pdf": 1,
+        ".txt": 1,
+        ".idx": 1,
+        ".pack": 1,
+        ".rev": 1
+      }
+    },
+    "date_partitions": {
+      "rca_data": [
+        "2022-08-22",
+        "2022-08-23",
+        "2023-01-29",
+        "2023-01-30"
+      ],
+      "construct_data": [
+        "2022-08-22",
+        "2022-08-23",
+        "2023-01-29",
+        "2023-01-30"
+      ]
+    },
+    "faults": {
+      "fault_count": 101,
+      "by_day": {
+        "2022-08-22": 24,
+        "2022-08-23": 32,
+        "2023-01-29": 28,
+        "2023-01-30": 17
+      },
+      "by_inject_type": {
+        "network_delay": 30,
+        "cpu_contention": 23,
+        "exception": 20,
+        "return": 18,
+        "cpu_consumed": 10
+      },
+      "top_services": {
+        "frontend": 8,
+        "checkoutservice": 8,
+        "adservice": 7,
+        "ts-basic-service": 7,
+        "recommendationservice": 6,
+        "ts-food-service": 6,
+        "ts-verification-code-service": 6,
+        "ts-travel-service": 6,
+        "emailservice": 5,
+        "productcatalogservice": 5,
+        "shippingservice": 5,
+        "ts-contacts-service": 5
+      },
+      "top_pods": {
+        "frontend-579b9bff58-t2dbm": 8,
+        "checkoutservice-578fcf4766-9csqn": 8,
+        "adservice-5f6585d649-fnmft": 7,
+        "recommendationservice-6cfdd55578-gfj6q": 6,
+        "emailservice-55fdc5b988-f6xth": 5,
+        "shippingservice-7b598fc7d-lmggd": 5,
+        "cartservice-579f59597d-wc2lz": 4,
+        "currencyservice-cf787dd48-vpjrd": 4,
+        "paymentservice-9cdb6588f-554sm": 4,
+        "productcatalogservice-668d5f85fb-jhwx9": 4,
+        "ts-contacts-service-866bd68c97-xcqfx": 4,
+        "ts-basic-service-5dc8d4f9fd-46997": 4
+      },
+      "first_timestamp": "2022-08-22T03:53:54+00:00",
+      "last_timestamp": "2023-01-30T14:08:19+00:00",
+      "label_window": {
+        "same_pod": true,
+        "before_seconds": 60,
+        "after_seconds": 360
+      }
+    },
+    "raw_metrics": {
+      "metric_files": 112,
+      "metric_rows": 95660,
+      "metric_labeled_rows": 527,
+      "metric_label_rate": 0.005509094710432783,
+      "metric_skipped_rows": 0,
+      "service_count": 56,
+      "pod_count": 103,
+      "top_services_by_rows": {
+        "adservice": 1930,
+        "cartservice": 1930,
+        "checkoutservice": 1930,
+        "currencyservice": 1930,
+        "emailservice": 1930,
+        "frontend": 1930,
+        "paymentservice": 1930,
+        "productcatalogservice": 1930,
+        "recommendationservice": 1930,
+        "shippingservice": 1930,
+        "ts-admin-basic-info-service": 1660,
+        "ts-admin-order-service": 1660
+      },
+      "top_pods_by_rows": {
+        "adservice-5f6585d649-fnmft": 1930,
+        "cartservice-579f59597d-wc2lz": 1930,
+        "checkoutservice-578fcf4766-9csqn": 1930,
+        "currencyservice-cf787dd48-vpjrd": 1930,
+        "emailservice-55fdc5b988-f6xth": 1930,
+        "frontend-579b9bff58-t2dbm": 1930,
+        "paymentservice-9cdb6588f-554sm": 1930,
+        "recommendationservice-6cfdd55578-gfj6q": 1930,
+        "shippingservice-7b598fc7d-lmggd": 1930,
+        "productcatalogservice-668d5f85fb-wckp8": 1209,
+        "ts-admin-basic-info-service-5f55b6cf68-77cfw": 919,
+        "ts-admin-order-service-84cbf6c798-7njv6": 919
+      },
+      "feature_stats": {
+        "cpu": {
+          "count": 95660,
+          "min": 0.0,
+          "mean": 3.7643367007908966,
+          "max": 110.75109520523867
+        },
+        "memory": {
+          "count": 95660,
+          "min": 0.0,
+          "mean": 20.482755458453372,
+          "max": 180.1835938
+        },
+        "network": {
+          "count": 95660,
+          "min": 0.0,
+          "mean": 76432.06571509539,
+          "max": 1093869.5787831512
+        },
+        "latency": {
+          "count": 95660,
+          "min": 0.0,
+          "mean": 14255.553398649396,
+          "max": 3600000.0
+        },
+        "workload": {
+          "count": 95660,
+          "min": 0.0,
+          "mean": 2.1870546467847323,
+          "max": 58.333333333333336
+        },
+        "success_rate_drop": {
+          "count": 95660,
+          "min": 100.0,
+          "mean": 100.0,
+          "max": 100.0
+        }
+      },
+      "first_timestamp": "2022-08-22T03:51:19+00:00",
+      "last_timestamp": "2028-12-23T19:32:40+00:00"
+    },
+    "raw_events": {
+      "rca_log": {
+        "files": 303,
+        "bytes": 2199136412,
+        "mb": 2097.26
+      },
+      "rca_trace": {
+        "files": 303,
+        "bytes": 738153248,
+        "mb": 703.958
+      },
+      "rca_traceid": {
+        "files": 303,
+        "bytes": 3009442,
+        "mb": 2.87
+      },
+      "construct_log": {
+        "files": 4,
+        "bytes": 29317486,
+        "mb": 27.959
+      },
+      "construct_trace": {
+        "files": 4,
+        "bytes": 10055363,
+        "mb": 9.59
+      },
+      "construct_traceid": {
+        "files": 4,
+        "bytes": 38312,
+        "mb": 0.037
+      },
+      "raw_event_rows_counted": false
+    },
+    "processed": {
+      "path": "nezha_setup\\processed",
+      "exists": true,
+      "summary": {
+        "dataset_root": "data\\Nezha",
+        "fault_count": 101,
+        "metric_files": 112,
+        "metric_rows": 95660,
+        "metric_labeled_rows": 527,
+        "metric_skipped_rows": 0,
+        "log_events": 5921,
+        "trace_events": 5775,
+        "context_events": 11696,
+        "feature_columns": [
+          "cpu",
+          "memory",
+          "network",
+          "latency",
+          "workload",
+          "success_rate_drop"
+        ],
+        "label_rule": {
+          "same_pod": true,
+          "before_seconds": 60,
+          "after_seconds": 360
+        },
+        "context_filter_rule": {
+          "near_fault_windows": true,
+          "before_seconds": 300,
+          "after_seconds": 600,
+          "max_context_events_per_fault_per_source": 80
+        }
+      },
+      "metrics": {
+        "exists": true,
+        "rows": 95660,
+        "columns": [
+          "timestamp",
+          "node_id",
+          "service_id",
+          "cpu",
+          "memory",
+          "network",
+          "latency",
+          "workload",
+          "success_rate_drop",
+          "inject_type",
+          "label"
+        ],
+        "bytes": 15974927
+      },
+      "logs": {
+        "exists": true,
+        "rows": 11696,
+        "keys": [
+          "doc_id",
+          "timestamp",
+          "node_id",
+          "service_id",
+          "pod_id",
+          "severity",
+          "event_type",
+          "source",
+          "message"
+        ],
+        "bytes": 5778167
+      }
+    },
+    "processed_details": {
+      "metric_labels": {
+        "normal": 95133,
+        "true_alert": 527
+      },
+      "metric_inject_types": {
+        "none": 95133,
+        "network_delay": 210,
+        "cpu_contention": 161,
+        "cpu_consumed": 71,
+        "exception": 43,
+        "return": 42
+      },
+      "metric_top_services": {
+        "adservice": 1930,
+        "cartservice": 1930,
+        "checkoutservice": 1930,
+        "currencyservice": 1930,
+        "emailservice": 1930,
+        "frontend": 1930,
+        "paymentservice": 1930,
+        "productcatalogservice": 1930,
+        "recommendationservice": 1930,
+        "shippingservice": 1930,
+        "ts-admin-basic-info-service": 1660,
+        "ts-admin-order-service": 1660
+      },
+      "context_event_types": {
+        "application_log": 5921,
+        "trace_span": 5775
+      },
+      "context_sources": {
+        "nezha_log": 5921,
+        "nezha_trace": 5775
+      },
+      "context_severities": {
+        "INFO": 11544,
+        "WARN": 94,
+        "ERROR": 48,
+        "WARNING": 10
+      }
+    },
+    "fit_for_experiment": [
+      "Hybrid monitoring with metric detector + log/trace context retrieval",
+      "LLM-as-a-Judge and local-first/API-fallback routing",
+      "Ablation, streaming replay, context rescue, and retrieval-quality analysis"
+    ]
+  }
+}

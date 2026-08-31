@@ -1,0 +1,241 @@
+{
+  "step": 9,
+  "status": "pass",
+  "paper_result_table_finalizable": true,
+  "hard_stop_failures": [],
+  "failed_checks": [],
+  "checks": [
+    {
+      "check_id": "paper_outputs_location",
+      "description": "All four paper tables and five figures exist under outputs/phase2.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "missing=[]; invalid_images=[]",
+      "evidence": [
+        "outputs/phase2/paper_tables/main_result_table.csv",
+        "outputs/phase2/paper_tables/fault_type_breakdown.csv",
+        "outputs/phase2/paper_tables/ablation_table.csv",
+        "outputs/phase2/paper_tables/cost_latency_table.csv",
+        "outputs/phase2/figures/f1_comparison.png",
+        "outputs/phase2/figures/context_coverage_comparison.png",
+        "outputs/phase2/figures/network_delay_recall.png",
+        "outputs/phase2/figures/alpha_beta_gamma_ablation.png",
+        "outputs/phase2/figures/service_graph_example.png"
+      ]
+    },
+    {
+      "check_id": "result_provenance",
+      "description": "Every paper result traces to a source artifact and View B traces to audit/config/summary.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "missing_sources=[]",
+      "evidence": [
+        "outputs/phase2/ablation/alpha_beta_gamma_ablation.csv",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_by_fault_type.csv",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_config_snapshot.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_results.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_summary.csv",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_summary.md",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_by_fault_type.csv",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_config_snapshot.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_results.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_summary.csv",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_summary.md",
+        "outputs/phase2/step7_rerun/operational_budget_120/step7_view_a_report.csv",
+        "outputs/phase2/step7_rerun/quality_full_budget/results/step7_view_a_quality_full_budget_paper_500_hybrid_bm25_top6_by_fault_type.csv",
+        "outputs/phase2/step7_rerun/quality_full_budget/results/step7_view_a_quality_full_budget_paper_500_topology_aware_fusion_top6_by_fault_type.csv",
+        "outputs/phase2/step7_rerun/quality_full_budget/step7_view_a_report.csv",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_context_rescue_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_detector_only_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_llm_without_rag_audit.jsonl",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_context_rescue_by_fault_type.csv",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_context_rescue_config_snapshot.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_context_rescue_results.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_context_rescue_summary.csv",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_context_rescue_summary.md",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_detector_only_by_fault_type.csv",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_detector_only_config_snapshot.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_detector_only_results.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_detector_only_summary.csv",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_detector_only_summary.md",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_llm_without_rag_by_fault_type.csv",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_llm_without_rag_config_snapshot.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_llm_without_rag_results.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_llm_without_rag_summary.csv",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_llm_without_rag_summary.md",
+        "outputs/phase2/step7_view_b/step7_view_b_report.csv"
+      ]
+    },
+    {
+      "check_id": "baseline_reproducibility",
+      "description": "Architecture-reference metrics match baseline_reference source summaries.",
+      "status": "pass",
+      "hard_stop": true,
+      "details": "errors=[]",
+      "evidence": [
+        "outputs/phase2/baseline_reference.csv"
+      ]
+    },
+    {
+      "check_id": "window_split_consistency",
+      "description": "BM25, topology and all View B methods use the frozen paper_500 window set.",
+      "status": "pass",
+      "hard_stop": true,
+      "details": "errors=[]",
+      "evidence": [
+        "outputs/phase2/input_freeze.json",
+        "outputs/phase2/step7_view_b/step7_view_b_report.json"
+      ]
+    },
+    {
+      "check_id": "debug_smoke_exclusion",
+      "description": "Paper tables exclude debug and smoke artifacts.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "violations=[]",
+      "evidence": [
+        "outputs/phase2/paper_tables/main_result_table.csv",
+        "outputs/phase2/paper_tables/fault_type_breakdown.csv",
+        "outputs/phase2/paper_tables/ablation_table.csv",
+        "outputs/phase2/paper_tables/cost_latency_table.csv"
+      ]
+    },
+    {
+      "check_id": "context_rescue_label",
+      "description": "Context Rescue is always labeled architecture-enhanced.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "rows_checked=9; violations=[]",
+      "evidence": [
+        "outputs/phase2/paper_tables/main_result_table.csv",
+        "outputs/phase2/paper_tables/fault_type_breakdown.csv",
+        "outputs/phase2/paper_tables/cost_latency_table.csv",
+        "outputs/phase2/step7_view_b/step7_view_b_report.csv"
+      ]
+    },
+    {
+      "check_id": "score_final_bounds",
+      "description": "All recorded score_final values are finite and within [0,1].",
+      "status": "pass",
+      "hard_stop": true,
+      "details": "values_checked=43008; invalid=[]",
+      "evidence": [
+        "outputs/phase2/retrieval/topk_contexts.jsonl",
+        "outputs/phase2/retrieval/topk_contexts_debug.jsonl",
+        "outputs/phase2/ablation/ablation_topk_contexts.jsonl",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_context_rescue_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_detector_only_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_llm_without_rag_audit.jsonl"
+      ]
+    },
+    {
+      "check_id": "graph_infinity_handling",
+      "description": "Unreachable graph distance maps to GraphSim=0.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "unreachable_components_checked=832; errors=[]",
+      "evidence": [
+        "src/phase2/retrieval/fusion_ranker.py"
+      ]
+    },
+    {
+      "check_id": "cache_api_separation",
+      "description": "Logical calls, actual API calls and cache hits are stored separately.",
+      "status": "pass",
+      "hard_stop": true,
+      "details": "records_checked=3500; errors=[]",
+      "evidence": [
+        "outputs/phase2/paper_tables/cost_latency_table.csv",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_context_rescue_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_detector_only_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_llm_without_rag_audit.jsonl"
+      ]
+    },
+    {
+      "check_id": "manual_review_semantics",
+      "description": "Manual review remains abstention and budget exhaustion never routes an alert.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "manual_reviews_checked=2141; errors=[]",
+      "evidence": [
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_context_rescue_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_detector_only_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_llm_without_rag_audit.jsonl"
+      ]
+    },
+    {
+      "check_id": "claim_boundaries",
+      "description": "Submission text preserves RCA, production-readiness and generalization boundaries.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "missing_required=[]; forbidden_assertions=[]",
+      "evidence": [
+        "EXPERIMENT_REPORT_FOR_SUBMISSION.md"
+      ]
+    },
+    {
+      "check_id": "table_window_labels",
+      "description": "Every paper table row identifies its window set.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "errors=[]",
+      "evidence": [
+        "outputs/phase2/paper_tables/main_result_table.csv",
+        "outputs/phase2/paper_tables/fault_type_breakdown.csv",
+        "outputs/phase2/paper_tables/ablation_table.csv",
+        "outputs/phase2/paper_tables/cost_latency_table.csv"
+      ]
+    },
+    {
+      "check_id": "key_configs_stored",
+      "description": "Frozen inputs and key retrieval/LLM configs are stored with results.",
+      "status": "pass",
+      "hard_stop": false,
+      "details": "missing=[]",
+      "evidence": [
+        "outputs/phase2/input_freeze.json",
+        "outputs/phase2/retrieval/phase2_retrieval_run_config.json",
+        "outputs/phase2/ablation/ablation_selected_settings.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_config_snapshot.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_config_snapshot.json",
+        "outputs/phase2/step7_rerun/quality_full_budget/results/step7_view_a_quality_full_budget_paper_500_hybrid_bm25_top6_config_snapshot.json",
+        "outputs/phase2/step7_rerun/quality_full_budget/results/step7_view_a_quality_full_budget_paper_500_topology_aware_fusion_top6_config_snapshot.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_detector_only_config_snapshot.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_llm_without_rag_config_snapshot.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_config_snapshot.json",
+        "outputs/phase2/step7_rerun/operational_budget_120/results/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_config_snapshot.json",
+        "outputs/phase2/step7_view_b/results/step7_view_b_paper_500_context_rescue_config_snapshot.json"
+      ]
+    },
+    {
+      "check_id": "audit_schema_validation",
+      "description": "Decision audit JSONL records contain the required schema and valid decisions.",
+      "status": "pass",
+      "hard_stop": true,
+      "details": "records_checked=3500; errors=[]",
+      "evidence": [
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/operational_budget_120/audit/step7_view_a_operational_budget_120_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_hybrid_bm25_top6_audit.jsonl",
+        "outputs/phase2/step7_rerun/quality_full_budget/audit/step7_view_a_quality_full_budget_paper_500_topology_aware_fusion_top6_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_context_rescue_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_detector_only_audit.jsonl",
+        "outputs/phase2/step7_view_b/audit/step7_view_b_paper_500_llm_without_rag_audit.jsonl"
+      ]
+    }
+  ]
+}

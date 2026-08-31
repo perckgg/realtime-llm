@@ -1,0 +1,30 @@
+{
+  "generated_at_utc": "2026-06-29T08:33:45.007213+00:00",
+  "description": "Index of pre-Phase2 outputs retained for Phase1 reproducibility.",
+  "roots": [
+    {
+      "path": "nezha_setup/outputs/phase3_smoke/ablation",
+      "exists": true
+    },
+    {
+      "path": "nezha_setup/outputs/phase4_benchmark/results",
+      "exists": true
+    },
+    {
+      "path": "nezha_setup/outputs/phase5_context_rescue/results",
+      "exists": true
+    },
+    {
+      "path": "nezha_setup/outputs/real_llm_stratified",
+      "exists": true
+    },
+    {
+      "path": "nezha_setup/outputs/local_first_ollama_smoke",
+      "exists": true
+    },
+    {
+      "path": "nezha_setup/outputs/**/audit",
+      "exists": true
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+split,method,method_description,top_k,alpha,beta,gamma,windows,positive_windows,retrieved_context_count,avg_retrieved_context_count,context_coverage,positive_context_coverage,service_context_coverage,positive_service_context_coverage,network_delay_context_coverage,network_delay_service_context_coverage,avg_context_tokens,avg_retrieval_latency_ms,p95_retrieval_latency_ms,graph_coverage,avg_graph_distance,avg_graph_candidate_count,topology_expanded_context_ratio,topology_only_context_ratio,avg_candidate_pool_size,avg_duplicates_removed
+debug_50,M0_bm25_only,BM25-only,6,1.0,0.0,0.0,50,25,300,6.0,1.0,1.0,0.64,1.0,1.0,1.0,8.24,31.1022,32.4383,0.66,0.0103,0.0,0.0,0.0,60.0,0.0
+debug_50,M1_bm25_time,BM25 + TimeSim,6,0.5,0.5,0.0,50,25,300,6.0,1.0,1.0,0.64,1.0,1.0,1.0,8.24,32.7426,37.6004,0.66,0.0103,0.0,0.0,0.0,60.0,0.0
+debug_50,M2_bm25_graph,BM25 + GraphSim,6,0.5,0.0,0.5,50,25,300,6.0,1.0,1.0,0.64,1.0,1.0,1.0,8.61,36.5805,51.2562,0.72,0.1792,12.0,0.4233,0.4067,71.78,0.22
+debug_50,M3_full_fusion,BM25 + TimeSim + GraphSim,6,0.4,0.3,0.3,50,25,300,6.0,1.0,1.0,0.64,1.0,1.0,1.0,8.66,34.5162,42.7422,0.72,0.1792,12.0,0.4667,0.4433,71.78,0.22
+paper_300,M0_bm25_only,BM25-only,6,1.0,0.0,0.0,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,35.7981,53.8814,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+paper_300,M1_bm25_time,BM25 + TimeSim,6,0.5,0.5,0.0,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,35.0469,50.0783,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+paper_300,M2_bm25_graph,BM25 + GraphSim,6,0.5,0.0,0.5,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,36.9464,51.6285,1.0,0.0,17.7533,0.0744,0.06,77.5567,0.1967
+paper_300,M3_full_fusion,BM25 + TimeSim + GraphSim,6,0.4,0.3,0.3,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,35.2373,46.4673,1.0,0.0,17.7533,0.0744,0.06,77.5567,0.1967
+paper_500,M0_bm25_only,BM25-only,6,1.0,0.0,0.0,500,100,3000,6.0,1.0,1.0,0.48,1.0,1.0,1.0,8.1393,34.0843,43.9075,0.502,0.0231,0.0,0.0,0.0,60.0,0.0
+paper_500,M1_bm25_time,BM25 + TimeSim,6,0.5,0.5,0.0,500,100,3000,6.0,1.0,1.0,0.48,1.0,1.0,1.0,8.1393,36.1369,55.9718,0.502,0.0231,0.0,0.0,0.0,60.0,0.0
+paper_500,M2_bm25_graph,BM25 + GraphSim,6,0.5,0.0,0.5,500,100,3000,6.0,1.0,1.0,0.48,1.0,1.0,1.0,8.365,37.9791,53.5549,0.524,0.1012,6.522,0.1757,0.152,66.224,0.298
+paper_500,M3_full_fusion,BM25 + TimeSim + GraphSim,6,0.4,0.3,0.3,500,100,3000,6.0,1.0,1.0,0.48,1.0,1.0,1.0,8.388,38.1668,55.0253,0.524,0.1012,6.522,0.1947,0.1657,66.224,0.298

@@ -1,0 +1,69 @@
+experiment:
+  name: phase2_topology_fusion_500w
+  mode: hybrid
+
+data:
+  metric_path: nezha_setup/processed/metrics.csv
+  log_path: nezha_setup/processed/logs.jsonl
+
+preprocessing:
+  window_size: 120
+  stride: 60
+  normalization: zscore
+
+detector:
+  name: isolation_forest
+  contamination: 0.05
+  threshold: 0.95
+  n_estimators: 100
+  random_state: 42
+  fit_strategy: warmup
+  warmup_windows: 1000
+  train_on_normal_only: false
+  min_fit_windows: 20
+
+retrieval:
+  backend: topology_aware_fusion
+  vector_db: topology_aware_fusion
+  lexical_backend: hybrid_bm25
+  embedding_model: hashing_bm25
+  embedding_dimensions: 512
+  graph_path: outputs\phase2\service_graph_undirected.json
+  top_k: 6
+  bm25_k: 60
+  search_k: 60
+  graph_max_distance: 2
+  graph_per_service_limit: 20
+  time_margin_minutes: 8
+  tau_seconds: 300
+  alpha: 0.35
+  beta: 0.25
+  gamma: 0.40
+
+llm_gate:
+  enabled: true
+  low_threshold: 0.80
+  high_threshold: 0.98
+  high_score_action: call_llm
+  max_llm_calls_per_minute: 20
+  max_total_calls: 120
+
+llm:
+  provider: mock
+  model: mock-judge
+  temperature: 0
+  max_output_tokens: 512
+  input_cost_per_1m_tokens: 0
+  output_cost_per_1m_tokens: 0
+  cost_pricing_source: mock_no_cost
+
+decision:
+  confidence_threshold: 0.80
+  require_evidence_for_true_alert: true
+  llm_budget_exhausted_action: manual_review
+
+evaluation:
+  output_dir: outputs\phase2\topology_fusion\results
+  audit_dir: outputs\phase2\topology_fusion\audit
+  max_windows: 500
+  max_llm_calls: 120

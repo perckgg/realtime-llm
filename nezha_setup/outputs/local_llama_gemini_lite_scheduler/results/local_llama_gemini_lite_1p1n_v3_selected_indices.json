@@ -1,0 +1,15 @@
+{
+  "seed": 11,
+  "selected": [
+    67476,
+    86495
+  ],
+  "selected_positives": [
+    67476
+  ],
+  "selected_negatives": [
+    86495
+  ],
+  "positive_count": 1,
+  "negative_count": 1
+}

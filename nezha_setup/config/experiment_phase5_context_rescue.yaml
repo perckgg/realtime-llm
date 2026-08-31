@@ -1,0 +1,68 @@
+experiment:
+  name: nezha_phase5_context_rescue
+  mode: hybrid
+
+data:
+  metric_path: nezha_setup/processed/metrics.csv
+  log_path: nezha_setup/processed/logs.jsonl
+
+preprocessing:
+  window_size: 120
+  stride: 60
+  normalization: zscore
+
+detector:
+  name: isolation_forest
+  contamination: 0.05
+  threshold: 0.95
+  n_estimators: 100
+  random_state: 42
+  fit_strategy: warmup
+  warmup_windows: 1000
+  train_on_normal_only: false
+  min_fit_windows: 20
+
+candidate_rescue:
+  enabled: true
+  min_detector_score: 0.0
+  min_context_score: 0.70
+  min_trace_duration_ms: 1.0
+  promoted_score: 0.85
+
+retrieval:
+  vector_db: hybrid_bm25
+  embedding_model: hashing_bm25
+  embedding_dimensions: 512
+  top_k: 6
+  search_k: 500
+  time_margin_minutes: 8
+  semantic_weight: 0.35
+  time_weight: 0.25
+  metadata_weight: 0.25
+  signal_weight: 0.15
+
+llm_gate:
+  enabled: true
+  low_threshold: 0.80
+  high_threshold: 0.98
+  high_score_action: call_llm
+  max_llm_calls_per_minute: 20
+  max_total_calls: 80
+
+llm:
+  provider: mock
+  model: mock-judge
+  temperature: 0
+  max_output_tokens: 512
+  input_cost_per_1m_tokens: 0
+  output_cost_per_1m_tokens: 0
+  cost_pricing_source: mock_no_cost
+
+decision:
+  confidence_threshold: 0.80
+
+evaluation:
+  output_dir: nezha_setup/outputs/phase5_context_rescue/results
+  audit_dir: nezha_setup/outputs/phase5_context_rescue/audit
+  max_windows: 300
+  max_llm_calls: 80

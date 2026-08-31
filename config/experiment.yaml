@@ -1,0 +1,44 @@
+experiment:
+  name: hybrid_monitoring_feasibility
+  mode: hybrid
+
+data:
+  metric_path: data/sample/metrics.csv
+  log_path: data/sample/logs.jsonl
+
+preprocessing:
+  window_size: 60
+  stride: 30
+  normalization: zscore
+
+detector:
+  name: feature_pressure
+  contamination: 0.05
+  threshold: 0.70
+
+retrieval:
+  vector_db: local
+  embedding_model: hashing
+  top_k: 5
+  time_margin_minutes: 5
+
+llm_gate:
+  enabled: true
+  low_threshold: 0.65
+  high_threshold: 0.90
+  high_score_action: direct_alert
+  max_llm_calls_per_minute: 20
+
+llm:
+  provider: mock
+  model: mock-judge
+  temperature: 0
+  max_output_tokens: 512
+
+decision:
+  confidence_threshold: 0.80
+  llm_budget_exhausted_action: manual_review
+
+evaluation:
+  output_dir: outputs/results
+  audit_dir: outputs/audit

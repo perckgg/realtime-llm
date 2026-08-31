@@ -1,0 +1,69 @@
+schedule:
+  name: online_boutique_fault_schedule_v1
+  namespace: online-boutique
+  warmup_seconds: 1200
+  default_duration_seconds: 300
+  default_cooldown_seconds: 300
+  randomize_order: false
+
+faults:
+  - fault_type: network_delay
+    chaos_kind: NetworkChaos
+    action: delay
+    target_service: cartservice
+    mode: one
+    severity: ERROR
+    duration_seconds: 300
+    cooldown_seconds: 300
+    expected_symptom: elevated cart latency and checkout latency
+    network:
+      latency: 500ms
+      jitter: 50ms
+      correlation: "25"
+
+  - fault_type: cpu_stress
+    chaos_kind: StressChaos
+    target_service: checkoutservice
+    mode: one
+    severity: ERROR
+    duration_seconds: 300
+    cooldown_seconds: 300
+    expected_symptom: checkout service CPU saturation and request latency increase
+    cpu:
+      workers: 2
+      load: 85
+
+  - fault_type: memory_stress
+    chaos_kind: StressChaos
+    target_service: recommendationservice
+    mode: one
+    severity: ERROR
+    duration_seconds: 300
+    cooldown_seconds: 300
+    expected_symptom: recommendation service memory pressure and restarts or slow responses
+    memory:
+      workers: 1
+      size: 256MB
+
+  - fault_type: pod_kill
+    chaos_kind: PodChaos
+    action: pod-kill
+    target_service: paymentservice
+    mode: one
+    severity: CRITICAL
+    duration_seconds: 60
+    cooldown_seconds: 300
+    expected_symptom: payment pod restart and transient checkout failure
+
+  - fault_type: http_error
+    chaos_kind: NetworkChaos
+    action: loss
+    target_service: adservice
+    mode: one
+    severity: ERROR
+    duration_seconds: 300
+    cooldown_seconds: 300
+    expected_symptom: frontend recommendation/ad request errors and increased error events
+    network:
+      loss: "35"
+      correlation: "25"

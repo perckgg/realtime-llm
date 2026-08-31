@@ -1,0 +1,1058 @@
+{
+  "nodes": [
+    {
+      "id": "adservice"
+    },
+    {
+      "id": "cartservice"
+    },
+    {
+      "id": "checkoutservice"
+    },
+    {
+      "id": "currencyservice"
+    },
+    {
+      "id": "emailservice"
+    },
+    {
+      "id": "frontend"
+    },
+    {
+      "id": "paymentservice"
+    },
+    {
+      "id": "productcatalogservice"
+    },
+    {
+      "id": "recommendationservice"
+    },
+    {
+      "id": "shippingservice"
+    },
+    {
+      "id": "ts-admin-basic-info-service"
+    },
+    {
+      "id": "ts-admin-order-service"
+    },
+    {
+      "id": "ts-admin-route-service"
+    },
+    {
+      "id": "ts-admin-travel-service"
+    },
+    {
+      "id": "ts-admin-user-service"
+    },
+    {
+      "id": "ts-assurance-service"
+    },
+    {
+      "id": "ts-auth-service"
+    },
+    {
+      "id": "ts-avatar-service"
+    },
+    {
+      "id": "ts-basic-service"
+    },
+    {
+      "id": "ts-cancel-service"
+    },
+    {
+      "id": "ts-config-service"
+    },
+    {
+      "id": "ts-consign-price-service"
+    },
+    {
+      "id": "ts-consign-service"
+    },
+    {
+      "id": "ts-contacts-service"
+    },
+    {
+      "id": "ts-delivery-service"
+    },
+    {
+      "id": "ts-execute-service"
+    },
+    {
+      "id": "ts-food-delivery-service"
+    },
+    {
+      "id": "ts-food-service"
+    },
+    {
+      "id": "ts-gateway-service"
+    },
+    {
+      "id": "ts-inside-payment-service"
+    },
+    {
+      "id": "ts-news-service"
+    },
+    {
+      "id": "ts-notification-service"
+    },
+    {
+      "id": "ts-order-other-service"
+    },
+    {
+      "id": "ts-order-service"
+    },
+    {
+      "id": "ts-payment-service"
+    },
+    {
+      "id": "ts-preserve-other-service"
+    },
+    {
+      "id": "ts-preserve-service"
+    },
+    {
+      "id": "ts-price-service"
+    },
+    {
+      "id": "ts-rebook-service"
+    },
+    {
+      "id": "ts-route-plan-service"
+    },
+    {
+      "id": "ts-route-service"
+    },
+    {
+      "id": "ts-seat-service"
+    },
+    {
+      "id": "ts-security-service"
+    },
+    {
+      "id": "ts-station-food-service"
+    },
+    {
+      "id": "ts-station-service"
+    },
+    {
+      "id": "ts-ticket-office-service"
+    },
+    {
+      "id": "ts-train-food-service"
+    },
+    {
+      "id": "ts-train-service"
+    },
+    {
+      "id": "ts-travel-plan-service"
+    },
+    {
+      "id": "ts-travel-service"
+    },
+    {
+      "id": "ts-travel2-service"
+    },
+    {
+      "id": "ts-ui-dashboard"
+    },
+    {
+      "id": "ts-user-service"
+    },
+    {
+      "id": "ts-verification-code-service"
+    },
+    {
+      "id": "ts-voucher-service"
+    },
+    {
+      "id": "ts-wait-order-service"
+    }
+  ],
+  "edges": [
+    {
+      "source_service": "frontend",
+      "target_service": "productcatalogservice",
+      "weight": 369044,
+      "trace_count": 74737,
+      "span_count": 369044,
+      "avg_duration_ms": 6.037,
+      "p95_duration_ms": 13.591,
+      "first_seen": "2022-08-22T03:50:19.150874Z",
+      "last_seen": "2022-08-23T17:00:28.107790Z",
+      "sample_operations": "hipstershop.ProductCatalogService/GetProduct;hipstershop.ProductCatalogService/ListProducts",
+      "source_files": "rca_data/2022-08-22/trace/04_53_trace.csv;rca_data/2022-08-23/trace/14_05_trace.csv;rca_data/2022-08-23/trace/13_27_trace.csv;rca_data/2022-08-23/trace/13_54_trace.csv;rca_data/2022-08-23/trace/13_20_trace.csv"
+    },
+    {
+      "source_service": "frontend",
+      "target_service": "currencyservice",
+      "weight": 234934,
+      "trace_count": 65046,
+      "span_count": 234934,
+      "avg_duration_ms": 3.085,
+      "p95_duration_ms": 2.616,
+      "first_seen": "2022-08-22T03:50:19.282834Z",
+      "last_seen": "2022-08-23T17:00:28.189294Z",
+      "sample_operations": "grpc.hipstershop.CurrencyService/Convert;grpc.hipstershop.CurrencyService/GetSupportedCurrencies",
+      "source_files": "rca_data/2022-08-22/trace/05_03_trace.csv;rca_data/2022-08-22/trace/04_10_trace.csv;rca_data/2022-08-23/trace/13_04_trace.csv;rca_data/2022-08-23/trace/16_14_trace.csv;rca_data/2022-08-22/trace/05_02_trace.csv"
+    },
+    {
+      "source_service": "frontend",
+      "target_service": "cartservice",
+      "weight": 71127,
+      "trace_count": 70838,
+      "span_count": 71127,
+      "avg_duration_ms": 3.538,
+      "p95_duration_ms": 2.899,
+      "first_seen": "2022-08-22T03:50:19.289106Z",
+      "last_seen": "2022-08-23T17:00:27.892547Z",
+      "sample_operations": "hipstershop.CartService/GetCart;hipstershop.CartService/AddItem",
+      "source_files": "rca_data/2022-08-23/trace/14_05_trace.csv;rca_data/2022-08-23/trace/16_41_trace.csv;rca_data/2022-08-22/trace/04_53_trace.csv;rca_data/2022-08-22/trace/07_17_trace.csv;rca_data/2022-08-23/trace/16_14_trace.csv"
+    },
+    {
+      "source_service": "frontend",
+      "target_service": "recommendationservice",
+      "weight": 56460,
+      "trace_count": 56226,
+      "span_count": 56460,
+      "avg_duration_ms": 60.043,
+      "p95_duration_ms": 139.888,
+      "first_seen": "2022-08-22T03:50:19.601901Z",
+      "last_seen": "2022-08-23T17:00:27.902169Z",
+      "sample_operations": "/hipstershop.RecommendationService/ListRecommendations",
+      "source_files": "rca_data/2022-08-23/trace/13_27_trace.csv;rca_data/2022-08-23/trace/14_05_trace.csv;rca_data/2022-08-22/trace/04_53_trace.csv;rca_data/2022-08-23/trace/14_22_trace.csv;rca_data/2022-08-23/trace/16_23_trace.csv"
+    },
+    {
+      "source_service": "recommendationservice",
+      "target_service": "productcatalogservice",
+      "weight": 56460,
+      "trace_count": 56226,
+      "span_count": 56460,
+      "avg_duration_ms": 11.897,
+      "p95_duration_ms": 26.137,
+      "first_seen": "2022-08-22T03:50:19.603490Z",
+      "last_seen": "2022-08-23T17:00:27.900851Z",
+      "sample_operations": "hipstershop.ProductCatalogService/ListProducts",
+      "source_files": "rca_data/2022-08-23/trace/13_27_trace.csv;rca_data/2022-08-23/trace/14_05_trace.csv;rca_data/2022-08-22/trace/04_53_trace.csv;rca_data/2022-08-23/trace/14_22_trace.csv;rca_data/2022-08-23/trace/16_23_trace.csv"
+    },
+    {
+      "source_service": "frontend",
+      "target_service": "adservice",
+      "weight": 45153,
+      "trace_count": 44943,
+      "span_count": 45153,
+      "avg_duration_ms": 29.857,
+      "p95_duration_ms": 44.693,
+      "first_seen": "2022-08-22T03:50:19.643000Z",
+      "last_seen": "2022-08-23T17:00:28.118764Z",
+      "sample_operations": "hipstershop.AdService/GetAds",
+      "source_files": "rca_data/2022-08-23/trace/16_23_trace.csv;rca_data/2022-08-23/trace/13_27_trace.csv;rca_data/2022-08-23/trace/13_20_trace.csv;rca_data/2022-08-23/trace/14_47_trace.csv;rca_data/2022-08-23/trace/15_04_trace.csv"
+    },
+    {
+      "source_service": "frontend",
+      "target_service": "shippingservice",
+      "weight": 17192,
+      "trace_count": 17115,
+      "span_count": 17192,
+      "avg_duration_ms": 6.478,
+      "p95_duration_ms": 0.838,
+      "first_seen": "2022-08-22T03:50:19.648493Z",
+      "last_seen": "2022-08-23T17:00:27.939813Z",
+      "sample_operations": "hipstershop.ShippingService/GetQuote",
+      "source_files": "rca_data/2022-08-22/trace/04_53_trace.csv;rca_data/2022-08-22/trace/06_02_trace.csv;rca_data/2022-08-22/trace/07_01_trace.csv;rca_data/2022-08-23/trace/16_14_trace.csv;rca_data/2022-08-23/trace/14_05_trace.csv"
+    },
+    {
+      "source_service": "ts-seat-service",
+      "target_service": "ts-config-service",
+      "weight": 10825,
+      "trace_count": 3972,
+      "span_count": 10825,
+      "avg_duration_ms": 3.048,
+      "p95_duration_ms": 4.894,
+      "first_seen": "2023-01-29T08:42:09.573000Z",
+      "last_seen": "2023-01-30T14:10:49.772593Z",
+      "sample_operations": "/api/v1/configservice/configs/{configName}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/13_32_trace.csv;rca_data/2023-01-29/trace/09_31_trace.csv"
+    },
+    {
+      "source_service": "checkoutservice",
+      "target_service": "productcatalogservice",
+      "weight": 7510,
+      "trace_count": 2963,
+      "span_count": 7510,
+      "avg_duration_ms": 5.273,
+      "p95_duration_ms": 11.093,
+      "first_seen": "2022-08-22T03:50:22.608459Z",
+      "last_seen": "2022-08-23T17:00:23.419033Z",
+      "sample_operations": "hipstershop.ProductCatalogService/GetProduct",
+      "source_files": "rca_data/2022-08-22/trace/05_02_trace.csv;rca_data/2022-08-22/trace/05_03_trace.csv;rca_data/2022-08-23/trace/13_04_trace.csv;rca_data/2022-08-23/trace/13_12_trace.csv;rca_data/2022-08-22/trace/05_11_trace.csv"
+    },
+    {
+      "source_service": "ts-seat-service",
+      "target_service": "ts-order-service",
+      "weight": 7478,
+      "trace_count": 2114,
+      "span_count": 7478,
+      "avg_duration_ms": 11.296,
+      "p95_duration_ms": 23.641,
+      "first_seen": "2023-01-29T08:42:10.330000Z",
+      "last_seen": "2023-01-30T14:10:49.534014Z",
+      "sample_operations": "/api/v1/orderservice/order/tickets",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;rca_data/2023-01-29/trace/13_32_trace.csv;rca_data/2023-01-29/trace/09_31_trace.csv;rca_data/2023-01-29/trace/14_25_trace.csv"
+    },
+    {
+      "source_service": "ts-travel-service",
+      "target_service": "ts-seat-service",
+      "weight": 7022,
+      "trace_count": 2114,
+      "span_count": 7022,
+      "avg_duration_ms": 48.904,
+      "p95_duration_ms": 233.683,
+      "first_seen": "2023-01-29T08:42:10.319000Z",
+      "last_seen": "2023-01-30T14:10:49.556399Z",
+      "sample_operations": "/api/v1/seatservice/seats/left_tickets",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;rca_data/2023-01-29/trace/13_32_trace.csv;rca_data/2023-01-29/trace/09_31_trace.csv;construct_data/2023-01-29/trace/08_50_trace.csv"
+    },
+    {
+      "source_service": "ts-basic-service",
+      "target_service": "ts-station-service",
+      "weight": 6721,
+      "trace_count": 4204,
+      "span_count": 6721,
+      "avg_duration_ms": 4.027,
+      "p95_duration_ms": 8.508,
+      "first_seen": "2023-01-29T08:42:09.499000Z",
+      "last_seen": "2023-01-30T14:10:49.699501Z",
+      "sample_operations": "/api/v1/stationservice/stations/idlist;/api/v1/stationservice/stations/id/{stationNameForId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_32_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv"
+    },
+    {
+      "source_service": "checkoutservice",
+      "target_service": "cartservice",
+      "weight": 5862,
+      "trace_count": 2995,
+      "span_count": 5862,
+      "avg_duration_ms": 3.083,
+      "p95_duration_ms": 2.203,
+      "first_seen": "2022-08-22T03:50:22.600088Z",
+      "last_seen": "2022-08-23T17:00:23.494732Z",
+      "sample_operations": "hipstershop.CartService/GetCart;hipstershop.CartService/EmptyCart",
+      "source_files": "rca_data/2022-08-22/trace/04_46_trace.csv;rca_data/2022-08-22/trace/04_20_trace.csv;rca_data/2022-08-23/trace/14_22_trace.csv;rca_data/2022-08-23/trace/14_55_trace.csv;rca_data/2022-08-23/trace/15_29_trace.csv"
+    },
+    {
+      "source_service": "checkoutservice",
+      "target_service": "shippingservice",
+      "weight": 5828,
+      "trace_count": 2961,
+      "span_count": 5828,
+      "avg_duration_ms": 3.564,
+      "p95_duration_ms": 0.627,
+      "first_seen": "2022-08-22T03:50:22.707603Z",
+      "last_seen": "2022-08-23T17:00:23.485132Z",
+      "sample_operations": "hipstershop.ShippingService/GetQuote;hipstershop.ShippingService/ShipOrder",
+      "source_files": "rca_data/2022-08-22/trace/04_46_trace.csv;rca_data/2022-08-22/trace/04_20_trace.csv;rca_data/2022-08-23/trace/14_22_trace.csv;rca_data/2022-08-23/trace/14_55_trace.csv;rca_data/2022-08-23/trace/15_29_trace.csv"
+    },
+    {
+      "source_service": "ts-basic-service",
+      "target_service": "ts-route-service",
+      "weight": 4981,
+      "trace_count": 4117,
+      "span_count": 4981,
+      "avg_duration_ms": 17.691,
+      "p95_duration_ms": 20.759,
+      "first_seen": "2023-01-29T08:42:09.519000Z",
+      "last_seen": "2023-01-30T14:10:49.723485Z",
+      "sample_operations": "/api/v1/routeservice/routes/byIds/;/api/v1/routeservice/routes/{routeId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-30/trace/12_52_trace.csv"
+    },
+    {
+      "source_service": "ts-basic-service",
+      "target_service": "ts-train-service",
+      "weight": 4981,
+      "trace_count": 4117,
+      "span_count": 4981,
+      "avg_duration_ms": 5.334,
+      "p95_duration_ms": 7.532,
+      "first_seen": "2023-01-29T08:42:09.508000Z",
+      "last_seen": "2023-01-30T14:10:49.704208Z",
+      "sample_operations": "/api/v1/trainservice/trains/byNames;/api/v1/trainservice/trains/byName/{name}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-30/trace/12_52_trace.csv"
+    },
+    {
+      "source_service": "ts-basic-service",
+      "target_service": "ts-price-service",
+      "weight": 4968,
+      "trace_count": 4104,
+      "span_count": 4968,
+      "avg_duration_ms": 6.574,
+      "p95_duration_ms": 8.035,
+      "first_seen": "2023-01-29T08:42:09.542000Z",
+      "last_seen": "2023-01-30T14:10:49.730145Z",
+      "sample_operations": "/api/v1/priceservice/prices/byRouteIdsAndTrainTypes;/api/v1/priceservice/prices/{routeId}/{trainType}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-30/trace/12_52_trace.csv"
+    },
+    {
+      "source_service": "ts-seat-service",
+      "target_service": "ts-order-other-service",
+      "weight": 4133,
+      "trace_count": 1875,
+      "span_count": 4133,
+      "avg_duration_ms": 4.649,
+      "p95_duration_ms": 12.669,
+      "first_seen": "2023-01-29T08:42:09.563000Z",
+      "last_seen": "2023-01-30T14:10:49.767769Z",
+      "sample_operations": "/api/v1/orderOtherService/orderOther/tickets",
+      "source_files": "rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-30/trace/12_52_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    },
+    {
+      "source_service": "ts-travel2-service",
+      "target_service": "ts-seat-service",
+      "weight": 3820,
+      "trace_count": 1875,
+      "span_count": 3820,
+      "avg_duration_ms": 34.341,
+      "p95_duration_ms": 96.619,
+      "first_seen": "2023-01-29T08:42:09.557000Z",
+      "last_seen": "2023-01-30T14:10:49.774248Z",
+      "sample_operations": "/api/v1/seatservice/seats/left_tickets",
+      "source_files": "rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-30/trace/12_52_trace.csv;rca_data/2023-01-29/trace/09_43_trace.csv"
+    },
+    {
+      "source_service": "frontend",
+      "target_service": "checkoutservice",
+      "weight": 3021,
+      "trace_count": 2995,
+      "span_count": 3021,
+      "avg_duration_ms": 448.741,
+      "p95_duration_ms": 1248.352,
+      "first_seen": "2022-08-22T03:50:22.593818Z",
+      "last_seen": "2022-08-23T17:00:23.504835Z",
+      "sample_operations": "hipstershop.CheckoutService/PlaceOrder",
+      "source_files": "rca_data/2022-08-22/trace/04_46_trace.csv;rca_data/2022-08-22/trace/04_20_trace.csv;rca_data/2022-08-23/trace/14_22_trace.csv;rca_data/2022-08-23/trace/14_55_trace.csv;rca_data/2022-08-23/trace/15_29_trace.csv"
+    },
+    {
+      "source_service": "checkoutservice",
+      "target_service": "paymentservice",
+      "weight": 2898,
+      "trace_count": 2872,
+      "span_count": 2898,
+      "avg_duration_ms": 0.331,
+      "p95_duration_ms": 0.427,
+      "first_seen": "2022-08-22T03:50:22.783840Z",
+      "last_seen": "2022-08-23T17:00:23.445924Z",
+      "sample_operations": "grpc.hipstershop.PaymentService/Charge",
+      "source_files": "rca_data/2022-08-22/trace/04_46_trace.csv;rca_data/2022-08-22/trace/04_20_trace.csv;rca_data/2022-08-23/trace/14_22_trace.csv;rca_data/2022-08-23/trace/14_55_trace.csv;rca_data/2022-08-23/trace/15_29_trace.csv"
+    },
+    {
+      "source_service": "checkoutservice",
+      "target_service": "emailservice",
+      "weight": 2841,
+      "trace_count": 2815,
+      "span_count": 2841,
+      "avg_duration_ms": 13.217,
+      "p95_duration_ms": 0.715,
+      "first_seen": "2022-08-22T03:50:22.809143Z",
+      "last_seen": "2022-08-23T17:00:23.501977Z",
+      "sample_operations": "/hipstershop.EmailService/SendOrderConfirmation",
+      "source_files": "rca_data/2022-08-22/trace/04_46_trace.csv;rca_data/2022-08-22/trace/04_20_trace.csv;rca_data/2022-08-23/trace/14_22_trace.csv;rca_data/2022-08-23/trace/14_55_trace.csv;rca_data/2022-08-23/trace/15_29_trace.csv"
+    },
+    {
+      "source_service": "ts-travel-service",
+      "target_service": "ts-basic-service",
+      "weight": 2256,
+      "trace_count": 2218,
+      "span_count": 2256,
+      "avg_duration_ms": 157.005,
+      "p95_duration_ms": 499.696,
+      "first_seen": "2023-01-29T08:42:10.020000Z",
+      "last_seen": "2023-01-30T14:10:49.315013Z",
+      "sample_operations": "/api/v1/basicservice/basic/travels;/api/v1/basicservice/basic/travel",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;construct_data/2023-01-29/trace/08_50_trace.csv;rca_data/2023-01-29/trace/08_45_trace.csv;rca_data/2023-01-29/trace/13_32_trace.csv"
+    },
+    {
+      "source_service": "ts-travel2-service",
+      "target_service": "ts-basic-service",
+      "weight": 2024,
+      "trace_count": 1986,
+      "span_count": 2024,
+      "avg_duration_ms": 161.669,
+      "p95_duration_ms": 501.215,
+      "first_seen": "2023-01-29T08:42:09.494000Z",
+      "last_seen": "2023-01-30T14:10:49.737314Z",
+      "sample_operations": "/api/v1/basicservice/basic/travels;/api/v1/basicservice/basic/travel",
+      "source_files": "rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-30/trace/12_52_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-travel-service",
+      "weight": 1865,
+      "trace_count": 1837,
+      "span_count": 1865,
+      "avg_duration_ms": 414.613,
+      "p95_duration_ms": 1191.562,
+      "first_seen": "2023-01-29T08:42:09.934000Z",
+      "last_seen": "2023-01-30T14:10:49.561728Z",
+      "sample_operations": "/api/v1/travelservice/trips/left",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;construct_data/2023-01-29/trace/08_50_trace.csv;rca_data/2023-01-29/trace/09_31_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-travel2-service",
+      "weight": 1751,
+      "trace_count": 1717,
+      "span_count": 1751,
+      "avg_duration_ms": 303.448,
+      "p95_duration_ms": 1052.811,
+      "first_seen": "2023-01-29T08:42:09.484000Z",
+      "last_seen": "2023-01-30T14:10:49.776264Z",
+      "sample_operations": "/api/v1/travel2service/trips/left",
+      "source_files": "rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-30/trace/12_52_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv"
+    },
+    {
+      "source_service": "ts-security-service",
+      "target_service": "ts-order-other-service",
+      "weight": 922,
+      "trace_count": 908,
+      "span_count": 922,
+      "avg_duration_ms": 11.963,
+      "p95_duration_ms": 21.174,
+      "first_seen": "2023-01-29T08:42:09.717000Z",
+      "last_seen": "2023-01-30T14:10:28.074980Z",
+      "sample_operations": "/api/v1/orderOtherService/orderOther/security/{checkDate}/{accountId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/10_56_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_32_trace.csv"
+    },
+    {
+      "source_service": "ts-security-service",
+      "target_service": "ts-order-service",
+      "weight": 922,
+      "trace_count": 908,
+      "span_count": 922,
+      "avg_duration_ms": 43.917,
+      "p95_duration_ms": 232.691,
+      "first_seen": "2023-01-29T08:42:09.704000Z",
+      "last_seen": "2023-01-30T14:10:28.060001Z",
+      "sample_operations": "/api/v1/orderservice/order/security/{checkDate}/{accountId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/10_56_trace.csv;rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_32_trace.csv"
+    },
+    {
+      "source_service": "ts-execute-service",
+      "target_service": "ts-order-service",
+      "weight": 905,
+      "trace_count": 691,
+      "span_count": 905,
+      "avg_duration_ms": 9.29,
+      "p95_duration_ms": 24.009,
+      "first_seen": "2023-01-29T08:42:28.795000Z",
+      "last_seen": "2023-01-30T14:10:30.695827Z",
+      "sample_operations": "/api/v1/orderservice/order/{orderId};/api/v1/orderservice/order/status/{orderId}/{status}",
+      "source_files": "rca_data/2023-01-29/trace/11_05_trace.csv;rca_data/2023-01-29/trace/14_23_trace.csv;rca_data/2023-01-29/trace/14_50_trace.csv;rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_13_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-execute-service",
+      "weight": 703,
+      "trace_count": 694,
+      "span_count": 703,
+      "avg_duration_ms": 29.114,
+      "p95_duration_ms": 69.481,
+      "first_seen": "2023-01-29T08:42:28.787000Z",
+      "last_seen": "2023-01-30T14:10:30.713988Z",
+      "sample_operations": "/api/v1/executeservice/execute/execute/{orderId};/api/v1/executeservice/execute/collected/{orderId}",
+      "source_files": "rca_data/2023-01-29/trace/11_04_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv;rca_data/2023-01-29/trace/14_23_trace.csv;rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/11_15_trace.csv"
+    },
+    {
+      "source_service": "ts-food-service",
+      "target_service": "ts-delivery-service",
+      "weight": 620,
+      "trace_count": 306,
+      "span_count": 620,
+      "avg_duration_ms": 5.797,
+      "p95_duration_ms": 19.155,
+      "first_seen": "2023-01-29T08:43:08.563000Z",
+      "last_seen": "2023-01-30T14:10:29.864176Z",
+      "sample_operations": "food_delivery process",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_44_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/08_44_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-auth-service",
+      "weight": 615,
+      "trace_count": 605,
+      "span_count": 615,
+      "avg_duration_ms": 268.352,
+      "p95_duration_ms": 418.699,
+      "first_seen": "2023-01-29T08:42:10.932000Z",
+      "last_seen": "2023-01-30T14:10:36.336082Z",
+      "sample_operations": "/api/v1/users/login",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/08_54_trace.csv;rca_data/2023-01-29/trace/10_00_trace.csv;rca_data/2023-01-29/trace/09_44_trace.csv;rca_data/2023-01-29/trace/10_46_trace.csv"
+    },
+    {
+      "source_service": "ts-auth-service",
+      "target_service": "ts-verification-code-service",
+      "weight": 605,
+      "trace_count": 595,
+      "span_count": 605,
+      "avg_duration_ms": 5.564,
+      "p95_duration_ms": 7.89,
+      "first_seen": "2023-01-29T08:42:10.938000Z",
+      "last_seen": "2023-01-30T14:10:36.188087Z",
+      "sample_operations": "/api/v1/verifycode/verify/{verifyCode}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/08_54_trace.csv;rca_data/2023-01-29/trace/10_00_trace.csv;rca_data/2023-01-29/trace/10_46_trace.csv;rca_data/2023-01-30/trace/11_51_trace.csv"
+    },
+    {
+      "source_service": "ts-inside-payment-service",
+      "target_service": "ts-order-service",
+      "weight": 541,
+      "trace_count": 302,
+      "span_count": 541,
+      "avg_duration_ms": 11.988,
+      "p95_duration_ms": 33.591,
+      "first_seen": "2023-01-29T08:42:43.667000Z",
+      "last_seen": "2023-01-30T14:09:54.548194Z",
+      "sample_operations": "/api/v1/orderservice/order/{orderId};/api/v1/orderservice/order/status/{orderId}/{status}",
+      "source_files": "rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/14_23_trace.csv;rca_data/2023-01-29/trace/10_13_trace.csv;rca_data/2023-01-29/trace/10_14_trace.csv;rca_data/2023-01-29/trace/14_49_trace.csv"
+    },
+    {
+      "source_service": "ts-cancel-service",
+      "target_service": "ts-order-service",
+      "weight": 539,
+      "trace_count": 322,
+      "span_count": 539,
+      "avg_duration_ms": 10.517,
+      "p95_duration_ms": 26.417,
+      "first_seen": "2023-01-29T08:43:15.115000Z",
+      "last_seen": "2023-01-30T14:10:44.857014Z",
+      "sample_operations": "/api/v1/orderservice/order/{orderId};/api/v1/orderservice/order",
+      "source_files": "rca_data/2023-01-29/trace/08_45_trace.csv;rca_data/2023-01-30/trace/12_06_trace.csv;rca_data/2023-01-30/trace/12_53_trace.csv;rca_data/2023-01-30/trace/11_59_trace.csv;rca_data/2023-01-29/trace/10_57_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-inside-payment-service",
+      "weight": 535,
+      "trace_count": 527,
+      "span_count": 535,
+      "avg_duration_ms": 139.824,
+      "p95_duration_ms": 387.536,
+      "first_seen": "2023-01-29T08:42:24.379000Z",
+      "last_seen": "2023-01-30T14:09:54.553279Z",
+      "sample_operations": "/api/v1/inside_pay_service/inside_payment",
+      "source_files": "rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/09_25_trace.csv;rca_data/2023-01-29/trace/09_27_trace.csv;rca_data/2023-01-29/trace/09_32_trace.csv;rca_data/2023-01-29/trace/10_00_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-preserve-service",
+      "weight": 533,
+      "trace_count": 523,
+      "span_count": 533,
+      "avg_duration_ms": 993.643,
+      "p95_duration_ms": 3141.271,
+      "first_seen": "2023-01-29T08:42:51.370000Z",
+      "last_seen": "2023-01-30T14:10:29.867152Z",
+      "sample_operations": "/api/v1/preserveservice/preserve",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-29/trace/11_31_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-security-service",
+      "weight": 531,
+      "trace_count": 521,
+      "span_count": 531,
+      "avg_duration_ms": 77.694,
+      "p95_duration_ms": 310.855,
+      "first_seen": "2023-01-29T08:42:51.380000Z",
+      "last_seen": "2023-01-30T14:10:28.080694Z",
+      "sample_operations": "/api/v1/securityservice/securityConfigs/{accountId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-29/trace/11_31_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-contacts-service",
+      "weight": 523,
+      "trace_count": 513,
+      "span_count": 523,
+      "avg_duration_ms": 15.056,
+      "p95_duration_ms": 18.549,
+      "first_seen": "2023-01-29T08:42:51.415000Z",
+      "last_seen": "2023-01-30T14:10:29.325607Z",
+      "sample_operations": "/api/v1/contactservice/contacts/{id}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-29/trace/11_31_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-travel-service",
+      "weight": 502,
+      "trace_count": 492,
+      "span_count": 502,
+      "avg_duration_ms": 441.771,
+      "p95_duration_ms": 1337.372,
+      "first_seen": "2023-01-29T08:42:51.433000Z",
+      "last_seen": "2023-01-30T14:10:29.738842Z",
+      "sample_operations": "/api/v1/travelservice/trip_detail",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;rca_data/2023-01-30/trace/13_01_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-food-service",
+      "weight": 479,
+      "trace_count": 467,
+      "span_count": 479,
+      "avg_duration_ms": 146.298,
+      "p95_duration_ms": 409.254,
+      "first_seen": "2023-01-29T08:42:22.326000Z",
+      "last_seen": "2023-01-30T14:10:26.991600Z",
+      "sample_operations": "/api/v1/foodservice/foods/{date}/{startStation}/{endStation}/{tripId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    },
+    {
+      "source_service": "ts-food-service",
+      "target_service": "ts-train-food-service",
+      "weight": 466,
+      "trace_count": 454,
+      "span_count": 466,
+      "avg_duration_ms": 10.3,
+      "p95_duration_ms": 19.106,
+      "first_seen": "2023-01-29T08:42:22.335000Z",
+      "last_seen": "2023-01-30T14:10:26.939465Z",
+      "sample_operations": "/api/v1/trainfoodservice/trainfoods/{tripId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-basic-service",
+      "weight": 465,
+      "trace_count": 461,
+      "span_count": 465,
+      "avg_duration_ms": 75.054,
+      "p95_duration_ms": 297.043,
+      "first_seen": "2023-01-29T08:42:51.620000Z",
+      "last_seen": "2023-01-30T14:10:29.775938Z",
+      "sample_operations": "/api/v1/basicservice/basic/travel",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;rca_data/2023-01-30/trace/13_01_trace.csv"
+    },
+    {
+      "source_service": "ts-food-service",
+      "target_service": "ts-travel-service",
+      "weight": 456,
+      "trace_count": 444,
+      "span_count": 456,
+      "avg_duration_ms": 64.774,
+      "p95_duration_ms": 68.691,
+      "first_seen": "2023-01-29T08:42:22.358000Z",
+      "last_seen": "2023-01-30T14:10:26.968139Z",
+      "sample_operations": "/api/v1/travelservice/routes/{tripId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-seat-service",
+      "weight": 456,
+      "trace_count": 452,
+      "span_count": 456,
+      "avg_duration_ms": 134.593,
+      "p95_duration_ms": 410.832,
+      "first_seen": "2023-01-29T08:42:51.737000Z",
+      "last_seen": "2023-01-30T14:10:29.814831Z",
+      "sample_operations": "/api/v1/seatservice/seats",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;rca_data/2023-01-30/trace/13_01_trace.csv"
+    },
+    {
+      "source_service": "ts-travel-service",
+      "target_service": "ts-route-service",
+      "weight": 456,
+      "trace_count": 444,
+      "span_count": 456,
+      "avg_duration_ms": 13.819,
+      "p95_duration_ms": 14.13,
+      "first_seen": "2023-01-29T08:42:22.366000Z",
+      "last_seen": "2023-01-30T14:10:26.963971Z",
+      "sample_operations": "/api/v1/routeservice/routes/{routeId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv"
+    },
+    {
+      "source_service": "ts-food-service",
+      "target_service": "ts-station-food-service",
+      "weight": 452,
+      "trace_count": 440,
+      "span_count": 452,
+      "avg_duration_ms": 17.81,
+      "p95_duration_ms": 25.372,
+      "first_seen": "2023-01-29T08:42:22.392000Z",
+      "last_seen": "2023-01-30T14:10:26.989171Z",
+      "sample_operations": "/api/v1/stationfoodservice/stationfoodstores",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-order-service",
+      "weight": 446,
+      "trace_count": 443,
+      "span_count": 446,
+      "avg_duration_ms": 44.998,
+      "p95_duration_ms": 217.025,
+      "first_seen": "2023-01-29T08:42:51.819000Z",
+      "last_seen": "2023-01-30T14:10:29.839896Z",
+      "sample_operations": "/api/v1/orderservice/order",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;rca_data/2023-01-29/trace/08_45_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-user-service",
+      "weight": 433,
+      "trace_count": 430,
+      "span_count": 433,
+      "avg_duration_ms": 9.283,
+      "p95_duration_ms": 14.568,
+      "first_seen": "2023-01-29T08:42:51.836000Z",
+      "last_seen": "2023-01-30T14:10:29.865628Z",
+      "sample_operations": "/api/v1/userservice/users/id/{userId}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-30/trace/12_29_trace.csv;rca_data/2023-01-29/trace/08_45_trace.csv"
+    },
+    {
+      "source_service": "ts-execute-service",
+      "target_service": "ts-order-other-service",
+      "weight": 414,
+      "trace_count": 268,
+      "span_count": 414,
+      "avg_duration_ms": 5.351,
+      "p95_duration_ms": 7.501,
+      "first_seen": "2023-01-29T08:42:41.816000Z",
+      "last_seen": "2023-01-30T14:10:30.712816Z",
+      "sample_operations": "/api/v1/orderOtherService/orderOther/{orderId};/api/v1/orderOtherService/orderOther/status/{orderId}/{status}",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_56_trace.csv;rca_data/2023-01-29/trace/09_05_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/08_44_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-preserve-other-service",
+      "weight": 400,
+      "trace_count": 396,
+      "span_count": 400,
+      "avg_duration_ms": 756.642,
+      "p95_duration_ms": 2736.226,
+      "first_seen": "2023-01-29T08:42:09.685000Z",
+      "last_seen": "2023-01-30T14:10:28.494909Z",
+      "sample_operations": "/api/v1/preserveotherservice/preserveOther",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_56_trace.csv"
+    },
+    {
+      "source_service": "ts-inside-payment-service",
+      "target_service": "ts-payment-service",
+      "weight": 399,
+      "trace_count": 391,
+      "span_count": 399,
+      "avg_duration_ms": 29.665,
+      "p95_duration_ms": 45.737,
+      "first_seen": "2023-01-29T08:42:24.437000Z",
+      "last_seen": "2023-01-30T14:09:54.527017Z",
+      "sample_operations": "/api/v1/paymentservice/payment",
+      "source_files": "rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-29/trace/09_04_trace.csv;rca_data/2023-01-29/trace/09_25_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-security-service",
+      "weight": 398,
+      "trace_count": 394,
+      "span_count": 398,
+      "avg_duration_ms": 69.712,
+      "p95_duration_ms": 240.603,
+      "first_seen": "2023-01-29T08:42:09.695000Z",
+      "last_seen": "2023-01-30T14:10:27.111778Z",
+      "sample_operations": "/api/v1/securityservice/securityConfigs/{accountId}",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_56_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-contacts-service",
+      "weight": 396,
+      "trace_count": 392,
+      "span_count": 396,
+      "avg_duration_ms": 17.396,
+      "p95_duration_ms": 17.994,
+      "first_seen": "2023-01-29T08:42:09.733000Z",
+      "last_seen": "2023-01-30T14:10:28.141896Z",
+      "sample_operations": "/api/v1/contactservice/contacts/{id}",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_56_trace.csv"
+    },
+    {
+      "source_service": "ts-inside-payment-service",
+      "target_service": "ts-order-other-service",
+      "weight": 381,
+      "trace_count": 213,
+      "span_count": 381,
+      "avg_duration_ms": 5.908,
+      "p95_duration_ms": 7.89,
+      "first_seen": "2023-01-29T08:42:24.395000Z",
+      "last_seen": "2023-01-30T14:09:48.271977Z",
+      "sample_operations": "/api/v1/orderOtherService/orderOther/{orderId};/api/v1/orderOtherService/orderOther/status/{orderId}/{status}",
+      "source_files": "rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-29/trace/09_04_trace.csv;rca_data/2023-01-29/trace/15_44_trace.csv;rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-travel2-service",
+      "weight": 363,
+      "trace_count": 359,
+      "span_count": 363,
+      "avg_duration_ms": 306.701,
+      "p95_duration_ms": 1134.207,
+      "first_seen": "2023-01-29T08:42:09.752000Z",
+      "last_seen": "2023-01-30T14:10:28.277804Z",
+      "sample_operations": "/api/v1/travel2service/trip_detail",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_56_trace.csv"
+    },
+    {
+      "source_service": "ts-cancel-service",
+      "target_service": "ts-inside-payment-service",
+      "weight": 328,
+      "trace_count": 322,
+      "span_count": 328,
+      "avg_duration_ms": 67.097,
+      "p95_duration_ms": 250.594,
+      "first_seen": "2023-01-29T08:43:15.192000Z",
+      "last_seen": "2023-01-30T14:10:44.941439Z",
+      "sample_operations": "/api/v1/inside_pay_service/inside_payment/drawback/{userId}/{money}",
+      "source_files": "rca_data/2023-01-29/trace/08_45_trace.csv;rca_data/2023-01-30/trace/12_06_trace.csv;rca_data/2023-01-30/trace/13_08_trace.csv;rca_data/2023-01-29/trace/11_19_trace.csv;rca_data/2023-01-30/trace/11_59_trace.csv"
+    },
+    {
+      "source_service": "ts-gateway-service",
+      "target_service": "ts-cancel-service",
+      "weight": 328,
+      "trace_count": 322,
+      "span_count": 328,
+      "avg_duration_ms": 165.981,
+      "p95_duration_ms": 431.555,
+      "first_seen": "2023-01-29T08:43:15.093000Z",
+      "last_seen": "2023-01-30T14:10:44.961750Z",
+      "sample_operations": "/api/v1/cancelservice/cancel/{orderId}/{loginId}",
+      "source_files": "rca_data/2023-01-29/trace/08_45_trace.csv;rca_data/2023-01-30/trace/12_06_trace.csv;rca_data/2023-01-30/trace/13_08_trace.csv;rca_data/2023-01-29/trace/11_19_trace.csv;rca_data/2023-01-30/trace/11_59_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-basic-service",
+      "weight": 323,
+      "trace_count": 319,
+      "span_count": 323,
+      "avg_duration_ms": 77.647,
+      "p95_duration_ms": 317.367,
+      "first_seen": "2023-01-29T08:42:10.076000Z",
+      "last_seen": "2023-01-30T14:10:28.313329Z",
+      "sample_operations": "/api/v1/basicservice/basic/travel",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-order-other-service",
+      "weight": 313,
+      "trace_count": 309,
+      "span_count": 313,
+      "avg_duration_ms": 15.935,
+      "p95_duration_ms": 25.051,
+      "first_seen": "2023-01-29T08:42:10.152000Z",
+      "last_seen": "2023-01-30T14:10:28.464338Z",
+      "sample_operations": "/api/v1/orderOtherService/orderOther",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-seat-service",
+      "weight": 313,
+      "trace_count": 309,
+      "span_count": 313,
+      "avg_duration_ms": 51.834,
+      "p95_duration_ms": 139.666,
+      "first_seen": "2023-01-29T08:42:10.131000Z",
+      "last_seen": "2023-01-30T14:10:28.443969Z",
+      "sample_operations": "/api/v1/seatservice/seats",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-user-service",
+      "weight": 272,
+      "trace_count": 271,
+      "span_count": 272,
+      "avg_duration_ms": 8.89,
+      "p95_duration_ms": 17.21,
+      "first_seen": "2023-01-29T08:42:10.195000Z",
+      "last_seen": "2023-01-30T14:10:28.493100Z",
+      "sample_operations": "/api/v1/userservice/users/id/{userId}",
+      "source_files": "rca_data/2023-01-29/trace/09_03_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/09_42_trace.csv;rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    },
+    {
+      "source_service": "ts-cancel-service",
+      "target_service": "ts-order-other-service",
+      "weight": 234,
+      "trace_count": 116,
+      "span_count": 234,
+      "avg_duration_ms": 6.06,
+      "p95_duration_ms": 8.023,
+      "first_seen": "2023-01-29T08:43:32.785000Z",
+      "last_seen": "2023-01-30T14:10:39.735447Z",
+      "sample_operations": "/api/v1/orderOtherService/orderOther/{orderId};/api/v1/orderOtherService/orderOther",
+      "source_files": "rca_data/2023-01-30/trace/13_08_trace.csv;rca_data/2023-01-29/trace/09_59_trace.csv;rca_data/2023-01-30/trace/13_07_trace.csv;rca_data/2023-01-30/trace/13_52_trace.csv;rca_data/2023-01-30/trace/14_10_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-assurance-service",
+      "weight": 216,
+      "trace_count": 214,
+      "span_count": 216,
+      "avg_duration_ms": 18.253,
+      "p95_duration_ms": 32.847,
+      "first_seen": "2023-01-29T08:42:52.498000Z",
+      "last_seen": "2023-01-30T14:09:47.328436Z",
+      "sample_operations": "/api/v1/assuranceservice/assurances/{typeIndex}/{orderId}",
+      "source_files": "rca_data/2023-01-29/trace/08_44_trace.csv;rca_data/2023-01-29/trace/14_25_trace.csv;rca_data/2023-01-29/trace/08_45_trace.csv;rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/09_14_trace.csv"
+    },
+    {
+      "source_service": "ts-cancel-service",
+      "target_service": "ts-user-service",
+      "weight": 211,
+      "trace_count": 206,
+      "span_count": 211,
+      "avg_duration_ms": 9.646,
+      "p95_duration_ms": 16.639,
+      "first_seen": "2023-01-29T08:43:15.223000Z",
+      "last_seen": "2023-01-30T14:10:44.956782Z",
+      "sample_operations": "/api/v1/userservice/users/id/{userId}",
+      "source_files": "rca_data/2023-01-30/trace/12_53_trace.csv;rca_data/2023-01-29/trace/08_45_trace.csv;rca_data/2023-01-29/trace/10_57_trace.csv;rca_data/2023-01-29/trace/14_23_trace.csv;rca_data/2023-01-30/trace/11_59_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-service",
+      "target_service": "ts-food-service",
+      "weight": 184,
+      "trace_count": 181,
+      "span_count": 184,
+      "avg_duration_ms": 26.892,
+      "p95_duration_ms": 47.609,
+      "first_seen": "2023-01-29T08:44:07.043000Z",
+      "last_seen": "2023-01-30T14:10:29.857931Z",
+      "sample_operations": "/api/v1/foodservice/orders",
+      "source_files": "rca_data/2023-01-29/trace/08_52_trace.csv;rca_data/2023-01-29/trace/10_52_trace.csv;rca_data/2023-01-29/trace/11_21_trace.csv;rca_data/2023-01-29/trace/09_44_trace.csv;rca_data/2023-01-29/trace/09_50_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-assurance-service",
+      "weight": 144,
+      "trace_count": 143,
+      "span_count": 144,
+      "avg_duration_ms": 18.36,
+      "p95_duration_ms": 33.024,
+      "first_seen": "2023-01-29T08:42:10.169000Z",
+      "last_seen": "2023-01-30T14:10:28.483579Z",
+      "sample_operations": "/api/v1/assuranceservice/assurances/{typeIndex}/{orderId}",
+      "source_files": "rca_data/2023-01-29/trace/10_28_trace.csv;rca_data/2023-01-30/trace/12_06_trace.csv;rca_data/2023-01-30/trace/12_17_trace.csv;rca_data/2023-01-29/trace/08_44_trace.csv;rca_data/2023-01-29/trace/09_00_trace.csv"
+    },
+    {
+      "source_service": "ts-preserve-other-service",
+      "target_service": "ts-food-service",
+      "weight": 126,
+      "trace_count": 125,
+      "span_count": 126,
+      "avg_duration_ms": 15.929,
+      "p95_duration_ms": 27.167,
+      "first_seen": "2023-01-29T08:43:08.550000Z",
+      "last_seen": "2023-01-30T14:09:50.551091Z",
+      "sample_operations": "/api/v1/foodservice/orders",
+      "source_files": "rca_data/2023-01-29/trace/09_58_trace.csv;rca_data/2023-01-29/trace/10_06_trace.csv;rca_data/2023-01-29/trace/08_44_trace.csv;rca_data/2023-01-29/trace/09_23_trace.csv;rca_data/2023-01-29/trace/11_05_trace.csv"
+    }
+  ]
+}

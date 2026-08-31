@@ -1,0 +1,47 @@
+{
+  "level": "A",
+  "description": "Phase 2 retrieval-only evaluation; no LLM/API calls.",
+  "methods": [
+    {
+      "method": "M0_bm25_only",
+      "description": "BM25-only",
+      "alpha": 1.0,
+      "beta": 0.0,
+      "gamma": 0.0,
+      "graph_per_service_limit": 0
+    },
+    {
+      "method": "M1_bm25_time",
+      "description": "BM25 + TimeSim",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "gamma": 0.0,
+      "graph_per_service_limit": 0
+    },
+    {
+      "method": "M2_bm25_graph",
+      "description": "BM25 + GraphSim",
+      "alpha": 0.5,
+      "beta": 0.0,
+      "gamma": 0.5,
+      "graph_per_service_limit": 20
+    },
+    {
+      "method": "M3_full_fusion",
+      "description": "BM25 + TimeSim + GraphSim",
+      "alpha": 0.4,
+      "beta": 0.3,
+      "gamma": 0.3,
+      "graph_per_service_limit": 20
+    }
+  ],
+  "splits": [
+    "debug_50",
+    "paper_300",
+    "paper_500"
+  ],
+  "top_k": 6,
+  "bm25_k": 60,
+  "graph_max_distance": 2,
+  "tau_seconds": 300.0
+}

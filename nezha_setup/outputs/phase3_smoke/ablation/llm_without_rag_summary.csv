@@ -1,0 +1,2 @@
+mode,precision,recall,f1,false_positive_rate,tp,fp,tn,fn,evaluated_windows,candidate_alerts,routed_alerts,alerts,llm_calls,llm_calls_avoided,llm_budget_exhausted,input_tokens,output_tokens,json_valid_rate,fallback_rate,avg_detector_latency_ms,avg_retrieval_latency_ms,avg_llm_latency_ms,avg_end_to_end_latency_ms,retrieval_backends,retrieval_backend_warnings
+llm_without_rag,0.0,0.0,0.0,0.0815,0,15,169,16,200,35,15,35,20,180,15,1400,340,1.0,0.0,12.7611,0.0,0.0077,12.8596,['local_hashing'],[]

@@ -1,0 +1,162 @@
+========================================================================================
+[ KIẾN TRÚC THỰC NGHIỆM ĐỀ XUẤT - HYBRID REAL-TIME MONITORING ARCHITECTURE ]
+(* Mục tiêu: kiểm chứng tính khả thi của kiến trúc lai, không phải kiến trúc tối ưu cuối cùng *)
+========================================================================================
+
+========================================================================================
+[ LUỒNG NHẬP DỮ LIỆU ĐA NGUỒN - MULTI-SOURCE TELEMETRY INGESTION ]
+(* Metric phục vụ phát hiện nhanh; Log/Event phục vụ bổ sung ngữ cảnh *)
+========================================================================================
+
+        (Stream 1: Numeric Metrics)                         (Stream 2: Logs / Events)
+     CPU, RAM, Disk I/O, Network, Latency...        App logs, Syslogs, K8s Events,
+                                                    Deployment, Backup, Autoscaling...
+                    |                                                |
+                    v                                                v
++-------------------------------------------+       +--------------------------------------------+
+| TẦNG 0.A: METRIC PREPROCESSING            |       | TẦNG 0.B: LOG / EVENT PREPROCESSING        |
+| - Đồng bộ timestamp                       |       | - Chuẩn hóa timestamp                      |
+| - Sliding Window                          |       | - Deduplication                            |
+| - Dynamic Z-score / Normalization         |       | - Regex filtering                          |
+| - Tạo metric window                       |       | - Chuẩn hóa service_id / node_id / pod_id  |
++-------------------------------------------+       +--------------------------------------------+
+                    |                                                |
+                    v                                                v
++-------------------------------------------+       +--------------------------------------------+
+| TẦNG 1: BASE ANOMALY DETECTOR             |       | TẦNG LẬP CHỈ MỤC NGỮ CẢNH                 |
+| - RRCF / MTAD-GAT / GDN                   |       | - Chunking log/event                       |
+| - Input: metric window                    |       | - Embedding text                           |
+| - Output: anomaly_score                   |       | - Lưu metadata: timestamp, node_id,        |
+|           candidate_label                 |       |   service_id, severity, event_type         |
++-------------------------------------------+       +--------------------------------------------+
+                    |                                                |
+         (Candidate Alert nếu vượt ngưỡng)                       (Ghi nhận liên tục)
+                    |                                                |
+                    v                                                v
++-------------------------------------------+                  +----------------------+
+| TẦNG 1.5: ALERT CANDIDATE BUILDER         |                  |  CONTEXT STORE /     |
+| - Extract: time_window                    |                  |  VECTOR DATABASE     |
+| - Extract: node_id / service_id / pod_id  |                  +----------------------+
+| - Lưu metric_snapshot                     |                            ^
+| - Lưu anomaly_score                       |                            |
+| - Tạo payload cảnh báo ứng viên           |                            |
++-------------------------------------------+                            |
+                    |                                                    |
+                    v                                                    |
++-------------------------------------------+                            |
+| TẦNG 1.6: LLM GATE / CALL POLICY          |                            |
+| - Nếu anomaly_score thấp: bỏ qua / log    |                            |
+| - Nếu anomaly_score vùng nghi vấn: gọi LLM|                            |
+| - Nếu anomaly_score rất cao: cảnh báo     |                            |
+|   trực tiếp hoặc vẫn gọi LLM tùy cấu hình |                            |
+| - Giới hạn số lần gọi LLM theo thời gian  |                            |
++-------------------------------------------+                            |
+                    |                                                    |
+       (Chỉ gửi các cảnh báo cần thẩm định)                              |
+                    |                                                    |
+                    v                                                    |
++-------------------------------------------+                            |
+| TẦNG 2: CONTEXT RETRIEVAL / RAG           |<---------------------------+
+| - Metadata filtering:                     |
+|   + time_window                           |
+|   + node_id / service_id / pod_id         |
+|   + event_type / severity nếu có          |
+| - Vector similarity search                |
+| - Trả về Top-K logs/events liên quan      |
++-------------------------------------------+
+                    |
+                    v
++--------------------------------------------------------------------------------------+
+| TẦNG 2.5: PROMPT COMPOSER & CONTEXT OPTIMIZER                                        |
+| - Ghép metric_payload + top-k logs/events                                            |
+| - Sắp xếp ngữ cảnh theo độ liên quan và thời gian                                    |
+| - Cắt bớt context nếu vượt token limit                                               |
+| - Tạo prompt có cấu trúc cho LLM                                                     |
++--------------------------------------------------------------------------------------+
+                    |
+                    v
++--------------------------------------------------------------------------------------+
+| TẦNG 3: LLM-AS-A-JUDGE                                                               |
+| - Vai trò: thẩm định ngữ nghĩa cảnh báo                                               |
+| - Input: metric snapshot + anomaly score + logs/events liên quan                     |
+| - Output bắt buộc dạng JSON                                                          |
+|                                                                                    |
+|   {                                                                                |
+|     "label": "true_alert | false_positive | uncertain",                           |
+|     "severity": "P1 | P2 | P3 | none",                                             |
+|     "confidence": 0.0,                                                             |
+|     "evidence": ["log_id/event_id liên quan"],                                     |
+|     "reason": "giải thích ngắn gọn",                                               |
+|     "recommended_action": "hành động đề xuất"                                      |
+|   }                                                                                |
++--------------------------------------------------------------------------------------+
+                    |
+                    v
++--------------------------------------------------------------------------------------+
+| TẦNG 4: DECISION, FALLBACK & AUDIT                                                    |
++--------------------------------------------------------------------------------------+
+          |                                  |                                  |
+          |                                  |                                  |
+ [JSON lỗi / API lỗi]              [label = uncertain hoặc              [label rõ ràng và
+ [LLM không phản hồi]               confidence < threshold]              confidence >= threshold]
+          |                                  |                                  |
+          v                                  v                                  v
++------------------------+        +---------------------------+        +------------------------+
+| FALLBACK ROUTINE       |        | HUMAN / MANUAL REVIEW     |        | LABEL ROUTER           |
+| - Dùng cảnh báo thô    |        | - SRE kiểm tra nếu cần    |        | - true_alert           |
+|   từ Base Detector     |        | - Ghi nhận nhãn xác nhận  |        | - false_positive       |
++------------------------+        +---------------------------+        +------------------------+
+          |                                  |                                  |
+          |                                  |                    +-------------+-------------+
+          |                                  |                    |                           |
+          v                                  v                    v                           v
++------------------------+        +---------------------------+  +-------------------+   +--------------------+
+| ALERT ROUTING          |        | AUDIT / FEEDBACK LOG      |  | IGNORE / SUPPRESS |   | ALERT ROUTING      |
+| - Gửi cảnh báo thô     |        | - Lưu quyết định thủ công |  | - Dập cảnh báo giả|   | - Gửi cảnh báo     |
+| - Đánh dấu fallback    |        | - Có thể dùng để cải tiến |  | - Lưu lý do       |   | - Phân loại P1/P2/P3|
++------------------------+        +---------------------------+  +-------------------+   +--------------------+
+          |                                  |                    |                           |
+          +----------------------------------+--------------------+---------------------------+
+                                             |
+                                             v
++--------------------------------------------------------------------------------------+
+| AUDIT DB / EXPERIMENT LOG                                                             |
+| - Lưu metric window, anomaly_score, candidate alert                                   |
+| - Lưu query truy xuất, top-k logs/events                                               |
+| - Lưu prompt metadata, số token, latency, LLM response                                 |
+| - Lưu final label, confidence, fallback status                                         |
+| - Phục vụ đánh giá: false positive reduction, latency, số lần gọi LLM, token cost      |
++--------------------------------------------------------------------------------------+
+
+
+========================================================================================
+[ GHI CHÚ THIẾT KẾ ĐỂ VẼ TRÊN DRAW.IO ]
+========================================================================================
+
+1. Nên vẽ thành 2 luồng song song ở đầu:
+   - Luồng trái: Metric Stream
+   - Luồng phải: Log/Event Stream
+
+2. Sau Tầng 1.5, luồng metric mới kết nối sang Context Retrieval/RAG.
+
+3. Context Retrieval/RAG nên nhận dữ liệu từ:
+   - Alert Candidate Builder
+   - Context Store / Vector Database
+
+4. Nên thêm một khối nhỏ "LLM Gate / Call Policy" trước RAG hoặc trước LLM.
+   Mục đích: thể hiện cơ chế kiểm soát số lần gọi LLM và chi phí.
+
+5. Tầng Decision nên vẽ đơn giản thành 3 nhánh:
+   - Fallback khi lỗi JSON/API
+   - Human review khi uncertain/confidence thấp
+   - Label Router khi output hợp lệ
+
+6. Audit DB nên đặt ở cuối và nối từ các nhánh quyết định về.
+   Đây là nơi lưu dữ liệu phục vụ đánh giá thực nghiệm.
+
+7. Khi vẽ trên draw.io, có thể nhóm màu:
+   - Metric pipeline: xanh dương nhạt
+   - Log/Event pipeline: xanh lá nhạt
+   - RAG/Context: vàng nhạt
+   - LLM: tím nhạt
+   - Decision/Audit: xám nhạt

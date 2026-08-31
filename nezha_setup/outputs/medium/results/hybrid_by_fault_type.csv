@@ -1,0 +1,7 @@
+fault_type,precision,recall,f1,false_positive_rate,tp,fp,tn,fn,windows,candidate_alerts,llm_calls
+cpu_consumed,1.0,0.875,0.9333,0.0,7,0,0,1,8,7,0
+cpu_contention,1.0,0.7812,0.8772,0.0,25,0,0,7,32,25,18
+exception,1.0,0.8125,0.8966,0.0,13,0,0,3,16,13,6
+network_delay,1.0,0.35,0.5185,0.0,14,0,0,26,40,14,5
+none,0.0,0.0,0.0,0.3928,0,1920,2968,0,4888,2064,164
+return,1.0,0.8125,0.8966,0.0,13,0,0,3,16,13,7

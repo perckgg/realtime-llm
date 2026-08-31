@@ -1,0 +1,13 @@
+run,group,windows,candidates,routed,manual_review,tp,fp,tn,fn,precision,recall,f1,fpr,llm_calls,context_coverage,avg_context,avg_anomaly_score
+phase4_hybrid_bm25_top6,cpu_contention,8,6,6,0,6,0,0,2,1.0,0.75,0.8571,0.0,6,0.75,4.5,0.8616
+phase4_hybrid_bm25_top6,network_delay,8,0,0,0,0,0,0,8,0.0,0.0,0.0,0.0,0,0.0,0.0,0.2497
+phase4_hybrid_bm25_top6,none,284,34,13,21,0,13,271,0,0.0,0.0,0.0,0.0458,24,0.0106,0.0493,0.5861
+phase5_context_rescue,cpu_contention,8,8,8,0,8,0,0,0,1.0,1.0,1.0,0.0,8,1.0,6.0,0.9978
+phase5_context_rescue,network_delay,8,8,8,0,8,0,0,0,1.0,1.0,1.0,0.0,8,1.0,6.0,0.871
+phase5_context_rescue,none,284,39,9,30,0,9,275,0,0.0,0.0,0.0,0.0317,39,0.1796,0.7711,0.5956
+real_llm_500w_cache_replay,cpu_consumed,13,13,8,5,8,0,0,5,1.0,0.6154,0.7619,0.0,8,0.6154,3.6923,0.9965
+real_llm_500w_cache_replay,cpu_contention,29,29,15,10,15,0,0,14,1.0,0.5172,0.6818,0.0,20,0.6897,4.1379,0.998
+real_llm_500w_cache_replay,exception,11,11,6,4,6,0,0,5,1.0,0.5455,0.7059,0.0,8,0.7273,4.3636,0.9987
+real_llm_500w_cache_replay,network_delay,40,39,14,22,14,0,0,26,1.0,0.35,0.5185,0.0,20,0.525,3.15,0.9799
+real_llm_500w_cache_replay,none,400,391,56,335,0,56,344,0,0.0,0.0,0.0,0.14,58,0.0075,0.025,0.9862
+real_llm_500w_cache_replay,return,7,7,4,2,4,0,0,3,1.0,0.5714,0.7273,0.0,6,0.8571,5.1429,0.998

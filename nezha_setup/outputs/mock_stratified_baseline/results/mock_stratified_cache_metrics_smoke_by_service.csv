@@ -1,0 +1,10 @@
+service_id,precision,recall,f1,false_positive_rate,tp,fp,tn,fn,windows,candidate_alerts,llm_calls
+cartservice,0.0,0.0,0.0,0.0,0,0,1,0,1,0,0
+checkoutservice,1.0,1.0,1.0,0.0,2,0,0,0,2,2,2
+emailservice,0.0,0.0,0.0,0.0,0,0,1,0,1,1,1
+frontend,1.0,1.0,1.0,0.0,1,0,0,0,1,1,1
+ts-consign-price-service,0.0,0.0,0.0,0.0,0,0,1,0,1,1,1
+ts-payment-service,0.0,0.0,0.0,0.0,0,0,1,0,1,1,1
+ts-route-service,1.0,1.0,1.0,0.0,1,0,0,0,1,1,1
+ts-station-food-service,0.0,0.0,0.0,1.0,0,1,0,0,1,1,1
+ts-travel-plan-service,0.0,0.0,0.0,0.0,0,0,1,0,1,1,1

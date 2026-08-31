@@ -1,0 +1,57 @@
+{
+  "level": "C",
+  "description": "Phase 2 alpha/beta/gamma retrieval-only ablation; no LLM/API calls.",
+  "tuning_split": "paper_300",
+  "confirmation_split": "paper_500",
+  "selected_confirmation_settings": [
+    "A2_bm25_graph",
+    "A4_topology_heavy"
+  ],
+  "selection_rule": "Select graph-enabled tuning settings by positive service coverage, network-delay service coverage, topology context ratio, gamma, and lower latency. Confirmation split is not used for tuning.",
+  "settings": [
+    {
+      "setting": "A0_bm25_only",
+      "description": "BM25 only",
+      "alpha": 1.0,
+      "beta": 0.0,
+      "gamma": 0.0,
+      "graph_per_service_limit": 0
+    },
+    {
+      "setting": "A1_bm25_time",
+      "description": "BM25 + Time",
+      "alpha": 0.5,
+      "beta": 0.5,
+      "gamma": 0.0,
+      "graph_per_service_limit": 0
+    },
+    {
+      "setting": "A2_bm25_graph",
+      "description": "BM25 + Graph",
+      "alpha": 0.5,
+      "beta": 0.0,
+      "gamma": 0.5,
+      "graph_per_service_limit": 20
+    },
+    {
+      "setting": "A3_balanced",
+      "description": "Balanced",
+      "alpha": 0.4,
+      "beta": 0.3,
+      "gamma": 0.3,
+      "graph_per_service_limit": 20
+    },
+    {
+      "setting": "A4_topology_heavy",
+      "description": "Topology-heavy",
+      "alpha": 0.35,
+      "beta": 0.25,
+      "gamma": 0.4,
+      "graph_per_service_limit": 20
+    }
+  ],
+  "top_k": 6,
+  "bm25_k": 60,
+  "graph_max_distance": 2,
+  "tau_seconds": 300.0
+}

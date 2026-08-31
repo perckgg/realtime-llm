@@ -1,0 +1,2 @@
+service_id,precision,recall,f1,false_positive_rate,tp,fp,tn,fn,windows,candidate_alerts,llm_calls
+cartservice,0.6667,1.0,0.8,0.1429,10,5,30,0,45,19,6

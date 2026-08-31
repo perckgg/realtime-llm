@@ -1,0 +1,10 @@
+comparison_view,split,budget_regime,method,architecture_enhanced,llm_calls,actual_api_calls,cache_hits,cache_hit_rate,json_valid_rate,avg_llm_latency_ms,estimated_cost_usd,source
+view_a_retrieval_fair,paper_500,operational_budget_120,BM25 RAG top-6,false,120,120,0,0.0,1.0,604.2891,0.0214684,outputs/phase2/step7_rerun/operational_budget_120/step7_view_a_report.csv
+view_a_retrieval_fair,paper_500,operational_budget_120,Topology-Aware Fusion top-6,false,120,120,0,0.0,1.0,971.5001,0.0401765,outputs/phase2/step7_rerun/operational_budget_120/step7_view_a_report.csv
+view_a_retrieval_fair,paper_500,quality_full_budget,BM25 RAG top-6,false,489,489,0,0.0,1.0,2311.5833,0.0627953,outputs/phase2/step7_rerun/quality_full_budget/step7_view_a_report.csv
+view_a_retrieval_fair,paper_500,quality_full_budget,Topology-Aware Fusion top-6,false,489,489,0,0.0,1.0,3041.4295,0.1669426,outputs/phase2/step7_rerun/quality_full_budget/step7_view_a_report.csv
+view_b_architecture_level,paper_500,operational_budget_120,Detector-only,false,0,0,0,0.0,0.0,0.0,0.0,outputs/phase2/step7_view_b/step7_view_b_report.csv
+view_b_architecture_level,paper_500,operational_budget_120,LLM without RAG,false,120,120,0,0.0,1.0,473.4813,0.0088813,outputs/phase2/step7_view_b/step7_view_b_report.csv
+view_b_architecture_level,paper_500,operational_budget_120,BM25 RAG top-6,false,120,120,0,0.0,1.0,604.2891,0.0214684,outputs/phase2/step7_view_b/step7_view_b_report.csv
+view_b_architecture_level,paper_500,operational_budget_120,Topology-Aware Fusion top-6,false,120,120,0,0.0,1.0,971.5001,0.0401765,outputs/phase2/step7_view_b/step7_view_b_report.csv
+view_b_architecture_level,paper_500,operational_budget_120,Context Rescue [architecture-enhanced],true,120,0,120,1.0,1.0,0.0625,0.0214684,outputs/phase2/step7_view_b/step7_view_b_report.csv

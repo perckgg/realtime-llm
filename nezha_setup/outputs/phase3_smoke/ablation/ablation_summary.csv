@@ -1,0 +1,5 @@
+variant,evaluated_windows,candidate_alerts,routed_alerts,precision,recall,f1,false_positive_rate,false_positive_reduction_vs_detector,llm_calls,llm_calls_avoided,avg_retrieval_latency_ms,avg_llm_latency_ms
+detector_only,200,35,35,0.1714,0.375,0.2353,0.1576,0.0,0,200,0.0,0.0
+llm_without_rag,200,35,15,0.0,0.0,0.0,0.0815,0.4828,20,180,0.0,0.0077
+hybrid,200,35,24,0.25,0.375,0.3,0.0978,0.3793,20,180,7.281,0.0093
+hybrid_no_gate,200,35,24,0.25,0.375,0.3,0.0978,0.3793,20,180,5.6047,0.0098

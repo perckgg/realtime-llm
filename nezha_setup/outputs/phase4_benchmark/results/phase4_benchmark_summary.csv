@@ -1,0 +1,6 @@
+variant,evaluated_windows,candidate_alerts,routed_alerts,precision,recall,f1,false_positive_rate,false_positive_reduction_vs_detector,llm_calls,llm_calls_avoided,avg_retrieval_latency_ms,avg_retrieved_context_count,context_coverage_rate,avg_context_tokens,input_tokens,output_tokens,estimated_llm_cost_usd,retrieval_backends
+detector_only,300,40,40,0.15,0.375,0.2143,0.1197,0.0,0,300,0.0,0.0,0.0,0.0,0,0,0.0,['local_hybrid_bm25']
+llm_without_rag,300,40,10,0.0,0.0,0.0,0.0352,0.7059,30,270,0.0,0.0,0.0,0.0,2100,510,0.0,['local_hybrid_bm25']
+hybrid_local_top6,300,40,19,0.3158,0.375,0.3429,0.0458,0.6176,30,270,6.4785,0.1667,0.225,1.0,2350,618,0.0,['local_hashing']
+hybrid_bm25_top6,300,40,19,0.3158,0.375,0.3429,0.0458,0.6176,30,270,11.1465,0.1667,0.225,1.0,2350,618,0.0,['local_hybrid_bm25']
+hybrid_bm25_top10,300,40,19,0.3158,0.375,0.3429,0.0458,0.6176,30,270,10.3172,0.2733,0.225,1.64,2510,618,0.0,['local_hybrid_bm25']

@@ -1,0 +1,212 @@
+{
+  "generated_at_utc": "2026-07-06T03:16:42.436038+00:00",
+  "phase": "phase2",
+  "dataset_policy": "Nezha only",
+  "freeze_policy": "Use these window IDs and inherited baseline artifacts for Phase 2 comparisons.",
+  "source_files": {
+    "window_index": {
+      "path": "outputs/phase2/window_index.csv",
+      "exists": true,
+      "sha256": "d3900eb9012935f4c5f8f27a9c82c385b9968fe0b179305a3f4febe0e66421e6"
+    },
+    "baseline_reference": {
+      "path": "outputs/phase2/baseline_reference.csv",
+      "exists": true,
+      "sha256": "3d0a03278be406c5b30a6164fe9493bedf60a22f34f298128b23fb584ec95d8b"
+    }
+  },
+  "window_sets": {
+    "debug_50": {
+      "rows": 50,
+      "expected_rows": 50,
+      "unique_windows": 50,
+      "duplicate_windows": 0,
+      "dataset_values": [
+        "IntelligentDDS/Nezha"
+      ],
+      "fault_type_counts": {
+        "cpu_consumed": 5,
+        "cpu_contention": 13,
+        "exception": 3,
+        "network_delay": 2,
+        "none": 25,
+        "return": 2
+      },
+      "ground_truth_counts": {
+        "normal": 25,
+        "true_alert": 25
+      },
+      "window_id_sha256": "d0784c65d8e140489e705de593293f50eaed2a0ef50a9d936b869a5c629eb680"
+    },
+    "paper_300": {
+      "rows": 300,
+      "expected_rows": 300,
+      "unique_windows": 300,
+      "duplicate_windows": 0,
+      "dataset_values": [
+        "IntelligentDDS/Nezha"
+      ],
+      "fault_type_counts": {
+        "cpu_contention": 8,
+        "network_delay": 8,
+        "none": 284
+      },
+      "ground_truth_counts": {
+        "normal": 284,
+        "true_alert": 16
+      },
+      "window_id_sha256": "6e5824396d5918be7c46d34daf5dca67b958e8eb5cbded44b97fe4640620e763"
+    },
+    "paper_500": {
+      "rows": 500,
+      "expected_rows": 500,
+      "unique_windows": 500,
+      "duplicate_windows": 0,
+      "dataset_values": [
+        "IntelligentDDS/Nezha"
+      ],
+      "fault_type_counts": {
+        "cpu_consumed": 13,
+        "cpu_contention": 29,
+        "exception": 11,
+        "network_delay": 40,
+        "none": 400,
+        "return": 7
+      },
+      "ground_truth_counts": {
+        "normal": 400,
+        "true_alert": 100
+      },
+      "window_id_sha256": "1745d09ec60c98b8520a6e38ed614f20e39009c3ac7173468f18658066a7cd9e"
+    }
+  },
+  "baseline_alignment": [
+    {
+      "baseline": "detector_only",
+      "expected_split": "paper_300",
+      "audit_path": "nezha_setup/outputs/phase4_benchmark/audit/detector_only_audit.jsonl",
+      "summary_csv": "nezha_setup/outputs/phase4_benchmark/results/detector_only_summary.csv",
+      "summary_md": "nezha_setup/outputs/phase4_benchmark/results/detector_only_summary.md",
+      "audit_rows": 300,
+      "unique_windows": 300,
+      "exists_audit": true,
+      "exists_summary_csv": true,
+      "exists_summary_md": true,
+      "audit_sha256": "f4315842363372695e2ccd5fd4d7ba174efa17c3d6c27671ae61d81fc47306ce",
+      "summary_csv_sha256": "d635b2a3792a456648ae7e45c925af9eb9970819239f2e106f97028df341b785",
+      "summary_md_sha256": "eb3b863f8ec5e05bc8e3748917850d4f1c903134c88822ed7af13599cb18214f",
+      "window_id_sha256": "6e5824396d5918be7c46d34daf5dca67b958e8eb5cbded44b97fe4640620e763",
+      "matches_expected_split": true,
+      "missing_from_baseline_count": 0,
+      "extra_in_baseline_count": 0,
+      "missing_from_baseline_sample": [],
+      "extra_in_baseline_sample": []
+    },
+    {
+      "baseline": "llm_without_rag",
+      "expected_split": "paper_300",
+      "audit_path": "nezha_setup/outputs/phase4_benchmark/audit/llm_without_rag_audit.jsonl",
+      "summary_csv": "nezha_setup/outputs/phase4_benchmark/results/llm_without_rag_summary.csv",
+      "summary_md": "nezha_setup/outputs/phase4_benchmark/results/llm_without_rag_summary.md",
+      "audit_rows": 300,
+      "unique_windows": 300,
+      "exists_audit": true,
+      "exists_summary_csv": true,
+      "exists_summary_md": true,
+      "audit_sha256": "daeb0ae6494db98abd5d27257c55bd06baecf196a8b0423bb25fd06eb3bdc072",
+      "summary_csv_sha256": "7048950b71794a5f886d5fe580bb96b749ad6b82472650da2d0dfefacc0792b1",
+      "summary_md_sha256": "8f85a33b47a43fab812933a16a257b14d9949ced2260f11074c9906a178d190e",
+      "window_id_sha256": "6e5824396d5918be7c46d34daf5dca67b958e8eb5cbded44b97fe4640620e763",
+      "matches_expected_split": true,
+      "missing_from_baseline_count": 0,
+      "extra_in_baseline_count": 0,
+      "missing_from_baseline_sample": [],
+      "extra_in_baseline_sample": []
+    },
+    {
+      "baseline": "hybrid_bm25_top6",
+      "expected_split": "paper_300",
+      "audit_path": "nezha_setup/outputs/phase4_benchmark/audit/hybrid_bm25_top6_audit.jsonl",
+      "summary_csv": "nezha_setup/outputs/phase4_benchmark/results/hybrid_bm25_top6_summary.csv",
+      "summary_md": "nezha_setup/outputs/phase4_benchmark/results/hybrid_bm25_top6_summary.md",
+      "audit_rows": 300,
+      "unique_windows": 300,
+      "exists_audit": true,
+      "exists_summary_csv": true,
+      "exists_summary_md": true,
+      "audit_sha256": "42c6d07d5e91f249b796539dd6e76456229949cdaacdfcc77f8137278d53fcd8",
+      "summary_csv_sha256": "b1784fedd9cdf0a349002c8c97b1be444e4951a25bf7541dea5c1aa3fa3523d8",
+      "summary_md_sha256": "f52c41a37d1d7111121074ae95eaa344542674bac98f235db1d7a814a2839069",
+      "window_id_sha256": "6e5824396d5918be7c46d34daf5dca67b958e8eb5cbded44b97fe4640620e763",
+      "matches_expected_split": true,
+      "missing_from_baseline_count": 0,
+      "extra_in_baseline_count": 0,
+      "missing_from_baseline_sample": [],
+      "extra_in_baseline_sample": []
+    },
+    {
+      "baseline": "hybrid_bm25_top10",
+      "expected_split": "paper_300",
+      "audit_path": "nezha_setup/outputs/phase4_benchmark/audit/hybrid_bm25_top10_audit.jsonl",
+      "summary_csv": "nezha_setup/outputs/phase4_benchmark/results/hybrid_bm25_top10_summary.csv",
+      "summary_md": "nezha_setup/outputs/phase4_benchmark/results/hybrid_bm25_top10_summary.md",
+      "audit_rows": 300,
+      "unique_windows": 300,
+      "exists_audit": true,
+      "exists_summary_csv": true,
+      "exists_summary_md": true,
+      "audit_sha256": "61857fb14ba825352c6c391d89ddf9cc51b010db4c196a6051c186168201d724",
+      "summary_csv_sha256": "1c101474a8dd2a5844b2cb35ab11fa7fa95ad420b81e8d4d4fcaa0beb6aa4df5",
+      "summary_md_sha256": "5f6cc7d5384261ba9d525594652f6f36253047c1926dc3bbf856939cfbb0bcee",
+      "window_id_sha256": "6e5824396d5918be7c46d34daf5dca67b958e8eb5cbded44b97fe4640620e763",
+      "matches_expected_split": true,
+      "missing_from_baseline_count": 0,
+      "extra_in_baseline_count": 0,
+      "missing_from_baseline_sample": [],
+      "extra_in_baseline_sample": []
+    },
+    {
+      "baseline": "phase5_context_rescue",
+      "expected_split": "paper_300",
+      "audit_path": "nezha_setup/outputs/phase5_context_rescue/audit/hybrid_audit.jsonl",
+      "summary_csv": "nezha_setup/outputs/phase5_context_rescue/results/hybrid_summary.csv",
+      "summary_md": "nezha_setup/outputs/phase5_context_rescue/results/hybrid_summary.md",
+      "audit_rows": 300,
+      "unique_windows": 300,
+      "exists_audit": true,
+      "exists_summary_csv": true,
+      "exists_summary_md": true,
+      "audit_sha256": "225b9e3e3d63075d4f2ed91b42a9700bc52154e3bc684718ee88f845c69cd7a1",
+      "summary_csv_sha256": "35d54e8f3d59ab4fb7ab27a687ee3d17c0330559abbccaabd0aa9bd56ae0bf16",
+      "summary_md_sha256": "b7bf8b0c385afe14a0267424ed2e33934bc99c53101b61ca79d6759467fab31f",
+      "window_id_sha256": "6e5824396d5918be7c46d34daf5dca67b958e8eb5cbded44b97fe4640620e763",
+      "matches_expected_split": true,
+      "missing_from_baseline_count": 0,
+      "extra_in_baseline_count": 0,
+      "missing_from_baseline_sample": [],
+      "extra_in_baseline_sample": []
+    },
+    {
+      "baseline": "real_llm_500w_cache_replay",
+      "expected_split": "paper_500",
+      "audit_path": "nezha_setup/outputs/real_llm_stratified/audit/gemini25_flash_lite_500w_budget_manual_review_cache_replay_audit.jsonl",
+      "summary_csv": "nezha_setup/outputs/real_llm_stratified/results/gemini25_flash_lite_500w_budget_manual_review_cache_replay_summary.csv",
+      "summary_md": "nezha_setup/outputs/real_llm_stratified/results/gemini25_flash_lite_500w_budget_manual_review_cache_replay_summary.md",
+      "audit_rows": 500,
+      "unique_windows": 500,
+      "exists_audit": true,
+      "exists_summary_csv": true,
+      "exists_summary_md": true,
+      "audit_sha256": "dc5933612c67d4701116675479f1eee84668d1e0c2a6aca5c609f6c84d3ee4d5",
+      "summary_csv_sha256": "a10ee71d89a7072c581db2d4fbef442d5468f4d52b6c73dc09e5d8aea8f33853",
+      "summary_md_sha256": "e3957fc16ea3efa87abd231d5ebe80b2335a570979b8df47508956287465b61d",
+      "window_id_sha256": "1745d09ec60c98b8520a6e38ed614f20e39009c3ac7173468f18658066a7cd9e",
+      "matches_expected_split": true,
+      "missing_from_baseline_count": 0,
+      "extra_in_baseline_count": 0,
+      "missing_from_baseline_sample": [],
+      "extra_in_baseline_sample": []
+    }
+  ],
+  "issues": []
+}

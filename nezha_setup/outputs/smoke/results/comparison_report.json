@@ -1,0 +1,174 @@
+{
+  "detector_only": {
+    "precision": 1.0,
+    "recall": 0.3333,
+    "f1": 0.5,
+    "false_positive_rate": 0.0,
+    "tp": 5,
+    "fp": 0,
+    "tn": 35,
+    "fn": 10,
+    "evaluated_windows": 50,
+    "candidate_alerts": 5,
+    "routed_alerts": 5,
+    "alerts": 5,
+    "llm_calls": 0,
+    "llm_calls_avoided": 50,
+    "llm_budget_exhausted": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "json_valid_rate": 0.0,
+    "fallback_rate": 0.0,
+    "avg_detector_latency_ms": 0.0221,
+    "avg_retrieval_latency_ms": 0.0,
+    "avg_llm_latency_ms": 0.0,
+    "avg_end_to_end_latency_ms": 0.0423,
+    "retrieval_backends": [
+      "local_hashing"
+    ],
+    "retrieval_backend_warnings": [],
+    "by_service": {
+      "cartservice": {
+        "precision": 1.0,
+        "recall": 0.3333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0,
+        "tp": 5,
+        "fp": 0,
+        "tn": 35,
+        "fn": 10,
+        "windows": 50,
+        "candidate_alerts": 5,
+        "llm_calls": 0
+      }
+    },
+    "by_fault_type": {
+      "cpu_contention": {
+        "precision": 1.0,
+        "recall": 0.7143,
+        "f1": 0.8333,
+        "false_positive_rate": 0.0,
+        "tp": 5,
+        "fp": 0,
+        "tn": 0,
+        "fn": 2,
+        "windows": 7,
+        "candidate_alerts": 5,
+        "llm_calls": 0
+      },
+      "network_delay": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 8,
+        "windows": 8,
+        "candidate_alerts": 0,
+        "llm_calls": 0
+      },
+      "none": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 35,
+        "fn": 0,
+        "windows": 35,
+        "candidate_alerts": 0,
+        "llm_calls": 0
+      }
+    },
+    "false_positive_reduction_vs_detector": 0.0
+  },
+  "hybrid": {
+    "precision": 1.0,
+    "recall": 0.3333,
+    "f1": 0.5,
+    "false_positive_rate": 0.0,
+    "tp": 5,
+    "fp": 0,
+    "tn": 35,
+    "fn": 10,
+    "evaluated_windows": 50,
+    "candidate_alerts": 5,
+    "routed_alerts": 5,
+    "alerts": 5,
+    "llm_calls": 5,
+    "llm_calls_avoided": 45,
+    "llm_budget_exhausted": 0,
+    "input_tokens": 475,
+    "output_tokens": 145,
+    "json_valid_rate": 1.0,
+    "fallback_rate": 0.0,
+    "avg_detector_latency_ms": 0.0299,
+    "avg_retrieval_latency_ms": 0.2522,
+    "avg_llm_latency_ms": 0.0125,
+    "avg_end_to_end_latency_ms": 0.3404,
+    "retrieval_backends": [
+      "local_hashing"
+    ],
+    "retrieval_backend_warnings": [],
+    "by_service": {
+      "cartservice": {
+        "precision": 1.0,
+        "recall": 0.3333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0,
+        "tp": 5,
+        "fp": 0,
+        "tn": 35,
+        "fn": 10,
+        "windows": 50,
+        "candidate_alerts": 5,
+        "llm_calls": 5
+      }
+    },
+    "by_fault_type": {
+      "cpu_contention": {
+        "precision": 1.0,
+        "recall": 0.7143,
+        "f1": 0.8333,
+        "false_positive_rate": 0.0,
+        "tp": 5,
+        "fp": 0,
+        "tn": 0,
+        "fn": 2,
+        "windows": 7,
+        "candidate_alerts": 5,
+        "llm_calls": 5
+      },
+      "network_delay": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 0,
+        "fn": 8,
+        "windows": 8,
+        "candidate_alerts": 0,
+        "llm_calls": 0
+      },
+      "none": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "tn": 35,
+        "fn": 0,
+        "windows": 35,
+        "candidate_alerts": 0,
+        "llm_calls": 0
+      }
+    },
+    "false_positive_reduction_vs_detector": 0.0
+  }
+}

@@ -1,0 +1,15 @@
+experiment_phase,variant,windows,candidates,precision,recall,f1,fpr,tp,fp,fn,llm_calls,api_fallback_calls,context_coverage,avg_context,retrieval_ms,avg_llm_ms,notes
+Microsoft cloud-monitoring,detector_only,49578,14686,0.1222,0.8077,0.2122,0.2722,1794,12892,427,0,0,0,0,0,0,Metric-only detector baseline; RAG/API evaluation is intentionally not used for this dataset.
+Phase 3 ablation,detector_only,200,35,0.1714,0.375,0.2353,0.1576,6,29,10,0,,,,0,0,Baseline without LLM/RAG cost.
+Phase 3 ablation,llm_without_rag,200,35,0,0,0,0.0815,0,15,16,20,,,,0,0.0077,Reduces false positives but loses true positives without context.
+Phase 3 ablation,hybrid,200,35,0.25,0.375,0.3,0.0978,6,18,10,20,,,,7.281,0.0093,Hybrid RAG variant; compare quality with retrieval/context cost.
+Phase 3 ablation,hybrid_no_gate,200,35,0.25,0.375,0.3,0.0978,6,18,10,20,,,,5.6047,0.0098,Hybrid RAG variant; compare quality with retrieval/context cost.
+Phase 4 benchmark,detector_only,300,40,0.15,0.375,0.2143,0.1197,6,34,10,0,,0,0,0,0,Baseline without LLM/RAG cost.
+Phase 4 benchmark,llm_without_rag,300,40,0,0,0,0.0352,0,10,16,30,,0,0,0,0.0069,
+Phase 4 benchmark,hybrid_local_top6,300,40,0.3158,0.375,0.3429,0.0458,6,13,10,30,,0.225,0.1667,6.4785,0.0091,Hybrid RAG variant; compare quality with retrieval/context cost.
+Phase 4 benchmark,hybrid_bm25_top6,300,40,0.3158,0.375,0.3429,0.0458,6,13,10,30,,0.225,0.1667,11.1465,0.0094,Hybrid RAG variant; compare quality with retrieval/context cost.
+Phase 4 benchmark,hybrid_bm25_top10,300,40,0.3158,0.375,0.3429,0.0458,6,13,10,30,,0.225,0.2733,10.3172,0.0106,More context than top6 but no classification gain in this slice.
+Phase 5 context rescue,context_rescue,300,55,0.64,1,0.7805,0.0317,16,9,0,55,,0.4727,1.05,135.6469,0.0201,Architectural improvement; not a single-variable ablation because rescue behavior and LLM calls changed.
+Local-first fallback,local_first_ollama_gemini,45,19,0.625,1,0.7692,0.1714,10,6,0,6,4,0.8421,2.6667,91.6506,4585.012,Operational feasibility smoke; not the main quality benchmark.
+Streaming replay,streaming_hybrid,50,9,0.5556,0.3333,0.4167,0.1143,5,4,10,9,,,,0.8263,0.0198,Sequential replay smoke; do not compare directly with Phase 4/5 due to different windows/backend.
+Real LLM cost/risk,gemini25_flash_lite_500w_budget_manual_review_cache_replay,500,490,0.4563,0.47,0.4631,0.14,47,56,53,120,0,0.1306,0.776,30.9229,0.0605,Cache replay using existing Gemini decisions; no new external API call.

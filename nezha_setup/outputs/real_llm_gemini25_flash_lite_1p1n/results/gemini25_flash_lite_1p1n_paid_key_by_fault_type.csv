@@ -1,0 +1,3 @@
+fault_type,precision,recall,f1,false_positive_rate,tp,fp,tn,fn,windows,candidate_alerts,llm_calls
+network_delay,1.0,1.0,1.0,0.0,1,0,0,0,1,1,1
+none,0.0,0.0,0.0,0.0,0,0,1,0,1,1,1

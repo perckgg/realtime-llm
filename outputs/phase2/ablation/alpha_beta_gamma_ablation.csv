@@ -1,0 +1,8 @@
+phase,split,setting,setting_description,top_k,alpha,beta,gamma,windows,positive_windows,retrieved_context_count,avg_retrieved_context_count,context_coverage,positive_context_coverage,service_context_coverage,positive_service_context_coverage,network_delay_context_coverage,network_delay_service_context_coverage,avg_context_tokens,avg_retrieval_latency_ms,p95_retrieval_latency_ms,graph_coverage,avg_graph_distance,avg_graph_candidate_count,topology_expanded_context_ratio,topology_only_context_ratio,avg_candidate_pool_size,avg_duplicates_removed
+tuning,paper_300,A0_bm25_only,BM25 only,6,1.0,0.0,0.0,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,35.4288,50.6793,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+tuning,paper_300,A1_bm25_time,BM25 + Time,6,0.5,0.5,0.0,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,40.4577,57.5473,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+tuning,paper_300,A2_bm25_graph,BM25 + Graph,6,0.5,0.0,0.5,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,36.7357,55.8831,1.0,0.0,17.7533,0.0744,0.06,77.5567,0.1967
+tuning,paper_300,A3_balanced,Balanced,6,0.4,0.3,0.3,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,35.5888,45.1541,1.0,0.0,17.7533,0.0744,0.06,77.5567,0.1967
+tuning,paper_300,A4_topology_heavy,Topology-heavy,6,0.35,0.25,0.4,300,16,1800,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,35.0295,41.2913,1.0,0.0,17.7533,0.0744,0.06,77.5567,0.1967
+confirmation,paper_500,A2_bm25_graph,BM25 + Graph,6,0.5,0.0,0.5,500,100,3000,6.0,1.0,1.0,0.48,1.0,1.0,1.0,8.365,35.4393,51.9981,0.524,0.1012,6.522,0.1757,0.152,66.224,0.298
+confirmation,paper_500,A4_topology_heavy,Topology-heavy,6,0.35,0.25,0.4,500,100,3000,6.0,1.0,1.0,0.48,1.0,1.0,1.0,8.388,37.7365,55.362,0.524,0.1012,6.522,0.1947,0.1657,66.224,0.298

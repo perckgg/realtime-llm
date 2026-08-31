@@ -1,0 +1,63 @@
+{
+  "dataset_root": "data\\cloud-monitoring-dataset\\data",
+  "series_count": 60,
+  "point_count": 225403,
+  "anomaly_point_count": 4553,
+  "skipped_point_count": 42,
+  "domains": {
+    "application-crash-rate-1": {
+      "series_count": 9,
+      "point_count": 5462,
+      "anomaly_point_count": 746,
+      "skipped_point_count": 42
+    },
+    "application-crash-rate-2": {
+      "series_count": 10,
+      "point_count": 11141,
+      "anomaly_point_count": 574,
+      "skipped_point_count": 0
+    },
+    "consumer-purchase-rate": {
+      "series_count": 6,
+      "point_count": 7488,
+      "anomaly_point_count": 171,
+      "skipped_point_count": 0
+    },
+    "data-ingress-rate": {
+      "series_count": 5,
+      "point_count": 79200,
+      "anomaly_point_count": 1089,
+      "skipped_point_count": 0
+    },
+    "ecommerce-api-incoming-rps": {
+      "series_count": 1,
+      "point_count": 6192,
+      "anomaly_point_count": 120,
+      "skipped_point_count": 0
+    },
+    "middle-tier-api-dependency-latency": {
+      "series_count": 23,
+      "point_count": 16560,
+      "anomaly_point_count": 553,
+      "skipped_point_count": 0
+    },
+    "mongodb-application-rps": {
+      "series_count": 4,
+      "point_count": 63360,
+      "anomaly_point_count": 1098,
+      "skipped_point_count": 0
+    },
+    "mongodb-machine-rps": {
+      "series_count": 1,
+      "point_count": 20160,
+      "anomaly_point_count": 202,
+      "skipped_point_count": 0
+    },
+    "service-unavailable": {
+      "series_count": 1,
+      "point_count": 15840,
+      "anomaly_point_count": 0,
+      "skipped_point_count": 0
+    }
+  }
+}

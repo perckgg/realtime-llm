@@ -1,0 +1,5 @@
+split,variant,windows,candidate_alerts,precision,recall,f1,false_positive_rate,llm_calls,actual_api_calls,llm_cache_hits,cache_hit_rate,context_coverage_rate,avg_retrieved_context_count,avg_retrieval_latency_ms,avg_llm_latency_ms,estimated_llm_cost_usd,json_valid_rate
+paper_300,hybrid_bm25_top6,300,40,1.0,0.25,0.4,0.0,40,1,39,0.975,0.2,0.16,11.4327,30.0292,0.0052102,1.0
+paper_300,topology_aware_fusion_top6,300,40,0.1905,0.25,0.2162,0.0599,40,1,39,0.975,1.0,0.8,10.1107,12.8359,0.014592,1.0
+paper_500,hybrid_bm25_top6,500,489,1.0,0.34,0.5075,0.0,120,1,119,0.9917,0.1125,0.554,20.5649,61.7131,0.0214684,1.0
+paper_500,topology_aware_fusion_top6,500,489,0.5823,0.46,0.514,0.0825,120,1,119,0.9917,0.2454,1.44,18.5192,6.64,0.0401765,1.0

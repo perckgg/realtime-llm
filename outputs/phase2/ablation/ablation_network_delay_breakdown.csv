@@ -1,0 +1,15 @@
+phase,split,setting,fault_group,windows,positive_windows,retrieved_context_count,avg_retrieved_context_count,context_coverage,positive_context_coverage,service_context_coverage,positive_service_context_coverage,network_delay_context_coverage,network_delay_service_context_coverage,avg_context_tokens,avg_retrieval_latency_ms,p95_retrieval_latency_ms,graph_coverage,avg_graph_distance,avg_graph_candidate_count,topology_expanded_context_ratio,topology_only_context_ratio,avg_candidate_pool_size,avg_duplicates_removed
+tuning,paper_300,A0_bm25_only,network_delay,8,8,48,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,33.2296,33.7631,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+tuning,paper_300,A0_bm25_only,non_network_delay,292,8,1752,6.0,1.0,1.0,1.0,1.0,0.0,0.0,9.0,35.4891,51.141,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+tuning,paper_300,A1_bm25_time,network_delay,8,8,48,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,40.0956,46.961,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+tuning,paper_300,A1_bm25_time,non_network_delay,292,8,1752,6.0,1.0,1.0,1.0,1.0,0.0,0.0,9.0,40.4676,57.7272,1.0,0.0,0.0,0.0,0.0,60.0,0.0
+tuning,paper_300,A2_bm25_graph,network_delay,8,8,48,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,36.231,42.5048,1.0,0.0,37.5,1.0,0.5625,92.625,4.875
+tuning,paper_300,A2_bm25_graph,non_network_delay,292,8,1752,6.0,1.0,1.0,1.0,1.0,0.0,0.0,9.0,36.7496,55.9647,1.0,0.0,17.2123,0.0491,0.0462,77.1438,0.0685
+tuning,paper_300,A3_balanced,network_delay,8,8,48,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,37.3811,41.5924,1.0,0.0,37.5,1.0,0.5625,92.625,4.875
+tuning,paper_300,A3_balanced,non_network_delay,292,8,1752,6.0,1.0,1.0,1.0,1.0,0.0,0.0,9.0,35.5397,46.0126,1.0,0.0,17.2123,0.0491,0.0462,77.1438,0.0685
+tuning,paper_300,A4_topology_heavy,network_delay,8,8,48,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.0,34.4925,37.6785,1.0,0.0,37.5,1.0,0.5625,92.625,4.875
+tuning,paper_300,A4_topology_heavy,non_network_delay,292,8,1752,6.0,1.0,1.0,1.0,1.0,0.0,0.0,9.0,35.0442,41.3719,1.0,0.0,17.2123,0.0491,0.0462,77.1438,0.0685
+confirmation,paper_500,A2_bm25_graph,network_delay,40,40,240,6.0,1.0,1.0,1.0,1.0,1.0,1.0,8.85,37.2486,48.0744,1.0,0.0,28.025,0.7042,0.4708,85.775,2.25
+confirmation,paper_500,A2_bm25_graph,non_network_delay,460,60,2760,6.0,1.0,1.0,0.4348,1.0,0.0,0.0,8.3228,35.2819,51.9981,0.4826,0.1198,4.6522,0.1297,0.1243,64.5239,0.1283
+confirmation,paper_500,A4_topology_heavy,network_delay,40,40,240,6.0,1.0,1.0,1.0,1.0,1.0,1.0,9.025,39.9598,55.6125,1.0,0.0,28.025,0.8417,0.5917,85.775,2.25
+confirmation,paper_500,A4_topology_heavy,non_network_delay,460,60,2760,6.0,1.0,1.0,0.4348,1.0,0.0,0.0,8.3326,37.5431,55.2535,0.4826,0.1198,4.6522,0.1384,0.1286,64.5239,0.1283

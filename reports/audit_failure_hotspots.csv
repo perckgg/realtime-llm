@@ -1,0 +1,25 @@
+run,hotspot_type,service_id,node_id,fault_type,windows,fp,fn,tp,precision,recall,candidates,manual_review,top_final_decisions
+phase4_hybrid_bm25_top6,fp_hotspot,cartservice,cartservice-579f59597d-wc2lz,none,284,13,0,0,0.0,0.0,34,21,"suppress=250, manual_review=21, route_alert=13"
+phase4_hybrid_bm25_top6,fn_hotspot,cartservice,cartservice-579f59597d-wc2lz,network_delay,8,0,8,0,0.0,0.0,0,0,suppress=8
+phase4_hybrid_bm25_top6,fn_hotspot,cartservice,cartservice-579f59597d-wc2lz,cpu_contention,8,0,2,6,1.0,0.75,6,0,"route_alert=6, suppress=2"
+phase5_context_rescue,fp_hotspot,cartservice,cartservice-579f59597d-wc2lz,none,284,9,0,0,0.0,0.0,39,30,"suppress=245, manual_review=30, route_alert=9"
+real_llm_500w_cache_replay,fp_hotspot,checkoutservice,checkoutservice-578fcf4766-9csqn,none,10,10,0,0,0.0,0.0,10,0,route_alert=10
+real_llm_500w_cache_replay,fp_hotspot,frontend,frontend-579b9bff58-t2dbm,none,9,8,0,0,0.0,0.0,9,1,"route_alert=8, manual_review=1"
+real_llm_500w_cache_replay,fp_hotspot,paymentservice,paymentservice-9cdb6588f-554sm,none,9,8,0,0,0.0,0.0,9,1,"route_alert=8, manual_review=1"
+real_llm_500w_cache_replay,fp_hotspot,shippingservice,shippingservice-7b598fc7d-lmggd,none,9,8,0,0,0.0,0.0,9,1,"route_alert=8, manual_review=1"
+real_llm_500w_cache_replay,fp_hotspot,recommendationservice,recommendationservice-6cfdd55578-gfj6q,none,8,6,0,0,0.0,0.0,6,0,"route_alert=6, suppress=2"
+real_llm_500w_cache_replay,fp_hotspot,currencyservice,currencyservice-cf787dd48-vpjrd,none,6,6,0,0,0.0,0.0,6,0,route_alert=6
+real_llm_500w_cache_replay,fp_hotspot,emailservice,emailservice-55fdc5b988-f6xth,none,6,6,0,0,0.0,0.0,6,0,route_alert=6
+real_llm_500w_cache_replay,fp_hotspot,productcatalogservice,productcatalogservice-668d5f85fb-wckp8,none,4,4,0,0,0.0,0.0,4,0,route_alert=4
+real_llm_500w_cache_replay,fn_hotspot,ts-food-service,ts-food-service-f5756978c-6sb8t,network_delay,4,0,4,0,0.0,0.0,4,4,manual_review=4
+real_llm_500w_cache_replay,fn_hotspot,adservice,adservice-5f6585d649-fnmft,cpu_consumed,3,0,3,0,0.0,0.0,3,3,manual_review=3
+real_llm_500w_cache_replay,fn_hotspot,currencyservice,currencyservice-cf787dd48-vpjrd,network_delay,4,0,2,2,1.0,0.5,4,1,"route_alert=2, suppress=1, manual_review=1"
+real_llm_500w_cache_replay,fn_hotspot,emailservice,emailservice-55fdc5b988-f6xth,network_delay,4,0,2,2,1.0,0.5,4,0,"suppress=2, route_alert=2"
+real_llm_500w_cache_replay,fn_hotspot,frontend,frontend-579b9bff58-t2dbm,exception,4,0,2,2,1.0,0.5,4,1,"route_alert=2, manual_review=1, suppress=1"
+real_llm_500w_cache_replay,fn_hotspot,frontend,frontend-579b9bff58-t2dbm,return,4,0,2,2,1.0,0.5,4,1,"route_alert=2, manual_review=1, suppress=1"
+real_llm_500w_cache_replay,fn_hotspot,adservice,adservice-5f6585d649-fnmft,cpu_contention,2,0,2,0,0.0,0.0,2,2,manual_review=2
+real_llm_500w_cache_replay,fn_hotspot,cartservice,cartservice-579f59597d-wc2lz,network_delay,2,0,2,0,0.0,0.0,1,1,"manual_review=1, suppress=1"
+real_llm_500w_cache_replay,fn_hotspot,emailservice,emailservice-55fdc5b988-f6xth,cpu_contention,2,0,2,0,0.0,0.0,2,1,"suppress=1, manual_review=1"
+real_llm_500w_cache_replay,fn_hotspot,productcatalogservice,productcatalogservice-668d5f85fb-jhwx9,exception,2,0,2,0,0.0,0.0,2,2,manual_review=2
+real_llm_500w_cache_replay,fn_hotspot,shippingservice,shippingservice-7b598fc7d-lmggd,cpu_consumed,2,0,2,0,0.0,0.0,2,2,manual_review=2
+real_llm_500w_cache_replay,fn_hotspot,ts-basic-service,ts-basic-service-5dc8d4f9fd-llznp,cpu_contention,2,0,2,0,0.0,0.0,2,2,manual_review=2

@@ -1,0 +1,2 @@
+fault_type,precision,recall,f1,false_positive_rate,tp,fp,tn,fn,windows,candidate_alerts,llm_calls
+none,0.1317,0.7893,0.2257,0.244,1753,11557,35800,468,49578,14686,1376

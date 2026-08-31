@@ -1,0 +1,97 @@
+project:
+  name: online_boutique_true_streaming
+  purpose: controlled_streaming_validation
+  llm_enabled_during_collection: false
+
+kubernetes:
+  backend: kind
+  cluster_name: ob-streaming
+  namespace: online-boutique
+  monitoring_namespace: monitoring
+  chaos_namespace: chaos-mesh
+  online_boutique_ref: v0.10.5
+  frontend_node_port: 30080
+  frontend_host_port: 8080
+
+telemetry_store:
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    url: redis://localhost:6379/0
+    streams:
+      metrics: ob:metrics
+      logs: ob:logs
+      traces: ob:traces
+      faults: ob:faults
+      windows: ob:windows
+    consumer_group: ob-pipeline
+    maxlen: 500000
+  postgres:
+    host: localhost
+    port: 5432
+    database: ob_streaming
+    user: ob_streaming
+    password: ob_streaming
+    url: postgresql://ob_streaming:ob_streaming@localhost:5432/ob_streaming
+    embedding_dimensions: 512
+
+collection:
+  poll_interval_seconds: 15
+  event_time_field: event_time
+  ingest_time_field: ingest_time
+  required_fields:
+    - event_time
+    - ingest_time
+    - service_id
+    - pod_id
+    - node_id
+    - source
+    - fault_id
+
+windowing:
+  window_size_seconds: 120
+  stride_seconds: 60
+  allowed_lag_seconds: 30
+  normalization: zscore
+  label_overlap_policy: any_fault_overlap
+  output_stream: ob:windows
+
+detector:
+  name: isolation_forest
+  threshold: 0.85
+  contamination: 0.05
+  n_estimators: 100
+  random_state: 42
+  warmup_windows: 1000
+
+retrieval:
+  vector_db: pgvector
+  embedding_model: hashing
+  embedding_dimensions: 512
+  top_k: 6
+  time_margin_minutes: 8
+  no_future_context: true
+
+candidate_rescue:
+  enabled: true
+  min_context_score: 0.70
+  min_trace_duration_ms: 1.0
+  promoted_score: 0.85
+
+fault_defaults:
+  warmup_seconds: 1200
+  duration_seconds: 300
+  cooldown_seconds: 300
+  severity: ERROR
+
+evaluation:
+  output_dir: online_boutique_streaming_setup/outputs/results
+  audit_dir: online_boutique_streaming_setup/outputs/audit
+  required_tables:
+    - overall
+    - by_fault_type
+    - by_service
+    - by_pod
+    - context_rescue_promotions
+    - no_future_leakage

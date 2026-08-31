@@ -1,0 +1,24 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Local editor/runtime files
+.vscode/
+.idea/
+*.log
+*.tmp
+
+# Large raw datasets and local model/API caches should be fetched or regenerated.
+data/
+nezha_setup/outputs/llm_response_cache*.jsonl

@@ -1,0 +1,95 @@
+{
+  "experiment": {
+    "name": "nezha_local_llama_gemini_lite_scheduler",
+    "mode": "hybrid"
+  },
+  "data": {
+    "metric_path": "nezha_setup/processed/metrics.csv",
+    "log_path": "nezha_setup/processed/logs.jsonl"
+  },
+  "preprocessing": {
+    "window_size": 120,
+    "stride": 60,
+    "normalization": "zscore"
+  },
+  "detector": {
+    "name": "isolation_forest",
+    "contamination": 0.05,
+    "threshold": 0.95,
+    "n_estimators": 100,
+    "random_state": 42,
+    "fit_strategy": "warmup",
+    "warmup_windows": 1000,
+    "train_on_normal_only": false,
+    "min_fit_windows": 20
+  },
+  "candidate_rescue": {
+    "enabled": true,
+    "min_detector_score": 0.0,
+    "min_context_score": 0.7,
+    "min_trace_duration_ms": 1.0,
+    "promoted_score": 0.85
+  },
+  "retrieval": {
+    "vector_db": "hybrid_bm25",
+    "embedding_model": "hashing_bm25",
+    "embedding_dimensions": 512,
+    "top_k": 6,
+    "search_k": 500,
+    "time_margin_minutes": 8,
+    "semantic_weight": 0.35,
+    "time_weight": 0.25,
+    "metadata_weight": 0.25,
+    "signal_weight": 0.15
+  },
+  "llm_gate": {
+    "enabled": true,
+    "low_threshold": 0.8,
+    "high_threshold": 0.98,
+    "high_score_action": "call_llm",
+    "max_llm_calls_per_minute": 1,
+    "max_total_calls": 4
+  },
+  "llm_scheduler": {
+    "enabled": true,
+    "high_priority_threshold": 0.98,
+    "defer_below_priority": 0.8,
+    "low_priority_action": "local_only",
+    "cooldown_action": "local_only",
+    "cooldown_on_429_seconds": 300,
+    "max_api_calls_per_run": 2,
+    "anomaly_weight": 0.75,
+    "context_weight": 0.2
+  },
+  "llm": {
+    "provider": "local_first",
+    "local_provider": "ollama",
+    "local_model": "llama3.2:3b",
+    "ollama_base_url": "http://localhost:11434",
+    "local_timeout_seconds": 120,
+    "local_max_output_tokens": 512,
+    "local_confidence_threshold": 0.8,
+    "fallback_on_uncertain": true,
+    "high_anomaly_fallback_threshold": 0.98,
+    "fallback_provider": "gemini",
+    "fallback_model": "gemini-2.5-flash-lite",
+    "fallback_max_output_tokens": 512,
+    "fallback_timeout_seconds": 60,
+    "fallback_max_retries": 0,
+    "max_output_tokens": 512,
+    "temperature": 0,
+    "input_cost_per_1m_tokens": 0,
+    "output_cost_per_1m_tokens": 0,
+    "cost_pricing_source": "not_configured"
+  },
+  "decision": {
+    "confidence_threshold": 0.8,
+    "require_evidence_for_true_alert": true
+  },
+  "evaluation": {
+    "output_dir": "nezha_setup/outputs/local_llama_gemini_lite_scheduler/results",
+    "audit_dir": "nezha_setup/outputs/local_llama_gemini_lite_scheduler/audit",
+    "max_windows": 0,
+    "max_llm_calls": 4
+  }
+}
