@@ -42,5 +42,14 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
-Việc tiếp theo (đúng Tuần 1 trong roadmap): `scripts/verify_labels.py` và
-`scripts/make_splits.py` — xem `docs/Final_Thesis_Phase2/04-implementation-roadmap.md`.
+Tái lập kết quả Tuần 1:
+
+```bash
+bash scripts/download_nezha.sh          # nếu chưa có data/Nezha/
+python scripts/verify_labels.py         # -> docs/label-audit.md  (~80 s)
+python scripts/make_splits.py           # -> data/splits/*.json
+python scripts/make_splits.py --check   # xác nhận split không đổi
+python -m pytest tests/ -q              # 8 test canh split
+```
+
+Việc tiếp theo là Tuần 2 — xem `docs/Final_Thesis_Phase2/04-implementation-roadmap.md`.

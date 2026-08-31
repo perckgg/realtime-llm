@@ -31,3 +31,8 @@ archive/phase1_extra/data/
 
 # Phase 2 eval results ARE committed (reproducibility evidence) — do not ignore.
 !eval/results/
+
+# Build artefacts from `pip install -e .`
+*.egg-info/
+build/
+dist/

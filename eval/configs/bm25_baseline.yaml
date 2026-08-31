@@ -1,0 +1,49 @@
+# Baseline Giai đoạn 1, dùng để tái lập ở Tuần 3.
+# Nguồn: docs/Final_Thesis_Phase2/07-setup-guide.md §10.
+#
+# CHƯA CHẠY ĐƯỢC. Harness (`python -m eval run`) là việc của Tuần 4, replayer và
+# detector là việc của Tuần 2. File này được tạo sẵn ở Tuần 1 để chốt tham số
+# baseline trước khi có code, đúng như tài liệu 07 §10 yêu cầu.
+#
+# `rescue.enabled: false` là bắt buộc: con số baseline Giai đoạn 1
+# (Precision 0.32, FPR 0.046) được đo KHÔNG có Context Rescue, nên phép so sánh
+# phải cùng điều kiện.
+
+run_id: bm25_baseline_v1
+seed: 42
+split: dev
+n_windows: 300
+
+# Xem docs/experiment-log.md QĐ-002. Cột epoch tái lập đúng nhãn của Giai đoạn 1
+# (527 fault window) và là phép kiểm tra "port đúng hay sai" ở Tuần 3.
+# Baseline chính thức của luận văn chạy lại với `wall` (704 fault window).
+time_source: epoch
+
+source:
+  type: nezha_replay
+  speed_multiplier: 0
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+
+rescue:
+  enabled: false
+
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+
+judge:
+  type: llm
+  backend: local_first
+  local_model: llama3.2:3b
+  fallback_model: gemini-flash-lite
+  require_evidence: true
+  cache: true
+
+rca:
+  enabled: false

@@ -1,0 +1,51 @@
+{
+  "seed": 42,
+  "generated_by": "scripts/make_splits.py",
+  "generated_at": "2026-08-31T02:44:17+00:00",
+  "time_source": "wall",
+  "buffer_seconds": 600,
+  "total_windows_in_corpus": 95660,
+  "total_windows_assigned": 95063,
+  "normal_excluded_buffer": 597,
+  "splits": {
+    "dev": {
+      "n_windows": 19316,
+      "n_fault_windows": 149,
+      "n_injections": 21,
+      "counts_by_fault_type": {
+        "cpu_consumed": 14,
+        "cpu_contention": 35,
+        "exception": 29,
+        "network_delay": 42,
+        "normal": 19167,
+        "return": 29
+      }
+    },
+    "val": {
+      "n_windows": 28898,
+      "n_fault_windows": 209,
+      "n_injections": 30,
+      "counts_by_fault_type": {
+        "cpu_consumed": 21,
+        "cpu_contention": 49,
+        "exception": 41,
+        "network_delay": 63,
+        "normal": 28689,
+        "return": 35
+      }
+    },
+    "test": {
+      "n_windows": 46849,
+      "n_fault_windows": 346,
+      "n_injections": 50,
+      "counts_by_fault_type": {
+        "cpu_consumed": 36,
+        "cpu_contention": 77,
+        "exception": 68,
+        "network_delay": 105,
+        "normal": 46503,
+        "return": 60
+      }
+    }
+  }
+}
