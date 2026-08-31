@@ -1,0 +1,89 @@
+# Phase 2 skeleton. clickhouse/postgres are runnable now; everything else is commented out
+# until the service code that would build/serve it exists (see docs/Final_Thesis_Phase2/07-setup-guide.md §6).
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3
+    profiles: ["dev", "full"]
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: aiops
+      CLICKHOUSE_PASSWORD: aiops
+    volumes:
+      - ./volumes/clickhouse:/var/lib/clickhouse
+      - ./infra/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["dev", "full"]
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: aiops
+      POSTGRES_PASSWORD: aiops
+      POSTGRES_DB: aiops
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aiops"]
+      interval: 10s
+      retries: 5
+
+  # --- Uncomment once services/api exists and infra/Dockerfile.api is written (Week 2-3). ---
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: infra/Dockerfile.api
+  #   profiles: ["dev", "full"]
+  #   ports:
+  #     - "8000:8000"
+  #   env_file: .env
+  #   environment:
+  #     CLICKHOUSE_HOST: clickhouse
+  #     POSTGRES_HOST: postgres
+  #   depends_on:
+  #     clickhouse: { condition: service_healthy }
+  #     postgres:   { condition: service_healthy }
+
+  # --- Uncomment once services/web exists (Week 18). ---
+  # web:
+  #   profiles: ["dev", "full"]
+  #   ...
+
+  # --- Only needed for stream-mode demo / Phase 3. ---
+  # redpanda:
+  #   image: redpandadata/redpanda:v24.1.1
+  #   profiles: ["full"]
+  #   command:
+  #     - redpanda start
+  #     - --smp 1
+  #     - --overprovisioned
+  #     - --kafka-addr PLAINTEXT://0.0.0.0:9092
+  #     - --advertise-kafka-addr PLAINTEXT://redpanda:9092
+  #   ports:
+  #     - "9092:9092"
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   profiles: ["full"]
+  #   ports: ["9090:9090"]
+  #   volumes:
+  #     - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   profiles: ["full"]
+  #   ports: ["3000:3000"]
+  #   environment:
+  #     GF_SECURITY_ADMIN_PASSWORD: aiops
+
+# Ollama runs outside Docker (see docs/Final_Thesis_Phase2/07-setup-guide.md §6) —
+# run `ollama serve` on the host, not as a compose service.

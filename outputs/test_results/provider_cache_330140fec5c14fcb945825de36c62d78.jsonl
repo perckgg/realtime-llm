@@ -1,1 +1,0 @@
-{"key": "c2472e43f29591e9292674150be7c61e2fa3abb933d91b48e9777320818b9f2c", "provider": "groq", "model": "llama-3.1-8b-instant", "raw": "{\"label\": \"false_positive\", \"severity\": \"none\", \"confidence\": 0.88, \"evidence\": [], \"reason\": \"benign\", \"recommended_action\": \"suppress\"}", "usage": {"prompt_tokens": 5, "completion_tokens": 7}}

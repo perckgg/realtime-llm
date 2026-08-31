@@ -1,0 +1,8 @@
+-- Placeholder. Copy the PostgreSQL DDL from
+-- docs/Final_Thesis_Phase2/03-schemas-and-contracts.md §4 here (Week 2 task).
+--
+-- Expected tables (see docs/Final_Thesis_Phase2/01-architecture-design.md §6):
+--   run_registry
+--   incidents
+--   diagnostic_reports
+--   diagnostic_rejected

@@ -1,0 +1,7 @@
+{"timestamp":"2026-05-14T00:02:20Z","node_id":"node-a","service_id":"payment-api","pod_id":"pay-7d9","severity":"ERROR","event_type":"database","message":"Database connection pool exhausted for payment-api"}
+{"timestamp":"2026-05-14T00:02:40Z","node_id":"node-a","service_id":"payment-api","pod_id":"pay-7d9","severity":"ERROR","event_type":"timeout","message":"Request timeout rate increased for payment-api checkout endpoint"}
+{"timestamp":"2026-05-14T00:03:15Z","node_id":"node-a","service_id":"payment-api","pod_id":"pay-7d9","severity":"WARN","event_type":"autoscaling","message":"Autoscaling triggered for service payment-api"}
+{"timestamp":"2026-05-14T00:05:00Z","node_id":"node-b","service_id":"auth-api","pod_id":"auth-2ac","severity":"INFO","event_type":"deployment","message":"Rolling update started for auth-api"}
+{"timestamp":"2026-05-14T00:05:15Z","node_id":"node-b","service_id":"auth-api","pod_id":"auth-2ac","severity":"INFO","event_type":"deployment","message":"Deployment completed successfully for auth-api"}
+{"timestamp":"2026-05-14T00:06:00Z","node_id":"node-b","service_id":"auth-api","pod_id":"auth-2ac","severity":"DEBUG","event_type":"healthcheck","message":"Periodic healthcheck succeeded"}
+
