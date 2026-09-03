@@ -52,4 +52,16 @@ python scripts/make_splits.py --check   # xác nhận split không đổi
 python -m pytest tests/ -q              # 8 test canh split
 ```
 
+## Dashboard (dựng trước tiến độ)
+
+`services/web/` đã có bản MVP bốn màn hình — Timeline, Alert detail, Incident
+detail, Experiment comparison — chạy trên **dữ liệu giả** vì pipeline chưa chạy.
+Roadmap xếp việc này vào Tuần 18; dựng sớm để chốt bố cục và để bốn màn hình
+ràng buộc ngược lại xem `services/api` phải trả những gì. Lý do và ranh giới:
+`docs/experiment-log.md` QĐ-007.
+
+```bash
+cd services/web && npm install && npm run dev    # http://localhost:5173
+```
+
 Việc tiếp theo là Tuần 2 — xem `docs/Final_Thesis_Phase2/04-implementation-roadmap.md`.

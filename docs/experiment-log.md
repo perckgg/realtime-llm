@@ -148,3 +148,60 @@ dependencies vì bước kiểm tra môi trường ở `07` §11 dùng nó.
 
 Môi trường hiện tại: `.venv` trên **Python 3.14.5** (máy chỉ có bản này). Mọi
 dependency trong `pyproject.toml` cài được, không phải hạ phiên bản.
+
+---
+
+## 2026-08-31 — QĐ-007. Dựng MVP dashboard trước tiến độ, chọn React + Vite
+
+**Bối cảnh.** Roadmap xếp dashboard vào Tuần 18. Việc dựng sớm ở Tuần 1 là
+**lệch thứ tự, không lệch phạm vi**: `06-scope-guard.md` §3 có mục
+"[x] Dashboard 4 màn hình" trong danh sách in-scope.
+
+**Vì sao dựng sớm.** Bốn màn hình trong `01` §6.7 là hợp đồng ngược cho cả
+pipeline: chúng quy định `services/api` phải trả gì, và do đó ClickHouse phải
+lưu gì. Dựng vỏ trước với dữ liệu giả làm lộ ra sớm những trường còn thiếu
+trong `03`, rẻ hơn nhiều so với phát hiện ở Tuần 18. Nó cũng cho một vật thể
+chạy được để chụp hình đưa vào báo cáo ngay từ bây giờ, đúng tinh thần cuốn
+chiếu.
+
+**Quyết định: React + Vite + TypeScript + Tailwind + Recharts + react-flow
+(`@xyflow/react`).**
+
+| Phương án | Vì sao không chọn |
+|---|---|
+| Streamlit | Nhanh nhất để dựng, nhưng không vẽ được đồ thị lan truyền tương tác — mà đó chính là màn hình gây ấn tượng nhất khi bảo vệ (`01` §6.7). |
+| FastAPI + Jinja + HTMX + Chart.js | Ít phụ thuộc nhất, nhưng phải tự viết layout đồ thị và tự quản lý trạng thái lọc. |
+| **React + Vite (đã chọn)** | `@xyflow/react` cho đồ thị lan truyền kéo–thả, zoom, tô sáng đường root cause; Recharts cho thanh sai số CI 95%; Vite dev server có sẵn proxy sang FastAPI. |
+
+**Đây có phải "web framework nặng" mà `06` §4 cấm không? Không.** Điều bị cấm
+là Next.js / SSR / hệ thống thiết kế đầy đủ. Ở đây là một SPA tĩnh, build ra
+một file JS, không có backend riêng, không có bước triển khai riêng.
+
+**Ranh giới đã đặt để không trượt vào sản phẩm hoá.**
+
+1. **Đúng bốn màn hình.** Danh sách sự cố là một tab trong Timeline chứ không
+   phải màn hình thứ năm.
+2. **Chỉ đọc.** Không có form, không có mutation, không có màn hình cấu hình
+   (`06` §6.4).
+3. **Chỉ light mode** (`06` §4 cấm dark mode).
+4. **Màn hình không bao giờ import `mock/`.** Chúng chỉ gọi interface
+   `DataSource` trong `src/api/client.ts`. Tuần 18 chỉ cần đặt
+   `VITE_DATA_SOURCE=http` là chạy với dữ liệu thật, không sửa màn hình nào.
+5. **Dải cảnh báo "dữ liệu giả"** hiện thường trực trên mọi màn hình khi chạy
+   bằng fixture, để không ai chụp màn hình rồi đưa vào luận văn như kết quả
+   thật.
+
+**Trực quan hoá.** Bảng màu đã chạy qua bộ kiểm định mù màu (`ALL CHECKS PASS`,
+light mode, nền `#fcfcfb`) và ghi lại trong `src/theme/tokens.ts`. Bốn ràng
+buộc được giữ: một biểu đồ chỉ một trục (chỉ số 0–1 và độ trễ ms nằm ở hai biểu
+đồ khác nhau); màu đi theo biến thể chứ không theo thứ hạng; danh tính luôn có
+ký hiệu và nhãn chữ kèm màu; mọi biểu đồ đều có bảng số tương ứng.
+
+**Kiểm chứng.** `npm run check` = typecheck + `scripts/smoke.tsx`. Smoke test
+render cả bốn màn hình trong jsdom, chờ dữ liệu về, rồi khẳng định biểu đồ có vẽ
+ra mark và bảng có dữ liệu — `tsc` không bắt được lớp lỗi đó. Đã bắt được một
+lỗi thật ngay khi viết: alias `@/` mới chỉ khai trong `tsconfig.json` nên
+TypeScript hiểu còn Vite thì không.
+
+**Chưa làm.** Chưa nối API thật (Tuần 18). Bundle 859 kB chưa chia nhỏ;
+`@xyflow/react` là phần nặng nhất, nếu cần thì lazy-load riêng màn hình 3.

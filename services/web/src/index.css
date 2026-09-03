@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens.
+
+   Bảng màu lấy nguyên từ bảng tham chiếu đã được kiểm định mù màu (CVD).
+   Ba slot đầu (blue / orange / aqua) dùng cho verdict — bộ ba này qua toàn bộ
+   ngưỡng all-pairs. Năm slot dùng cho loại lỗi và biến thể RAG (qua ngưỡng
+   adjacent-pairs; ba slot aqua/yellow/magenta dưới 3:1 tương phản nên MỌI biểu
+   đồ dùng chúng phải có nhãn trực tiếp hoặc bảng số kèm theo — quy tắc "relief").
+
+   Chỉ có light mode. docs/Final_Thesis_Phase2/06-scope-guard.md §4 cấm dark mode
+   trong Giai đoạn 2: nó tốn thời gian đánh bóng mà không đóng góp gì cho luận văn.
+--------------------------------------------------------------------------- */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Bề mặt và mực */
+  --color-surface: #fcfcfb;
+  --color-plane: #f9f9f7;
+  --color-ink: #0b0b0b;
+  --color-ink-2: #52514e;
+  --color-ink-muted: #898781;
+  --color-grid: #e1e0d9;
+  --color-axis: #c3c2b7;
+  --color-hairline: rgb(11 11 11 / 0.1);
+
+  /* Categorical — thứ tự cố định, không bao giờ xoay vòng */
+  --color-series-1: #2a78d6; /* blue */
+  --color-series-2: #eb6834; /* orange */
+  --color-series-3: #1baf7a; /* aqua */
+  --color-series-4: #eda100; /* yellow */
+  --color-series-5: #e87ba4; /* magenta */
+
+  /* Sequential (blue, nhạt → đậm) cho độ lớn liên tục */
+  --color-seq-250: #86b6ef;
+  --color-seq-400: #3987e5;
+  --color-seq-550: #1c5cab;
+  --color-seq-700: #0d366b;
+
+  /* Status — dành riêng, không bao giờ tái sử dụng làm màu series */
+  --color-good: #0ca30c;
+  --color-warning: #fab219;
+  --color-serious: #ec835a;
+  --color-critical: #d03b3b;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-plane);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Trục và lưới của Recharts phải lùi lại phía sau dữ liệu. */
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line {
+  stroke: var(--color-axis);
+}
+.recharts-cartesian-grid line {
+  stroke: var(--color-grid);
+}
+.recharts-text {
+  fill: var(--color-ink-muted);
+  font-size: 11px;
+}
+.recharts-surface:focus {
+  outline: none;
+}
+
+/* react-flow: bỏ watermark, dùng nền phẳng của chúng ta. */
+.react-flow__attribution {
+  display: none;
+}

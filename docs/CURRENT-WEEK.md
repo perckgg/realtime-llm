@@ -73,6 +73,12 @@ theo cột wall-clock.
 `--time-source epoch` để đối chiếu port đúng/sai, rồi `--time-source wall` để
 lấy con số báo cáo chính thức. Chi tiết trong `docs/experiment-log.md` QĐ-002.
 
+**Dashboard dựng trước tiến độ (QĐ-007).** Ngoài phạm vi Tuần 1 nhưng trong
+phạm vi Giai đoạn 2: `services/web/` đã có MVP bốn màn hình bằng React + Vite +
+Recharts + react-flow, chạy trên dữ liệu giả. Đây là lệch **thứ tự**, không phải
+lệch **phạm vi** — `06-scope-guard.md` §3 vẫn liệt kê "Dashboard 4 màn hình" là
+in-scope. Không có màn hình thứ năm, không có form, không có dark mode.
+
 **Vá setup.** `pip install -e ".[dev]"` không chạy được với `pyproject.toml`
 ban đầu (setuptools từ chối flat-layout vì repo có nhiều thư mục top-level).
 Đã vá, xem QĐ-006.
