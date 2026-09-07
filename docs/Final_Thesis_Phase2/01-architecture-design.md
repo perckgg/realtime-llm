@@ -236,12 +236,15 @@ window
        -> ngược lại              -> bỏ qua
 ```
 
-`RescueScore(w) = α·λ_log(w) + β·φ_topo(w, A) + γ·δ_time(w)`
+`RescueScore(w | A) = η1·Λ_log(w) + η2·Φ_topo(w, A) + η3·Δ_time(w, A)`
 
-- `λ_log`: tỷ lệ log ERROR/EXCEPTION trên tổng log trong window
-- `φ_topo`: độ gần topology giữa service của w và tập service đang có True Alert
-- `δ_time`: hệ số suy giảm thời gian
-- α, β, γ, τ đọc từ config, **không hardcode**
+Ràng buộc: `η1, η2, η3 >= 0` và `η1 + η2 + η3 = 1`; `RescueScore ∈ [0, 1)` (cận trên không đạt được vì `Λ_log` là hàm bão hòa tiệm cận).
+
+Các thành phần chuẩn hóa:
+- `Λ_log(w) = 1 - exp(- N_err(w) / k_log) ∈ [0, 1)`: Mật độ log lỗi trong cửa sổ trượt (với `k_log = 10`, đếm log ERROR, FATAL, HTTP >= 500, exception). Hàm bão hòa giúp kháng log flood.
+- `Φ_topo(w, A) = max_{s_a ∈ S_A} [1 / (1 + d_G^undirected(s_w, s_a))]`: Độ cận kề đồ thị phụ thuộc vô hướng giữa service `s_w` của window và tập service `S_A` đang có True Alert (bằng 0 nếu chưa có alert nào).
+- `Δ_time(w, A) = max_{t_a ∈ T_A} exp(- |t_w - t_a| / σ_rescue)`: Độ cận kề thời gian với các alert đang nổ trong cụm sự cố `A` (`σ_rescue` mặc định 300 s).
+- `η1, η2, η3, τ` đọc từ config, **không hardcode**. Ngưỡng kích hoạt: nếu `y_IF(w) == 0` và `RescueScore >= τ` thì phát hành `AlertCandidate(source="rescue")`.
 
 Phải ghi lại `rescue_score` và các thành phần vào ClickHouse cho mọi window, kể cả window không được promote — cần dữ liệu này để vẽ biểu đồ độ nhạy của τ.
 
@@ -256,7 +259,7 @@ retrieval/
   temporal.py          # cửa sổ thích nghi theo anomaly score
   cross_modal.py       # 3 kênh log/trace/metric + weighted fusion
   graph.py             # lan rộng theo service dependency graph
-  hybrid_bm25_graph.py # RRF merge
+  hybrid_bm25_graph.py # Weighted Context Fusion (chính) / RRF merge (phụ)
   registry.py          # name -> class, dùng bởi config loader
 ```
 
@@ -270,7 +273,16 @@ Tham số: `window_min` (mặc định 2 phút), `window_max` (mặc định 15 
 
 **`graph`** — BFS từ service của alert, tối đa `hop` bước (mặc định 2), trọng số `decay_factor ** distance`. Cần `packages/graph` dựng sẵn đồ thị.
 
-**`hybrid_bm25_graph`** — chạy BM25 và Graph song song, merge bằng Reciprocal Rank Fusion: `score(d) = Σ 1/(k + rank_i(d))`, `k` mặc định 60.
+**`hybrid_bm25_graph` (Topology-Aware Retrieval with Weighted Context Fusion)** — Lõi đóng góp của bài báo và luận văn.
+Hỗ trợ hai chế độ tính điểm:
+1. **Weighted Context Fusion (`fusion_mode: "weighted"` — mặc định, cho Paper & Thesis):**
+   `Score_fusion(c | s0, t0) = α·BM25_norm(c, q) + β·TimeSim(tc, t0) + γ·GraphSim(sc, s0)`
+   - Ràng buộc: `α, β, γ >= 0` và `α + β + γ = 1`.
+   - `BM25_norm(c, q) = (BM25(c, q) - min) / (max - min + ε)`: Chuẩn hóa Min-Max trên tập ứng viên.
+   - `TimeSim(tc, t0) = exp(- |tc - t0| / τ_time)`: Hàm phân rã thời gian (`τ_time` mặc định 300 s).
+   - `GraphSim(sc, s0) = 1 / (1 + d_G(sc, s0))`: Tương đồng topology dựa trên khoảng cách đồ thị có hướng `d_G` từ trace (`sc` là service của context, `s0` là service của alert). Khoảng cách càng lớn thì điểm tương đồng càng giảm về 0, khắc phục lỗi cộng trực tiếp khoảng cách.
+2. **Reciprocal Rank Fusion (`fusion_mode: "rrf"` — baseline phụ không tham số):**
+   Chạy BM25 và Graph song song, merge bằng: `score(d) = Σ 1 / (k + rank_i(d))`, `k` mặc định 60.
 
 ### 6.4 `services/judge`
 

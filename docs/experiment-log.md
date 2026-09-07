@@ -202,6 +202,148 @@ render cả bốn màn hình trong jsdom, chờ dữ liệu về, rồi khẳng 
 ra mark và bảng có dữ liệu — `tsc` không bắt được lớp lỗi đó. Đã bắt được một
 lỗi thật ngay khi viết: alias `@/` mới chỉ khai trong `tsconfig.json` nên
 TypeScript hiểu còn Vite thì không.
-
 **Chưa làm.** Chưa nối API thật (Tuần 18). Bundle 859 kB chưa chia nhỏ;
 `@xyflow/react` là phần nặng nhất, nếu cần thì lazy-load riêng màn hình 3.
+
+---
+
+## 2026-09-03 — QĐ-008. Toán học hoá chuẩn tắc và tách bạch ký hiệu Fusion Score & Rescue Score
+
+**Bối cảnh.** Góp ý chiến lược từ phản biện (`5_diem_can_sua_chien_luoc_bao_luan_van.docx`, Điểm 1 & 2)
+chỉ ra hai khiếm khuyết trong tài liệu và bản nháp trước:
+1. Việc cộng trực tiếp `GraphDistance` vào điểm xếp hạng ranking bị sai chiều (khoảng cách càng lớn thì mức độ liên quan phải càng nhỏ).
+2. Việc cùng dùng ký hiệu `(α, β, γ)` cho cả Fusion Score (RAG context ranking) và Rescue Score (candidate promotion) gây nhầm lẫn về mục tiêu nghiên cứu và vai trò của từng cơ chế.
+
+**Quyết định.**
+1. **Tách bạch ký hiệu và phạm vi áp dụng:**
+   - **Fusion Score (Nhánh A — Paper & Luận văn):** Dùng bộ trọng số `(α, β, γ)` với `α + β + γ = 1`, `α, β, γ >= 0`.
+     `Score_fusion(c | s0, t0) = α·BM25_norm(c, q) + β·TimeSim(tc, t0) + γ·GraphSim(sc, s0)`.
+     Trong đó:
+     - `BM25_norm(c, q)`: Chuẩn hóa Min-Max trên tập context ứng viên.
+     - `TimeSim(tc, t0) = exp(- |tc - t0| / τ_time)`: Hàm phân rã thời gian số mũ (`τ_time = 300 s`).
+     - `GraphSim(sc, s0) = 1 / (1 + d_G(sc, s0))`: Nghịch đảo khoảng cách đồ thị có hướng từ trace (hoặc `exp(-d_G / τ_graph)`). Khắc phục triệt để lỗi cộng trực tiếp khoảng cách.
+   - **Rescue Score (Nhánh B — Luận văn):** Dùng bộ trọng số `(η1, η2, η3)` và ngưỡng `τ` (`η1 + η2 + η3 = 1`).
+     `RescueScore(w | A) = η1·Λ_log(w) + η2·Φ_topo(w, A) + η3·Δ_time(w, A) >= τ`.
+     Trong đó:
+     - `Λ_log(w) = 1 - exp(- N_err(w) / k_log)`: Mật độ log lỗi bão hòa (`k_log = 10`), kháng log storm.
+     - `Φ_topo(w, A) = max_{s_a ∈ S_A} [1 / (1 + d_G^undirected(s_w, s_a))]`: Độ cận kề topology vô hướng với tập alert đang hoạt động.
+     - `Δ_time(w, A) = max_{t_a ∈ T_A} exp(- |t_w - t_a| / σ_rescue)`: Độ cận kề thời gian với sự cố (`σ_rescue = 300 s`).
+2. **Hệ quả kiến trúc & cấu hình:**
+   - Đồng bộ hóa các tài liệu `01-architecture-design.md`, `02-data-and-experiment-protocol.md`, `03-schemas-and-contracts.md`, `04-implementation-roadmap.md`, `06-scope-guard.md`.
+   - Cấu hình YAML đổi `rescue.alpha, beta, gamma` thành `rescue.eta1, eta2, eta3, tau`.
+   - `hybrid_bm25_graph` được định nghĩa rõ: hỗ trợ cả `fusion_mode: weighted` (chính, Paper core) và `fusion_mode: rrf` (baseline phụ không tham số).
+
+---
+
+## 2026-09-03 — QĐ-009. Cổng chặn Tuần 2: rolling buffer cho Isolation Forest, hoãn Rescue Score, và lỗi dữ liệu NaN latency
+
+**Bối cảnh.** Tuần 2 port `IsolationForestDetector` từ
+`legacy/src/detectors/isolation_forest_detector.py` sang `services/detector/`,
+theo nguyên tắc "bọc, đừng viết lại" (`07-setup-guide.md` §8.1). Ba vấn đề
+phát sinh trong quá trình port, không có trong roadmap gốc.
+
+**1. Lệch đơn vị cửa sổ giữa Giai đoạn 1 và Giai đoạn 2.**
+GĐ1 tính mean/std/min/max/last/delta trên nhiều mẫu thô trong một
+`MetricWindow` (`window_size=120s` trên metric lấy mẫu 60s ⇒ ~2 điểm/cửa sổ).
+`TelemetryWindow` của GĐ2 (QĐ-003) chỉ có đúng một điểm/60s. Áp công thức GĐ1
+trực tiếp lên một điểm sẽ luôn cho std=0, delta=0 — vô nghĩa.
+
+**Quyết định (người dùng chọn qua AskUserQuestion).** Giữ một rolling buffer
+theo từng service (`_ServiceBuffer`, mặc định `buffer_size=2` ≈ 120s lịch sử ở
+tần suất lấy mẫu 60s của Nezha, khớp `window_size=120s` của GĐ1) và tính công
+thức GĐ1 trên buffer đó thay vì trên một `TelemetryWindow` đơn lẻ. `fit()`
+replay buffer theo thứ tự thời gian trên toàn bộ tập fit để tránh lệch phân
+phối giữa train và serve; buffer sống (`score()`) bắt đầu rỗng sau khi `fit()`
+xong, không rò rỉ từ tập train.
+
+**Hệ quả — cold-start guard.** Điểm cửa sổ đầu tiên của một service có lịch sử
+một-điểm (std=0/delta=0 suy biến), về cấu trúc khác thường so với phần lớn
+vector train (đa số 2-điểm) bất kể giá trị metric thật là gì. Nếu không chặn,
+`is_candidate()` có thể bật/tắt cảnh báo chỉ vì buffer chưa đầy, không phải vì
+bất thường thật. Đã thêm `_ServiceBuffer.is_full()`; `is_candidate()` luôn trả
+`False` khi buffer chưa đầy, dù `score` cao. Kiểm chứng bằng
+`tests/test_isolation_forest_detector.py` (`test_cold_start_first_point_can_look_unusual`,
+`test_is_candidate_false_during_cold_start_even_if_score_is_high`).
+
+**2. Rescue Score (nhánh "else" của SS6.2) chưa cài ở Tuần 2 — hoãn có chủ ý.**
+Hai lý do: (a) `packages/schemas/loaders.py` chưa nạp `logs`/`spans` vào
+`TelemetryWindow` (thiết kế có chủ ý của module đó, chưa ai yêu cầu chiến lược
+join log/trace), mà `Λ_log(w)` trong Rescue Score (QĐ-008) cần mật độ log lỗi;
+(b) `04-implementation-roadmap.md` đặt ablation Rescue Score ở Tuần 8 (Tháng
+2), bảng việc Tuần 2 không nhắc đến. `IsolationForestDetector` vì vậy chỉ sinh
+`AlertCandidate(source="metric")`, không có nhánh Rescue.
+
+**3. Lỗi dữ liệu: chuỗi literal `"NaN"` trong 6 cột latency percentile.**
+Chạy dry-run trên dữ liệu Nezha thật gây `ValueError: inf or nan encountered
+in data` tại `statistics.pstdev`. Quét toàn corpus: 6 cột
+`PodClientLatencyP90/95/99(s)`, `PodServerLatencyP90/95/99(s)` chứa chuỗi
+`"NaN"` ở các cửa sổ 0 request (percentile không xác định, không phải độ trễ
+0) — **27.335 / 95.660 dòng (28,58%)**, tổng **83.695 giá trị** trên toàn
+corpus.
+
+**Quyết định.** `packages/schemas/loaders.py::_row_to_window` bỏ giá trị metric
+không hữu hạn (`not math.isfinite(parsed)`) — coi là "thiếu", không parse
+thành 0.0 hay `inf`, vì cả hai đều mô tả sai một cửa sổ nhàn rỗi. Hồi quy:
+`tests/test_loaders.py`.
+
+**Kiểm chứng cổng chặn Tuần 2 (DoD `04` dòng 30–42).** Trên dữ liệu Nezha thật
+(không cần Docker): fit trên toàn bộ split dev (19.316 cửa sổ) trong ~24,9s;
+replay 50 cửa sổ đầu (`scripts/replay_smoke.py`) trong ~10,5s, sinh 14
+`AlertCandidate`. Toàn bộ 32 test đơn vị (`pytest tests/ -q`) pass. Vế "ghi vào
+ClickHouse" của DoD được kiểm chứng sau đó, ngày 2026-09-07 — xem QĐ-010.
+
+---
+
+## 2026-09-07 — QĐ-010. Hai lỗi hạ tầng Docker khi kiểm chứng cổng chặn Tuần 2, đã vá trong `docker-compose.yml`
+
+**Bối cảnh.** Mở Docker Desktop và chạy `docker compose --profile dev up -d`
+lần đầu trên máy này (Windows, Docker Desktop/WSL2) để chốt vế còn lại của DoD
+Tuần 2 (QĐ-009). Hai lỗi hạ tầng gặp phải, không liên quan đến logic pipeline.
+
+**1. Cổng host 9000 đã bị chiếm bởi phần mềm quản lý của công ty.**
+`docker compose up -d` tạo container `clickhouse` nhưng không khởi động được:
+`ports are not available: exposing port TCP 0.0.0.0:9000`. Xác định bằng
+`Get-NetTCPConnection -LocalPort 9000` + `tasklist` rằng cổng 9000 bị giữ vĩnh
+viễn bởi `ZSATunnel.exe` (tiến trình VPN/proxy Zscaler chạy nền trên máy công
+ty) — không phải xung đột tạm thời, không được và không cần tắt tiến trình
+này.
+
+**Quyết định.** Đổi cổng host cho giao thức TCP gốc của ClickHouse từ
+`9000:9000` thành `9004:9000` trong `docker-compose.yml`. Không ảnh hưởng
+pipeline: `packages/storage/clickhouse.py` dùng `clickhouse_connect`, giao
+tiếp qua HTTP ở cổng 8123 (không đổi); cổng 9000 chỉ dùng cho `clickhouse-client`
+gõ tay, không có trong luồng chạy tự động nào.
+
+**2. `./volumes/clickhouse` (bind mount) làm insert thất bại vì lỗi quyền ghi.**
+Sau khi vá lỗi cổng, `scripts/replay_smoke.py` chạy hết fit + replay nhưng
+insert vào ClickHouse báo `DatabaseError: ... filesystem error: in rename:
+Permission denied`. Nguyên nhân: ClickHouse ghi dữ liệu bằng cách tạo thư mục
+tạm rồi `rename()` sang tên chính thức (atomic insert); thao tác `rename` này
+thất bại trên một bind mount trỏ vào ổ đĩa Windows chia sẻ qua WSL2 (khác
+`postgres`, vốn healthy ngay với cùng kiểu bind mount `./volumes/postgres` vì
+không dùng cơ chế rename tương tự).
+
+**Quyết định.** Đổi volume của service `clickhouse` từ bind mount
+`./volumes/clickhouse:/var/lib/clickhouse` sang named volume Docker
+(`clickhouse-data:/var/lib/clickhouse`, khai ở khối `volumes:` cấp cao nhất
+của `docker-compose.yml`). Named volume do Docker quản lý trực tiếp trên
+filesystem của máy ảo WSL2, không đi qua lớp chia sẻ ổ đĩa Windows nên
+`rename()` hoạt động bình thường. `postgres` giữ nguyên bind mount vì không có
+lỗi.
+
+**Kiểm chứng.** Sau hai thay đổi trên: `docker compose --profile dev up -d`
+đưa cả hai container về `healthy`; `SHOW TABLES FROM aiops` liệt kê đúng
+`fact_alert_evaluation` và `fact_retrieval_trace` (tự tạo từ
+`infra/clickhouse/init.sql`); `scripts/replay_smoke.py --windows 50` chạy
+xong, in "Wrote 50 rows to fact_alert_evaluation (14 alert candidates)"; truy
+vấn trực tiếp `SELECT count(), sum(candidate_source='metric') FROM
+aiops.fact_alert_evaluation WHERE run_id='week2-smoke'` trả về `50  14`,
+khớp chính xác với output script. DoD Tuần 2 coi như qua hoàn toàn — xem
+`docs/CURRENT-WEEK.md`.
+
+**Hệ quả cho người dùng khác trên máy khác.** Named volume cho `clickhouse`
+là lựa chọn an toàn hơn bind mount trên Windows nói chung (không riêng lỗi
+Zscaler), nên giữ nguyên kể cả trên máy không có Zscaler. Cổng `9004` chỉ là
+vá cho máy này; nếu máy khác không có gì chiếm cổng 9000, đổi lại
+`docker-compose.yml` cho khớp môi trường đó không bắt buộc vì client chỉ dùng
+8123.

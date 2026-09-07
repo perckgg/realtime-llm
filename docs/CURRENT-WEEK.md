@@ -5,54 +5,56 @@
 
 ---
 
-## Tuần: 1 / 24 — **ĐÃ XONG**
-## Ngày bắt đầu: 2026-08-31
+## Tuần: 2 / 24 — **QUA**
+## Ngày bắt đầu: 2026-09-03
+## Ngày qua cổng chặn: 2026-09-07
 ## Giai đoạn: Tháng 1 — Nền tảng và kiểm chứng dữ liệu
 
 ---
 
 ## Mục tiêu tuần này
 
-**Kiểm tra dữ liệu trước, code sau.** Tuần này KHÔNG viết code pipeline.
-
-Rủi ro lớn nhất của toàn đề tài nằm ở đây: nếu Nezha không có nhãn
-`root_cause_service`, toàn bộ Nhánh B không đo được Hit@1/Hit@3.
+Hạ tầng và port GĐ1: `docker-compose` profiles, `infra/*/init.sql` theo tài
+liệu `03`, `packages/schemas/`, port `services/replayer` và `services/detector`.
 
 ---
 
 ## Task được phép làm
 
-- [x] `scripts/verify_labels.py` — kiểm tra nhãn root-cause của Nezha
-- [x] Kiểm tra trace có đủ `span_id` / `parent_span_id` để dựng call chain
-- [x] Viết `docs/label-audit.md` (một trang, có bảng số liệu)
-- [x] `scripts/make_splits.py` — chia dev/val/test stratified, seed 42
-- [x] Khởi tạo repo, `pyproject.toml`, cấu trúc thư mục theo `01-architecture-design.md` §7
-- [x] Copy `AGENTS.md`, `docs/05-agent-coding-rules.md`, `docs/06-scope-guard.md` vào repo
-
----
-
-## Task KHÔNG được làm tuần này
-
-- Viết bất kỳ retrieval strategy nào
-- Port detector hoặc judge
-- Dựng ClickHouse schema
-- Viết dashboard
-- Bất cứ thứ gì thuộc Tuần 2 trở đi
+- [x] `docker-compose.yml` profiles dev/full
+- [x] `infra/clickhouse/init.sql`, `infra/postgres/init.sql` theo `03`
+- [x] `packages/schemas/` — toàn bộ model ở `03` §1, kèm `loaders.py` bọc `scripts/nezha_windows.py`
+- [x] Port `services/replayer` từ GĐ1 → `NezhaReplaySource`
+- [x] Port `services/detector` (Isolation Forest 0.85) → `IsolationForestDetector`
 
 ---
 
 ## Definition of Done
 
-- [x] Biết chính xác có bao nhiêu fault window có nhãn root-cause
-      → **704 fault window / 95.660 cửa sổ, từ 101/101 lần tiêm lỗi**
-- [x] `data/splits/{dev,val,test}.json` được commit
-      → dev 19.316 · val 28.898 · test 46.849 cửa sổ, seed 42
-- [x] Nếu thiếu nhãn: đã ra quyết định và ghi vào `docs/experiment-log.md`
-      → không thiếu nhãn; các quyết định QĐ-001 … QĐ-006 đã ghi
+- [x] Một lệnh dựng được toàn bộ môi trường dev
+      → `docker compose --profile dev up -d` chạy được, `clickhouse` +
+      `postgres` đều `healthy`. Hai lỗi hạ tầng gặp và vá khi kiểm chứng lần
+      đầu — xem QĐ-010 trong `docs/experiment-log.md`.
+- [x] Replay 50 window → alert candidate ghi vào ClickHouse
+      → `scripts/replay_smoke.py --windows 50`: fit 19.316 cửa sổ dev, replay
+      50 cửa sổ, sinh 14 `AlertCandidate`. Xác nhận bằng truy vấn trực tiếp:
+      `SELECT count(), sum(candidate_source='metric') FROM
+      aiops.fact_alert_evaluation WHERE run_id='week2-smoke'` → `50  14`,
+      khớp chính xác với output script.
 
 ---
 
 ## Cổng chặn
+
+**QUA.** Toàn bộ code và test (32/32, `pytest tests/ -q`) đã xong và xác nhận
+đúng trên dữ liệu thật. Cả hai vế DoD đã kiểm chứng: môi trường dev dựng bằng
+một lệnh, và 50 window replay ghi đúng 50 dòng (14 candidate) vào
+`fact_alert_evaluation`, xác nhận bằng truy vấn trực tiếp trong ClickHouse.
+Được phép sang Tuần 3.
+
+---
+
+## Cổng chặn Tuần 1 (đã qua)
 
 **QUA.** Nezha có sẵn nhãn root-cause mức pod cho cả 101 lần tiêm lỗi, ánh xạ
 100% lên tên service, trace có đủ `SpanID`/`ParentID`. Không phải gán nhãn tay,
@@ -61,6 +63,18 @@ không phải đổi dataset. Được phép sang Tuần 2.
 ---
 
 ## Ghi chú trong tuần
+
+**Rolling buffer, hoãn Rescue Score, lỗi dữ liệu NaN latency (QĐ-009).** Port
+`IsolationForestDetector` gặp ba vấn đề ngoài roadmap gốc: (1) lệch đơn vị cửa
+sổ giữa `MetricWindow` nhiều-điểm của GĐ1 và `TelemetryWindow` một-điểm của
+GĐ2 — giải quyết bằng rolling buffer theo service (người dùng chọn qua
+AskUserQuestion), kèm cold-start guard để không cảnh báo giả khi buffer chưa
+đầy; (2) Rescue Score (nhánh "else" SS6.2) hoãn có chủ ý sang Tuần 8 — chưa có
+dữ liệu log/trace trong `TelemetryWindow` và roadmap không yêu cầu ở Tuần 2;
+(3) 6 cột latency percentile của Nezha chứa chuỗi literal `"NaN"` ở cửa sổ 0
+request, ảnh hưởng 28,58% số cửa sổ toàn corpus — đã lọc bỏ trong
+`packages/schemas/loaders.py`. Chi tiết đầy đủ trong `docs/experiment-log.md`
+QĐ-009.
 
 **Lỗi múi giờ trong dataset (QĐ-002).** Nezha ghi mỗi mốc thời gian hai lần và
 hai bản không khớp: ngày 2023-01-29 có 24/28 lần tiêm lỗi bị lệch 8 tiếng ở cột
@@ -97,9 +111,18 @@ python -m pytest tests/ -q              # 8 test canh split
 
 ---
 
-## Tuần sau (Tuần 2) — chưa được bắt đầu
+## Lệnh tái lập Tuần 2 (cần Docker Desktop đang chạy, xem QĐ-010 nếu cổng 9000 bận)
 
-Hạ tầng và port GĐ1: `docker-compose` profiles, `infra/*/init.sql` theo tài liệu
-`03`, `packages/schemas/`, port replayer và detector. Việc đầu tiên nên làm là
-bọc `scripts/nezha_windows.py` thành `packages/schemas/loaders.py` để không code
-nào phải tự parse CSV Nezha lần nữa.
+```bash
+docker compose --profile dev up -d      # clickhouse + postgres
+python -m pytest tests/ -q              # 32 test, không cần Docker/dataset
+python scripts/replay_smoke.py --windows 50   # fit + replay + ghi ClickHouse
+```
+
+---
+
+## Tuần sau (Tuần 3) — chưa được bắt đầu
+
+Interface và tái lập baseline GĐ1 — tuần quan trọng nhất của Tháng 1. Phải
+chạy cổng chặn hai lần (`--time-source epoch` rồi `--time-source wall`, xem
+QĐ-002) để phân biệt "port sai" với "nhãn đã sửa".

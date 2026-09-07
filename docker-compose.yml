@@ -6,12 +6,19 @@ services:
     profiles: ["dev", "full"]
     ports:
       - "8123:8123"
-      - "9000:9000"
+      # Host 9000 is permanently held by Zscaler (ZSATunnel.exe) on this
+      # machine -- remapped to 9004. Only the HTTP interface (8123) is used
+      # by packages/storage/clickhouse.py (clickhouse_connect); this native
+      # TCP port is for clickhouse-client and isn't required by the pipeline.
+      - "9004:9000"
     environment:
       CLICKHOUSE_DB: aiops
       CLICKHOUSE_PASSWORD: aiops
     volumes:
-      - ./volumes/clickhouse:/var/lib/clickhouse
+      # Named volume, not a ./volumes bind mount: ClickHouse's atomic-rename
+      # insert path fails with "Permission denied" on a Windows/WSL2-shared
+      # bind mount (unlike postgres below, which tolerates it fine).
+      - clickhouse-data:/var/lib/clickhouse
       - ./infra/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ulimits:
       nofile: { soft: 262144, hard: 262144 }
@@ -87,3 +94,6 @@ services:
 
 # Ollama runs outside Docker (see docs/Final_Thesis_Phase2/07-setup-guide.md §6) —
 # run `ollama serve` on the host, not as a compose service.
+
+volumes:
+  clickhouse-data:

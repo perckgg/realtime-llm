@@ -50,12 +50,13 @@ Danh sách đóng. Nếu một việc không nằm ở đây, mặc định là 
 - [x] 5 retrieval strategy: `bm25_hybrid` (baseline), `temporal`, `cross_modal`, `graph`, `hybrid_bm25_graph`
 - [x] Interface chung `RetrievalStrategy` để hoán đổi bằng config
 - [x] Service dependency graph dựng từ trace Nezha
-- [x] Rescue Score có tham số + ablation xác định α, β, γ, τ
+- [x] Weighted Context Fusion cho Topology-Aware RAG có tham số α, β, γ (Paper & Luận văn)
 - [x] Eval harness sinh P/R/F1/FPR/coverage/latency/tokens có CI
 - [x] Chấm context precision thủ công trên mẫu
 
 ### Nhánh B — RCA Agent
 
+- [x] Rescue Score có tham số η1, η2, η3, τ + ablation xác định cấu hình tối ưu
 - [x] Alert Grouping theo thời gian + topology
 - [x] Fault Propagation Analysis: backward tracing mức 1-hop và mức full path
 - [x] Diagnostic Summary theo JSON schema cố định, có validator

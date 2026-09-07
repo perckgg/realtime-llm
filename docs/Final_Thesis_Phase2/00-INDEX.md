@@ -43,7 +43,7 @@ Những thứ đã có, **port sang chứ không viết lại**:
 | LLM-as-a-Judge | 3 nhãn, `require_evidence_for_true_alert` | Port nguyên vẹn |
 | Local-first LLM routing | llama3.2:3b + Gemini Flash Lite fallback | Port nguyên vẹn |
 | LLM response cache | Đã có | **Bắt buộc giữ** — chạy lại thực nghiệm không được tốn tiền |
-| Context Rescue | Heuristic cứng | GĐ2 thay bằng công thức Rescue Score có tham số |
+| Context Rescue | Heuristic cứng | GĐ2 thay bằng công thức Rescue Score có tham số (η1, η2, η3, τ) |
 
 ## Số liệu baseline GĐ1 — mốc so sánh bắt buộc
 

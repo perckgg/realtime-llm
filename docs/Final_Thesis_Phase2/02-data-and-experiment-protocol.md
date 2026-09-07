@@ -61,7 +61,7 @@ Kết quả đo ghi vào `docs/graph-coverage.md` ở Tuần 4. Nếu graph quá
 | Split | Tỷ lệ | Dùng để | Được chạm bao nhiêu lần |
 |---|---|---|---|
 | `dev` | 20% | Debug, phát triển, thử nhanh | Không giới hạn |
-| `val` | 30% | Tuning Rescue Score (α, β, γ, τ), chọn tham số biến thể RAG | Không giới hạn |
+| `val` | 30% | Tuning Rescue Score (η1, η2, η3, τ), chọn tham số Fusion Score (α, β, γ) | Không giới hạn |
 | `test` | 50% | Báo cáo kết quả cuối trong luận văn | **Một lần, từ Tuần 11** |
 
 ### 2.2 Cách chia
@@ -108,9 +108,9 @@ detector:
 
 rescue:
   enabled: true
-  alpha: 0.5
-  beta: 0.3
-  gamma: 0.2
+  eta1: 0.5                    # trọng số mật độ log lỗi (Λ_log)
+  eta2: 0.3                    # trọng số độ cận kề topology (Φ_topo)
+  eta3: 0.2                    # trọng số độ cận kề thời gian (Δ_time)
   tau: 0.6
 
 retrieval:
@@ -118,7 +118,11 @@ retrieval:
   top_k: 6
   max_tokens: 4000
   timeout_ms: 500
+  fusion_mode: weighted        # weighted (chính, paper core) | rrf (baseline)
   params:
+    alpha: 0.4                 # trọng số BM25 norm
+    beta: 0.3                  # trọng số TimeSim
+    gamma: 0.3                 # trọng số GraphSim
     hop: 2
     decay_factor: 0.6
 
@@ -240,21 +244,23 @@ Kết luận "các biến thể tương đương" **là một kết quả nghiê
 
 ---
 
-## 6. Ablation Rescue Score (Tuần 8)
+## 6. Ablation Rescue Score & Fusion Score (Tuần 8 & Tuần 10)
 
-### 6.1 Không gian tham số
+### 6.1 Không gian tham số Rescue Score (Tuần 8 — Luận văn)
+
+Công thức: `RescueScore(w | A) = η1·Λ_log(w) + η2·Φ_topo(w, A) + η3·Δ_time(w, A) >= τ`
 
 ```text
-α, β, γ  ∈ {0, 0.2, 0.4, 0.6, 0.8, 1.0}, ràng buộc α + β + γ = 1
-τ        ∈ {0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}
+η1, η2, η3 ∈ {0, 0.2, 0.4, 0.6, 0.8, 1.0}, ràng buộc η1 + η2 + η3 = 1
+τ          ∈ {0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}
 ```
 
-Số tổ hợp hợp lệ của (α, β, γ) với ràng buộc tổng = 1 là 21, nhân 7 giá trị τ = 147 cấu hình. Chạy trên `val` split.
+Số tổ hợp hợp lệ của (η1, η2, η3) với ràng buộc tổng = 1 là 21, nhân 7 giá trị τ = 147 cấu hình. Chạy trên `val` split.
 
 ### 6.2 Chạy thế nào cho rẻ
 
 - Bật LLM cache. Cùng một prompt chỉ gọi LLM một lần trong toàn bộ ablation.
-- Tính trước `λ_log`, `φ_topo`, `δ_time` cho mọi window một lần, lưu ra file. Ablation chỉ là tổ hợp tuyến tính trên các giá trị đã tính — không cần chạy lại pipeline 147 lần.
+- Tính trước `Λ_log`, `Φ_topo`, `Δ_time` cho mọi window một lần, lưu ra file `data/rescue_features.parquet`. Ablation chỉ là tổ hợp tuyến tính trên các giá trị đã tính — không cần chạy lại pipeline 147 lần.
 
 Đây là tối ưu quan trọng nhất của Tuần 8. Nếu không làm, ablation sẽ mất nhiều ngày và tốn tiền API.
 
@@ -266,7 +272,17 @@ Vẽ đường cong: trục x = τ, trục y trái = Recall, trục y phải = s
 
 ### 6.4 Khi nào rút gọn công thức
 
-Nếu ablation cho thấy một thành phần chiếm ưu thế rõ rệt (ví dụ β tối ưu ≈ 0), rút về công thức hai tham số và ghi rõ lý do. Điều này đã được dự phòng trong bảng rủi ro của bản định hướng — thực hiện nó không phải thất bại.
+Nếu ablation cho thấy một thành phần chiếm ưu thế rõ rệt (ví dụ η2 tối ưu ≈ 0), rút về công thức hai tham số và ghi rõ lý do. Điều này đã được dự phòng trong bảng rủi ro của bản định hướng — thực hiện nó không phải thất bại.
+
+### 6.5 Ablation Fusion Score (Tuần 10 — Paper & Luận văn)
+
+Công thức xếp hạng context: `Score_fusion(c | s0, t0) = α·BM25_norm(c, q) + β·TimeSim(tc, t0) + γ·GraphSim(sc, s0)`
+
+```text
+α, β, γ ∈ {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}, ràng buộc α + β + γ = 1
+```
+
+Quét lưới tham số trên `val` để tìm bộ (α, β, γ) tối ưu hóa Context Precision và F1 chẩn đoán downstream, chứng minh định hướng: *Topology-Aware RAG vượt trội so với chỉ dùng từ khóa (α=1) hoặc chỉ dùng thời gian (β=1)*.
 
 ---
 

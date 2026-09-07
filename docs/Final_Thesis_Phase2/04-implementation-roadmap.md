@@ -106,13 +106,13 @@ Thứ tự đã đổi so với bản định hướng gốc: Graph RAG lên tr�
 
 | Task | Output |
 |---|---|
-| Tính trước `λ_log`, `φ_topo`, `δ_time` cho mọi window, lưu ra file | `data/rescue_features.parquet` |
-| Quét 147 tổ hợp (α,β,γ,τ) trên các giá trị đã tính | `eval/results/rescue_ablation/` |
+| Tính trước `Λ_log`, `Φ_topo`, `Δ_time` cho mọi window, lưu ra file | `data/rescue_features.parquet` |
+| Quét 147 tổ hợp (η1, η2, η3, τ) trên các giá trị đã tính | `eval/results/rescue_ablation/` |
 | Vẽ đường cong τ vs (Recall, số lần gọi LLM) | Hình cho luận văn |
 | Quyết định: giữ 3 tham số hay rút về 2 | Ghi vào experiment-log |
 
 **DoD Tuần 8:**
-- [ ] Có bộ (α, β, γ, τ) tối ưu trên val
+- [ ] Có bộ (η1, η2, η3, τ) tối ưu trên val
 - [ ] Có hình đường cong độ nhạy τ
 - [ ] Ablation chạy xong trong dưới 2 giờ nhờ pre-compute + cache
 
@@ -130,14 +130,14 @@ Thứ tự đã đổi so với bản định hướng gốc: Graph RAG lên tr�
 
 Alert Grouping không phụ thuộc biến thể RAG nào thắng → bắt đầu ngay, đừng chờ Tháng 4.
 
-### Tuần 10 — Hybrid BM25 + Graph
+### Tuần 10 — Hybrid BM25 + Graph (Weighted Context Fusion & RRF)
 
 | Task | Output |
 |---|---|
-| `retrieval/hybrid_bm25_graph.py` — RRF merge, `k=60` | Strategy `hybrid_bm25_graph` |
-| Quét `k ∈ {20, 60}`, kết hợp `hop` tốt nhất từ Tuần 6 | Run trên val |
+| `retrieval/hybrid_bm25_graph.py` — Weighted Context Fusion (α, β, γ) & RRF merge | Strategy `hybrid_bm25_graph` |
+| Quét lưới (α, β, γ) cho Weighted Fusion; so sánh với RRF `k ∈ {20, 60}` | Run trên val (Paper core) |
 
-Đây là biến thể có giá trị cận biên thấp nhất. Nếu Tuần 10 trễ, đây là thứ đầu tiên bị cắt (xem §8).
+Đây là biến thể lõi cho bài báo *Topology-Aware RAG + Weighted Context Fusion*.
 
 ### Tuần 11 — Chạy test split, chốt Nhánh A
 

@@ -105,7 +105,7 @@ class RetrievalResult(BaseModel):
 | `temporal` | `window_size_sec` đã chọn, `score_mapping` |
 | `cross_modal` | `channel`, `channel_rank`, `fusion_weight` |
 | `graph` | `graph_distance`, `decay_applied`, `path` |
-| `hybrid_bm25_graph` | `bm25_rank`, `graph_rank`, `rrf_score` |
+| `hybrid_bm25_graph` | `bm25_norm`, `time_sim`, `graph_sim`, `score_final` (nếu weighted) hoặc `bm25_rank`, `graph_rank`, `rrf_score` (nếu rrf) |
 
 ### 1.4 JudgedAlert
 
