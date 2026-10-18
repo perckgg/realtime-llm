@@ -12,7 +12,8 @@ Thời gian ước tính: nửa ngày đến một ngày.
 |---|---|---|
 | Python | 3.11+ | 3.12 cũng được |
 | Docker + Docker Compose | v2 | `docker compose` không phải `docker-compose` |
-| Ollama | mới nhất | Chạy ngoài Docker cho nhẹ |
+| ~~Ollama~~ | — | **Không cần trong GĐ2** (QĐ-013): judge là `gemini-2.5-flash-lite` qua API. Các bước Ollama bên dưới chỉ còn để tham chiếu GĐ1 |
+| `GEMINI_API_KEY` | — | Bắt buộc khi chạy judge thật; không cần cho G-port (mock) và demo offline từ cache |
 | Git | bất kỳ | |
 | RAM | ≥ 16 GB | Profile `dev` cần ~6 GB |
 | Ổ đĩa trống | ≥ 20 GB | Nezha + ClickHouse + model |

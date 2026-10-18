@@ -81,6 +81,8 @@ class ContextEvent(BaseModel):
     service: str
     content: str                  # dạng text đưa vào prompt
     score: float                  # điểm retrieval
+    origin: Literal["local", "graph"] = "local"  # QĐ-011: graph = có được nhờ mở rộng topology
+    graph_distance: int | None = None             # d_G(service, s0); None nếu không tới được
     debug: dict[str, Any] = {}    # vì sao được chọn: rank BM25, graph distance, kênh...
 
 class RetrievalBudget(BaseModel):
@@ -120,13 +122,26 @@ class JudgedAlert(BaseModel):
     confidence: float             # 0.0 - 1.0
     reasoning: str
     evidence_event_ids: list[str] # tham chiếu ContextEvent
-    judge_backend: str            # llama3.2:3b | gemini-flash-lite
+    judge_backend: str            # gemini-2.5-flash-lite | mock (chỉ G-port) — QĐ-013
     llm_latency_ms: float
     cache_hit: bool
     downgraded_by_evidence_rule: bool = False
 ```
 
 `downgraded_by_evidence_rule` bật khi LLM trả TRUE_ALERT nhưng không nêu evidence → hạ xuống UNCERTAIN. Phải ghi lại để báo cáo tần suất.
+
+**Trường bổ sung cho CTAV (QĐ-011, thêm ở Tuần 8):**
+
+```python
+    raw_verdict: Literal["TRUE_ALERT", "FALSE_POSITIVE", "UNCERTAIN"]  # trước policy C2/C3
+    routing_tier: Literal[1, 2] = 1          # C4: 1 = chỉ BM25, 2 = đã mở rộng topology
+    evidence_origin: Literal["local", "graph", "mixed", "none"] = "none"  # nguồn của evidence được trích
+    threshold_applied: float | None = None   # θ_local hoặc θ_topo đã áp
+    downgraded_by_gating: bool = False       # C2 hạ verdict
+    downgraded_by_anchoring: bool = False    # C3 hạ verdict
+```
+
+`verdict` là kết quả **sau** policy. Giữ cả `raw_verdict` để ablation H3 không cần gọi lại LLM.
 
 ### 1.5 Incident
 
@@ -140,6 +155,13 @@ class Incident(BaseModel):
     end_ts: datetime
     grouping_reason: dict[str, Any]   # temporal_window_sec, graph_edges_used
 ```
+
+### 1.6 Cột ClickHouse cho CTAV
+
+`fact_alert_evaluation` (§3.1) cần thêm `raw_verdict`, `routing_tier`, `evidence_origin`,
+`threshold_applied`, `downgraded_gating`, `downgraded_anchoring`; `fact_retrieval_trace`
+(§3.2) cần thêm `origin`, `graph_distance`. Bảng đã có dữ liệu smoke Tuần 2 ⇒ thêm bằng
+script `infra/clickhouse/migrations/001_ctav_columns.sql` theo §7, không sửa `init.sql` tại chỗ.
 
 ---
 

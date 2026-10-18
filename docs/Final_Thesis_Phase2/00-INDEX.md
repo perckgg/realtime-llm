@@ -18,6 +18,7 @@
 | `05-agent-coding-rules.md` | Quy tắc kỹ thuật bắt buộc cho AI coding agent | Nạp vào context mỗi phiên code |
 | `06-scope-guard.md` | **Bộ neo mục tiêu** — chống lạc đề, chống scope creep | Nạp vào context mỗi phiên code |
 | `07-setup-guide.md` | Dựng môi trường, bộ khung repo, đưa code GĐ1 vào | **Làm đầu tiên**, trước Tuần 1 |
+| `08-research-direction.md` | **Giải pháp CTAV**: vấn đề từ paper, GĐ1 → GĐ2, thành phần C1–C5, giả thuyết H0–H5 và cách chứng minh, platform demo, đầu ra cuối cùng | Đầu mỗi chặng; khi viết luận văn |
 | `AGENTS.md` | File bootstrap đặt ở gốc repo, agent tự đọc | Copy vào gốc repo |
 | `CURRENT-WEEK.md` | Tuần đang làm, cập nhật đầu mỗi tuần | Copy vào `docs/` |
 
@@ -25,9 +26,11 @@
 
 ## Mục tiêu Giai đoạn 2 — phát biểu một câu
 
-> Xây dựng một nền tảng chạy được, có khả năng: (A) so sánh có kiểm soát bốn biến thể RAG trên dữ liệu Nezha để xác định kiến trúc retrieval tối ưu cho bài toán AIOps, và (B) dùng biến thể tối ưu đó làm nền tảng cho một tác tử chẩn đoán nguyên nhân gốc rễ sinh báo cáo có cấu trúc.
+> Đề xuất và chứng minh **CTAV** (Calibrated Topology-Aware Alert Validation), một phương pháp thẩm định cảnh báo có nhận biết topology, được hiệu chỉnh theo nguồn gốc bằng chứng: giữ mức tăng recall của topology mà không làm tăng báo động giả so với BM25 trong cùng ngân sách LLM **(A)**; dùng CTAV làm nền cho tác tử RCA định vị service gốc **(B)**; hiện thực hoá cả hai trên một platform chạy được để demo trước hội đồng.
 
-Mọi dòng code trong 24 tuần tới phải phục vụ một trong hai mệnh đề A hoặc B. Nếu không, xem `06-scope-guard.md`.
+Mọi dòng code phải phục vụ A, B, hoặc platform demo của chúng. Nếu không, xem `06-scope-guard.md`.
+
+**Mạch luận văn:** GĐ1 (thực nghiệm khả thi) → paper ICAETM 2026 (phát hiện vấn đề: topology tăng recall nhưng gây thiên lệch xác nhận, FP 7 → 137) → GĐ2 (giải pháp CTAV + chứng minh H0–H5 + platform). Chi tiết giải pháp, giả thuyết, cách chứng minh: **`08-research-direction.md`** (QĐ-011, 2026-10-18).
 
 ---
 
@@ -40,38 +43,60 @@ Những thứ đã có, **port sang chứ không viết lại**:
 | Streaming replay + watermark | Đã hoạt động | Port nguyên vẹn |
 | Isolation Forest detector | threshold 0.85 | Port nguyên vẹn |
 | BM25 hybrid retrieval | top-6, latency ~11ms | Trở thành strategy `bm25_hybrid`, dùng làm baseline |
+| Topology fusion (paper) | `legacy/src/phase2/retrieval/` | Trở thành `hybrid_bm25_graph` = C1 của CTAV |
 | LLM-as-a-Judge | 3 nhãn, `require_evidence_for_true_alert` | Port nguyên vẹn |
-| Local-first LLM routing | llama3.2:3b + Gemini Flash Lite fallback | Port nguyên vẹn |
+| Local-first LLM routing | qwen2.5:1.5b / llama3.2:3b + Gemini fallback | **Không dùng trong GĐ2** (QĐ-013): judge cố định là `gemini-2.5-flash-lite` qua API — lý do ở `08` §4.1 |
 | LLM response cache | Đã có | **Bắt buộc giữ** — chạy lại thực nghiệm không được tốn tiền |
 | Context Rescue | Heuristic cứng | GĐ2 thay bằng công thức Rescue Score có tham số (η1, η2, η3, τ) |
 
-## Số liệu baseline GĐ1 — mốc so sánh bắt buộc
+## Số liệu baseline — hai loại, dùng cho hai việc khác nhau
+
+**(1) Mốc kiểm tra port — GĐ1 Phase 4/5, judge giả (`provider: mock`).** Chỉ dùng để
+kiểm tra code GĐ2 port đúng (cổng chặn G-port, Tuần 9). **Không** dùng làm số liệu khoa
+học: judge mock không phải LLM.
 
 | Chỉ số | Giá trị GĐ1 | Nguồn |
 |---|---|---|
-| Precision (hybrid BM25 top-6, 300 windows) | 0.32 | Phase 4 |
-| FPR (hybrid BM25 top-6) | 0.046 | Phase 4 |
-| F1 (có Context Rescue) | 0.781 | Phase 5 |
-| Recall (có Context Rescue) | 1.000 | Phase 5 |
-| Context coverage | 0.47 | Phase 5 |
+| Precision (hybrid BM25 top-6, `paper_300`) | 0.3158 (6 TP / 13 FP) | Phase 4, mock |
+| Recall / FPR (hybrid BM25 top-6) | 0.375 / 0.0458 | Phase 4, mock |
+| F1 khi không có RAG | 0.000 | Phase 4, mock |
+| F1 / Recall (có Context Rescue) | 0.781 / 1.000 | Phase 5, mock |
 | Retrieval latency (BM25) | ~11 ms | Phase 4 |
-| F1 khi không có RAG | 0.000 | Phase 3/4 |
 
-Nếu pipeline GĐ2 không tái lập được các con số này ở Tuần 3, **dừng lại và sửa** trước khi làm tiếp. Đây là kiểm chứng tính đúng đắn của việc port code.
+Cấu hình GĐ1 Phase 4: threshold 0.95, fit 1.000 cửa sổ đầu, gate 0.80/0.98, ngân sách 30
+lần gọi (`legacy/nezha_setup/config/experiment_phase4_benchmark.yaml`).
+
+**(2) Baseline khoa học — paper ICAETM 2026, gemini-2.5-flash-lite thật, `paper_500`.**
+Dùng cho cổng chặn G-paper (Tuần 10) và là điểm xuất phát của H0.
+
+| Chỉ số (full budget, top-6) | BM25 | Topology (C1) |
+|---|---|---|
+| Precision / Recall | 0.892 / 0.58 | 0.351 / 0.74 |
+| F1 | 0.703 | 0.476 |
+| FPR (FP / 400 normal) | 0.0175 (7) | 0.3425 (137) |
+| Context coverage | 0.225 | 1.000 |
+| F1 @ 120 lần gọi | 0.508 | 0.514 (LLM-không-RAG: 0.566) |
+
+Lưu ý: "F1 không RAG = 0.000" của GĐ1 (mock) mâu thuẫn với 0.566 của paper (LLM thật).
+Luận văn phải nói rõ điều này.
 
 ---
 
 ## Mục tiêu số liệu Giai đoạn 2
 
-**Nhánh A — RAG variants**
+**Nhánh A — CTAV** (định nghĩa đầy đủ ở `08` §5; ngưỡng định lượng chốt khi đăng ký giả thuyết, Tuần 15)
 
 | Chỉ số | Mục tiêu |
 |---|---|
-| F1 của biến thể tốt nhất | ≥ 0.78 |
-| Context coverage | ≥ 0.47 |
-| Retrieval latency Graph RAG | ≤ 3× baseline BM25 (≤ 33 ms) |
-| Avg context tokens | Ghi nhận để phân tích cost/quality |
+| F1(CTAV) − F1(BM25) trên `test` | > 0, CI 95% không chứa 0, McNemar p < 0.05 (H2) |
+| Recall CTAV | ≥ Recall C1 − δ (giữ phần lớn mức tăng của topology) |
+| FPR CTAV | không tệ hơn BM25 có ý nghĩa thống kê |
+| Ablation C2 / C3 / C4 | mỗi thành phần có Δ có ý nghĩa ở chỉ số nó nhắm tới (H3) |
+| F1 @ ngân sách giới hạn | ≥ LLM-không-RAG (H4) |
+| Retrieval latency C1 | ≤ 3× BM25 |
 | Context precision | Chấm thủ công trên mẫu ≥ 50 window |
+
+Chỉ tiêu cũ "F1 ≥ 0.78" bị bỏ: nó lấy từ GĐ1 Phase 5 đo bằng judge mock.
 
 **Nhánh B — RCA Agent**
 
@@ -96,8 +121,8 @@ Nếu pipeline GĐ2 không tái lập được các con số này ở Tuần 3, 
 | Analytics DB | ClickHouse | Alert, retrieval trace, per-window results |
 | Metadata DB | PostgreSQL | Incident, diagnostic report, run registry |
 | Graph | NetworkX | Service dependency graph, đủ cho quy mô Nezha |
-| LLM local | Ollama + llama3.2:3b | Local-first |
-| LLM API | Gemini Flash Lite | Fallback |
+| LLM | `gemini-2.5-flash-lite` qua API, temperature 0 | Judge duy nhất, cố định cho mọi thực nghiệm; cache bắt buộc (QĐ-013) |
+| LLM local | ~~Ollama~~ | Không dùng trong GĐ2 (phần cứng + lý do phương pháp, `08` §4.1) |
 | Dashboard | React + Recharts, fallback Streamlit | Quyết định ở Tuần 18, xem `04` |
 | Đóng gói | Docker Compose, profiles `dev` / `full` | Không Kubernetes trong GĐ2 |
 
@@ -108,6 +133,7 @@ Nếu pipeline GĐ2 không tái lập được các con số này ở Tuần 3, 
 Khi bắt đầu một phiên code, nạp theo thứ tự:
 
 ```
+08-research-direction.md (giải pháp CTAV, giả thuyết — đọc khi bắt đầu chặng mới)
 06-scope-guard.md      (mục tiêu và ranh giới)
 05-agent-coding-rules.md (quy tắc kỹ thuật)
 01-architecture-design.md (kiến trúc)

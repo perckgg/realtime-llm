@@ -347,3 +347,106 @@ Zscaler), nên giữ nguyên kể cả trên máy không có Zscaler. Cổng `90
 vá cho máy này; nếu máy khác không có gì chiếm cổng 9000, đổi lại
 `docker-compose.yml` cho khớp môi trường đó không bắt buộc vì client chỉ dùng
 8123.
+
+---
+
+## 2026-10-18 — QĐ-011. Đổi hướng GĐ2: từ "so sánh biến thể RAG" sang giải pháp CTAV + chứng minh, giữ platform demo; xếp lại lịch
+
+**Bối cảnh.** GVHD yêu cầu GĐ2 phải đưa ra một giải pháp và chứng minh giải pháp đó,
+không chỉ thực nghiệm như GĐ1. Kế hoạch cũ (Nhánh A = so sánh 5 biến thể RAG) vẫn là
+thực nghiệm. Paper ICAETM 2026 đã cho thấy topology tăng recall (0.58 → 0.74) nhưng tăng
+báo động giả trên traffic bình thường (7 → 137), F1 giảm (0.703 → 0.476) — một vấn đề
+cụ thể chưa có lời giải. Review ngày 2026-10-18 còn phát hiện: (1) toàn bộ baseline GĐ1
+Phase 4/5 (P 0.32, FPR 0.046, F1 không RAG 0.000, F1 có Rescue 0.781) đo bằng judge
+`mock`; (2) `hybrid_bm25_graph` — lõi của paper — vừa nằm ở Tuần 10 vừa đứng đầu danh
+sách cắt; (3) Tuần 3–7 không có tiến độ.
+
+**Quyết định (người dùng yêu cầu cập nhật plan theo hướng này).**
+1. Mục tiêu GĐ2: đề xuất và chứng minh **CTAV** = C1 Fusion Score topology (paper) +
+   C2 asymmetric gating θ_topo > θ_local + C3 evidence anchoring + C4 adaptive two-tier
+   routing (+ C5 Rescue Score); Nhánh B = RCA agent trên nền CTAV; platform demo giữ nguyên.
+   Chi tiết: `docs/Final_Thesis_Phase2/08-research-direction.md`.
+2. Chứng minh bằng giả thuyết H0–H5, đăng ký trước khi chạm `test`, kiểm định bootstrap
+   CI + McNemar, ablation từng thành phần, ≥ 3 lần chạy.
+3. Retrieval thu gọn còn `bm25_hybrid` và `hybrid_bm25_graph`; `temporal`/`graph` thành
+   ablation của C1; `cross_modal` và RRF cắt (ghi `docs/ideas.md`).
+4. Ngưỡng gating ký hiệu θ_local, θ_topo (không dùng η như paper, tránh trùng η1..η3 của
+   Rescue Score — QĐ-008).
+5. Lịch: giữ mốc bảo vệ Tuần 24 (tuần 2027-02-08); việc của Tuần 3 cũ làm ở Tuần 8;
+   `test` chạm ở Tuần 16 thay vì Tuần 11; không còn tuần đệm; thứ tự cắt mới ở `04` §8.
+6. Bỏ chỉ tiêu "F1 ≥ 0.78" (gốc từ số mock); chỉ tiêu mới theo H2–H5 (`00-INDEX.md`).
+
+**Tài liệu đã cập nhật:** `00-INDEX.md`, `01` §6.3–6.4, `02` §5.3–5.4 và §6.5, `03` §1.3,
+§1.4, §1.6, `04` (viết lại từ Tuần 8), `06` §1–§3, §4, §8, §10, `08`, `AGENTS.md`,
+`docs/CURRENT-WEEK.md`.
+
+**Còn mở:** Q1–Q5 ở `08` §9 (judge chính, phạm vi đánh giá, xử lý metric thiếu, lịch sử
+buffer, mốc bảo vệ) — chốt đầu Tuần 8.
+
+---
+
+## 2026-10-18 — QĐ-012. Định nghĩa lại cổng chặn "tái lập baseline" thành hai cổng G-port và G-paper
+
+**Bối cảnh.** Cổng chặn Tuần 3 cũ yêu cầu Precision ≈ 0.32 (±0.03), FPR ≈ 0.046 trên
+"300 window đầu của dev". So với cấu hình đã sinh ra con số đó
+(`legacy/nezha_setup/config/experiment_phase4_benchmark.yaml`), `eval/configs/bm25_baseline.yaml`
+khác ở: ngưỡng detector (0.85 vs 0.95), cách fit (toàn dev vs 1.000 cửa sổ đầu), judge
+(LLM thật vs `mock`), gate (không có vs 0.80/0.98, tối đa 30 lần gọi), tập cửa sổ (dev
+theo thời gian, ~2 fault, vs `paper_300` đóng băng, 16 fault / 284 normal), đơn vị cửa
+sổ (60 s vs 120 s bước 60 s). Thêm nữa P = 6/19, nên lệch 1 TP đã ra ngoài ±0.03. Cổng
+cũ sẽ trượt dù port đúng, và không nói được lỗi nằm ở tầng nào.
+
+**Quyết định.**
+- **G-port (Tuần 9):** `eval/configs/gd1_phase4_parity.yaml` đúng cấu hình GĐ1 Phase 4,
+  chạy trên `paper_300` ánh xạ sang `window_id` GĐ2. So từng tầng với đầu vào của GĐ1:
+  retrieval (40 candidate từ audit GĐ1 → top-6 trùng doc ID), judge mock (verdict trùng),
+  toàn pipeline (P 0.3158, FPR 0.0458, recall 0.375; lệch ≤ 1 cửa sổ mỗi ô ma trận nhầm
+  lẫn, giải thích được), detector (so phân phối điểm, không đòi trùng tuyệt đối do đơn vị
+  cửa sổ khác — QĐ-009).
+- **G-paper (Tuần 10):** `eval/configs/paper_viewA_replay.yaml` tái lập Table 1 của paper
+  trên `paper_500` từ cache Gemini, cache hit 100%.
+- `bm25_baseline.yaml` giữ lại làm điểm xuất phát cho H0 trên split GĐ2 (Tuần 11), không
+  còn là config của cổng chặn.
+
+---
+
+## 2026-10-18 — QĐ-013. Judge duy nhất là `gemini-2.5-flash-lite` qua API; không chạy LLM local, không local-first
+
+**Bối cảnh.** Q1 của `08` §9. Kế hoạch cũ port nguyên local-first (llama3.2:3b qua
+Ollama, fallback Gemini Flash Lite). Người dùng cho biết máy thực nghiệm không đủ tài
+nguyên chạy LLM local, nên sẽ tập trung vào LLM API, nhưng cần lý do hợp lý để trình bày.
+
+**Quyết định.** Mọi thực nghiệm chính (H0–H5) dùng một model API cố định
+`gemini-2.5-flash-lite`, temperature 0, cùng prompt; không local-first, không fallback
+sang model khác. Lỗi API: retry có trần, hết retry ⇒ `manual_review` + ghi log. Backend
+`mock` chỉ dùng cho G-port.
+
+**Lý do** (đầy đủ ở `08` §4.1):
+1. Judge là biến cố định của thiết kế thực nghiệm; câu hỏi nghiên cứu nằm ở retrieval +
+   chính sách quyết định.
+2. Local-first tạo biến ẩn: model nào chấm một alert phụ thuộc lỗi/timeout của model local
+   ⇒ so sánh giữa các cấu hình không còn có kiểm soát, không tái lập được.
+3. Paper đo bằng `gemini-2.5-flash-lite`; cùng model mới tái lập được paper từ cache (G-paper).
+4. GĐ1 đã đo (báo cáo GĐ1 §4.7.5, §4.8.4, qwen2.5:1.5b, 45 cửa sổ): 4/6 lần gọi phải
+   chuyển sang Gemini (3 do `local_error`); độ trễ 4.585 ms vs 338 ms; F1 0.769 vs 0.800.
+5. Phần cứng không đủ cho model local đủ lớn ở quy mô hàng nghìn lần gọi mỗi run.
+6. Chi phí API thấp: paper đo ≈ 0,00013 USD/lần chấm (BM25), ≈ 0,00034 USD (topology);
+   policy C2/C3 chạy lại trên cache không tốn lần gọi.
+7. Nezha là benchmark công khai ⇒ không có vấn đề riêng tư khi gửi dữ liệu ra API.
+
+**Hệ quả.**
+- Cache key thêm `repeat` (mặc định 0): `sha256(prompt + model + temperature + max_tokens + repeat)`.
+  Với temperature 0 + cache, "3 lần chạy" cho cùng kết quả; phương sai đo bằng
+  `repeat ∈ {0, 1, 2}` trên tập con. Sửa quy tắc 4 trong `AGENTS.md`.
+- Mỗi bản ghi lưu model id/phiên bản trả về để chống trôi phiên bản model.
+- Demo bảo vệ chạy offline hoàn toàn từ cache.
+- `eval/configs/bm25_baseline.yaml` đổi khối `judge` sang `backend: api`, `model: gemini-2.5-flash-lite`.
+- Ollama không còn là yêu cầu cài đặt (`07` §1). Local-first được trình bày như kết quả GĐ1 và
+  hướng GĐ3 (`docs/ideas.md`).
+
+**Tài liệu đã cập nhật:** `00-INDEX.md` (bảng kế thừa, ngăn xếp công nghệ), `01` §5.4, §6.4,
+sơ đồ §3, §7; `02` §3.1; `03` §1.4; `04` Tuần 8; `06` §3; `07` §1; `08` §4.1, §5.2, §9;
+`AGENTS.md`; `docs/CURRENT-WEEK.md`; `docs/ideas.md`.
+
+**Cần kiểm ở Tuần 9:** số candidate thật trên `val` ⇒ ước tính chi phí mỗi run và tổng
+ngân sách API cho Chặng 2–3, ghi vào file này.

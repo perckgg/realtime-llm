@@ -65,7 +65,7 @@ Trong GĐ2 chỉ implement `NezhaReplaySource`. `KafkaSource` để trống vớ
                                  ▼
                     ┌──────────────────────────┐
                     │  Judge Service           │
-                    │  - local-first routing   │
+                    │  - gemini-2.5-flash-lite │
                     │  - require_evidence      │
                     └────────────┬─────────────┘
                                  │  JudgedAlert (TRUE/FP/UNCERTAIN)
@@ -207,7 +207,7 @@ class Judge(Protocol):
         """Trả về verdict TRUE_ALERT / FALSE_POSITIVE / UNCERTAIN kèm evidence."""
 ```
 
-Implement: `LLMJudge` với local-first routing.
+Implement: `LLMJudge` gọi một model API cố định (`gemini-2.5-flash-lite`, QĐ-013) qua cache; backend `mock` chỉ cho G-port.
 
 ---
 
@@ -250,20 +250,25 @@ Phải ghi lại `rescue_score` và các thành phần vào ClickHouse cho mọi
 
 ### 6.3 `services/retrieval`
 
-Trách nhiệm: chứa 5 strategy, chọn theo config.
+Trách nhiệm: chứa 2 strategy, chọn theo config (QĐ-011 — thu gọn từ 5).
 
 ```text
 retrieval/
   base.py              # Protocol + RetrievalBudget + RetrievalResult
   bm25_hybrid.py       # baseline, port từ GĐ1
-  temporal.py          # cửa sổ thích nghi theo anomaly score
-  cross_modal.py       # 3 kênh log/trace/metric + weighted fusion
-  graph.py             # lan rộng theo service dependency graph
-  hybrid_bm25_graph.py # Weighted Context Fusion (chính) / RRF merge (phụ)
+  hybrid_bm25_graph.py # C1 của CTAV: Weighted Context Fusion, port từ legacy/src/phase2/retrieval/
   registry.py          # name -> class, dùng bởi config loader
 ```
 
-Chi tiết từng biến thể:
+Mỗi `ContextEvent` phải ghi `origin` (`local` = cùng service `s_0` hoặc lấy từ BM25;
+`graph` = có được nhờ mở rộng topology) và `graph_distance` — chính sách C2/C3 ở
+`services/judge` cần hai trường này (`03` §1.3).
+
+> **Đã cắt ở QĐ-011** (giữ mô tả bên dưới để tham chiếu): `temporal` và `graph` thuần
+> trở thành ablation của `hybrid_bm25_graph` (β = 1, γ = 1); `cross_modal` và chế độ RRF
+> bị cắt, ghi vào `docs/ideas.md`.
+
+Chi tiết từng biến thể (bản thiết kế cũ):
 
 **`temporal`** — window size = ánh xạ tuyến tính từ anomaly score:
 `window = window_min + (window_max - window_min) * normalized_score`.
@@ -289,8 +294,23 @@ Hỗ trợ hai chế độ tính điểm:
 Port từ GĐ1. Giữ nguyên:
 - Prompt template và cấu trúc output 3 nhãn
 - `require_evidence_for_true_alert`: verdict TRUE_ALERT bị hạ xuống UNCERTAIN nếu LLM không nêu được evidence cụ thể
-- Local-first: thử llama3.2:3b trước, fallback Gemini Flash Lite khi timeout/lỗi/output không parse được
-- Response cache theo `hash(prompt + model + temperature)`
+- ~~Local-first: thử llama3.2:3b trước, fallback Gemini Flash Lite~~ — **bỏ ở QĐ-013**: một model API cố định `gemini-2.5-flash-lite`, không fallback sang model khác. Lỗi API: retry có trần, hết retry ⇒ `manual_review` + ghi log
+- Response cache theo `hash(prompt + model + temperature + max_tokens + repeat)` — `repeat` (mặc định 0) để đo phương sai bằng cách gọi lại thật (`08` §4.1)
+- Mỗi bản ghi lưu model id/phiên bản API trả về
+- Backend `mock` của GĐ1 — chỉ dùng cho cổng chặn G-port, không dùng cho số liệu khoa học
+
+Thêm mới cho CTAV (QĐ-011, `08` §4):
+
+```text
+judge/
+  llm_judge.py   # port GĐ1, trả verdict thô của LLM
+  policy.py      # C2 asymmetric gating (θ_local, θ_topo) + C3 evidence anchoring
+  routing.py     # C4: tầng 1 BM25 -> judge; UNCERTAIN/thiếu bằng chứng -> tầng 2 topology -> judge
+```
+
+- `policy.py` là hàm thuần trên (verdict thô, `RetrievalResult`, graph) → verdict cuối;
+  chạy lại được trên verdict đã cache mà **không gọi LLM**, nên quét θ rất rẻ.
+- Verdict thô và verdict sau policy đều được ghi lại, để đo đóng góp của từng thành phần (H3).
 
 ### 6.5 `services/rca_agent`
 
@@ -386,7 +406,7 @@ aiops-rca-platform/
   packages/
     schemas/                   # pydantic models, dùng chung mọi service
     graph/                     # service dependency graph builder
-    llm/                       # client, cache, local-first router
+    llm/                       # client API (gemini-2.5-flash-lite), cache, retry có trần
     storage/                   # ClickHouse + Postgres client
 
   eval/

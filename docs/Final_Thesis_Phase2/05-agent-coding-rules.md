@@ -28,11 +28,11 @@ def __init__(self, hop: int, decay_factor: float):
 
 Mỗi run có `run_id` và `seed` trong config. Không có config thì không phải thực nghiệm, chỉ là thử nghiệm cá nhân — và kết quả không được đưa vào luận văn.
 
-### R-A2 — Không chạm test split trước Tuần 11
+### R-A2 — Không chạm test split trước Tuần 16 (QĐ-011)
 
 Tuning tham số chỉ trên `val`. Debug chỉ trên `dev`.
 
-Nếu agent thấy `split: test` trong config trước Tuần 11, phải dừng và hỏi lại.
+Nếu agent thấy `split: test` trong config trước Tuần 16, phải dừng và hỏi lại.
 
 ### R-A3 — Kết quả không bao giờ bị ghi đè
 

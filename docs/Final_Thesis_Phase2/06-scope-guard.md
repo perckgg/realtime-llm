@@ -8,9 +8,11 @@
 
 ## 1. Mục tiêu duy nhất
 
-> Xây dựng một nền tảng chạy được, có khả năng: **(A)** so sánh có kiểm soát bốn biến thể RAG trên dữ liệu Nezha để xác định kiến trúc retrieval tối ưu cho bài toán AIOps, và **(B)** dùng biến thể tối ưu đó làm nền tảng cho một tác tử chẩn đoán nguyên nhân gốc rễ sinh báo cáo có cấu trúc.
+> **(A)** Đề xuất và chứng minh **CTAV** — thẩm định cảnh báo có nhận biết topology, được hiệu chỉnh theo nguồn gốc bằng chứng — giữ mức tăng recall của topology mà không làm tăng báo động giả so với BM25 trong cùng ngân sách LLM; **(B)** dùng CTAV làm nền cho tác tử RCA định vị service gốc và sinh báo cáo có cấu trúc; cả hai chạy trên **một platform demo được** trước hội đồng.
 
-Đây không phải một sản phẩm. Đây là **bằng chứng cho hai luận điểm khoa học**. Mọi thứ khác là phương tiện.
+Đây không phải một sản phẩm. Đây là **bằng chứng cho hai luận điểm khoa học** (giả thuyết H0–H5, `08-research-direction.md` §5), cộng với platform hiện thực hoá chúng. Mọi thứ khác là phương tiện.
+
+> Cập nhật 2026-10-18 (QĐ-011): trước đây Nhánh A là "so sánh 4–5 biến thể RAG". GVHD yêu cầu GĐ2 đưa ra giải pháp và chứng minh nó, nên Nhánh A đổi sang CTAV; số biến thể retrieval thu gọn (xem §3).
 
 ---
 
@@ -35,7 +37,8 @@ Ví dụ áp dụng:
 | Bootstrap CI cho metrics | Cả hai | Có — không có CI thì kết luận không vững | Làm |
 | Thêm dark mode cho dashboard | Không | Không | Không làm |
 | Cache LLM response | Cả hai | Có — không cache thì ablation không khả thi | Làm |
-| Thêm vector search làm biến thể RAG thứ 6 | Nhánh A | Không — 5 biến thể đã đủ trả lời câu hỏi nghiên cứu | Không làm |
+| Thêm vector search làm biến thể RAG mới | Nhánh A | Không — câu hỏi nghiên cứu là hiệu chỉnh quyết định trên topology, không phải tìm thêm retriever | Không làm |
+| Quét θ_topo cho asymmetric gating | Nhánh A | Có — không có đường cong này thì H2/H3 không vững | Làm |
 | Viết Dockerfile production multi-stage | Không | Không | Không làm |
 | Unit test cho hàm tính F1 | Cả hai | Có — F1 sai thì luận văn sai | Làm |
 
@@ -45,13 +48,19 @@ Ví dụ áp dụng:
 
 Danh sách đóng. Nếu một việc không nằm ở đây, mặc định là ngoài phạm vi.
 
-### Nhánh A — So sánh chiến lược RAG
+### Nhánh A — Giải pháp CTAV và chứng minh
 
-- [x] 5 retrieval strategy: `bm25_hybrid` (baseline), `temporal`, `cross_modal`, `graph`, `hybrid_bm25_graph`
+- [x] 2 retrieval strategy: `bm25_hybrid` (baseline), `hybrid_bm25_graph` (C1 — Weighted Context Fusion α, β, γ của paper)
+- [x] Temporal-only (β = 1) và graph-only (γ = 1) **chỉ là ablation** của C1, không phải module riêng
+- [x] C2 Asymmetric Confidence Gating (θ_local, θ_topo) — `services/judge/policy.py`
+- [x] C3 Evidence anchoring (bằng chứng phải neo vào `s_0` hoặc đường gọi lỗi/chậm tới `s_0`) — `services/judge/policy.py`
+- [x] C4 Adaptive Two-Tier Routing (BM25 trước, topology khi cần) — `services/judge/routing.py`
+- [x] Baseline so sánh: detector-only, LLM-không-RAG, BM25, C1 chưa hiệu chỉnh
+- [x] Thí nghiệm cơ chế H1 (tỷ lệ bằng chứng graph trong prompt)
 - [x] Interface chung `RetrievalStrategy` để hoán đổi bằng config
 - [x] Service dependency graph dựng từ trace Nezha
-- [x] Weighted Context Fusion cho Topology-Aware RAG có tham số α, β, γ (Paper & Luận văn)
-- [x] Eval harness sinh P/R/F1/FPR/coverage/latency/tokens có CI
+- [x] Eval harness sinh P/R/F1/FPR/coverage/latency/tokens/chi phí có bootstrap CI + McNemar
+- [x] Đăng ký giả thuyết trước khi chạy `test`
 - [x] Chấm context precision thủ công trên mẫu
 
 ### Nhánh B — RCA Agent
@@ -68,7 +77,7 @@ Danh sách đóng. Nếu một việc không nằm ở đây, mặc định là 
 
 - [x] Stream replayer từ Nezha có watermark
 - [x] Isolation Forest detector
-- [x] LLM judge với local-first routing + cache
+- [x] LLM judge: một model API cố định `gemini-2.5-flash-lite` + cache (QĐ-013; local-first không dùng trong GĐ2)
 - [x] ClickHouse + PostgreSQL lưu kết quả
 - [x] API đọc dữ liệu
 - [x] Dashboard 4 màn hình
@@ -114,7 +123,7 @@ Agent **không được tự ý thêm** bất kỳ mục nào dưới đây. N�
 
 | Mục | Vì sao cấm |
 |---|---|
-| Biến thể RAG thứ 6 trở lên | 5 biến thể đã trả lời được câu hỏi nghiên cứu; thêm nữa làm loãng và không kịp |
+| Biến thể retrieval thứ 3 trở lên (`cross_modal`, RRF, vector search, reranker...) | Đã cắt ở QĐ-011, ghi trong `ideas.md`; câu hỏi nghiên cứu nằm ở chính sách quyết định, không ở retriever |
 | Detector thứ hai (LSTM, GDN, MTAD-GAT) | Detector là biến cố định trong thiết kế thực nghiệm; đổi nó phá vỡ tính so sánh |
 | Thêm nhãn thứ tư cho judge | GĐ1 đã chốt 3 nhãn |
 | Prompt engineering tùy hứng | Prompt là biến cố định giữa các biến thể RAG; đổi prompt giữa chừng làm kết quả không so sánh được |
@@ -213,8 +222,11 @@ Nếu agent thấy mình đang làm việc không có trong tuần hiện tại,
 | Cổng | Tuần | Điều kiện | Nếu không đạt |
 |---|---|---|---|
 | Nhãn dữ liệu | 1 | Biết chính xác Nezha có nhãn root-cause hay không | Dừng, gán tay hoặc đổi dataset |
-| Tái lập baseline | 3 | Precision ≈ 0.32, FPR ≈ 0.046 trên 300 window | Dừng, tìm lỗi port code |
-| Quy trình test split | 11 | Chỉ chạm `test` một lần, sau khi đã chốt tham số trên `val` | Không có cách sửa — phải trung thực ghi lại |
+| G-port | 9 | Tái lập GĐ1 Phase 4 theo từng tầng trên `paper_300` (judge mock): P = 0.3158, FPR = 0.0458, lệch ≤ 1 cửa sổ mỗi ô — QĐ-012 | Dừng, tìm lỗi port code |
+| G-paper | 10 | Tái lập Table 1 của paper từ cache Gemini, cache hit 100% | Dừng, tìm chỗ prompt/retrieval khác GĐ1 |
+| Quy trình test split | 16 | Chỉ chạm `test` một lần, sau khi đã đăng ký giả thuyết và chốt tham số trên `val` | Không có cách sửa — phải trung thực ghi lại |
+
+(Hai cổng "Tái lập baseline Tuần 3" và "test split Tuần 11" cũ được thay bằng ba cổng trên ở QĐ-011/QĐ-012.)
 
 Vượt cổng bằng cách bỏ qua điều kiện là cách chắc chắn nhất để hỏng luận văn.
 
@@ -236,8 +248,9 @@ Nếu có câu trả lời đáng lo, xử lý ngay trong tuần, đừng để 
 ## 10. Nhắc lại, ngắn gọn
 
 ```text
-Mục tiêu:  A = biến thể RAG nào tốt nhất cho AIOps
-           B = tác tử RCA sinh chẩn đoán có cấu trúc
+Mục tiêu:  A = CTAV: topology + hiệu chỉnh theo nguồn gốc bằng chứng, chứng minh bằng H0–H4
+           B = tác tử RCA trên nền CTAV, chứng minh bằng H5
+           Platform demo được trước hội đồng
 
 Dữ liệu:   Nezha, chia dev/val/test cố định
 Cấm:       test split trước Tuần 11

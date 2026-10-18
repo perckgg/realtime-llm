@@ -62,7 +62,7 @@ Kết quả đo ghi vào `docs/graph-coverage.md` ở Tuần 4. Nếu graph quá
 |---|---|---|---|
 | `dev` | 20% | Debug, phát triển, thử nhanh | Không giới hạn |
 | `val` | 30% | Tuning Rescue Score (η1, η2, η3, τ), chọn tham số Fusion Score (α, β, γ) | Không giới hạn |
-| `test` | 50% | Báo cáo kết quả cuối trong luận văn | **Một lần, từ Tuần 11** |
+| `test` | 50% | Báo cáo kết quả cuối trong luận văn | **Một lần, từ Tuần 16** (QĐ-011) |
 
 ### 2.2 Cách chia
 
@@ -79,7 +79,7 @@ File split được **commit vào git** và không được sinh lại. Nếu ph
 
 ### 2.3 Quy tắc test split
 
-- Không chạy thực nghiệm trên `test` trước Tuần 11
+- Không chạy thực nghiệm trên `test` trước Tuần 16 (QĐ-011; trước đây Tuần 11) và trước khi đăng ký giả thuyết
 - Không tuning bất kỳ tham số nào dựa trên kết quả `test`
 - Nếu lỡ nhìn kết quả `test` sớm, phải ghi lại vào `docs/experiment-log.md` — luận văn trung thực về việc này vẫn tốt hơn luận văn giấu
 
@@ -128,9 +128,9 @@ retrieval:
 
 judge:
   type: llm
-  backend: local_first
-  local_model: llama3.2:3b
-  fallback_model: gemini-flash-lite
+  backend: api                 # QĐ-013: một model API cố định, không local-first, không fallback
+  model: gemini-2.5-flash-lite
+  temperature: 0
   require_evidence: true
   cache: true
 
@@ -232,6 +232,21 @@ def bootstrap_ci(per_window_results, metric_fn, n_boot=1000, seed=42):
 
 Ngoài ra, mỗi cấu hình chạy với **ít nhất 3 seed khác nhau** (42, 123, 2024) và báo cáo trung bình ± độ lệch chuẩn.
 
+So sánh hai phương pháp trên **cùng tập cửa sổ** (CTAV vs BM25, CTAV vs C1...) phải kèm
+**McNemar test chính xác** trên đúng/sai từng cửa sổ, như paper đã làm (QĐ-011):
+
+```python
+# eval/harness/stats.py
+def mcnemar_exact(correct_a: list[bool], correct_b: list[bool]) -> float:
+    """p-value hai phía trên các cặp bất đồng (b, c)."""
+```
+
+### 5.4 Giả thuyết đăng ký trước
+
+Giả thuyết H0–H5 và tiêu chí bác bỏ nằm ở `08-research-direction.md` §5. Bản có ngưỡng
+định lượng được commit vào `docs/experiment-log.md` ở Tuần 15, **trước** lần chạy `test`
+duy nhất. Không sửa giả thuyết sau khi đã thấy kết quả `test`.
+
 ### 5.3 Cách phát biểu kết luận
 
 | Tình huống | Cách viết đúng |
@@ -244,9 +259,9 @@ Kết luận "các biến thể tương đương" **là một kết quả nghiê
 
 ---
 
-## 6. Ablation Rescue Score & Fusion Score (Tuần 8 & Tuần 10)
+## 6. Ablation Rescue Score & Fusion Score (Tuần 15 & Tuần 11 theo lịch QĐ-011)
 
-### 6.1 Không gian tham số Rescue Score (Tuần 8 — Luận văn)
+### 6.1 Không gian tham số Rescue Score (Tuần 15 theo lịch QĐ-011 — Luận văn)
 
 Công thức: `RescueScore(w | A) = η1·Λ_log(w) + η2·Φ_topo(w, A) + η3·Δ_time(w, A) >= τ`
 
@@ -274,7 +289,11 @@ Vẽ đường cong: trục x = τ, trục y trái = Recall, trục y phải = s
 
 Nếu ablation cho thấy một thành phần chiếm ưu thế rõ rệt (ví dụ η2 tối ưu ≈ 0), rút về công thức hai tham số và ghi rõ lý do. Điều này đã được dự phòng trong bảng rủi ro của bản định hướng — thực hiện nó không phải thất bại.
 
-### 6.5 Ablation Fusion Score (Tuần 10 — Paper & Luận văn)
+### 6.5 Ablation Fusion Score (Tuần 11 theo lịch QĐ-011 — Paper & Luận văn)
+
+> QĐ-011: lưới này chạy **retrieval-only** (không gọi LLM) trên `val`, và gồm luôn
+> temporal-only (β = 1) và graph-only (γ = 1) thay cho hai strategy `temporal`, `graph`
+> đã cắt. Ablation của CTAV (C2/C3/C4, θ_topo) xem `08` §5 và `04` Tuần 13–14.
 
 Công thức xếp hạng context: `Score_fusion(c | s0, t0) = α·BM25_norm(c, q) + β·TimeSim(tc, t0) + γ·GraphSim(sc, s0)`
 

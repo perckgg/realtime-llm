@@ -10,21 +10,22 @@ Nền tảng nghiên cứu cho luận văn thạc sĩ: **AIOps RCA Platform**.
 
 Mục tiêu duy nhất:
 
-> **(A)** So sánh có kiểm soát bốn biến thể RAG trên dữ liệu Nezha để xác định kiến trúc retrieval tối ưu cho bài toán giám sát microservices, và **(B)** dùng biến thể tối ưu đó làm nền tảng cho một tác tử chẩn đoán nguyên nhân gốc rễ sinh báo cáo có cấu trúc.
+> **(A)** Đề xuất và chứng minh **CTAV** (Calibrated Topology-Aware Alert Validation): thẩm định cảnh báo có nhận biết topology, được hiệu chỉnh theo nguồn gốc bằng chứng, giữ mức tăng recall của topology mà không làm tăng báo động giả so với BM25 trong cùng ngân sách LLM; **(B)** dùng CTAV làm nền cho tác tử RCA định vị service gốc, sinh báo cáo có cấu trúc; cả hai chạy trên **một platform demo được** trước hội đồng.
 
-Đây **không phải sản phẩm thương mại**. Đây là bằng chứng cho hai luận điểm khoa học. Tối ưu cho khả năng tái lập thực nghiệm, không phải cho vận hành production.
+Đây **không phải sản phẩm thương mại**. Đây là bằng chứng cho hai luận điểm khoa học (giả thuyết H0–H5) cộng platform hiện thực hoá chúng. Tối ưu cho khả năng tái lập thực nghiệm, không phải cho vận hành production.
 
 ---
 
 ## Đọc gì trước khi code
 
-Bắt buộc, theo thứ tự:
+Bắt buộc, theo thứ tự (tất cả nằm trong `docs/Final_Thesis_Phase2/`):
 
-1. `docs/06-scope-guard.md` — mục tiêu và ranh giới. **Đọc trước tiên.**
-2. `docs/05-agent-coding-rules.md` — quy tắc kỹ thuật
-3. `docs/01-architecture-design.md` — kiến trúc, 4 Protocol lõi
-4. `docs/03-schemas-and-contracts.md` — mọi model và DDL
-5. `docs/04-implementation-roadmap.md` — **chỉ đọc phần tuần hiện tại**
+1. `06-scope-guard.md` — mục tiêu và ranh giới. **Đọc trước tiên.**
+2. `08-research-direction.md` — giải pháp CTAV, giả thuyết, cách chứng minh
+3. `05-agent-coding-rules.md` — quy tắc kỹ thuật
+4. `01-architecture-design.md` — kiến trúc, 4 Protocol lõi
+5. `03-schemas-and-contracts.md` — mọi model và DDL
+6. `04-implementation-roadmap.md` — **chỉ đọc phần tuần hiện tại**
 
 Tuần hiện tại: xem `docs/CURRENT-WEEK.md`.
 
@@ -33,16 +34,16 @@ Tuần hiện tại: xem `docs/CURRENT-WEEK.md`.
 ## Năm quy tắc không được vi phạm
 
 1. **Không hardcode tham số thí nghiệm.** Mọi tham số đến từ `eval/configs/*.yaml`.
-2. **Không chạm `test` split trước Tuần 11.** Tuning chỉ trên `val`, debug chỉ trên `dev`.
+2. **Không chạm `test` split trước Tuần 16** (và trước khi đăng ký giả thuyết). Tuning chỉ trên `val`, debug chỉ trên `dev`.
 3. **Không ghi đè `eval/results/`.** Chạy lại với tham số khác = `run_id` mới.
-4. **Mọi lời gọi LLM đi qua cache.** Key = `sha256(prompt + model + temperature + max_tokens)`.
+4. **Mọi lời gọi LLM đi qua cache.** Key = `sha256(prompt + model + temperature + max_tokens + repeat)`, `repeat` mặc định 0 (QĐ-013). Judge duy nhất: `gemini-2.5-flash-lite` qua API — không local-first, không fallback sang model khác.
 5. **Không thêm gì ngoài danh sách phạm vi** trong `docs/06-scope-guard.md` §3.
 
 ---
 
 ## Cấm tuyệt đối
 
-Không tự ý thêm: Kubernetes · vector database · LangChain/AutoGen/CrewAI · MCTS · fine-tuning · authentication · multi-tenant · alert notification · runbook thực thi · biến thể RAG thứ 6 · detector thứ hai.
+Không tự ý thêm: Kubernetes · vector database · LangChain/AutoGen/CrewAI · MCTS · fine-tuning · authentication · multi-tenant · alert notification · runbook thực thi · retrieval strategy thứ 3 (`cross_modal`, RRF, reranker... đã cắt ở QĐ-011) · detector thứ hai.
 
 Nếu nghĩ một trong số này là ý hay: ghi vào `docs/ideas.md` và tiếp tục làm theo đặc tả.
 
@@ -51,17 +52,19 @@ Nếu nghĩ một trong số này là ý hay: ghi vào `docs/ideas.md` và tiế
 ## Kiến trúc tóm tắt
 
 ```text
-Replayer → Detector → Retrieval → Judge → [RCA Agent] → ClickHouse/Postgres → API → Dashboard
-           (IForest)  (5 chiến    (LLM     (grouping →
-                       lược)       local-   propagation →
-                                   first)   summary)
+Replayer → Detector → CTAV ─────────────────────────────────────→ [RCA Agent] → ClickHouse/Postgres → API → Dashboard
+           (IForest   tầng 1 BM25 → judge                          (grouping →
+            +Rescue)  tầng 2 topology (C1) khi cần (C4) → judge     propagation →
+                      policy: gating θ_topo>θ_local (C2) + anchoring (C3)   summary)
 ```
 
 Bốn Protocol lõi ở `packages/schemas/protocols.py`: `SourceAdapter`, `Detector`, `RetrievalStrategy`, `Judge`.
-**Không đổi signature của chúng** mà không cập nhật `docs/01-architecture-design.md` trong cùng commit.
+**Không đổi signature của chúng** mà không cập nhật `docs/Final_Thesis_Phase2/01-architecture-design.md` trong cùng commit.
 
-Năm retrieval strategy: `bm25_hybrid` (baseline GĐ1) · `temporal` · `cross_modal` · `graph` · `hybrid_bm25_graph`.
+Hai retrieval strategy: `bm25_hybrid` (baseline) · `hybrid_bm25_graph` (C1, Fusion Score α, β, γ của paper).
+Temporal-only / graph-only là ablation của C1, không phải module riêng.
 Tham số riêng nằm trong `__init__`, không thêm vào signature của `retrieve()`.
+C2/C3 ở `services/judge/policy.py`, C4 ở `services/judge/routing.py`.
 
 ---
 
@@ -72,31 +75,29 @@ Tham số riêng nằm trong `__init__`, không thêm vào signature của `retr
 docker compose --profile dev up -d
 docker compose --profile full up -d
 
-# Thực nghiệm
-python -m eval run --config eval/configs/<name>.yaml
-python -m eval compare --runs bm25_baseline,temporal,graph
-python -m eval ablation --config eval/configs/rescue_ablation.yaml
+# Thực nghiệm (máy này dùng `py`, không có `python` trên PATH)
+py -m eval run --config eval/configs/<name>.yaml
+py -m eval compare --runs bm25_baseline,topology_c1,ctav_final
+py -m eval ablation --config eval/configs/rescue_ablation.yaml
 
 # Kiểm tra
-pytest
-mypy packages services
-ruff check .
+py -m pytest
+py -m mypy packages services
+py -m ruff check .
 ```
 
 ---
 
-## Số liệu baseline Giai đoạn 1 — mốc kiểm chứng
+## Hai loại baseline — mốc kiểm chứng
 
-| Chỉ số | Giá trị |
-|---|---|
-| Precision (BM25 hybrid top-6, 300 window) | 0.32 |
-| FPR | 0.046 |
-| F1 có Context Rescue | 0.781 |
-| Recall có Context Rescue | 1.000 |
-| Context coverage | 0.47 |
-| Retrieval latency BM25 | ~11 ms |
+**Kiểm tra port (G-port, Tuần 9)** — GĐ1 Phase 4, **judge mock**, `paper_300`, threshold 0.95, gate 0.80/0.98, ngân sách 30:
+Precision 0.3158 (6 TP / 13 FP), Recall 0.375, FPR 0.0458, latency BM25 ~11 ms.
+Config: `eval/configs/gd1_phase4_parity.yaml`. Lệch quá 1 cửa sổ mỗi ô ma trận nhầm lẫn = port sai — dừng và sửa.
 
-Pipeline mới phải tái lập được các con số này ở Tuần 3. Lệch nhiều nghĩa là port sai — dừng và sửa.
+**Baseline khoa học (G-paper, Tuần 10)** — paper ICAETM 2026, gemini-2.5-flash-lite, `paper_500`, full budget:
+BM25 F1 0.703 / FP 7; Topology F1 0.476 / FP 137. Phải tái lập từ cache, cache hit 100%.
+
+Không dùng số mock (kể cả "F1 không RAG = 0.000", "F1 có Rescue = 0.781") làm kết luận khoa học.
 
 ---
 
