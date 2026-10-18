@@ -41,6 +41,7 @@ class TraceSpan(BaseModel):
 class TelemetryWindow(BaseModel):
     window_id: str            # duy nhất, ổn định giữa các lần chạy
     service: str
+    pod: str | None = None        # QĐ-015: nhãn và rolling buffer của detector theo pod
     start_ts: datetime
     end_ts: datetime
     metrics: list[MetricPoint]

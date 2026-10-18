@@ -8,8 +8,8 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-import services.replayer.nezha_source as nezha_source
 from packages.schemas.models import TelemetryWindow
+from services.replayer import nezha_source
 
 
 def _window(window_id: str, service: str, ts: datetime) -> TelemetryWindow:
@@ -58,3 +58,38 @@ def test_deterministic_across_repeated_streams(monkeypatch, unordered_windows):
     first = [w.window_id for w in source.stream()]
     second = [w.window_id for w in source.stream()]
     assert first == second == ["a", "b", "c"]
+
+
+def test_history_mode_streams_all_but_evaluates_only_selected(monkeypatch, unordered_windows):
+    # QD-015 (D2): the split marks evaluated windows; history windows still stream.
+    seen_filters = []
+
+    def fake_loader(**kwargs):
+        seen_filters.append(kwargs.get("window_ids"))
+        return iter(list(unordered_windows))
+
+    monkeypatch.setattr(nezha_source, "iter_telemetry_windows", fake_loader)
+    source = nezha_source.NezhaReplaySource(window_ids={"b"}, speed_multiplier=0, include_history=True)
+    streamed = list(source.stream())
+    assert [w.window_id for w in streamed] == ["a", "b", "c"]
+    assert [source.is_evaluated(w) for w in streamed] == [False, True, False]
+    assert seen_filters == [None]
+
+
+def test_history_mode_limit_counts_evaluated_windows_only(monkeypatch, unordered_windows):
+    monkeypatch.setattr(nezha_source, "iter_telemetry_windows", lambda **kwargs: iter(list(unordered_windows)))
+    source = nezha_source.NezhaReplaySource(window_ids={"b"}, speed_multiplier=0, include_history=True, limit=1)
+    assert [w.window_id for w in source.stream()] == ["a", "b"]
+
+
+def test_without_history_split_filter_is_passed_to_loader(monkeypatch, unordered_windows):
+    seen_filters = []
+
+    def fake_loader(**kwargs):
+        seen_filters.append(kwargs.get("window_ids"))
+        return iter([w for w in unordered_windows if w.window_id in kwargs["window_ids"]])
+
+    monkeypatch.setattr(nezha_source, "iter_telemetry_windows", fake_loader)
+    source = nezha_source.NezhaReplaySource(window_ids={"b"}, speed_multiplier=0)
+    assert [w.window_id for w in source.stream()] == ["b"]
+    assert seen_filters == [{"b"}]

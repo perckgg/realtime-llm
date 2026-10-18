@@ -476,3 +476,53 @@ theo, kết quả hiện tại, vấn đề cần người dùng giải quyết.
 **Tài liệu đã cập nhật:** `00`, `01` §5, §6.5, `02` §2, §4.4, §5.3–5.4, §6, `03` §1.4, §1.6,
 `04` (viết lại), `05` R-A2 và checklist, `06` §7–§10, `07` checklist, `08` §5.3, §8, §9,
 `AGENTS.md`, `README.md`.
+
+---
+
+## 2026-10-19 — QĐ-015. M1 việc 1: sửa detector (D1–D6) — điền metric thiếu, lịch sử liên tục theo pod, chấm điểm idempotent
+
+**Bối cảnh.** Review 2026-10-18 (`docs/milestones/M0-nen-tang.md` §2, R1–R5) tìm ra các lỗi ở
+`IsolationForestDetector` port ở M0. Người dùng chọn: metric thiếu → giá trị gần nhất của
+cùng pod + cờ thiếu (Q3); detector được thấy lịch sử liên tục ngoài split (Q4).
+
+**Thay đổi.**
+
+| # | Vấn đề | Sửa | File |
+|---|---|---|---|
+| D1 | Metric thiếu (latency `"NaN"` bị loader bỏ) bị điền 0.0 trong vector đặc trưng | Điền bằng giá trị quan sát gần nhất của cùng pod; pod chưa từng có → median của tập fit; thêm đặc trưng `missing_fraction` cho mỗi metric (7 đặc trưng/metric thay vì 6) | `services/detector/isolation_forest.py` |
+| D2 | Buffer chỉ thấy cửa sổ thuộc split → cửa sổ khởi phát lỗi có lịch sử từ ≥ 10 phút trước | `NezhaReplaySource(include_history=True)` phát mọi cửa sổ theo thời gian, split chỉ đánh dấu cửa sổ được chấm (`is_evaluated`); `detector.observe()` cho cửa sổ ngoài split; `fit(windows, train_ids)` dùng lịch sử đầy đủ nhưng chỉ lấy cửa sổ trong `train_ids` làm mẫu huấn luyện. Không dùng nhãn của cửa sổ ngoài split | `services/replayer/nezha_source.py`, `isolation_forest.py` |
+| D3 | `score()` gọi hai lần là đẩy buffer hai lần | Đẩy idempotent theo `window_id`; `is_candidate()` chỉ đúng cho cửa sổ vừa được đẩy cuối cùng | `isolation_forest.py` |
+| D4 | mypy dừng ngay (stub numpy cần ≥ 3.12); ruff 11 lỗi | `[tool.mypy] python_version = "3.12"`; sửa hết lỗi ruff | `pyproject.toml` |
+| D5 | Chạy lại smoke cùng `run_id` nhân đôi dòng ClickHouse | `run_exists()`; `replay_smoke.py` bắt buộc `--run-id` và từ chối `run_id` đã có | `packages/storage/clickhouse.py`, `scripts/replay_smoke.py` |
+| D6 | Buffer theo service, `TelemetryWindow` không có pod | Thêm `TelemetryWindow.pod` (`03` §1.1); buffer theo pod, fallback service | `packages/schemas/models.py`, `loaders.py` |
+
+Phần còn lại của D6 (đưa `buffer_size`, cách fit vào `eval/configs/`; bỏ phụ thuộc
+`packages` → `scripts`) dời sang M2 cùng harness.
+
+**Kết quả.** Bảng QĐ-015-1. Detector trên split dev, fit và chấm cùng dev (in-sample, như
+smoke M0), threshold 0.85, `buffer_size` 2, seed 42. Script đo: xem phụ lục báo cáo M1.
+
+| Biến thể | Candidate | TP | FP | Recall detector | FPR |
+|---|---|---|---|---|---|
+| Trước (code M0) | 2.895 | 67 | 2.828 | 0.4497 | 0.1475 |
+| Chỉ D1 + D6 (không lịch sử) | 2.896 | 66 | 2.830 | 0.4430 | 0.1476 |
+| **Sau: D1 + D2 + D6** | **2.898** | **73** | **2.825** | **0.4899** | **0.1474** |
+
+- 149 fault window dev: trước có 18/138 cửa sổ có mẫu liền trước không phải t−60 s; sau:
+  137 cách đúng 60 s, 12 cách 59 hoặc 61 s (lệch nhịp lấy mẫu), 0 cold start ⇒ **149/149 có
+  mẫu liền trước thật**.
+- 4.164/19.316 cửa sổ dev (21,6%) có ít nhất một metric được điền thay vì 0.0.
+- Mức tăng recall (+6 TP) đến từ D2; D1 trung tính về khả năng phát hiện (−1 TP, trong
+  nhiễu) nhưng sửa đúng ngữ nghĩa dữ liệu (QĐ-009).
+- FPR detector vẫn ~0,15 ⇒ trên `val` dự kiến ~4.300 candidate/run — đầu vào cho Q2 ở M2.
+
+**Kiểm chứng.** `py -m pytest tests/ -q` → 48 pass (thêm 16 test: điền metric, idempotent,
+`observe`, buffer theo pod, `train_ids`, chế độ history của replayer, `run_exists`);
+`py -m mypy packages services` → sạch; `py -m ruff check .` → sạch.
+
+**Smoke với ClickHouse thật** (`docker compose --profile dev up -d`, cả hai container
+healthy): `py scripts/replay_smoke.py --windows 50 --run-id m1-smoke` → 50 dòng, 9 candidate,
+48 s. Truy vấn trực tiếp: `run_id='m1-smoke'` có 50 dòng, 50 `window_id` khác nhau, 9
+`candidate_source='metric'`. Cùng đúng 50 cửa sổ như `week2-smoke` (đều là normal): trước 14
+candidate, sau 9, trùng 8 — tức 6 báo động giả của code M0 biến mất, thêm 1 mới; 50 cửa sổ
+normal quá ít để kết luận. Chạy lại cùng `run_id` → script từ chối, số dòng giữ nguyên 50 (D5).

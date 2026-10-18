@@ -51,6 +51,26 @@ def get_client() -> Any:
     )
 
 
+def run_exists(run_id: str, client: Any | None = None) -> bool:
+    """True if fact_alert_evaluation already holds rows for `run_id`.
+
+    Rule 3 of AGENTS.md: results are never overwritten or appended to under
+    the same run_id -- a re-run with other parameters gets a new run_id
+    (QD-015, D5). MergeTree does not deduplicate, so callers must check.
+    """
+    owns_client = client is None
+    client = client or get_client()
+    try:
+        result = client.query(
+            "SELECT count() FROM fact_alert_evaluation WHERE run_id = {run_id:String}",
+            parameters={"run_id": run_id},
+        )
+        return int(result.result_rows[0][0]) > 0
+    finally:
+        if owns_client:
+            client.close()
+
+
 def insert_alert_evaluations(rows: list[dict[str, Any]], client: Any | None = None) -> None:
     """Insert rows into fact_alert_evaluation. Each row must have every key
     in FACT_ALERT_EVALUATION_COLUMNS -- build one with

@@ -28,7 +28,7 @@ Còn mở (không chặn M1): Q2 (chốt ở M2), Q5 (mốc bảo vệ) — xem 
 
 ## Việc được phép làm (theo thứ tự)
 
-1. - [ ] Sửa detector (`docs/milestones/M0-nen-tang.md` §2, R1–R5 + D6): metric thiếu, lịch sử liên tục, `score()` không trạng thái ẩn, mypy/ruff sạch, chặn `run_id` trùng, việc nhỏ. Đo trước/sau trên dev → QĐ-015
+1. - [x] **Xong 2026-10-19 (QĐ-015)** — Sửa detector (`docs/milestones/M0-nen-tang.md` §2, R1–R5 + D6): metric thiếu, lịch sử liên tục, `score()` không trạng thái ẩn, mypy/ruff sạch, chặn `run_id` trùng, việc nhỏ. Đo trước/sau trên dev → QĐ-015
 2. - [ ] `packages/schemas/protocols.py` — 4 Protocol theo `01` §5; `models.py` — `ContextEvent` (có `origin`, `graph_distance`), `RetrievalBudget`, `RetrievalResult`, `JudgedAlert` (có trường CTAV) theo `03` §1.3–1.4
 3. - [ ] `packages/schemas/evidence.py` — loader log/trace Nezha → kho bằng chứng, lọc theo cửa sổ thời gian
 4. - [ ] `services/retrieval/bm25_hybrid.py` — port GĐ1, bỏ tag fault type khỏi truy vấn

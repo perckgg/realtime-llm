@@ -1,6 +1,6 @@
 """Nezha dataset loader that emits packages.schemas.TelemetryWindow.
 
-This is the wrapper promised in docs/CURRENT-WEEK.md's "Tuần sau" note: it
+This is the wrapper promised in the Week 1 "Tuần sau" note: it
 reuses the Week 1 labelling logic in scripts/nezha_windows.py (window
 definition, wall-clock vs epoch join, pod -> service mapping) so that no
 service downstream has to parse the Nezha CSVs itself and risk repeating the
@@ -30,6 +30,7 @@ import os
 from collections.abc import Iterator
 from pathlib import Path
 
+from packages.schemas.models import MetricPoint, TelemetryWindow, WindowLabel
 from scripts.nezha_windows import (
     DEFAULT_TIME_SOURCE,
     LABEL_AFTER_SECONDS,
@@ -44,7 +45,6 @@ from scripts.nezha_windows import (
     parse_wall_clock,
     pod_to_service,
 )
-from packages.schemas.models import MetricPoint, TelemetryWindow, WindowLabel
 
 # Columns that are timestamps or identifiers, not metric values.
 _NON_METRIC_COLUMNS = {"Time", "TimeStamp", "PodName"}
@@ -171,6 +171,7 @@ def _row_to_window(
     return TelemetryWindow(
         window_id=window_id,
         service=service,
+        pod=pod,
         start_ts=start_ts,
         end_ts=end_ts,
         metrics=metrics,

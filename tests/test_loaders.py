@@ -69,3 +69,18 @@ def test_empty_metric_value_is_skipped():
     )
     assert window is not None
     assert window.metrics == []
+
+
+def test_window_carries_pod_name():
+    # QD-015: rolling buffers and ground truth are per pod.
+    window = _row_to_window(
+        _row(),
+        day="2022-08-22",
+        known={},
+        day_injections=(),
+        time_source=DEFAULT_TIME_SOURCE,
+        metric_names=["CpuUsage(m)"],
+        before_after=(60, 360),
+    )
+    assert window is not None
+    assert window.pod == "checkoutservice-578fcf4766-9csqn"

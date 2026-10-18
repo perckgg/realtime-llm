@@ -45,7 +45,9 @@ target-version = "py311"
 exclude = ["legacy", "archive"]
 
 [tool.mypy]
-python_version = "3.11"
+# numpy's stubs use PEP 695 `type` statements, which mypy only accepts for
+# python_version >= 3.12; with 3.11 mypy aborts before checking anything (QD-015, D4).
+python_version = "3.12"
 ignore_missing_imports = true
 explicit_package_bases = true
 

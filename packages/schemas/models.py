@@ -68,6 +68,7 @@ class TelemetryWindow(BaseModel):
 
     window_id: str  # deterministic: hash(service + start_ts), see make_window_id
     service: str
+    pod: str | None = None  # QD-015: ground truth and rolling buffers are per pod (QD-003)
     start_ts: datetime
     end_ts: datetime
     metrics: list[MetricPoint] = []
