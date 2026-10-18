@@ -450,3 +450,29 @@ sơ đồ §3, §7; `02` §3.1; `03` §1.4; `04` Tuần 8; `06` §3; `07` §1; `
 
 **Cần kiểm ở Tuần 9:** số candidate thật trên `val` ⇒ ước tính chi phí mỗi run và tổng
 ngân sách API cho Chặng 2–3, ghi vào file này.
+
+---
+
+## 2026-10-18 — QĐ-014. Lộ trình theo cột mốc M0–M12 thay cho tuần; bắt buộc báo cáo sau mỗi mốc
+
+**Bối cảnh.** QĐ-011 xếp lại lịch theo tuần lịch ("Tuần 8"), trong khi việc đang làm là
+"Tuần 3" của bản gốc — người dùng thấy nhầm. Người dùng yêu cầu tổ chức lại theo cột mốc
+(không cần theo tuần) và sau mỗi mốc phải có log ghi: cần review gì, plan cho mốc tiếp
+theo, kết quả hiện tại, vấn đề cần người dùng giải quyết.
+
+**Quyết định.**
+1. `04-implementation-roadmap.md` viết lại thành 13 mốc M0–M12, mỗi mốc có DoD; cổng chặn:
+   M0 (nhãn), M2 (G-port), M3 (G-paper), M4 (H0), M8 (G-test). Hạn ghi kèm chỉ là mục
+   tiêu mềm để so với mốc bảo vệ (tuần 2027-02-08). Ánh xạ tuần cũ → mốc ở `04` §11.
+2. Đóng một mốc = DoD đạt + báo cáo `docs/milestones/M<n>-<ten>.md` theo mẫu
+   `docs/milestones/README.md`, đủ bốn phần: **Kết quả hiện tại · Cần review gì · Vấn đề
+   cần bạn giải quyết · Plan cho mốc tiếp theo** + người dùng đã xem. Chưa có báo cáo thì
+   chưa sang mốc sau. Báo cáo mốc là "không bao giờ cắt" (`04` §9).
+3. `docs/CURRENT-WEEK.md` → `docs/CURRENT-MILESTONE.md` (đang ở M1); xoá bản mẫu trống
+   `docs/Final_Thesis_Phase2/CURRENT-WEEK.md`.
+4. Viết bù báo cáo M0 (`docs/milestones/M0-nen-tang.md`) từ review 2026-10-18.
+5. Đánh số lại: kết quả sửa detector D1/D2 ghi ở **QĐ-015** (trước đây dự kiến QĐ-014).
+
+**Tài liệu đã cập nhật:** `00`, `01` §5, §6.5, `02` §2, §4.4, §5.3–5.4, §6, `03` §1.4, §1.6,
+`04` (viết lại), `05` R-A2 và checklist, `06` §7–§10, `07` checklist, `08` §5.3, §8, §9,
+`AGENTS.md`, `README.md`.

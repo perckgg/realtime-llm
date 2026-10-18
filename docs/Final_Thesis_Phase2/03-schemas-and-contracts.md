@@ -130,7 +130,7 @@ class JudgedAlert(BaseModel):
 
 `downgraded_by_evidence_rule` bật khi LLM trả TRUE_ALERT nhưng không nêu evidence → hạ xuống UNCERTAIN. Phải ghi lại để báo cáo tần suất.
 
-**Trường bổ sung cho CTAV (QĐ-011, thêm ở Tuần 8):**
+**Trường bổ sung cho CTAV (QĐ-011, thêm ở mốc M1):**
 
 ```python
     raw_verdict: Literal["TRUE_ALERT", "FALSE_POSITIVE", "UNCERTAIN"]  # trước policy C2/C3
@@ -160,7 +160,7 @@ class Incident(BaseModel):
 
 `fact_alert_evaluation` (§3.1) cần thêm `raw_verdict`, `routing_tier`, `evidence_origin`,
 `threshold_applied`, `downgraded_gating`, `downgraded_anchoring`; `fact_retrieval_trace`
-(§3.2) cần thêm `origin`, `graph_distance`. Bảng đã có dữ liệu smoke Tuần 2 ⇒ thêm bằng
+(§3.2) cần thêm `origin`, `graph_distance`. Bảng đã có dữ liệu smoke của M0 ⇒ thêm bằng
 script `infra/clickhouse/migrations/001_ctav_columns.sql` theo §7, không sửa `init.sql` tại chỗ.
 
 ---

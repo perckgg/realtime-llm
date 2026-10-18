@@ -140,7 +140,7 @@ Quy tắc:
 
 ## 5. Interface — phần quan trọng nhất của kiến trúc
 
-Bốn interface dưới đây là xương sống. **Không được đổi signature** sau Tuần 3 mà không cập nhật tài liệu này.
+Bốn interface dưới đây là xương sống. **Không được đổi signature** sau mốc M1 mà không cập nhật tài liệu này.
 
 ### 5.1 SourceAdapter
 
@@ -328,7 +328,7 @@ rca_agent/
 2. Trong mỗi cụm thời gian, dựng đồ thị con từ service dependency graph
 3. Mỗi thành phần liên thông = 1 Incident
 ```
-Không phụ thuộc biến thể RAG nào → **có thể code từ Tuần 9**.
+Không phụ thuộc biến thể RAG nào → **bản khởi động làm song song ở M6**.
 
 **`propagation.py`** — hai mức, implement mức 1 trước:
 - Mức 1 (bắt buộc): từ span lỗi ở frontend đi ngược 1 hop, chọn immediate upstream service có dấu hiệu bất thường

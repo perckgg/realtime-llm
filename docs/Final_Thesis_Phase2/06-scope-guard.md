@@ -171,7 +171,7 @@ Nhận diện sớm để chặn.
 
 > "Thêm authentication cho API phòng khi sau này deploy public."
 
-Không có "sau này" trong 24 tuần. API chạy trên localhost.
+Không có "sau này" trong GĐ2. API chạy trên localhost.
 
 ### 6.2 Lạc đề kiểu "chuẩn công nghiệp"
 
@@ -205,13 +205,13 @@ Tham số nằm trong YAML. Chỉnh bằng editor. Màn hình quản lý không 
 
 ---
 
-## 7. Neo mục tiêu theo tuần
+## 7. Neo mục tiêu theo cột mốc
 
-Mỗi tuần chỉ làm việc của tuần đó trong `04-implementation-roadmap.md`.
+Mỗi lúc chỉ làm việc của mốc hiện tại (`docs/CURRENT-MILESTONE.md`) trong `04-implementation-roadmap.md`.
 
-**Quy tắc nạp context:** chỉ nạp phần tuần hiện tại, không nạp toàn bộ roadmap. Agent nhìn thấy task Tháng 5 khi đang ở Tuần 3 sẽ có xu hướng chuẩn bị trước, và "chuẩn bị trước" là một dạng lạc đề.
+**Quy tắc nạp context:** chỉ nạp phần mốc hiện tại, không nạp toàn bộ roadmap. Agent nhìn thấy việc của M10 khi đang ở M1 sẽ có xu hướng chuẩn bị trước, và "chuẩn bị trước" là một dạng lạc đề.
 
-Nếu agent thấy mình đang làm việc không có trong tuần hiện tại, dừng và hỏi.
+Nếu agent thấy mình đang làm việc không có trong mốc hiện tại, dừng và hỏi. Hết mốc thì viết báo cáo mốc (`04` §2) trước khi sang mốc sau.
 
 ---
 
@@ -219,29 +219,31 @@ Nếu agent thấy mình đang làm việc không có trong tuần hiện tại,
 
 Đây là các mốc mà nếu không đạt thì **không được đi tiếp**, dù có áp lực tiến độ:
 
-| Cổng | Tuần | Điều kiện | Nếu không đạt |
+| Cổng | Mốc | Điều kiện | Nếu không đạt |
 |---|---|---|---|
-| Nhãn dữ liệu | 1 | Biết chính xác Nezha có nhãn root-cause hay không | Dừng, gán tay hoặc đổi dataset |
-| G-port | 9 | Tái lập GĐ1 Phase 4 theo từng tầng trên `paper_300` (judge mock): P = 0.3158, FPR = 0.0458, lệch ≤ 1 cửa sổ mỗi ô — QĐ-012 | Dừng, tìm lỗi port code |
-| G-paper | 10 | Tái lập Table 1 của paper từ cache Gemini, cache hit 100% | Dừng, tìm chỗ prompt/retrieval khác GĐ1 |
-| Quy trình test split | 16 | Chỉ chạm `test` một lần, sau khi đã đăng ký giả thuyết và chốt tham số trên `val` | Không có cách sửa — phải trung thực ghi lại |
+| Nhãn dữ liệu | M0 | Biết chính xác Nezha có nhãn root-cause hay không | Dừng, gán tay hoặc đổi dataset |
+| G-port | M2 | Tái lập GĐ1 Phase 4 theo từng tầng trên `paper_300` (judge mock): P = 0.3158, FPR = 0.0458, lệch ≤ 1 cửa sổ mỗi ô — QĐ-012 | Dừng, tìm lỗi port code |
+| G-paper | M3 | Tái lập Table 1 của paper từ cache Gemini, cache hit 100% | Dừng, tìm chỗ prompt/retrieval khác GĐ1 |
+| H0 tái lập vấn đề | M4 | Topology chưa hiệu chỉnh tăng FPR so với BM25 trên split GĐ2 | Dừng, trao đổi GVHD, viết lại câu chuyện |
+| Quy trình test split | M8 | Chỉ chạm `test` một lần, sau khi đã đăng ký giả thuyết và chốt tham số trên `val` | Không có cách sửa — phải trung thực ghi lại |
 
-(Hai cổng "Tái lập baseline Tuần 3" và "test split Tuần 11" cũ được thay bằng ba cổng trên ở QĐ-011/QĐ-012.)
+(Hai cổng "Tái lập baseline Tuần 3" và "test split Tuần 11" của bản gốc được thay bằng các cổng trên ở QĐ-011/012/014.)
 
 Vượt cổng bằng cách bỏ qua điều kiện là cách chắc chắn nhất để hỏng luận văn.
 
 ---
 
-## 9. Câu hỏi tự kiểm mỗi cuối tuần
+## 9. Câu hỏi tự kiểm khi đóng mỗi mốc
 
-- [ ] Tuần này tôi có tạo ra bằng chứng nào cho Nhánh A hoặc Nhánh B không?
+- [ ] Mốc này tôi có tạo ra bằng chứng nào cho Nhánh A hoặc Nhánh B không?
 - [ ] Có dòng code nào tôi viết mà không phục vụ hai nhánh đó không?
 - [ ] Tôi có chạm vào `test` split không?
 - [ ] Có tham số thí nghiệm nào bị hardcode không?
 - [ ] `experiment-log.md` đã cập nhật chưa?
-- [ ] Tôi có đang ở đúng tuần trong roadmap không?
+- [ ] Tôi có đang ở đúng mốc trong roadmap không?
+- [ ] Báo cáo mốc đã đủ 4 phần, nhất là "Cần review gì" và "Vấn đề cần bạn giải quyết"?
 
-Nếu có câu trả lời đáng lo, xử lý ngay trong tuần, đừng để tích tụ.
+Nếu có câu trả lời đáng lo, xử lý ngay trong mốc, đừng để tích tụ.
 
 ---
 
@@ -253,7 +255,8 @@ Mục tiêu:  A = CTAV: topology + hiệu chỉnh theo nguồn gốc bằng ch�
            Platform demo được trước hội đồng
 
 Dữ liệu:   Nezha, chia dev/val/test cố định
-Cấm:       test split trước Tuần 11
+Cấm:       test split trước M8 (và trước đăng ký giả thuyết ở M7)
+Bắt buộc:  báo cáo mốc sau mỗi mốc (docs/milestones/)
 Cấm:       hardcode tham số thí nghiệm
 Cấm:       thêm biến thể / kỹ thuật ngoài kế hoạch
 Cấm:       ghi đè kết quả cũ

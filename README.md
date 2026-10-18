@@ -13,10 +13,10 @@
 
 ## Trạng thái hiện tại
 
-Đang ở **Tuần 8/24** (xem [`docs/CURRENT-WEEK.md`](docs/CURRENT-WEEK.md)). Đã xong Tuần
-1–2: kiểm chứng nhãn Nezha, split dev/val/test, hạ tầng ClickHouse + Postgres, port
+Đang ở **mốc M1** (xem [`docs/CURRENT-MILESTONE.md`](docs/CURRENT-MILESTONE.md)). Đã xong M0
+([báo cáo](docs/milestones/M0-nen-tang.md)): kiểm chứng nhãn Nezha, split dev/val/test, hạ tầng ClickHouse + Postgres, port
 replayer và detector. Retrieval, judge, harness, RCA agent, API chưa có. Lịch đã xếp lại
-ngày 2026-10-18 (QĐ-011, QĐ-012 trong `docs/experiment-log.md`).
+ngày 2026-10-18 và tổ chức theo cột mốc (QĐ-011..014 trong `docs/experiment-log.md`).
 
 ```text
 services/     replayer, detector, retrieval, judge, rca_agent, api, web
@@ -44,7 +44,7 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
-Tái lập kết quả Tuần 1:
+Tái lập kết quả M0:
 
 ```bash
 bash scripts/download_nezha.sh          # nếu chưa có data/Nezha/
@@ -58,7 +58,7 @@ python -m pytest tests/ -q              # 8 test canh split
 
 `services/web/` đã có bản MVP bốn màn hình — Timeline, Alert detail, Incident
 detail, Experiment comparison — chạy trên **dữ liệu giả** vì pipeline chưa chạy.
-Roadmap xếp việc nối dữ liệu thật vào Tuần 19 (QĐ-011); dựng sớm để chốt bố cục và để bốn màn hình
+Roadmap xếp việc nối dữ liệu thật vào mốc M10; dựng sớm để chốt bố cục và để bốn màn hình
 ràng buộc ngược lại xem `services/api` phải trả những gì. Lý do và ranh giới:
 `docs/experiment-log.md` QĐ-007.
 
@@ -66,4 +66,4 @@ ràng buộc ngược lại xem `services/api` phải trả những gì. Lý do 
 cd services/web && npm install && npm run dev    # http://localhost:5173
 ```
 
-Việc tiếp theo là Tuần 8 — xem `docs/CURRENT-WEEK.md` và `docs/Final_Thesis_Phase2/04-implementation-roadmap.md`.
+Việc tiếp theo là mốc M1 — xem `docs/CURRENT-MILESTONE.md` và `docs/Final_Thesis_Phase2/04-implementation-roadmap.md`.

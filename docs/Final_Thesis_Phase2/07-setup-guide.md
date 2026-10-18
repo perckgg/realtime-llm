@@ -483,7 +483,7 @@ git commit -m "chore: khởi tạo bộ khung repo GĐ2
 - [ ] Dữ liệu Nezha nằm trong `data/nezha/`
 - [ ] Code GĐ1 đã chép vào `legacy/`
 - [ ] `AGENTS.md` ở gốc repo, bộ tài liệu ở `docs/`
-- [ ] `docs/CURRENT-WEEK.md` đang ở Tuần 1
+- [ ] `docs/CURRENT-MILESTONE.md` đang ở mốc M0 (bản gốc: `CURRENT-WEEK.md` Tuần 1; đổi ở QĐ-014)
 - [ ] `ruff` và `mypy` chạy không lỗi
 - [ ] Commit đầu tiên đã xong
 
@@ -513,6 +513,6 @@ docker compose up -d clickhouse postgres
 
 ## 15. Xong setup rồi làm gì
 
-Mở `docs/CURRENT-WEEK.md`. Việc đầu tiên của Tuần 1 là `scripts/verify_labels.py` — kiểm tra Nezha có nhãn `root_cause_service` hay không.
+Mở `docs/CURRENT-MILESTONE.md`. Việc đầu tiên của M0 (Tuần 1 bản gốc) là `scripts/verify_labels.py` — kiểm tra Nezha có nhãn `root_cause_service` hay không.
 
 Chưa viết code pipeline trong tuần này.

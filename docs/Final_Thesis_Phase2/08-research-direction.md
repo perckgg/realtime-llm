@@ -153,7 +153,7 @@ fallback sang model khác. LLM local (Ollama) không chạy trong GĐ2.
    rơi vào điểm 4.
 6. **Chi phí API thấp và kiểm soát được.** Paper đo được ≈ 0,00013 USD mỗi lần chấm với
    BM25 và ≈ 0,00034 USD với topology (0,0628 và 0,1669 USD cho 489 lần chấm). Chi phí
-   một run ≈ số candidate × đơn giá — đo số candidate thật trên `val` ở Tuần 9 rồi ghi
+   một run ≈ số candidate × đơn giá — đo số candidate thật trên `val` ở mốc M2 rồi ghi
    ngân sách vào experiment-log. Policy C2/C3 chạy lại trên verdict đã cache, không tốn
    thêm lần gọi nào.
 7. **Không có rủi ro riêng tư dữ liệu.** Lý do phổ biến nhất để chạy LLM local trong
@@ -213,11 +213,11 @@ Ngưỡng định lượng (Δ tối thiểu, θ) điền sau khi có số liệ
 
 | Cổng | Khi nào | Điều kiện | Ý nghĩa |
 |---|---|---|---|
-| G-port | Tuần 9 | Pipeline GĐ2 tái lập đúng GĐ1 Phase 4 (judge mock, `paper_300`) | Code port đúng |
-| G-paper | Tuần 10 | Tái lập View A của paper trên `paper_500` bằng cache Gemini | Baseline khoa học đúng |
-| G-test | Tuần 16 | Chạm `test` một lần, sau đăng ký giả thuyết | Kết luận hợp lệ |
+| G-port | M2 | Pipeline GĐ2 tái lập đúng GĐ1 Phase 4 (judge mock, `paper_300`) | Code port đúng |
+| G-paper | M3 | Tái lập View A của paper trên `paper_500` bằng cache Gemini | Baseline khoa học đúng |
+| G-test | M8 | Chạm `test` một lần, sau đăng ký giả thuyết | Kết luận hợp lệ |
 
-Chi tiết từng tuần: `04-implementation-roadmap.md`.
+Chi tiết từng mốc: `04-implementation-roadmap.md`.
 
 ---
 
@@ -266,11 +266,11 @@ lúc bảo vệ).
 
 ---
 
-## 8. Việc phải sửa trước / trong Tuần 8 (Tuần 3 cũ)
+## 8. Việc phải sửa ở mốc M1
 
-Kết quả review 2026-10-18. Đưa vào `docs/CURRENT-WEEK.md`.
+Kết quả review 2026-10-18 (cũng có trong `docs/milestones/M0-nen-tang.md` §2). Đã đưa vào `docs/CURRENT-MILESTONE.md`.
 
-### 8.1 Code detector (Tuần 2)
+### 8.1 Code detector (từ M0)
 
 | # | Việc | Vị trí | Cần quyết định? |
 |---|---|---|---|
@@ -289,7 +289,7 @@ Kết quả review 2026-10-18. Đưa vào `docs/CURRENT-WEEK.md`.
   (cho G-port) và `paper_viewA_replay.yaml` (cho G-paper) — QĐ-012.
 - 4 file `legacy/` sửa chưa commit; cache `legacy/outputs/test_results/*_cache_*.jsonl`
   chưa ignore; `front_matter.txt`, `refs_sample.txt`, `toc_out.txt` ở gốc repo.
-- `docs/Final_Thesis_Phase2/CURRENT-WEEK.md` là mẫu trống; bản đang dùng là `docs/CURRENT-WEEK.md`.
+- `CURRENT-WEEK.md` đã thay bằng `docs/CURRENT-MILESTONE.md`; bản mẫu trống trong `Final_Thesis_Phase2/` đã xoá (QĐ-014).
 
 ---
 
@@ -298,7 +298,7 @@ Kết quả review 2026-10-18. Đưa vào `docs/CURRENT-WEEK.md`.
 | # | Câu hỏi | Mặc định nếu không có ý kiến khác | Hạn |
 |---|---|---|---|
 | ~~Q1~~ | ~~Judge chính~~ | **Đã chốt 2026-10-18 (QĐ-013):** `gemini-2.5-flash-lite` qua API, không local, không fallback — §4.1 | — |
-| Q2 | Đánh giá trên toàn `val`/`test` (≈ 1:135 normal) hay thêm tập cố định kiểu `paper_500`? | Toàn split cho kết quả chính; ngân sách gọi LLM giới hạn + cache | Tuần 9 (cần số candidate thật) |
+| Q2 | Đánh giá trên toàn `val`/`test` (≈ 1:135 normal) hay thêm tập cố định kiểu `paper_500`? | Toàn split cho kết quả chính; ngân sách gọi LLM giới hạn + cache | M2 (cần số candidate thật) |
 | ~~Q3~~ | ~~D1~~ | **Đã chốt 2026-10-18:** giá trị gần nhất của cùng pod + cột chỉ báo thiếu | — |
 | ~~Q4~~ | ~~D2~~ | **Đã chốt 2026-10-18:** có — split chỉ quyết định cửa sổ nào được chấm | — |
-| Q5 | Mốc bảo vệ (Tuần 24) có cố định không? | Cố định, tuần 2027-02-08 | Ngay |
+| Q5 | Mốc bảo vệ (M12) có cố định không? | Cố định, tuần 2027-02-08 | Ngay |

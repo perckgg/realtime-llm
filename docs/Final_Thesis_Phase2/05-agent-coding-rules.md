@@ -28,11 +28,11 @@ def __init__(self, hop: int, decay_factor: float):
 
 Mỗi run có `run_id` và `seed` trong config. Không có config thì không phải thực nghiệm, chỉ là thử nghiệm cá nhân — và kết quả không được đưa vào luận văn.
 
-### R-A2 — Không chạm test split trước Tuần 16 (QĐ-011)
+### R-A2 — Không chạm test split trước mốc M8 (QĐ-014)
 
 Tuning tham số chỉ trên `val`. Debug chỉ trên `dev`.
 
-Nếu agent thấy `split: test` trong config trước Tuần 16, phải dừng và hỏi lại.
+Nếu agent thấy `split: test` trong config trước mốc M8, phải dừng và hỏi lại.
 
 ### R-A3 — Kết quả không bao giờ bị ghi đè
 
@@ -243,7 +243,7 @@ Mỗi lần chạy thực nghiệm → thêm một dòng vào `docs/experiment-l
 Các tình huống phải hỏi người dùng:
 
 - Tham số không có trong config và không có giá trị mặc định rõ ràng
-- Task hiện tại có vẻ vượt ra ngoài tuần đang làm trong roadmap
+- Task hiện tại có vẻ vượt ra ngoài mốc đang làm trong roadmap
 - Cần thêm thư viện mới
 - Cần đổi signature của Protocol lõi
 - Kết quả thực nghiệm khác xa baseline GĐ1
@@ -255,7 +255,7 @@ Nếu agent nghĩ có cách retrieve tốt hơn, ghi ý tưởng vào `docs/idea
 
 ### R-G3 — Không refactor lớn khi chưa được yêu cầu
 
-Đặc biệt sau Tuần 3 — code đã tái lập được baseline là code đã được kiểm chứng. Refactor có thể làm số liệu đổi mà không ai biết.
+Đặc biệt sau cổng chặn G-port (M2) — code đã tái lập được baseline là code đã được kiểm chứng. Refactor có thể làm số liệu đổi mà không ai biết.
 
 ---
 
@@ -270,7 +270,7 @@ Một task chỉ xong khi:
 - [ ] Log có cấu trúc, không có secret
 - [ ] Tài liệu liên quan đã cập nhật (R-F1, R-F2)
 - [ ] `docs/experiment-log.md` đã cập nhật nếu có chạy thực nghiệm
-- [ ] Đối chiếu với DoD của tuần trong `04-implementation-roadmap.md`
+- [ ] Đối chiếu với DoD của mốc trong `04-implementation-roadmap.md`; việc cuối của mốc → viết báo cáo `docs/milestones/`
 
 ---
 
@@ -283,7 +283,7 @@ Một task chỉ xong khi:
 | Ghi đè `eval/results/` | Mất bằng chứng tái lập |
 | Tự thêm vector database | Ngoài phạm vi, thành biến thể RAG thứ 6 |
 | Sửa hàm tính F1 cho "hợp lý hơn" | Số liệu cũ và mới không so sánh được |
-| Refactor `bm25_hybrid.py` sau Tuần 3 | Baseline không còn đáng tin |
+| Refactor `bm25_hybrid.py` sau G-port (M2) | Baseline không còn đáng tin |
 | Tính Recall chỉ trên candidate | Thổi phồng số liệu, xem `02` §4.1 |
 | Dùng `test` split để tune | Hỏng tính hợp lệ của luận văn |
 | Thêm LangChain/AutoGen | Ngoài phạm vi, xem `06` |

@@ -14,13 +14,14 @@
 | `01-architecture-design.md` | Kiến trúc hệ thống, service breakdown, interface, luồng dữ liệu | Trước khi code dòng đầu tiên |
 | `02-data-and-experiment-protocol.md` | Dữ liệu Nezha, chia split, seed, định nghĩa chỉ số, quy tắc chạy thực nghiệm | Tuần 1, và mỗi khi thêm thí nghiệm |
 | `03-schemas-and-contracts.md` | Pydantic model, event schema, JSON diagnostic schema, DDL ClickHouse/Postgres | Khi implement bất kỳ service nào |
-| `04-implementation-roadmap.md` | Lộ trình 24 tuần, task theo tuần, Definition of Done từng mốc | Đầu mỗi tuần |
+| `04-implementation-roadmap.md` | Lộ trình theo cột mốc M0–M12, DoD và cổng chặn từng mốc, quy trình đóng mốc | Đầu mỗi tuần |
 | `05-agent-coding-rules.md` | Quy tắc kỹ thuật bắt buộc cho AI coding agent | Nạp vào context mỗi phiên code |
 | `06-scope-guard.md` | **Bộ neo mục tiêu** — chống lạc đề, chống scope creep | Nạp vào context mỗi phiên code |
 | `07-setup-guide.md` | Dựng môi trường, bộ khung repo, đưa code GĐ1 vào | **Làm đầu tiên**, trước Tuần 1 |
 | `08-research-direction.md` | **Giải pháp CTAV**: vấn đề từ paper, GĐ1 → GĐ2, thành phần C1–C5, giả thuyết H0–H5 và cách chứng minh, platform demo, đầu ra cuối cùng | Đầu mỗi chặng; khi viết luận văn |
 | `AGENTS.md` | File bootstrap đặt ở gốc repo, agent tự đọc | Copy vào gốc repo |
-| `CURRENT-WEEK.md` | Tuần đang làm, cập nhật đầu mỗi tuần | Copy vào `docs/` |
+| `docs/CURRENT-MILESTONE.md` | Mốc đang làm, cập nhật khi bắt đầu mốc mới | Mỗi phiên code |
+| `docs/milestones/` | Báo cáo sau mỗi mốc: kết quả · cần review gì · vấn đề cần người dùng giải quyết · plan mốc sau | Sau mỗi mốc |
 
 ---
 
@@ -52,7 +53,7 @@ Những thứ đã có, **port sang chứ không viết lại**:
 ## Số liệu baseline — hai loại, dùng cho hai việc khác nhau
 
 **(1) Mốc kiểm tra port — GĐ1 Phase 4/5, judge giả (`provider: mock`).** Chỉ dùng để
-kiểm tra code GĐ2 port đúng (cổng chặn G-port, Tuần 9). **Không** dùng làm số liệu khoa
+kiểm tra code GĐ2 port đúng (cổng chặn G-port, M2). **Không** dùng làm số liệu khoa
 học: judge mock không phải LLM.
 
 | Chỉ số | Giá trị GĐ1 | Nguồn |
@@ -67,7 +68,7 @@ Cấu hình GĐ1 Phase 4: threshold 0.95, fit 1.000 cửa sổ đầu, gate 0.80
 lần gọi (`legacy/nezha_setup/config/experiment_phase4_benchmark.yaml`).
 
 **(2) Baseline khoa học — paper ICAETM 2026, gemini-2.5-flash-lite thật, `paper_500`.**
-Dùng cho cổng chặn G-paper (Tuần 10) và là điểm xuất phát của H0.
+Dùng cho cổng chặn G-paper (M3) và là điểm xuất phát của H0.
 
 | Chỉ số (full budget, top-6) | BM25 | Topology (C1) |
 |---|---|---|
@@ -84,7 +85,7 @@ Luận văn phải nói rõ điều này.
 
 ## Mục tiêu số liệu Giai đoạn 2
 
-**Nhánh A — CTAV** (định nghĩa đầy đủ ở `08` §5; ngưỡng định lượng chốt khi đăng ký giả thuyết, Tuần 15)
+**Nhánh A — CTAV** (định nghĩa đầy đủ ở `08` §5; ngưỡng định lượng chốt khi đăng ký giả thuyết, M7)
 
 | Chỉ số | Mục tiêu |
 |---|---|
@@ -123,7 +124,7 @@ Chỉ tiêu cũ "F1 ≥ 0.78" bị bỏ: nó lấy từ GĐ1 Phase 5 đo bằng 
 | Graph | NetworkX | Service dependency graph, đủ cho quy mô Nezha |
 | LLM | `gemini-2.5-flash-lite` qua API, temperature 0 | Judge duy nhất, cố định cho mọi thực nghiệm; cache bắt buộc (QĐ-013) |
 | LLM local | ~~Ollama~~ | Không dùng trong GĐ2 (phần cứng + lý do phương pháp, `08` §4.1) |
-| Dashboard | React + Recharts, fallback Streamlit | Quyết định ở Tuần 18, xem `04` |
+| Dashboard | React + Recharts, fallback Streamlit | MVP React đã có; nối dữ liệu thật ở M10, xem `04` |
 | Đóng gói | Docker Compose, profiles `dev` / `full` | Không Kubernetes trong GĐ2 |
 
 ---
@@ -138,7 +139,7 @@ Khi bắt đầu một phiên code, nạp theo thứ tự:
 05-agent-coding-rules.md (quy tắc kỹ thuật)
 01-architecture-design.md (kiến trúc)
 03-schemas-and-contracts.md (hợp đồng dữ liệu)
-04-implementation-roadmap.md (chỉ phần tuần hiện tại)
+docs/CURRENT-MILESTONE.md (mốc hiện tại; chỉ phần mốc đó trong 04)
 ```
 
-Không nạp toàn bộ roadmap — chỉ nạp tuần đang làm, để agent không tự nhảy sang task tương lai.
+Không nạp toàn bộ roadmap — chỉ nạp mốc đang làm, để agent không tự nhảy sang task tương lai.

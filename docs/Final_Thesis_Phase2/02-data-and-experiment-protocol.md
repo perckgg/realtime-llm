@@ -50,7 +50,7 @@ Lọc: bỏ cạnh xuất hiện < min_edge_count (mặc định 5) để giảm
 | Edge density | số cạnh / (số node × (số node - 1)) | ghi nhận |
 | Fault window có service trong graph | % | **< 60% → kích hoạt fallback BM25** |
 
-Kết quả đo ghi vào `docs/graph-coverage.md` ở Tuần 4. Nếu graph quá thưa, đây **là một finding của luận văn**, không phải thất bại — ghi lại và phân tích tại sao.
+Kết quả đo ghi vào `docs/graph-coverage.md` ở mốc M3. Nếu graph quá thưa, đây **là một finding của luận văn**, không phải thất bại — ghi lại và phân tích tại sao.
 
 ---
 
@@ -62,7 +62,7 @@ Kết quả đo ghi vào `docs/graph-coverage.md` ở Tuần 4. Nếu graph quá
 |---|---|---|---|
 | `dev` | 20% | Debug, phát triển, thử nhanh | Không giới hạn |
 | `val` | 30% | Tuning Rescue Score (η1, η2, η3, τ), chọn tham số Fusion Score (α, β, γ) | Không giới hạn |
-| `test` | 50% | Báo cáo kết quả cuối trong luận văn | **Một lần, từ Tuần 16** (QĐ-011) |
+| `test` | 50% | Báo cáo kết quả cuối trong luận văn | **Một lần, ở mốc M8** (QĐ-014) |
 
 ### 2.2 Cách chia
 
@@ -79,7 +79,7 @@ File split được **commit vào git** và không được sinh lại. Nếu ph
 
 ### 2.3 Quy tắc test split
 
-- Không chạy thực nghiệm trên `test` trước Tuần 16 (QĐ-011; trước đây Tuần 11) và trước khi đăng ký giả thuyết
+- Không chạy thực nghiệm trên `test` trước mốc M8 và trước khi đăng ký giả thuyết ở M7 (QĐ-011, QĐ-014)
 - Không tuning bất kỳ tham số nào dựa trên kết quả `test`
 - Nếu lỡ nhìn kết quả `test` sớm, phải ghi lại vào `docs/experiment-log.md` — luận văn trung thực về việc này vẫn tốt hơn luận văn giấu
 
@@ -200,7 +200,7 @@ Thư mục này được **commit vào git**. Đây là bằng chứng tái lậ
 
 **Ánh xạ incident → ground truth:** một incident gom nhiều alert. Ground truth của incident = root cause service của fault đã tiêm trong khoảng thời gian đó. Nếu một incident chứa alert từ nhiều fault khác nhau, đánh dấu là `ambiguous` và loại khỏi tính Hit@k, nhưng **phải báo cáo số lượng bị loại**.
 
-### 4.4 Đánh giá chất lượng chẩn đoán bằng người (Tuần 20)
+### 4.4 Đánh giá chất lượng chẩn đoán bằng người (mốc M11)
 
 Mẫu 30 incident, chấm theo ba tiêu chí, thang 0–2:
 
@@ -241,13 +241,13 @@ def mcnemar_exact(correct_a: list[bool], correct_b: list[bool]) -> float:
     """p-value hai phía trên các cặp bất đồng (b, c)."""
 ```
 
-### 5.4 Giả thuyết đăng ký trước
+### 5.3 Giả thuyết đăng ký trước
 
 Giả thuyết H0–H5 và tiêu chí bác bỏ nằm ở `08-research-direction.md` §5. Bản có ngưỡng
-định lượng được commit vào `docs/experiment-log.md` ở Tuần 15, **trước** lần chạy `test`
+định lượng được commit vào `docs/experiment-log.md` ở mốc M7, **trước** lần chạy `test`
 duy nhất. Không sửa giả thuyết sau khi đã thấy kết quả `test`.
 
-### 5.3 Cách phát biểu kết luận
+### 5.4 Cách phát biểu kết luận
 
 | Tình huống | Cách viết đúng |
 |---|---|
@@ -259,9 +259,9 @@ Kết luận "các biến thể tương đương" **là một kết quả nghiê
 
 ---
 
-## 6. Ablation Rescue Score & Fusion Score (Tuần 15 & Tuần 11 theo lịch QĐ-011)
+## 6. Ablation Rescue Score & Fusion Score (mốc M7 & M4)
 
-### 6.1 Không gian tham số Rescue Score (Tuần 15 theo lịch QĐ-011 — Luận văn)
+### 6.1 Không gian tham số Rescue Score (mốc M7 — Luận văn)
 
 Công thức: `RescueScore(w | A) = η1·Λ_log(w) + η2·Φ_topo(w, A) + η3·Δ_time(w, A) >= τ`
 
@@ -277,7 +277,7 @@ Số tổ hợp hợp lệ của (η1, η2, η3) với ràng buộc tổng = 1 l
 - Bật LLM cache. Cùng một prompt chỉ gọi LLM một lần trong toàn bộ ablation.
 - Tính trước `Λ_log`, `Φ_topo`, `Δ_time` cho mọi window một lần, lưu ra file `data/rescue_features.parquet`. Ablation chỉ là tổ hợp tuyến tính trên các giá trị đã tính — không cần chạy lại pipeline 147 lần.
 
-Đây là tối ưu quan trọng nhất của Tuần 8. Nếu không làm, ablation sẽ mất nhiều ngày và tốn tiền API.
+Đây là tối ưu quan trọng nhất của mốc M7. Nếu không làm, ablation sẽ mất nhiều ngày và tốn tiền API.
 
 ### 6.3 Tiêu chí chọn
 
@@ -289,11 +289,11 @@ Vẽ đường cong: trục x = τ, trục y trái = Recall, trục y phải = s
 
 Nếu ablation cho thấy một thành phần chiếm ưu thế rõ rệt (ví dụ η2 tối ưu ≈ 0), rút về công thức hai tham số và ghi rõ lý do. Điều này đã được dự phòng trong bảng rủi ro của bản định hướng — thực hiện nó không phải thất bại.
 
-### 6.5 Ablation Fusion Score (Tuần 11 theo lịch QĐ-011 — Paper & Luận văn)
+### 6.5 Ablation Fusion Score (mốc M4 — Paper & Luận văn)
 
 > QĐ-011: lưới này chạy **retrieval-only** (không gọi LLM) trên `val`, và gồm luôn
 > temporal-only (β = 1) và graph-only (γ = 1) thay cho hai strategy `temporal`, `graph`
-> đã cắt. Ablation của CTAV (C2/C3/C4, θ_topo) xem `08` §5 và `04` Tuần 13–14.
+> đã cắt. Ablation của CTAV (C2/C3/C4, θ_topo) xem `08` §5 và `04` mốc M6.
 
 Công thức xếp hạng context: `Score_fusion(c | s0, t0) = α·BM25_norm(c, q) + β·TimeSim(tc, t0) + γ·GraphSim(sc, s0)`
 
