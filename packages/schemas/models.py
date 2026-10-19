@@ -4,17 +4,17 @@ Copied verbatim from docs/Final_Thesis_Phase2/03-schemas-and-contracts.md §1.
 No service may redefine these — import from here (rule R-B2 in
 docs/Final_Thesis_Phase2/05-agent-coding-rules.md).
 
-Only the models needed through Week 2 (TelemetryWindow, WindowLabel,
-AlertCandidate and their pieces) are implemented so far. RetrievalResult,
-JudgedAlert, Incident and DiagnosticReport belong to later weeks
-(docs/CURRENT-WEEK.md) and are added when those services are ported, to keep
-this module in sync with what is actually used.
+Implemented through milestone M1: TelemetryWindow, WindowLabel, AlertCandidate
+and their pieces (M0), ContextEvent, RetrievalBudget, RetrievalResult and
+JudgedAlert with the CTAV fields (M1, QD-011/QD-016). Incident and
+DiagnosticReport are added when services/rca_agent is ported, to keep this
+module in sync with what is actually used.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -89,3 +89,80 @@ class AlertCandidate(BaseModel):
     source: Literal["metric", "rescue"]  # rescue = promoted by the Rescue Score gate
     rescue_score: float | None = None
     rescue_components: dict[str, float] | None = None  # lambda_log, phi_topo, delta_time
+    # QD-016: what the BM25 query and the GD1 judge prompt read from the window
+    # (GD1's alert_candidate carried node_id, time_window, metric_snapshot,
+    # top_features). Never ground truth.
+    pod: str | None = None
+    end_ts: datetime | None = None
+    metric_snapshot: dict[str, float] = {}
+    top_features: list[str] = []
+
+
+Verdict = Literal["TRUE_ALERT", "FALSE_POSITIVE", "UNCERTAIN"]
+
+
+class ContextEvent(BaseModel):
+    """One piece of evidence a RetrievalStrategy hands to the judge (03 SS1.3)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    event_id: str
+    modality: Literal["log", "trace", "metric"]
+    ts: datetime
+    service: str
+    content: str  # text put in the prompt
+    score: float  # retrieval score
+    origin: Literal["local", "graph"] = "local"  # QD-011: graph = reached by topology expansion
+    graph_distance: int | None = None  # d_G(service, s0); None if unreachable
+    debug: dict[str, Any] = {}  # why it was picked: BM25 rank, graph distance, channel...
+
+
+class RetrievalBudget(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    top_k: int = 6
+    max_tokens: int = 4000
+    timeout_ms: int = 500
+
+
+class RetrievalResult(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    strategy: str
+    events: list[ContextEvent]
+    latency_ms: float
+    token_estimate: int
+    truncated: bool = False
+    debug: dict[str, Any] = {}
+
+
+class JudgedAlert(BaseModel):
+    """Judge output (03 SS1.4). `verdict` is after the decision rules,
+    `raw_verdict` is the LLM's own label, so policy ablations (H3) never need
+    a new LLM call."""
+
+    model_config = ConfigDict(frozen=True)
+
+    alert_id: str
+    candidate_id: str
+    window_id: str
+    service: str
+    ts: datetime
+    verdict: Verdict
+    confidence: float  # 0.0 - 1.0
+    reasoning: str
+    evidence_event_ids: list[str]  # references ContextEvent.event_id
+    judge_backend: str  # gemini-2.5-flash-lite | mock (G-port only) -- QD-013
+    llm_latency_ms: float
+    cache_hit: bool
+    downgraded_by_evidence_rule: bool = False
+    # CTAV (QD-011, milestone M1)
+    raw_verdict: Verdict
+    routing_tier: Literal[1, 2] = 1  # C4: 1 = BM25 only, 2 = topology expanded
+    evidence_origin: Literal["local", "graph", "mixed", "none"] = "none"
+    threshold_applied: float | None = None  # theta_local or theta_topo
+    downgraded_by_gating: bool = False  # C2
+    downgraded_by_anchoring: bool = False  # C3
+    # QD-016: model version returned by the API, cache key, tokens, parse
+    # errors, the LLM's raw evidence list -- what a re-run or an audit needs.
+    debug: dict[str, Any] = {}

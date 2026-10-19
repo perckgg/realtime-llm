@@ -254,11 +254,22 @@ Trách nhiệm: chứa 2 strategy, chọn theo config (QĐ-011 — thu gọn t�
 
 ```text
 retrieval/
-  base.py              # Protocol + RetrievalBudget + RetrievalResult
-  bm25_hybrid.py       # baseline, port từ GĐ1
-  hybrid_bm25_graph.py # C1 của CTAV: Weighted Context Fusion, port từ legacy/src/phase2/retrieval/
-  registry.py          # name -> class, dùng bởi config loader
+  bm25_hybrid.py       # baseline, port từ GĐ1 (M1)
+  hybrid_bm25_graph.py # C1 của CTAV: Weighted Context Fusion, port từ legacy/src/phase2/retrieval/ (M3)
+  registry.py          # name -> class, dùng bởi config loader (M1)
 ```
+
+Protocol, `RetrievalBudget`, `RetrievalResult` nằm ở `packages/schemas/` (`protocols.py`,
+`models.py`), không có `base.py` riêng. Kho bằng chứng (log/trace Nezha) là
+`packages/schemas/evidence.py`.
+
+**`bm25_hybrid`** (M1, QĐ-016) — port nguyên văn `HybridRetriever` của GĐ1: cùng tokenizer,
+BM25 (k1 = 1,5, b = 0,75), cosine hashing, `search = 0,6·bm25/(bm25+1) + 0,4·cos`,
+`final = 0,45·search + 0,25·time + 0,20·metadata + 0,10·signal`, lề ±8 phút, `search_k` 60.
+Hai khác biệt có chủ đích: (1) truy vấn **không chứa fault type** (lỗi paper §3.5);
+(2) `pool="window"` — tập ứng viên là bằng chứng của `s_0` trong [t − lề, t + lề] lấy từ
+kho Nezha đầy đủ, thống kê BM25 tính trên tập đó. `pool="global"` + `extra_query_terms`
+giữ đúng hành vi GĐ1 (tìm toàn corpus rồi mới lọc thời gian), chỉ dùng cho G-port/G-paper.
 
 Mỗi `ContextEvent` phải ghi `origin` (`local` = cùng service `s_0` hoặc lấy từ BM25;
 `graph` = có được nhờ mở rộng topology) và `graph_distance` — chính sách C2/C3 ở
@@ -295,7 +306,7 @@ Port từ GĐ1. Giữ nguyên:
 - Prompt template và cấu trúc output 3 nhãn
 - `require_evidence_for_true_alert`: verdict TRUE_ALERT bị hạ xuống UNCERTAIN nếu LLM không nêu được evidence cụ thể
 - ~~Local-first: thử llama3.2:3b trước, fallback Gemini Flash Lite~~ — **bỏ ở QĐ-013**: một model API cố định `gemini-2.5-flash-lite`, không fallback sang model khác. Lỗi API: retry có trần, hết retry ⇒ `manual_review` + ghi log
-- Response cache theo `hash(prompt + model + temperature + max_tokens + repeat)` — `repeat` (mặc định 0) để đo phương sai bằng cách gọi lại thật (`08` §4.1)
+- Response cache tương thích file với GĐ1: `sha256(provider | model | prompt | "max=<max_tokens>|t=0")`, thêm `"|repeat=n"` khi `repeat = n > 0` (mặc định 0 ⇒ trùng key GĐ1) để đo phương sai bằng cách gọi lại thật (`08` §4.1, `03` §6)
 - Mỗi bản ghi lưu model id/phiên bản API trả về
 - Backend `mock` của GĐ1 — chỉ dùng cho cổng chặn G-port, không dùng cho số liệu khoa học
 
@@ -303,7 +314,11 @@ Thêm mới cho CTAV (QĐ-011, `08` §4):
 
 ```text
 judge/
-  llm_judge.py   # port GĐ1, trả verdict thô của LLM
+  prompt.py      # prompt GĐ1 nguyên văn (M1)
+  cache.py       # cache JSONL, key GĐ1 + repeat (M1)
+  backends.py    # GeminiBackend (gemini-2.5-flash-lite), MockBackend (M1)
+  llm_judge.py   # port GĐ1: verdict thô + require_evidence + ngưỡng 0,80 đối xứng của GĐ1 (M1)
+  registry.py    # config judge: -> LLMJudge (M1)
   policy.py      # C2 asymmetric gating (θ_local, θ_topo) + C3 evidence anchoring
   routing.py     # C4: tầng 1 BM25 -> judge; UNCERTAIN/thiếu bằng chứng -> tầng 2 topology -> judge
 ```

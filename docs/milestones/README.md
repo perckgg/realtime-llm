@@ -9,6 +9,7 @@ nằm ở `docs/experiment-log.md`; báo cáo mốc tổng hợp lại và dẫn
 | Mốc | Báo cáo | Ngày | Kết luận |
 |---|---|---|---|
 | M0 | [M0-nen-tang.md](M0-nen-tang.md) | 2026-10-18 | QUA (viết bù sau review) |
+| M1 | [M1-detector-bm25-judge.md](M1-detector-bm25-judge.md) | 2026-10-19 | QUA; 3 quyết định mới chờ người dùng (V7–V9) |
 
 ## Mẫu
 

@@ -3,6 +3,11 @@ SS6.2's flow). Only the metric-score branch is implemented -- see
 services/detector/isolation_forest.py's module docstring and
 docs/experiment-log.md QD-009 for why the Rescue Score gate (that section's
 "else" branch) is deferred to Month 2.
+
+QD-016: the candidate also carries what retrieval and the judge prompt read
+from the window -- pod, end of window, the window's metric values. The
+detector does not yet report per-feature contributions, so `top_features`
+stays empty (GD1's IsolationForest reported the top-3 deviating features).
 """
 
 from __future__ import annotations
@@ -20,4 +25,7 @@ def build_alert_candidate(window: TelemetryWindow, score: float, is_candidate: b
         ts=window.start_ts,
         anomaly_score=score,
         source="metric",
+        pod=window.pod,
+        end_ts=window.end_ts,
+        metric_snapshot={point.name: point.value for point in window.metrics},
     )

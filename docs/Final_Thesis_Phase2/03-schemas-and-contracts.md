@@ -70,6 +70,11 @@ class AlertCandidate(BaseModel):
     source: Literal["metric", "rescue"]   # rescue = được promote bởi Rescue Score
     rescue_score: float | None = None
     rescue_components: dict[str, float] | None = None  # lambda_log, phi_topo, delta_time
+    # QĐ-016 (M1): những gì truy vấn BM25 và prompt judge GĐ1 đọc từ cửa sổ. Không bao giờ là nhãn.
+    pod: str | None = None
+    end_ts: datetime | None = None
+    metric_snapshot: dict[str, float] = {}
+    top_features: list[str] = []          # detector GĐ2 chưa điền (M1 §3 báo cáo)
 ```
 
 ### 1.3 ContextEvent và RetrievalResult
@@ -104,7 +109,7 @@ class RetrievalResult(BaseModel):
 
 | Strategy | `debug` chứa |
 |---|---|
-| `bm25_hybrid` | `bm25_score`, `time_distance_sec` |
+| `bm25_hybrid` | `rank`, `bm25_score` (= `0,6·bm25_norm + 0,4·cos`, "semantic_score" của GĐ1), `bm25_raw`, `time_distance_sec`, `time_score`, `metadata_score`, `severity_score`, `trace_score`, `pod`, `severity`, `event_type`, `source`, `trace_id`, `span_id`, `parent_span_id`, `duration_ms`. `RetrievalResult.debug`: `query`, `pool`, `pool_size`, `search_top_n`, `time_margin_sec`, `in_window_strict`, `in_window_relaxed`, `timeout_exceeded` |
 | `temporal` | `window_size_sec` đã chọn, `score_mapping` |
 | `cross_modal` | `channel`, `channel_rank`, `fusion_weight` |
 | `graph` | `graph_distance`, `decay_applied`, `path` |
@@ -144,6 +149,21 @@ class JudgedAlert(BaseModel):
 
 `verdict` là kết quả **sau** policy. Giữ cả `raw_verdict` để ablation H3 không cần gọi lại LLM.
 
+**Trường `debug` (QĐ-016, thêm ở M1):** `debug: dict[str, Any] = {}` — `retrieval_strategy`,
+`repeat`, `cache_key`, `model_version` (API trả về), `actual_api_call`, `retry_count`,
+`prompt_tokens`, `completion_tokens`, `json_valid`, `error`, `status`
+(`llm_valid` | `manual_review`), `raw_response`, `severity`, `recommended_action`,
+`raw_evidence`, `invalid_evidence_ids`, `downgraded_by_threshold`.
+
+**Luật quyết định của `LLMJudge` (M1)**, áp theo thứ tự lên nhãn LLM (`raw_verdict`):
+1. Lỗi API sau retry có trần / JSON không hợp lệ ⇒ `UNCERTAIN`, `status = manual_review`
+   (GĐ1 chuyển JSON lỗi thành alert; GĐ2 không bao giờ biến lỗi thành TRUE_ALERT).
+2. `require_evidence`: TRUE_ALERT không có evidence id nào **có trong context** ⇒ `UNCERTAIN`,
+   `downgraded_by_evidence_rule`. ID bịa bị bỏ, ghi ở `debug.invalid_evidence_ids`.
+3. Ngưỡng đối xứng của GĐ1 (`confidence_threshold = 0,80`): TRUE_ALERT dưới ngưỡng ⇒
+   `UNCERTAIN`, `debug.downgraded_by_threshold`; `threshold_applied = 0,80`. C2 (M6) thay
+   bằng θ_local/θ_topo. FALSE_POSITIVE giữ nguyên ở mọi mức confidence (như GĐ1).
+
 ### 1.5 Incident
 
 ```python
@@ -163,6 +183,12 @@ class Incident(BaseModel):
 `threshold_applied`, `downgraded_gating`, `downgraded_anchoring`; `fact_retrieval_trace`
 (§3.2) cần thêm `origin`, `graph_distance`. Bảng đã có dữ liệu smoke của M0 ⇒ thêm bằng
 script `infra/clickhouse/migrations/001_ctav_columns.sql` theo §7, không sửa `init.sql` tại chỗ.
+
+Đã áp ở M1 (`py scripts/apply_clickhouse_migrations.py`, idempotent): `raw_verdict
+LowCardinality(String) DEFAULT ''`, `routing_tier UInt8 DEFAULT 0` (0 = chưa chấm),
+`evidence_origin LowCardinality(String) DEFAULT 'none'`, `threshold_applied Nullable(Float32)`,
+`downgraded_gating UInt8 DEFAULT 0`, `downgraded_anchoring UInt8 DEFAULT 0`; `origin
+LowCardinality(String) DEFAULT 'local'`, `graph_distance Nullable(UInt8)`.
 
 ---
 
@@ -404,12 +430,16 @@ Quy tắc kế thừa từ dự án Gateway:
 ## 6. Cấu hình LLM cache
 
 ```python
-cache_key = sha256(
-    prompt_text + model_name + str(temperature) + str(max_tokens)
-).hexdigest()
+# services/judge/cache.py — trùng từng byte với legacy/src/llm/response_cache.py (QĐ-016)
+extra = f"max={max_output_tokens}|t=0" + (f"|repeat={repeat}" if repeat else "")
+cache_key = sha256(f"{provider}|{model}|{prompt}|{extra}".encode()).hexdigest()
 ```
 
-Lưu ở `data/llm_cache/` dạng file JSON hoặc SQLite. **Commit `.gitignore`, không commit cache** (dung lượng lớn), nhưng phải giữ giữa các lần chạy trên máy local.
+Temperature luôn bằng 0 (QĐ-013) nên nằm cố định trong `extra` như GĐ1. `repeat = 0` cho
+đúng key GĐ1 ⇒ đọc thẳng cache Gemini của paper (G-paper). Định dạng JSONL của GĐ1
+(`key`, `provider`, `model`, `raw`, `usage`); GĐ2 ghi thêm `model_version`, `repeat`.
+
+Lưu ở `data/llm_cache/gemini.jsonl`. **Commit `.gitignore`, không commit cache** (dung lượng lớn), nhưng phải giữ giữa các lần chạy trên máy local.
 
 Ghi `cache_hit` vào mọi bản ghi để báo cáo tỷ lệ cache hit trong `runtime.json`. Ablation Rescue Score chỉ khả thi về chi phí nhờ cache này.
 

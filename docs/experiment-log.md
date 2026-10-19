@@ -526,3 +526,121 @@ healthy): `py scripts/replay_smoke.py --windows 50 --run-id m1-smoke` → 50 dò
 `candidate_source='metric'`. Cùng đúng 50 cửa sổ như `week2-smoke` (đều là normal): trước 14
 candidate, sau 9, trùng 8 — tức 6 báo động giả của code M0 biến mất, thêm 1 mới; 50 cửa sổ
 normal quá ít để kết luận. Chạy lại cùng `run_id` → script từ chối, số dòng giữ nguyên 50 (D5).
+
+---
+
+## 2026-10-19 — QĐ-016. M1 việc 2–5: hợp đồng retrieval/judge, kho bằng chứng, port BM25 + judge; tái lập nửa BM25 của paper từ cache; hai phát hiện về đánh giá của paper
+
+**Bối cảnh.** Việc 2–5 của M1 (`docs/CURRENT-MILESTONE.md`). Ràng buộc từ M3 (G-paper):
+prompt GĐ2 phải trùng từng byte prompt GĐ1 để trúng 100% cache Gemini của paper; đồng thời
+M1 yêu cầu bỏ tag fault type khỏi truy vấn BM25 (lỗi paper §3.5). Hai yêu cầu mâu thuẫn nếu
+chỉ có một chế độ, vì truy vấn GĐ1 chứa fault type.
+
+**Quyết định.**
+
+| # | Nội dung | File |
+|---|---|---|
+| 1 | 4 Protocol `01` §5, `runtime_checkable` | `packages/schemas/protocols.py` |
+| 2 | `ContextEvent`, `RetrievalBudget`, `RetrievalResult`, `JudgedAlert` + trường CTAV theo `03` §1.3–1.4. Thêm `JudgedAlert.debug` (DoD M1 đòi "`JudgedAlert` có `debug`"; `08` §4.1 đòi ghi model id/phiên bản) và `AlertCandidate.pod/end_ts/metric_snapshot/top_features` (prompt GĐ1 đọc `node_id`, `time_window`, `metric_snapshot`, `top_features`) | `packages/schemas/models.py`, `03` §1 |
+| 3 | Kho bằng chứng: mỗi dòng log/span Nezha → `EvidenceDoc` đúng định dạng GĐ1 (doc id, text, severity trace = WARN khi ≥ 1.000 ms, bỏ health-check, bỏ trùng). `NezhaEvidenceStore` đọc **toàn bộ** `rca_data` (4,18 M log + 4,12 M span) theo file từng phút, LRU 48 file; không lọc theo nhãn | `packages/schemas/evidence.py` |
+| 4 | `bm25_hybrid` port nguyên văn công thức GĐ1. Mặc định: truy vấn không có fault type; `pool="window"` = bằng chứng của `s_0` trong ±8 phút, thống kê BM25 trên pool. Chế độ parity `pool="global"` + `extra_query_terms` (đưa lại `detector_label`, `fault_type`) chỉ dùng cho G-port/G-paper | `services/retrieval/bm25_hybrid.py`, `registry.py` |
+| 5 | Judge: prompt nguyên văn; cache JSONL đọc thẳng file GĐ1, key GĐ1 + `|repeat=n` khi n > 0; `GeminiBackend` (request, retry, schema như GĐ1; ghi `modelVersion`); `MockBackend` = mock GĐ1; luật quyết định `03` §1.4 | `services/judge/` |
+| 6 | Migration CTAV cho ClickHouse, idempotent | `infra/clickhouse/migrations/001_ctav_columns.sql`, `scripts/apply_clickhouse_migrations.py` |
+
+Lý do `pool="window"`: GĐ1 tìm trên toàn corpus, lấy top `max(search_k, 20·top_k)` = 120
+rồi mới lọc thời gian. Corpus GĐ1 chỉ có 11.696 event; trên 8,3 M event của Nezha đầy đủ,
+120 kết quả toàn cục gần như không bao giờ rơi vào cửa sổ ±8 phút ⇒ hầu như mọi alert không
+có bằng chứng. Giới hạn ở `s_0` làm baseline thành "chỉ bằng chứng cục bộ" — đúng tầng 1
+của CTAV (`08` §4); bằng chứng service khác là việc của C1.
+
+**Kiểm chứng tái lập GĐ1** (`scripts/dump_gd1_prompts.py` chạy lại pipeline Step 7 View A
+của GĐ1 trên `paper_500`, biến thể `hybrid_bm25_top6`, judge ép `mock`, không gọi API, 84 s;
+`scripts/check_gd1_parity.py` chạy port GĐ2 ở chế độ parity trên cùng đầu vào, 30 s):
+
+Bảng QĐ-016-1. Port GĐ2 so với GĐ1 trên 489 lần gọi LLM của paper (BM25, full budget).
+
+| Kiểm tra | Khớp |
+|---|---|
+| Prompt GĐ1 tái lập được và key có trong cache Gemini của paper | 489 / 489 |
+| Top-6 doc ID của `bm25_hybrid` (parity) trùng GĐ1, đúng thứ tự | 489 / 489 |
+| Chuỗi prompt GĐ2 trùng GĐ1 | 489 / 489 |
+| Key cache GĐ2 trùng, trúng cache GĐ1 (không cần API key) | 489 / 489 |
+
+Verdict của `LLMJudge` GĐ2 tính lại từ các câu trả lời đã cache: TRUE_ALERT 65 (58 fault,
+7 normal), FALSE_POSITIVE 33, UNCERTAIN 391. Trên 100 fault của `paper_500`: P = 58/65 =
+0,8923, R = 0,58, **F1 = 0,7030, FP = 7 — trùng Table 1 của paper** (BM25, full budget).
+Nửa BM25 của cổng G-paper (M3) vì vậy đã đạt; nửa topology chờ port C1.
+
+**Phát hiện 1 — có bằng chứng hay không gần như lộ nhãn, cả ở paper lẫn ở Nezha gốc.**
+Hai nguyên nhân chồng lên nhau:
+
+1. *Dataset:* Nezha chỉ có file log/trace cho một số phút quanh các lần tiêm lỗi (vd.
+   2022-08-22: 72 phút có log trong khoảng 03:53–07:55; cả 4 ngày: 303 phút), trong khi metric
+   liên tục cả ngày. Cửa sổ normal xa lần tiêm lỗi không có log/trace nào.
+2. *GĐ1:* `legacy/nezha_setup/prepare_nezha_data.py` còn lọc tiếp, chỉ giữ log/trace của
+   service/pod bị tiêm lỗi trong [−300 s, +600 s] quanh mỗi lần tiêm, tối đa 80 event mỗi
+   nguồn (`context_filter_rule` trong `processed/summary.json`).
+
+Bảng QĐ-016-2. Có bằng chứng hay không, theo nhãn, trên 489 lần gọi LLM của paper
+(`py scripts/evidence_coverage.py`, 4 phút).
+
+| | Fault (98) | Normal (391) |
+|---|---|---|
+| GĐ1/paper: top-6 không rỗng | 89 (90,8%) | 21 (5,4%) |
+| GĐ2 (`NezhaEvidenceStore` đầy đủ, `pool="window"`): top-6 không rỗng | 98 (100%) | 76 (19,4%) |
+| Có file log/trace trong ±8 phút | 98 (100%) | 106 (27,1%) |
+
+Bảng QĐ-016-3. Cửa sổ của split GĐ2 có file log/trace trong ±8 phút.
+
+| Split | Fault | Normal |
+|---|---|---|
+| dev | 149/149 (100%) | 4.881/19.167 (25,5%) |
+| val | 209/209 (100%) | 7.427/28.689 (25,9%) |
+| test | 346/346 (100%) | 11.639/46.503 (25,0%) |
+
+Hệ quả. (i) Trong paper, 370/391 normal không có bằng chứng; 360 trong số đó được LLM gắn
+true_alert và chỉ bị `require_evidence` chặn thành manual_review. FP = 7 của BM25 vì vậy chủ
+yếu đến từ việc normal **không có** bằng chứng, không phải từ việc BM25 chọn bằng chứng tốt;
+topology mở rộng sang service lân cận ⇒ thêm normal có bằng chứng ⇒ FP 137 — một cách giải
+thích khác cho "thiên lệch xác nhận do ngữ cảnh", cần tách ra ở H1. (ii) **GĐ2 cũng mắc nếu
+đánh giá trên toàn split**: ~75% normal của `val`/`test` không có log/trace nào, judge với
+`require_evidence` sẽ "đúng" một cách tầm thường trên chúng. Giao thức đánh giá (Q2) phải
+xử lý việc này — xem báo cáo M1 §3 V7. G-paper vẫn tái lập trên kho GĐ1 (để chứng minh port
+đúng), nhưng kho này không dùng cho kết quả khoa học nào của GĐ2.
+
+**Phát hiện 2 — confidence của Gemini chủ yếu là `anomaly_score` chép lại.** Trong 489 câu
+trả lời của paper (BM25), 365 (74,6%) có `confidence` **bằng đúng** `anomaly_score` trong
+prompt; 404 (82,6%) lệch ≤ 0,005. Smoke M1 lặp lại hiện tượng (0,8885 ↔ 0,8885; 0,8784 ↔
+0,8784). Ngưỡng confidence (0,80 của GĐ1, θ_local/θ_topo của C2) vì thế phần lớn là ngưỡng
+trên điểm detector.
+
+**Smoke end-to-end** (`py scripts/judge_smoke.py`): detector fit trên dev (30 s), replay dev,
+`bm25_hybrid` trên kho đầy đủ, judge mock và `gemini-2.5-flash-lite` thật (5 lần gọi API,
+`modelVersion = gemini-2.5-flash-lite`, ~1.950 token prompt + ~460 token output mỗi lần).
+
+Bảng QĐ-016-4. Năm candidate dev qua BM25 → judge.
+
+| Run | Candidate | Nhãn | Pool | Mock | Gemini (conf) |
+|---|---|---|---|---|---|
+| `m1-judge-smoke` | cartservice 03:54 | normal | 4.032 | TRUE_ALERT | FALSE_POSITIVE (0,8885) |
+| | cartservice 03:55 | normal | 4.638 | TRUE_ALERT | FALSE_POSITIVE (0,80) |
+| | cartservice 03:56 | normal | 4.640 | TRUE_ALERT | FALSE_POSITIVE (0,80) |
+| `m1-judge-smoke-fault` | checkoutservice 04:43 | cpu_contention | 6.816 | TRUE_ALERT | FALSE_POSITIVE (0,90) |
+| | checkoutservice 04:44 | cpu_contention | 6.958 | TRUE_ALERT | TRUE_ALERT (0,8784) |
+
+Độ trễ retrieval: 4–8 s khi phải đọc file lần đầu, 90–140 ms khi đã có trong LRU. Mock GĐ1
+gắn TRUE_ALERT cho mọi context có span (luật `duration_ms=`), nên mock chỉ có giá trị cho
+G-port. 5 candidate không đủ để kết luận gì về chất lượng.
+
+**Kiểm chứng.** `py -m pytest tests/ -q` → 86 pass (thêm 38 test: protocol; định dạng doc so
+trực tiếp với hàm GĐ1; bỏ trùng file chồng lấn; không rò fault type, kèm kiểm tra độ nhạy;
+BM25 parity so trực tiếp `HybridRetriever` GĐ1 và top-6 thật của `paper_500`; prompt/mock so
+trực tiếp code GĐ1; key cache = key GĐ1 với `repeat = 0`, khác với `repeat > 0`; cache hit
+không cần API key; luật `require_evidence`, ID bịa, ngưỡng, lỗi API/JSON); `py -m mypy
+packages services` → sạch; `py -m ruff check .` → sạch. Migration áp hai lần không lỗi, 100
+dòng smoke M0/M1 giữ nguyên với giá trị mặc định.
+
+**Chưa làm / dời.** `top_features` của detector GĐ2 còn rỗng; metric snapshot GĐ2 là 19
+metric thô (GĐ1: 6 đặc trưng tổng hợp) — cả hai ảnh hưởng prompt của mọi run GĐ2, cần chốt
+trước H0 (M4). Phụ thuộc `packages` → `scripts` tăng thêm một chỗ (`evidence.py` dùng
+`scripts.nezha_windows`), gộp vào việc D6 ở M2.

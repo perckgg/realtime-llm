@@ -1,0 +1,170 @@
+{
+ "source": "scripts/dump_gd1_prompts.py, paper_500 hybrid_bm25_top6 (GD1 Step 7 quality_full_budget)",
+ "cases": [
+  {
+   "alert": {
+    "alert_id": "alert-99d824a9df",
+    "window_id": "cartservice-579f59597d-wc2lz-cartservice-2022-08-22T04:37:19Z-2022-08-22T04:39:19Z",
+    "time_window": {
+     "start": "2022-08-22T04:37:19Z",
+     "end": "2022-08-22T04:39:19Z"
+    },
+    "node_id": "cartservice-579f59597d-wc2lz",
+    "service_id": "cartservice",
+    "anomaly_score": 0.996,
+    "metric_snapshot": {
+     "cpu": 88.2962,
+     "memory": 32.6538,
+     "network": 41216.0535,
+     "latency": 467.5,
+     "workload": 8.6,
+     "success_rate_drop": 100.0
+    },
+    "detector_label": "anomaly",
+    "top_features": [
+     "cpu",
+     "latency",
+     "memory"
+    ],
+    "ground_truth": "true_alert",
+    "fault_type": "cpu_contention"
+   },
+   "contexts": [
+    {
+     "doc_id": "trace-2022-08-22-14c6171671e30ce5f9f07d666fddf883-dbb95e9bdf21184e",
+     "timestamp": "2022-08-22T04:37:17.508087Z",
+     "source": "nezha_trace",
+     "score": 0.8134,
+     "semantic_score": 0.6425,
+     "time_score": 0.9969,
+     "metadata_score": 1.0,
+     "severity_score": 0.25,
+     "trace_score": 0.75,
+     "node_id": "cartservice-579f59597d-wc2lz",
+     "service_id": "cartservice",
+     "severity": "INFO",
+     "event_type": "trace_span",
+     "message": "Trace span hipstershop.CartService/EmptyCart on cartservice-579f59597d-wc2lz duration_ms=100.409",
+     "retrieval_backend": "local_hybrid_bm25"
+    },
+    {
+     "doc_id": "trace-2022-08-22-0066c0e087422c616a4ddd3a07357ad8-56c69ae4b9e69245",
+     "timestamp": "2022-08-22T04:37:17.308091Z",
+     "source": "nezha_trace",
+     "score": 0.8133,
+     "semantic_score": 0.6425,
+     "time_score": 0.9965,
+     "metadata_score": 1.0,
+     "severity_score": 0.25,
+     "trace_score": 0.75,
+     "node_id": "cartservice-579f59597d-wc2lz",
+     "service_id": "cartservice",
+     "severity": "INFO",
+     "event_type": "trace_span",
+     "message": "Trace span hipstershop.CartService/GetCart on cartservice-579f59597d-wc2lz duration_ms=100.323",
+     "retrieval_backend": "local_hybrid_bm25"
+    },
+    {
+     "doc_id": "trace-2022-08-22-3f310cab16e346829ee95b50618e39d9-da8b2051b8d97241",
+     "timestamp": "2022-08-22T04:37:17.208374Z",
+     "source": "nezha_trace",
+     "score": 0.8132,
+     "semantic_score": 0.6425,
+     "time_score": 0.9963,
+     "metadata_score": 1.0,
+     "severity_score": 0.25,
+     "trace_score": 0.75,
+     "node_id": "cartservice-579f59597d-wc2lz",
+     "service_id": "cartservice",
+     "severity": "INFO",
+     "event_type": "trace_span",
+     "message": "Trace span hipstershop.CartService/GetCart on cartservice-579f59597d-wc2lz duration_ms=100.416",
+     "retrieval_backend": "local_hybrid_bm25"
+    },
+    {
+     "doc_id": "trace-2022-08-22-83e867049d1d7b64154aaca3a3c0a04e-62fc68917f4efd4e",
+     "timestamp": "2022-08-22T04:37:16.606706Z",
+     "source": "nezha_trace",
+     "score": 0.8129,
+     "semantic_score": 0.6425,
+     "time_score": 0.995,
+     "metadata_score": 1.0,
+     "severity_score": 0.25,
+     "trace_score": 0.75,
+     "node_id": "cartservice-579f59597d-wc2lz",
+     "service_id": "cartservice",
+     "severity": "INFO",
+     "event_type": "trace_span",
+     "message": "Trace span hipstershop.CartService/GetCart on cartservice-579f59597d-wc2lz duration_ms=100.566",
+     "retrieval_backend": "local_hybrid_bm25"
+    },
+    {
+     "doc_id": "trace-2022-08-22-7d25e7f23885502c9dff9f456da5f784-ad261e3263bc0446",
+     "timestamp": "2022-08-22T04:37:16.408748Z",
+     "source": "nezha_trace",
+     "score": 0.8128,
+     "semantic_score": 0.6425,
+     "time_score": 0.9946,
+     "metadata_score": 1.0,
+     "severity_score": 0.25,
+     "trace_score": 0.75,
+     "node_id": "cartservice-579f59597d-wc2lz",
+     "service_id": "cartservice",
+     "severity": "INFO",
+     "event_type": "trace_span",
+     "message": "Trace span hipstershop.CartService/GetCart on cartservice-579f59597d-wc2lz duration_ms=100.403",
+     "retrieval_backend": "local_hybrid_bm25"
+    },
+    {
+     "doc_id": "trace-2022-08-22-8884aa08db1faec9951c000285c68d76-ab5a4b642e0ffd43",
+     "timestamp": "2022-08-22T04:37:15.607450Z",
+     "source": "nezha_trace",
+     "score": 0.8124,
+     "semantic_score": 0.6425,
+     "time_score": 0.9929,
+     "metadata_score": 1.0,
+     "severity_score": 0.25,
+     "trace_score": 0.75,
+     "node_id": "cartservice-579f59597d-wc2lz",
+     "service_id": "cartservice",
+     "severity": "INFO",
+     "event_type": "trace_span",
+     "message": "Trace span hipstershop.CartService/GetCart on cartservice-579f59597d-wc2lz duration_ms=100.592",
+     "retrieval_backend": "local_hybrid_bm25"
+    }
+   ],
+   "cache_key": "a8263fcb0f8fa6a40a405f37d157619651e2cb19531c9db8d9e9da26354bb67e"
+  },
+  {
+   "alert": {
+    "alert_id": "alert-e65fe2dc53",
+    "window_id": "checkoutservice-578fcf4766-9csqn-checkoutservice-2022-08-22T04:18:19Z-2022-08-22T04:20:19Z",
+    "time_window": {
+     "start": "2022-08-22T04:18:19Z",
+     "end": "2022-08-22T04:20:19Z"
+    },
+    "node_id": "checkoutservice-578fcf4766-9csqn",
+    "service_id": "checkoutservice",
+    "anomaly_score": 0.999,
+    "metric_snapshot": {
+     "cpu": 9.2079,
+     "memory": 30.2032,
+     "network": 155446.5735,
+     "latency": 492.5,
+     "workload": 0.2667,
+     "success_rate_drop": 100.0
+    },
+    "detector_label": "anomaly",
+    "top_features": [
+     "network",
+     "latency",
+     "workload"
+    ],
+    "ground_truth": "normal",
+    "fault_type": "none"
+   },
+   "contexts": [],
+   "cache_key": "4f47964f9b53306da48bda0d0deddd5f18c67c858f811bf472d70cd13c786ed3"
+  }
+ ]
+}
