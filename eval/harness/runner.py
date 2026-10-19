@@ -131,12 +131,21 @@ def _evidence(config: dict[str, Any], nezha: NezhaEvidenceStore) -> NezhaEvidenc
 
 
 def _git_commit() -> str:
+    """HEAD plus every tracked file modified at run time (untracked files are ignored)."""
     try:
         sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO, capture_output=True, text=True, check=True)
-        dirty = subprocess.run(["git", "status", "--porcelain"], cwd=REPO, capture_output=True, text=True, check=False)
-        return sha.stdout.strip() + (" (dirty working tree)" if dirty.stdout.strip() else "")
+        status = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=REPO, capture_output=True, text=True, check=False,
+        )
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
+    modified = [line[3:] for line in status.stdout.splitlines() if line.strip()]
+    lines = [sha.stdout.strip()]
+    if modified:
+        lines.append("modified tracked files at run time:")
+        lines += [f"  {path}" for path in modified]
+    return "\n".join(lines)
 
 
 class Gate:
