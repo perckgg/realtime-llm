@@ -200,6 +200,11 @@ class GeminiBackend:
             )
         usage = body.get("usageMetadata") or {}
         model_version = body.get("modelVersion")
+        if model_version and model_version != self.model:
+            # QD-020: some Gemini ids are silently served by a newer model
+            # (gemini-3.7-flash -> gemini-3.8-flash on 2026-10-19). A run must
+            # be judged by one model, so stop instead of mixing; not cached.
+            raise ModelVersionMismatch(f"requested {self.model!r}, API served {model_version!r}")
         self.cache.put(
             key,
             {
@@ -215,6 +220,10 @@ class GeminiBackend:
             raw=text, usage=usage, cache_key=key, actual_api_call=True,
             retry_count=retries, model_version=model_version,
         )
+
+class ModelVersionMismatch(RuntimeError):
+    """The API answered with a different model than the one configured (QD-020)."""
+
 
 class _RequestFailed(RuntimeError):
     def __init__(self, message: str, retry_count: int) -> None:

@@ -55,7 +55,9 @@ CONFIGS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--split", default="paper_500", choices=sorted(CONFIGS))
-    parser.add_argument("--variant", default="hybrid_bm25_top6", choices=["hybrid_bm25_top6"])
+    parser.add_argument(
+        "--variant", default="hybrid_bm25_top6", choices=["hybrid_bm25_top6", "topology_aware_fusion_top6"]
+    )
     parser.add_argument("--max-total-calls", type=int, default=500, help="GD1 quality_full_budget = 500")
     parser.add_argument("--model", default="gemini-2.5-flash-lite")
     parser.add_argument("--max-output-tokens", type=int, default=1024)
@@ -114,8 +116,14 @@ def main() -> int:
     config["evaluation"]["audit_dir"] = str(REPO / "data" / "gd1_parity" / "legacy_audit")
     config["llm_gate"]["max_total_calls"] = args.max_total_calls
     config["llm"].update({"provider": "mock", "model": "mock-judge"})
-    if args.split != "phase4":
+    # legacy/scripts/phase2/run_step7_view_a.py `_step7_config` per variant.
+    if args.split != "phase4" and args.variant == "hybrid_bm25_top6":
         config["retrieval"].update({"backend": "hybrid_bm25", "vector_db": "hybrid_bm25", "top_k": 6})
+    elif args.split != "phase4":
+        config["retrieval"].update(
+            {"backend": "topology_aware_fusion", "vector_db": "topology_aware_fusion",
+             "lexical_backend": "hybrid_bm25", "top_k": 6}
+        )
 
     captured: list[dict[str, Any]] = []
     original = gd1_main.compose_prompt

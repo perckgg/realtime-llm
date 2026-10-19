@@ -217,3 +217,22 @@ def test_debug_records_prompt_inputs_and_backend():
     assert judged.judge_backend == "mock" and judged.verdict == "TRUE_ALERT"
     for key in ("retrieval_strategy", "repeat", "cache_key", "model_version", "json_valid", "raw_response"):
         assert key in judged.debug
+
+
+def test_model_version_mismatch_stops_and_is_not_cached(monkeypatch, tmp_path):
+    from services.judge import backends
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    body = {
+        "candidates": [{"content": {"parts": [{"text": json.dumps(_answer("uncertain"))}]}}],
+        "usageMetadata": {},
+        "modelVersion": "gemini-3.8-flash",
+    }
+    monkeypatch.setattr(backends, "_post_json_with_retry", lambda *args, **kwargs: (body, 0))
+    cache = ResponseCache(tmp_path / "c.jsonl")
+    backend = GeminiBackend(cache, model="gemini-3.7-flash")
+    with pytest.raises(backends.ModelVersionMismatch):
+        backend.complete("p", [])
+    assert len(cache) == 0
+    body["modelVersion"] = "gemini-3.7-flash"
+    assert backend.complete("p", []).error is None and len(cache) == 1

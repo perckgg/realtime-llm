@@ -801,3 +801,67 @@ Hiện tượng chép điểm gắn chặt với việc prompt thiếu bằng ch
 
 **Kiểm chứng.** 103 test pass (thêm: limiter đa luồng, `judge_all` song song = tuần tự và
 giữ thứ tự, cache ghi đồng thời); mypy, ruff sạch.
+
+---
+
+## 2026-10-19 — QĐ-020. Khảo sát trước M3: retrieval topology của paper không giới hạn thời gian; model Gemini bị chuyển ngầm; chặn lệch model
+
+**Bối cảnh.** Chuẩn bị M3 (C1 + nửa topology của G-paper). Đọc code topology GĐ1
+(`legacy/src/phase2/retrieval/`) và chạy lại biến thể `topology_aware_fusion_top6` của paper
+offline: `py scripts/dump_gd1_prompts.py --variant topology_aware_fusion_top6` (judge mock).
+
+**Kết quả tái lập.** 489/489 prompt topology tái lập được và có key trong cache Gemini của
+paper ⇒ nửa topology của G-paper khả thi nếu port đúng.
+
+**Phát hiện 3 — biến thể "topology" của paper chủ yếu là BM25 không giới hạn thời gian.**
+`TopologyAwareRetriever` gộp (i) top-60 BM25 tìm trên **toàn corpus, không lọc thời gian**
+và (ii) mở rộng đồ thị 2-hop trong ±8 phút, rồi xếp bằng Fusion Score. Trên 489 prompt:
+
+Bảng QĐ-020-1. Nguồn và thời điểm của 2.934 context topology trong paper (BM25: QĐ-016 —
+mọi context nằm trong ±8 phút).
+
+| | Số context | Tỷ lệ |
+|---|---|---|
+| Chỉ từ BM25 toàn corpus | 2.612 | 89,0% |
+| Chỉ từ mở rộng đồ thị | 229 | 7,8% |
+| Cả hai | 93 | 3,2% |
+| Ngoài ±8 phút quanh cửa sổ | 2.354 | 80,2% |
+| … trong đó cách > 1 giờ | 2.200 | 75,0% |
+| Prompt có ít nhất một context ngoài ±8 phút | 411 / 489 | 84,0% |
+| Normal có context | 391 / 391 | 100% (BM25: 21 / 391) |
+
+`graph_distance` của context: 0 → 1.364, 1 → 147, 2 → 401, 3+ → 190, không tới được → 832
+(BM25 lấy cả service ngoài 2-hop). Kết hợp QĐ-016 (corpus GĐ1 chỉ gồm log/trace quanh các
+lần tiêm lỗi): với biến thể topology, **mọi** normal nhận bằng chứng — phần lớn là log/trace
+của sự cố ở thời điểm khác. Đây là một giải thích cạnh tranh cho FP 137 của paper, khác
+"thiên lệch do topology": bằng chứng lệch thời gian, không phải bằng chứng lân cận trên đồ thị.
+
+**Đồ thị service** (`legacy/outputs/phase2/service_graph_*`): dựng từ **toàn bộ** trace thô
+(`rca_data` + `construct_data`, 4,18 M span), không lọc theo nhãn; 56 service, 68 cạnh (vô
+hướng = có hướng, không có cặp hai chiều), trọng số cạnh nhỏ nhất 126 ⇒ `min_edge_count = 5`
+(`02` §1.3) không loại cạnh nào; 18 service train-ticket cô lập. Coverage: 149/149 (dev),
+209/209 (val), 346/346 (test) fault window nằm trên service có cạnh ⇒ ngưỡng fallback 60% không
+kích hoạt (các service cô lập chưa từng bị tiêm lỗi).
+
+**Model Gemini — yêu cầu nâng cấp của người dùng (chưa chốt, xem V12).** Thử một request
+judge (payload GĐ1: temperature 0, `thinkingBudget: 0`, JSON schema) lên các model Flash
+key được phép dùng:
+
+Bảng QĐ-020-2. Thử một prompt paper (prompt 1.725 token) trên các model Flash, 2026-10-19.
+
+| Model gọi | `modelVersion` API trả về | Độ trễ | Token output | Ghi chú |
+|---|---|---|---|---|
+| `gemini-2.5-flash-lite` | gemini-2.5-flash-lite | 2,3 s | 462 | Judge hiện tại (QĐ-013) |
+| `gemini-2.5-flash` | gemini-2.5-flash | 3,4 s | 420 | Đúng model, phiên bản "001" |
+| `gemini-3.5-flash` | **gemini-3.6-flash** | 3,0 s | 186 | Bị chuyển ngầm |
+| `gemini-3.7-flash` | **gemini-3.8-flash** | 4,3 s | 180 | Bị chuyển ngầm |
+| `gemini-3.8-flash` | gemini-3.8-flash | 4,5 s | 219 | Mới nhất |
+
+Cả 5 chấp nhận `thinkingBudget: 0`. Hai id dòng 3.x được phục vụ bởi model mới hơn mà không
+báo. **Quyết định:** `GeminiBackend` so `modelVersion` của mọi câu trả lời với model đã cấu
+hình; lệch ⇒ `ModelVersionMismatch`, run dừng, câu trả lời không vào cache
+(`services/judge/backends.py`, test `test_model_version_mismatch_stops_and_is_not_cached`).
+Một run luôn do đúng một model chấm.
+
+**Hệ quả cho M3–M4.** V12–V15 trong `docs/CURRENT-MILESTONE.md` (chờ người dùng). G-paper
+không bị ảnh hưởng bởi việc đổi model: nó phát lại cache `gemini-2.5-flash-lite` của paper.
