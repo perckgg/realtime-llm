@@ -4,7 +4,10 @@
 (legacy/src/llm/judge_client.py): same request (temperature 0, thinking
 budget 0, JSON response schema), same cache key, same retry policy (429/5xx
 and network errors, honouring Retry-After / retryDelay, exponential backoff
-capped at 60 s). Retries are capped (`max_retries`); when they run out the
+capped at 60 s). Thread-safe (QD-019): the harness judges candidates from
+several worker threads; every HTTP attempt, retries included, takes a slot
+from one shared `RateLimiter` (default 200 calls/min, Tier-1 quota is
+1,000+ RPM for Flash models), and the cache is lock-protected. Retries are capped (`max_retries`); when they run out the
 backend returns an error and LLMJudge records the alert for manual review --
 it never falls back to another model. A cache hit needs no API key, so a
 cached run (and the defence demo) works offline.
@@ -18,6 +21,7 @@ import json
 import os
 import random
 import re
+import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any, Protocol
@@ -107,6 +111,26 @@ class MockBackend:
         return BackendResponse(raw=raw, model_version="mock")
 
 
+class RateLimiter:
+    """At most `per_minute` acquisitions per minute across threads, evenly
+    spaced (one slot every 60 / per_minute s); `per_minute <= 0` disables it."""
+
+    def __init__(self, per_minute: int) -> None:
+        self.interval = 60.0 / per_minute if per_minute > 0 else 0.0
+        self._lock = threading.Lock()
+        self._next = 0.0
+
+    def acquire(self) -> None:
+        if not self.interval:
+            return
+        with self._lock:
+            now = time.monotonic()
+            slot = max(now, self._next)
+            self._next = slot + self.interval
+        if slot > now:
+            time.sleep(slot - now)
+
+
 class GeminiBackend:
     def __init__(
         self,
@@ -115,7 +139,7 @@ class GeminiBackend:
         max_output_tokens: int = 1024,  # GD1 Step 7 (paper) value; part of the cache key
         timeout_seconds: float = 60.0,
         max_retries: int = 5,
-        max_calls_per_minute: int = 15,
+        max_calls_per_minute: int = 200,  # QD-019; GD1 used 15 (free tier)
         api_key: str | None = None,
     ) -> None:
         self.cache = cache
@@ -124,9 +148,8 @@ class GeminiBackend:
         self.max_output_tokens = max_output_tokens
         self.timeout_seconds = timeout_seconds
         self.max_retries = max_retries
-        self.min_interval = 60.0 / max_calls_per_minute if max_calls_per_minute else 0.0
+        self.limiter = RateLimiter(max_calls_per_minute)
         self._api_key = api_key
-        self._last_call = 0.0
 
     def cache_key(self, prompt: str, repeat: int = 0) -> str:
         return make_key("gemini", self.model, prompt, cache_extra(self.max_output_tokens, repeat))
@@ -145,7 +168,6 @@ class GeminiBackend:
         api_key = self._api_key or os.environ.get("GEMINI_API_KEY")
         if not api_key:
             return BackendResponse(raw="", cache_key=key, error="cache miss and GEMINI_API_KEY is not set")
-        self._throttle()
         payload = {
             "contents": [{"role": "user", "parts": [{"text": prompt}]}],
             "generationConfig": {
@@ -163,7 +185,7 @@ class GeminiBackend:
             method="POST",
         )
         try:
-            body, retries = _post_json_with_retry(req, self.max_retries, self.timeout_seconds)
+            body, retries = _post_json_with_retry(req, self.max_retries, self.timeout_seconds, self.limiter)
         except _RequestFailed as exc:
             return BackendResponse(
                 raw="", cache_key=key, actual_api_call=True, retry_count=exc.retry_count, error=str(exc)
@@ -194,23 +216,19 @@ class GeminiBackend:
             retry_count=retries, model_version=model_version,
         )
 
-    def _throttle(self) -> None:
-        if self.min_interval and self._last_call:
-            wait = self.min_interval - (time.monotonic() - self._last_call)
-            if wait > 0:
-                time.sleep(wait)
-        self._last_call = time.monotonic()
-
-
 class _RequestFailed(RuntimeError):
     def __init__(self, message: str, retry_count: int) -> None:
         super().__init__(message)
         self.retry_count = retry_count
 
 
-def _post_json_with_retry(req: request.Request, retries: int, timeout_seconds: float) -> tuple[dict[str, Any], int]:
+def _post_json_with_retry(
+    req: request.Request, retries: int, timeout_seconds: float, limiter: RateLimiter | None = None
+) -> tuple[dict[str, Any], int]:
     """GD1 `_urlopen_json_with_retry`: retry 429/5xx and network errors, at most `retries` times."""
     for attempt in range(retries + 1):
+        if limiter is not None:
+            limiter.acquire()
         try:
             with request.urlopen(req, timeout=timeout_seconds) as response:
                 return json.loads(response.read().decode("utf-8")), attempt

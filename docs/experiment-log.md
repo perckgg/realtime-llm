@@ -742,3 +742,62 @@ gate/quyết định/config); mypy `packages services eval` sạch; ruff sạch;
 --check` khớp. Ghi ClickHouse thử với run `m2-clickhouse-smoke`: 300 dòng
 `fact_alert_evaluation` có cột CTAV, 54 dòng `fact_retrieval_trace`; truy vấn `03` §3.3 ra
 TP 6 / FP 19, khớp `metrics.json`.
+
+---
+
+## 2026-10-19 — QĐ-019. Chốt V10 (G-port đạt theo tầng), V11 (judge song song, 200 lần gọi/phút); tinh chỉnh Phát hiện 2
+
+**V10 → (a).** Người dùng chốt: G-port **đạt**. Căn cứ: mọi tầng nhận đầu vào GĐ1 đều trùng
+tuyệt đối (retrieval 40/40, judge 30/30, gate + ngân sách + retrieval + judge + quyết định
+6/13/10/271); phần lệch FP +6 của toàn pipeline (QĐ-018, Bảng QĐ-018-1) do detector cửa sổ
+60 s (QĐ-009) và candidate mang dữ liệu GĐ2, đã phân rã đủ 14 cửa sổ. Không viết detector
+"chế độ GĐ1". Luận văn trình bày G-port theo tầng như Bảng QĐ-018-1.
+
+**V11.** API key ở gói Pay-as-you-go Tier 1 (hạn mức 1.000+ RPM cho dòng Flash, ~80 USD
+credit). Thay đổi:
+
+| | Trước | Sau | File |
+|---|---|---|---|
+| Giới hạn tốc độ | 15 lần/phút, không an toàn đa luồng | `RateLimiter` dùng chung giữa các thread, mỗi lần thử HTTP (kể cả retry) lấy một slot; mặc định **200 lần/phút** | `services/judge/backends.py` |
+| Judge trong harness | Tuần tự trong vòng replay | Pha 1 tuần tự (replay, detector, gate/ngân sách, retrieval); pha 2 `judge_all()` trên `judge.workers` thread (mặc định **8**); kết quả ghi theo thứ tự candidate ⇒ output không phụ thuộc số worker | `eval/harness/runner.py` |
+| Cache | Có khoá | Không đổi; test 200 lần ghi đồng thời từ 8 thread | `services/judge/cache.py` |
+
+200 lần/phút thấp hơn nhiều hạn mức Tier 1, và với độ trễ ~2,4 s mỗi lần gọi thì 8 worker
+đạt đúng ~200 lần/phút; muốn tăng RPM phải tăng worker theo (RPM ≈ worker × 60 / 2,4).
+Gate/ngân sách chỉ phụ thuộc thứ tự candidate, không phụ thuộc kết quả judge, nên tách pha
+không đổi ngữ nghĩa: chạy lại `gd1_phase4_parity` cho `per_window.csv` trùng 300/300 dòng
+(trừ cột độ trễ).
+
+Bảng QĐ-019-1. Smoke judge song song với Gemini thật (`eval/configs/m2_parallel_judge_smoke.yaml`,
+1.000 cửa sổ dev đầu tiên, BM25 GĐ2, 8 worker, 200 lần/phút).
+
+| Chỉ số | Giá trị |
+|---|---|
+| Candidate / lần gọi API | 196 / 196 (cache trống) |
+| Thời gian pha judge | 60,1 s (≈ 196 lần/phút — chạm trần limiter) |
+| Lỗi / retry / 429 | 0 / 0 / 0 |
+| Token prompt / output | 301.196 / 65.087 (trung bình 1.537 / 332 mỗi lần) |
+| Chi phí | 0,056 USD (≈ 0,00029 USD mỗi lần) |
+| Độ trễ LLM trung bình / P95 | 2,41 s / 3,09 s |
+| Retrieval trung bình | 0,30 s (tuần tự, CPU) |
+| Tổng thời gian run | 168 s (fit 28 s, replay + retrieval 80 s, judge 60 s) |
+
+Ước tính một run trên tập chính của `val` (1.749 candidate, QĐ-018): judge ≈ 9 phút,
+retrieval tuần tự ≈ 9 phút, replay + fit ≈ 6 phút ⇒ **~25 phút, ~0,50 USD**. Nút thắt giờ là
+retrieval (CPU, tuần tự) — nếu M4 cần nhanh hơn: song song hoá retrieval bằng process, hoặc
+dùng lại kết quả detector giữa các biến thể.
+
+**Tinh chỉnh Phát hiện 2 (QĐ-016).** Tỷ lệ `confidence` = `anomaly_score`:
+
+| | Có confidence = `anomaly_score` |
+|---|---|
+| Paper, prompt không có context | 316 / 379 (83,4%) |
+| Paper, prompt có context | 49 / 110 (44,5%) |
+| GĐ2 smoke (mọi candidate có context, có `top_features`) | 16 / 196 (8,2%) |
+
+Hiện tượng chép điểm gắn chặt với việc prompt thiếu bằng chứng. Quyết định V8 (a) giữ nguyên
+(C2 không dựa chỉ vào confidence), nhưng trên giao thức GĐ2 mức độ nhẹ hơn nhiều; đo lại trên
+`val` ở M4.
+
+**Kiểm chứng.** 103 test pass (thêm: limiter đa luồng, `judge_all` song song = tuần tự và
+giữ thứ tự, cache ghi đồng thời); mypy, ruff sạch.

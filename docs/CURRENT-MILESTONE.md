@@ -38,11 +38,11 @@ Còn mở (không chặn M2): Q5 (mốc bảo vệ), V1 (mail GVHD — nên kèm
 
 - [x] Retrieval: 40 candidate Phase 4 → top-6 BM25 GĐ2 (chế độ parity) trùng doc ID GĐ1; mọi khác biệt giải thích được
 - [x] Judge mock: cùng candidate + context → verdict trùng audit GĐ1
-- [ ] **Một phần** — Toàn pipeline: P = 0,3158 (6 TP, 13 FP), FPR = 0,0458, recall 0,375; lệch ≤ 1 cửa sổ mỗi ô. Phần sau detector trùng tuyệt đối (tầng 3a); với detector GĐ2: 6/19/10/265 (FP +6, phân rã đủ) — chờ người dùng (V10)
+- [x] **Đạt theo tầng (V10 a, QĐ-019)** — Toàn pipeline: P = 0,3158 (6 TP, 13 FP), FPR = 0,0458, recall 0,375; lệch ≤ 1 cửa sổ mỗi ô. Phần sau detector trùng tuyệt đối (tầng 3a); với detector GĐ2: 6/19/10/265 (FP +6, phân rã đủ)
 - [x] Detector: so phân phối điểm với `detector_only_audit` (không đòi trùng tuyệt đối — QĐ-009)
 - [x] Đủ 6 file output `02` §3.3; `pytest`/`mypy`/`ruff` sạch
 - [x] Số candidate thật trên `val` + chi phí ước tính ghi vào experiment-log
-- [x] Báo cáo `docs/milestones/M2-harness-gport.md` đủ 4 phần — **chờ người dùng xem, chốt V10, V11** trước khi mở M3
+- [x] Báo cáo `docs/milestones/M2-harness-gport.md` đủ 4 phần — người dùng đã xem, V10/V11 chốt (QĐ-019). **M2 đóng; chờ lệnh mở M3**
 
 Lệch hơn mức trên = port sai. **Dừng và sửa**, không sang M3.
 

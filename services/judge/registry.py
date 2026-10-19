@@ -7,6 +7,8 @@
       require_evidence: true
       confidence_threshold: 0.80
       repeat: 0
+      max_calls_per_minute: 200   # shared by all workers (QD-019)
+      workers: 8                  # parallel judge threads in the harness (QD-019)
       cache_path: data/llm_cache/gemini.jsonl
       cache_read_paths: []     # extra read-only caches, e.g. GD1's (G-paper)
 """
@@ -44,7 +46,7 @@ def build_judge(config: Mapping[str, Any]) -> LLMJudge:
             model=model,
             max_output_tokens=int(config.get("max_output_tokens", 1024)),
             max_retries=int(config.get("max_retries", 5)),
-            max_calls_per_minute=int(config.get("max_calls_per_minute", 15)),
+            max_calls_per_minute=int(config.get("max_calls_per_minute", 200)),
         )
     else:
         raise ValueError(f"unknown judge backend {backend_name!r} (api | mock)")

@@ -1,0 +1,10 @@
+a688a8a2abfa1c6f11668404304ac3f981145a1d
+modified tracked files at run time:
+  eval/harness/runner.py
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  services/judge/backends.py
+  services/judge/registry.py
+  tests/test_harness.py

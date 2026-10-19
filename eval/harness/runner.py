@@ -3,7 +3,12 @@
     py -m eval run --config eval/configs/<name>.yaml
 
 Replays Nezha in time order through detector -> gate -> retrieval -> judge
-and writes the six files of 02 SS3.3 (plus `judged.jsonl`) to
+in two phases (QD-019): (1) sequential replay -- detector (stateful), gate and
+budget (depend only on candidate order), retrieval (CPU-bound, keeps the
+evidence LRU warm); (2) the judge calls, which are network-bound, run on
+`judge.workers` threads (default 8) sharing the backend's rate limiter.
+Results are written in candidate order, so the output does not depend on the
+number of workers. It writes the six files of 02 SS3.3 (plus `judged.jsonl`) to
 eval/results/<run_id>/, which must not exist yet (results are never
 overwritten; a new parameter set = a new run_id). Optionally writes the same
 rows to ClickHouse (`storage.clickhouse: true`, 03 SS3).
@@ -34,7 +39,8 @@ import csv
 import json
 import subprocess
 import time
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -48,6 +54,7 @@ from packages.schemas.loaders import load_split_window_ids
 from packages.schemas.models import AlertCandidate, JudgedAlert, RetrievalResult, TelemetryWindow
 from services.detector.candidates import build_alert_candidate
 from services.detector.isolation_forest import IsolationForestDetector
+from services.judge.llm_judge import LLMJudge
 from services.judge.registry import build_judge
 from services.replayer.nezha_source import NezhaReplaySource
 from services.retrieval.bm25_hybrid import Bm25HybridRetriever
@@ -185,6 +192,16 @@ def _decision(gate_action: str, gate: Gate, judged: JudgedAlert | None) -> str:
     return "none"
 
 
+def judge_all(
+    judge: LLMJudge, jobs: Sequence[tuple[AlertCandidate, RetrievalResult]], workers: int = 8
+) -> list[JudgedAlert]:
+    """Judge every (candidate, context) pair, `workers` at a time; results in input order."""
+    if workers <= 1 or len(jobs) <= 1:
+        return [judge.evaluate(candidate, result) for candidate, result in jobs]
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        return list(pool.map(lambda job: judge.evaluate(*job), jobs))
+
+
 def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
     run_id = str(config["run_id"])
     out_dir = results_root / run_id
@@ -225,42 +242,53 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
     threshold = detector.threshold
 
     rows: list[dict[str, Any]] = []
+    jobs: list[tuple[AlertCandidate, RetrievalResult]] = []
+    job_rows: list[dict[str, Any]] = []
     out_dir.mkdir(parents=True)
     replay = NezhaReplaySource(
         window_ids=evaluated, include_history=True, time_source=time_source, limit=config.get("n_windows")
     )
+    # Phase 1: sequential replay, detector, gate/budget, retrieval.
+    for window in replay.stream():
+        if not replay.is_evaluated(window):
+            detector.observe(window)
+            continue
+        label = label_override.get(window.window_id) or _dataset_label(window)
+        score = detector.score(window)
+        promoted = detector.is_candidate(window, score)
+        candidate = build_alert_candidate(window, score, promoted, detector.top_features(window))
+        row = _row(window, label, score, candidate, nezha)
+        gate_action = "not_candidate"
+        if candidate is not None and not full:
+            gate_action = "detector_only"
+        elif candidate is not None:
+            gate_action = gate.action(score)
+            if gate_action == "call_llm":
+                query_terms[candidate.candidate_id] = [
+                    "anomaly" if score >= threshold else "normal",
+                    label.fault_type if label.is_fault else "none",
+                ]
+                jobs.append((candidate, strategy.retrieve(candidate, budget)))
+                job_rows.append(row)
+                gate.calls += 1
+        row["gate_action"] = gate_action
+        row["decision"] = _decision(gate_action, gate, None)
+        rows.append(row)
+    replay_seconds = time.perf_counter() - started
+
+    # Phase 2: judge calls in parallel; written back in candidate order.
+    judge_started = time.perf_counter()
+    workers = int((config.get("judge") or {}).get("workers", 8))
+    verdicts = judge_all(judge, jobs, workers) if full else []
+    judge_seconds = time.perf_counter() - judge_started
     with (out_dir / "retrieval.jsonl").open("w", encoding="utf-8") as retrieval_out, (
         out_dir / "judged.jsonl"
     ).open("w", encoding="utf-8") as judged_out:
-        for window in replay.stream():
-            if not replay.is_evaluated(window):
-                detector.observe(window)
-                continue
-            label = label_override.get(window.window_id) or _dataset_label(window)
-            score = detector.score(window)
-            promoted = detector.is_candidate(window, score)
-            candidate = build_alert_candidate(window, score, promoted, detector.top_features(window))
-            row = _row(window, label, score, candidate, nezha)
-            judged: JudgedAlert | None = None
-            gate_action = "not_candidate"
-            if candidate is not None and not full:
-                gate_action = "detector_only"
-            elif candidate is not None:
-                gate_action = gate.action(score)
-                if gate_action == "call_llm":
-                    query_terms[candidate.candidate_id] = [
-                        "anomaly" if score >= threshold else "normal",
-                        label.fault_type if label.is_fault else "none",
-                    ]
-                    result = strategy.retrieve(candidate, budget)
-                    judged = judge.evaluate(candidate, result)
-                    gate.calls += 1
-                    _fill_judged(row, result, judged)
-                    retrieval_out.write(_jsonl({"window_id": window.window_id, **result.model_dump(mode="json")}))
-                    judged_out.write(_jsonl(judged.model_dump(mode="json")))
-            row["gate_action"] = gate_action
-            row["decision"] = _decision(gate_action, gate, judged)
-            rows.append(row)
+        for row, (_, result), judged in zip(job_rows, jobs, verdicts, strict=True):
+            _fill_judged(row, result, judged)
+            row["decision"] = _decision(row["gate_action"], gate, judged)
+            retrieval_out.write(_jsonl({"window_id": row["window_id"], **result.model_dump(mode="json")}))
+            judged_out.write(_jsonl(judged.model_dump(mode="json")))
 
     judge_config = config.get("judge") or {}
     metrics = summarize(
@@ -275,6 +303,9 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
         "finished_at": datetime.now(UTC).isoformat(),
         "wall_seconds": round(time.perf_counter() - started, 1),
         "detector_fit_seconds": round(fit_seconds, 1),
+        "replay_and_retrieval_seconds": round(replay_seconds - fit_seconds, 1),
+        "judge_seconds": round(judge_seconds, 1),
+        "judge_workers": workers,
         "evaluated_windows": len(rows),
         "llm_calls": metrics["all"]["operations"]["llm_calls"],
         "api_calls": metrics["all"]["operations"]["api_calls"],

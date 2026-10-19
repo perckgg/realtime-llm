@@ -4,9 +4,9 @@
 |---|---|
 | Ngày đóng mốc | 2026-10-19 |
 | Hạn mục tiêu | 2026-11-01 (sớm 13 ngày) |
-| Kết luận | **QUA CÓ ĐIỀU KIỆN**: tầng 1, 2, 3a của G-port trùng GĐ1 tuyệt đối; tầng 3b (toàn pipeline với detector GĐ2) lệch FP +6, vượt ngưỡng ±1. Đã phân rã hết nguyên nhân, nằm ở detector và cách biểu diễn candidate, không ở mã port. **Cần bạn quyết định (V10)** |
+| Kết luận | **QUA** — người dùng chốt V10 (a) ngày 2026-10-19 (QĐ-019): G-port đạt theo tầng; tầng 3b lệch FP +6 do detector, đã phân rã. V11: judge song song 8 worker, 200 lần gọi/phút |
 | Commit | commit M2 (cùng commit với báo cáo này) |
-| Quyết định liên quan | QĐ-017 (V7–V9), QĐ-018 (kết quả M2) |
+| Quyết định liên quan | QĐ-017 (V7–V9), QĐ-018 (kết quả M2), QĐ-019 (V10, V11) |
 
 ## 1. Kết quả hiện tại
 
@@ -111,3 +111,12 @@ py -m eval run --config eval/configs/gd1_phase4_parity.yaml      # run_id mới 
 py scripts/gport_layers.py --run gd1_phase4_parity_v1            # Bảng M2-1
 py -m eval run --config eval/configs/val_detector_count.yaml     # Bảng M2-2, ~5 phút
 ```
+
+## Cập nhật sau review (2026-10-19, QĐ-019)
+
+- **V10 → (a):** G-port đạt theo tầng.
+- **V11:** Tier 1. `RateLimiter` dùng chung giữa các thread (200 lần/phút), judge song song
+  8 worker trong harness. Smoke Gemini thật: 196 lần gọi trong 60 s, 0 lỗi, 0,056 USD. Ước
+  một run `val` (tập chính) ~25 phút, ~0,50 USD; nút thắt chuyển sang retrieval tuần tự.
+- **Phát hiện 2 tinh chỉnh:** confidence = `anomaly_score` ở 83% prompt paper không có
+  context, 45% có context, chỉ 8% trên prompt GĐ2.

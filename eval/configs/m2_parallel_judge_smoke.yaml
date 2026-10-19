@@ -1,0 +1,34 @@
+# QĐ-019: đo thông lượng judge song song với Gemini thật (8 worker, 200 lần gọi/phút)
+# trên 1.000 cửa sổ dev đầu tiên theo thời gian. Smoke kỹ thuật, không phải kết quả khoa học.
+run_id: m2_parallel_judge_smoke_v1
+seed: 42
+split: dev
+n_windows: 1000
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+
+judge:
+  backend: api
+  model: gemini-2.5-flash-lite
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8

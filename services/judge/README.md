@@ -7,7 +7,7 @@ hỏi backend, parse JSON 3 nhãn, áp luật quyết định → `JudgedAlert`.
 |---|---|
 | `prompt.py` | `compose_prompt` nguyên văn GĐ1; `alert_payload`, `context_payload` chuyển object GĐ2 sang dict GĐ1 |
 | `cache.py` | Cache JSONL đọc thẳng được file cache GĐ1; key GĐ1 + `repeat` (`03` §6) |
-| `backends.py` | `GeminiBackend` (`gemini-2.5-flash-lite`, temperature 0, retry có trần, giới hạn lần gọi/phút, ghi `modelVersion`); `MockBackend` = mock GĐ1, chỉ cho G-port |
+| `backends.py` | `GeminiBackend` (`gemini-2.5-flash-lite`, temperature 0, retry có trần, ghi `modelVersion`, an toàn đa luồng); `RateLimiter` dùng chung giữa các thread (mặc định 200 lần/phút, QĐ-019); `MockBackend` = mock GĐ1, chỉ cho G-port |
 | `llm_judge.py` | Luật: lỗi ⇒ `UNCERTAIN`/`manual_review`; `require_evidence`; ngưỡng 0,80 đối xứng của GĐ1 (`03` §1.4) |
 | `registry.py` | `build_judge(config["judge"])`; từ chối model không phải Gemini và temperature ≠ 0 (QĐ-013) |
 

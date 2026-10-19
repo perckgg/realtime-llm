@@ -160,3 +160,76 @@ def test_committed_configs_load():
         if path.name == "bm25_baseline.yaml":
             continue  # M0 draft, superseded in M4
         load_config(path)
+
+
+# --- parallel judging (QD-019) ------------------------------------------------------------
+
+
+def test_rate_limiter_spaces_calls_across_threads():
+    import threading
+    import time
+
+    from services.judge.backends import RateLimiter
+
+    limiter = RateLimiter(per_minute=1200)  # one slot every 50 ms
+    stamps: list[float] = []
+    lock = threading.Lock()
+
+    def take() -> None:
+        limiter.acquire()
+        with lock:
+            stamps.append(time.monotonic())
+
+    threads = [threading.Thread(target=take) for _ in range(6)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    stamps.sort()
+    assert stamps[-1] - stamps[0] >= 5 * 0.05 - 0.01
+    RateLimiter(0).acquire()  # disabled: returns immediately
+
+
+def test_judge_all_parallel_equals_sequential_and_keeps_order():
+    from datetime import UTC, datetime
+
+    from eval.harness.runner import judge_all
+    from packages.schemas.models import AlertCandidate, ContextEvent, RetrievalResult
+    from services.judge.backends import MockBackend
+    from services.judge.llm_judge import LLMJudge
+
+    ts = datetime(2022, 8, 22, tzinfo=UTC)
+    jobs = []
+    for i in range(20):
+        severity = ["ERROR", "INFO", "WARN"][i % 3]
+        event = ContextEvent(
+            event_id=f"e{i}", modality="log", ts=ts, service="s", content="m", score=0.5,
+            debug={"source": "nezha_log", "severity": severity, "event_type": "application_log"},
+        )
+        candidate = AlertCandidate(
+            candidate_id=f"c{i}", window_id=f"w{i}", service="s", ts=ts, anomaly_score=0.9, source="metric"
+        )
+        jobs.append((candidate, RetrievalResult(strategy="x", events=[event], latency_ms=0, token_estimate=1)))
+    judge = LLMJudge(MockBackend())
+
+    def strip(alerts):
+        return [a.model_dump(exclude={"llm_latency_ms"}) for a in alerts]
+
+    sequential = judge_all(judge, jobs, workers=1)
+    parallel = judge_all(judge, jobs, workers=8)
+    assert strip(parallel) == strip(sequential)
+    assert [a.candidate_id for a in parallel] == [f"c{i}" for i in range(20)]
+
+
+def test_response_cache_is_safe_under_concurrent_writes(tmp_path: Path):
+    from concurrent.futures import ThreadPoolExecutor
+
+    from services.judge.cache import ResponseCache
+
+    path = tmp_path / "c.jsonl"
+    cache = ResponseCache(path)
+    with ThreadPoolExecutor(8) as pool:
+        list(pool.map(lambda i: cache.put(f"k{i}", {"raw": "{}", "n": i}), range(200)))
+    reloaded = ResponseCache(path)
+    assert len(reloaded) == 200
+    assert all(reloaded.get(f"k{i}")["n"] == i for i in range(200))  # type: ignore[index]
