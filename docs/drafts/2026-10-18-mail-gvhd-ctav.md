@@ -1,5 +1,7 @@
 # Mẫu mail gửi GVHD — định hướng Giai đoạn 2 (CTAV)
 
+> **Đã thay thế** bởi `2026-10-19-mail-gvhd-ctav.md` (thêm kết quả tái lập bài báo, Phát hiện 1–4, judge `gemini-2.5-flash`). Giữ lại để đối chiếu, không gửi bản này.
+
 > Soạn 2026-10-18. Chưa gửi. Đổi xưng hô "Thầy/Cô" cho phù hợp trước khi gửi.
 > Có thể đính kèm `docs/Final_Thesis_Phase2/08-research-direction.md` (xuất PDF).
 
