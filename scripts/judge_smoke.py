@@ -77,7 +77,9 @@ def main() -> int:
                 detector.observe(window)
                 continue
             score = detector.score(window)
-            candidate = build_alert_candidate(window, score, detector.is_candidate(window, score))
+            candidate = build_alert_candidate(
+                window, score, detector.is_candidate(window, score), detector.top_features(window)
+            )
             if candidate is None or (args.fault_only and not (window.label and window.label.is_fault)):
                 continue
             result = retriever.retrieve(candidate, budget)

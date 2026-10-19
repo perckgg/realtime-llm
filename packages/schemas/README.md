@@ -16,7 +16,7 @@ text, so the ported BM25/prompt hit GD1's cache). `NezhaEvidenceStore` reads the
 corpus (GD1's label-filtered one, for the parity gates only — QĐ-016).
 
 `loaders.py` — `iter_telemetry_windows` wraps the Week 1 labelling logic in
-`scripts/nezha_windows.py` and emits `TelemetryWindow` objects for `services/replayer`. Drops
+`packages/schemas/nezha.py` (moved from `scripts/nezha_windows.py` in M2, D6) and emits `TelemetryWindow` objects for `services/replayer`. Drops
 non-finite metric values (the Nezha `"NaN"`-literal percentile bug, see `docs/experiment-log.md`
 QĐ-009) instead of parsing them as 0.0/inf. `logs`/`spans` are intentionally left empty — no Week 2
 service consumes them yet.

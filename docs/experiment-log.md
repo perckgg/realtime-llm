@@ -644,3 +644,101 @@ dòng smoke M0/M1 giữ nguyên với giá trị mặc định.
 metric thô (GĐ1: 6 đặc trưng tổng hợp) — cả hai ảnh hưởng prompt của mọi run GĐ2, cần chốt
 trước H0 (M4). Phụ thuộc `packages` → `scripts` tăng thêm một chỗ (`evidence.py` dùng
 `scripts.nezha_windows`), gộp vào việc D6 ở M2.
+
+---
+
+## 2026-10-19 — QĐ-017. Chốt V7, V8, V9 sau báo cáo M1; mở M2
+
+**Bối cảnh.** Báo cáo `docs/milestones/M1-detector-bm25-judge.md` §3 nêu ba vấn đề mới
+(QĐ-016, Phát hiện 1–2). Người dùng đã xem báo cáo và chọn:
+
+**Quyết định.**
+
+- **V7 → (a). Kết quả chính chấm trên cửa sổ có telemetry.** Một cửa sổ "có telemetry" khi
+  Nezha có ít nhất một file log/trace trong ±8 phút quanh nó (cùng lề với `bm25_hybrid`).
+  Chỉ số chính (P/R/F1/FPR, CI, McNemar) tính trên tập này; toàn split báo cáo làm số phụ.
+  `val`: 209 fault + 7.427 normal; `test`: 346 + 11.639. Mask được tính từ danh sách file
+  của dataset, không từ nhãn, nên không rò nhãn. **Thay mặc định của Q2** (`08` §9: "toàn
+  split") — Q2 coi như đã chốt; số candidate thật trên `val` vẫn đo ở M2 để ước chi phí.
+  Luận văn trình bày hiện tượng "có bằng chứng ⇔ gần sự cố" như hạn chế của giao thức paper
+  và lý do của giao thức GĐ2.
+- **V8 → (a). Giữ prompt GĐ1 nguyên văn cho mọi biến thể** (một judge, một prompt); C2
+  (M6) gating dựa trên nguồn gốc/neo bằng chứng thay vì chỉ confidence; log-prob của nhãn
+  đo thêm như ablation ở M4.
+- **V9 → làm ở M2.** Detector GĐ2 báo top-3 đặc trưng lệch như GĐ1 để `top_features` của
+  prompt không rỗng, trước khi chạy H0 (M4).
+
+**Hệ quả.** Harness M2 phải ghi cột `has_telemetry` cho mọi cửa sổ và tính chỉ số trên cả
+hai tập. `08` §9 Q2 và `02` §4.1 cập nhật cùng commit.
+
+---
+
+## 2026-10-19 — QĐ-018. M2: harness, V9, D6; cổng G-port đo theo tầng; số candidate thật trên `val`
+
+**Thay đổi.**
+
+| Việc | File |
+|---|---|
+| V9: `IsolationForestDetector.top_features()` — 3 metric lệch nhất so với tập fit (max theo metric của \|x − mean\| / std), như `_top_contributing_features` của GĐ1; `build_alert_candidate(..., top_features)` | `services/detector/isolation_forest.py`, `candidates.py` |
+| D6: `scripts/nezha_windows.py` → `packages/schemas/nezha.py`; `packages` không còn import `scripts`; tham số detector (`threshold`, `buffer_size`, `fit`) đọc từ config | `packages/schemas/nezha.py`, harness |
+| Harness `py -m eval run --config X`: replay có lịch sử → detector → gate GĐ1 (tùy chọn, có ngân sách) → retrieval → judge; 7 file output; ClickHouse tùy chọn (`fact_alert_evaluation` có cột CTAV, `fact_retrieval_trace`); `stages: detector` | `eval/harness/runner.py`, `eval/__main__.py` |
+| Chỉ số trên tập có telemetry và toàn bộ (QĐ-017); CI bootstrap 95% (multinomial trên 4 ô — tương đương lấy mẫu lại cửa sổ); McNemar chính xác | `eval/harness/metrics.py`, `stats.py` |
+| `NezhaEvidenceStore.has_telemetry()` — mask QĐ-017, chỉ dùng danh sách file | `packages/schemas/evidence.py` |
+| Ánh xạ cửa sổ GĐ1 → GĐ2; dump Phase 4; so từng tầng | `scripts/map_gd1_windows.py`, `dump_gd1_prompts.py --split phase4`, `scripts/gport_layers.py` |
+
+**Ánh xạ cửa sổ.** `paper_300` = 300 cửa sổ GĐ1 đầu tiên = 300 phút liên tiếp của **một**
+pod (`cartservice-579f59597d-wc2lz`, 2022-08-22 03:51–08:50); fit Phase 4 = 1.000 cửa sổ
+đầu của cùng pod. Cửa sổ GĐ1 [T, T+120) chứa đúng 2 mẫu (1.000/1.000); ánh xạ sang cửa sổ
+GĐ2 của mẫu cuối (lệch T + 60 s ở 568 cửa sổ, T + 61 s ở 432 — GĐ1 dựng lưới cố định, nhịp
+lấy mẫu Nezha trôi 1 s). Đồng hồ epoch như GĐ1. Nhãn: GĐ1 16 fault, GĐ2 (mẫu cuối) 14 — 2
+cửa sổ cuối đợt lỗi (index 41, 50) mà GĐ1 gắn fault vì mẫu đầu còn lỗi; config parity dùng
+nhãn GĐ1.
+
+**Phát hiện về Phase 4.** Lần chạy Phase 4 đã commit (code GĐ1 cũ hơn) chuyển 10 candidate
+hết ngân sách LLM thành **route_alert**; cả 10 là normal. **10/13 FP của Phase 4 đến từ quy
+tắc hết ngân sách, chỉ 3 từ judge.** Code GĐ1 hiện tại mặc định manual_review. Config parity
+dùng `budget_exhausted_action: route_alert` để tái lập.
+
+**Cổng G-port** (`py scripts/gport_layers.py --run gd1_phase4_parity_v1` →
+`eval/results/gport_layers_phase4.json`; `py -m eval run --config
+eval/configs/gd1_phase4_parity.yaml` → `eval/results/gd1_phase4_parity_v1/`):
+
+Bảng QĐ-018-1. G-port theo tầng, mỗi tầng nhận đúng đầu vào của GĐ1.
+
+| Tầng | Đầu vào | Kết quả | Đạt |
+|---|---|---|---|
+| 0. Dump GĐ1 | Chạy lại Phase 4 | 40/40 candidate trùng audit đã commit | — |
+| 1. Retrieval | 40 candidate GĐ1, corpus GĐ1 | Top-6 doc ID trùng **40/40**, đúng thứ tự | Đạt |
+| 2. Judge mock | Candidate + context GĐ1 | Verdict trùng **30/30** lần GĐ1 chấm | Đạt |
+| 3a. Gate + ngân sách + retrieval + judge + quyết định của harness | 300 cửa sổ, 40 candidate GĐ1 | TP/FP/FN/TN **6/13/10/271 = GĐ1**, 0 cửa sổ khác | Đạt |
+| 3b. Toàn pipeline GĐ2 (detector GĐ2) | 300 cửa sổ ánh xạ | 6/**19**/10/**265**: P 0,2400 (GĐ1 0,3158), R 0,375 (=), FPR 0,0669 (GĐ1 0,0458) | **Lệch FP +6** (> ±1) |
+| 4. Detector | 300 cửa sổ ánh xạ | Spearman điểm 0,79; trung bình 0,604 vs 0,584; candidate 41 vs 40, chung 32 | So phân phối (QĐ-009) |
+
+Phân rã 14 cửa sổ lệch ở tầng 3b (cả 14 đều normal; TP, FN không đổi):
+- 6 cửa sổ cả hai cùng chấm nhưng verdict mock khác (index 7, 8, 11, 87, 90, 99): context
+  khác vì candidate GĐ2 mang cửa sổ thời gian [T+60, T+120) và metric/top-feature GĐ2 thay cho
+  [T, T+120) và 6 đặc trưng chuẩn hoá của GĐ1 ⇒ truy vấn BM25 và điểm thời gian khác. Trên 22
+  cửa sổ cả hai cùng chấm, chỉ 8 có top-6 giống. Mã retrieval/judge đã đúng ở tầng 1, 2, 3a.
+- 8 cửa sổ do tập candidate khác (detector, QĐ-009) và hệ quả của nó lên thứ tự tiêu ngân
+  sách 30 lần gọi (index 3, 174, 175, 176, 182, 190, 198, 219).
+
+**Đếm candidate trên `val`** (`eval/configs/val_detector_count.yaml`, chỉ detector,
+threshold 0,85, fit dev, 305 s):
+
+Bảng QĐ-018-2. Detector GĐ2 trên `val`.
+
+| Tập | Cửa sổ | Candidate | TP | Recall detector (CI 95%) | FPR |
+|---|---|---|---|---|---|
+| Có telemetry (chính) | 7.636 | 1.749 | 109 / 209 | 0,52 (0,45–0,59) | 0,221 |
+| Toàn split | 28.898 | 5.677 | 109 / 209 | 0,52 | 0,194 |
+
+Chi phí ước tính mỗi run trên tập chính: 1.749 lần gọi × ~0,00038 USD (≈ 1.950 token prompt
++ 460 token output đo ở smoke M1, giá 0,10/0,40 USD mỗi 1 M token) ≈ **0,67 USD**; toàn split
+≈ 2,2 USD. Thời gian ở giới hạn 15 lần/phút của GĐ1: ≈ 2 giờ mỗi run trên tập chính —
+giới hạn thực tế là tốc độ, không phải tiền.
+
+**Kiểm chứng.** `py -m pytest tests/ -q` → 100 pass (thêm: top_features, harness stats/metrics/
+gate/quyết định/config); mypy `packages services eval` sạch; ruff sạch; `make_splits.py
+--check` khớp. Ghi ClickHouse thử với run `m2-clickhouse-smoke`: 300 dòng
+`fact_alert_evaluation` có cột CTAV, 54 dòng `fact_retrieval_trace`; truy vấn `03` §3.3 ra
+TP 6 / FP 19, khớp `metrics.json`.

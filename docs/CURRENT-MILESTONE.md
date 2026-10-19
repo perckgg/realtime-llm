@@ -6,86 +6,51 @@
 
 ---
 
-## Mốc: M1 — Sửa detector, hợp đồng dữ liệu, port BM25 + judge
-## Bắt đầu: 2026-10-19 · Hạn mục tiêu: 2026-10-25
-## Mốc trước: M0 — QUA, báo cáo `docs/milestones/M0-nen-tang.md`
-
-**Bối cảnh.** Kế hoạch đã đổi sang giải pháp **CTAV** + chứng minh, giữ platform demo
-(QĐ-011..014) — đọc `docs/Final_Thesis_Phase2/08-research-direction.md` trước khi làm.
-M1 là phần việc "Tuần 3" của bản gốc, cộng các điểm sửa từ review.
+## Mốc: M2 — Eval harness + cổng chặn G-port
+## Bắt đầu: 2026-10-19 · Hạn mục tiêu: 2026-11-01
+## Mốc trước: M1 — QUA, báo cáo `docs/milestones/M1-detector-bm25-judge.md`, người dùng đã xem (QĐ-017)
 
 ---
 
 ## Quyết định đã chốt cho mốc này
 
-- [x] Q1 — Judge: `gemini-2.5-flash-lite` qua API, không local, không fallback (QĐ-013, `08` §4.1)
-- [x] Q3 — Metric thiếu: **giá trị gần nhất của cùng pod + cột chỉ báo thiếu**
-- [x] Q4 — **Có** cho detector thấy lịch sử liên tục: replayer phát mọi cửa sổ theo thời gian để cập nhật buffer, split chỉ lọc cửa sổ được chấm và ghi kết quả
+- [x] V7 / Q2 — chỉ số chính trên cửa sổ **có telemetry** (file log/trace Nezha trong ±8 phút); toàn split là số phụ (QĐ-017)
+- [x] V8 — prompt GĐ1 nguyên văn cho mọi biến thể; C2 không dựa chỉ vào confidence (M6)
+- [x] V9 — detector báo top-3 đặc trưng lệch, làm ở mốc này
 
-Còn mở (không chặn M1): Q2 (chốt ở M2), Q5 (mốc bảo vệ) — xem `docs/milestones/M0-nen-tang.md` §3.
+Còn mở (không chặn M2): Q5 (mốc bảo vệ), V1 (mail GVHD — nên kèm V7, V8).
 
 ---
 
 ## Việc được phép làm (theo thứ tự)
 
-1. - [x] **Xong 2026-10-19 (QĐ-015)** — Sửa detector (`docs/milestones/M0-nen-tang.md` §2, R1–R5 + D6): metric thiếu, lịch sử liên tục, `score()` không trạng thái ẩn, mypy/ruff sạch, chặn `run_id` trùng, việc nhỏ. Đo trước/sau trên dev → QĐ-015
-2. - [x] **Xong 2026-10-19 (QĐ-016)** — `packages/schemas/protocols.py` — 4 Protocol theo `01` §5; `models.py` — `ContextEvent` (có `origin`, `graph_distance`), `RetrievalBudget`, `RetrievalResult`, `JudgedAlert` (có trường CTAV) theo `03` §1.3–1.4
-3. - [x] **Xong (QĐ-016)** — `packages/schemas/evidence.py` — loader log/trace Nezha → kho bằng chứng, lọc theo cửa sổ thời gian
-4. - [x] **Xong (QĐ-016)** — `services/retrieval/bm25_hybrid.py` — port GĐ1, bỏ tag fault type khỏi truy vấn
-5. - [x] **Xong (QĐ-016)** — `services/judge/` — prompt **nguyên văn** GĐ1, 3 nhãn, `require_evidence`, cache (key có `repeat`), client `gemini-2.5-flash-lite` (ghi model id, retry có trần → `manual_review`), backend `mock`; `services/retrieval/registry.py`
+1. - [x] **Xong (QĐ-018)** — V9 + phần còn lại của D6: top-3 đặc trưng lệch trong `IsolationForestDetector`; tham số detector (`buffer_size`, cách fit) đọc từ config; bỏ phụ thuộc `packages` → `scripts`
+2. - [x] **Xong (QĐ-018)** — `eval/harness/` — config loader, `runner.py` (`py -m eval run --config X`), 6 file output `02` §3.3 + ClickHouse, cột `has_telemetry`, từ chối `run_id` đã có
+3. - [x] **Xong (QĐ-018)** — `eval/harness/metrics.py` (P/R/F1/FPR/coverage/latency/token/số lần gọi/chi phí, trên tập có telemetry và toàn split), `stats.py` (bootstrap CI + McNemar chính xác)
+4. - [x] **Xong, có điều kiện (QĐ-018)** — G-port: `scripts/map_gd1_windows.py` (`paper_300` → `window_id` GĐ2), `eval/configs/gd1_phase4_parity.yaml`, so từng tầng với audit Phase 4
+5. - [x] **Xong (QĐ-018)** — Đếm candidate thật trên `val` (toàn split và có telemetry) → ước chi phí API mỗi run
 
-**Không làm ở mốc này:** harness, ánh xạ `paper_300` (M2); graph, C1 (M3); C2–C4 (M6).
-
----
-
-## Definition of Done
-
-- [x] `py -m pytest tests/ -q` (86 pass), `py -m mypy packages services`, `py -m ruff check .` đều sạch
-- [x] Một candidate dev đi hết BM25 → judge (mock và Gemini thật) → `JudgedAlert` có `debug` đầy đủ (`eval/results/m1-judge-smoke*/`)
-- [x] Unit test: cache key, không rò tag fault type, `require_evidence`, điền metric thiếu, lịch sử buffer liên tục
-- [x] QĐ-015 ghi kết quả D1/D2 (số đo trước/sau) trong `docs/experiment-log.md`
-- [x] Báo cáo `docs/milestones/M1-detector-bm25-judge.md` đủ 4 phần — **chờ người dùng xem** trước khi mở M2
+**Không làm ở mốc này:** graph, C1 (M3); H0 trên `val` với Gemini (M4); C2–C4 (M6).
 
 ---
 
-## Trạng thái — 2026-10-19: M1 xong, chờ người dùng xem báo cáo
+## Definition of Done (cổng chặn G-port, QĐ-012)
 
-Toàn bộ 5 việc và DoD đã đạt — báo cáo `docs/milestones/M1-detector-bm25-judge.md`, chi
-tiết QĐ-015 (việc 1) và QĐ-016 (việc 2–5). **Không mở M2 trước khi người dùng xem §3 của
-báo cáo** (`04` §2).
+- [x] Retrieval: 40 candidate Phase 4 → top-6 BM25 GĐ2 (chế độ parity) trùng doc ID GĐ1; mọi khác biệt giải thích được
+- [x] Judge mock: cùng candidate + context → verdict trùng audit GĐ1
+- [ ] **Một phần** — Toàn pipeline: P = 0,3158 (6 TP, 13 FP), FPR = 0,0458, recall 0,375; lệch ≤ 1 cửa sổ mỗi ô. Phần sau detector trùng tuyệt đối (tầng 3a); với detector GĐ2: 6/19/10/265 (FP +6, phân rã đủ) — chờ người dùng (V10)
+- [x] Detector: so phân phối điểm với `detector_only_audit` (không đòi trùng tuyệt đối — QĐ-009)
+- [x] Đủ 6 file output `02` §3.3; `pytest`/`mypy`/`ruff` sạch
+- [x] Số candidate thật trên `val` + chi phí ước tính ghi vào experiment-log
+- [x] Báo cáo `docs/milestones/M2-harness-gport.md` đủ 4 phần — **chờ người dùng xem, chốt V10, V11** trước khi mở M3
 
-Điểm chính: port BM25 + prompt + cache trùng GĐ1 489/489 trên `paper_500`, tái lập F1 0,7030
-/ FP 7 của paper từ cache (nửa BM25 của G-paper). Hai phát hiện về giao thức của paper
-(có bằng chứng ⇔ gần sự cố, ở paper lẫn ở Nezha gốc; confidence = `anomaly_score` chép lại) — V7, V8.
-
-### Vấn đề đang chờ người dùng
-
-| # | Vấn đề | Chặn gì |
-|---|---|---|
-| V7 | Có bằng chứng ⇔ gần sự cố: Nezha chỉ có log/trace quanh lần tiêm lỗi (100% fault, ~25% normal có); paper còn lọc theo nhãn → đề xuất chấm trên cửa sổ có telemetry, trả lời luôn Q2 | **Chặn thiết kế harness M2** |
-| V8 | Confidence Gemini ≈ `anomaly_score` → C2 cần tín hiệu khác confidence | Chặn thiết kế C2 (M6) |
-| V9 | `top_features` rỗng, metric snapshot thô → port top-3 đặc trưng lệch GĐ1 | Phải xong trước M4 (đề xuất làm ở M2) |
-| V1 | Gửi GVHD tóm tắt hướng CTAV (`docs/drafts/2026-10-18-mail-gvhd-ctav.md`) — nên kèm V7, V8 | Nên có trước M4 |
-| V2 | Q2: toàn split hay thêm tập cố định | M2/M4 |
-| V3 | Q5: mốc bảo vệ tuần 2027-02-08 | Không |
-| V4 | 4 file `legacy/` sửa chưa commit — vẫn để nguyên | Không |
-| V5 | `front_matter.txt`, `refs_sample.txt`, `toc_out.txt`; cache `legacy/outputs/test_results/*_cache_*.jsonl` chưa ignore | Không |
-| V6 | Kết luận "LLM không RAG thất bại" của GĐ1 là số mock | Không |
-
-### Ghi nhớ kỹ thuật
-
-- Dump GĐ1 (`data/gd1_parity/`, không commit): tạo lại bằng `py scripts/dump_gd1_prompts.py`.
-- Cache Gemini GĐ2: `data/llm_cache/gemini.jsonl` (không commit; 5 entry smoke M1).
-- Migration ClickHouse: sau khi tạo volume mới, chạy `py scripts/apply_clickhouse_migrations.py`.
-- Docker: `docker compose --profile dev up -d` / `down`.
+Lệch hơn mức trên = port sai. **Dừng và sửa**, không sang M3.
 
 ---
 
-## Mốc sau (M2) — chưa được bắt đầu
+## Mốc sau (M3) — chưa được bắt đầu
 
-Eval harness (runner, metrics, bootstrap CI + McNemar) và **cổng chặn G-port**: tái lập GĐ1
-Phase 4 trên `paper_300` theo từng tầng với judge mock (QĐ-012); đếm candidate thật trên
-`val` để chốt Q2.
+Service graph + C1 (`hybrid_bm25_graph`) + cổng chặn G-paper (nửa topology; nửa BM25 đã đạt ở M1).
 
 ---
 
@@ -96,8 +61,18 @@ bash scripts/download_nezha.sh          # nếu chưa có data/Nezha/
 py scripts/verify_labels.py             # -> docs/label-audit.md (~80 s)
 py scripts/make_splits.py --check       # xác nhận split không đổi
 docker compose --profile dev up -d      # clickhouse + postgres
-py -m pytest tests/ -q                  # 86 test (sau QĐ-016)
+py -m pytest tests/ -q                  # 100 test (sau QĐ-018)
 py scripts/replay_smoke.py --windows 50 --run-id <run_id-mới>   # fit + replay + ghi ClickHouse
+```
+
+## Lệnh tái lập M2
+
+```bash
+py scripts/map_gd1_windows.py
+py scripts/dump_gd1_prompts.py --split phase4 --max-total-calls 40
+py -m eval run --config eval/configs/gd1_phase4_parity.yaml      # run_id mới nếu đã có
+py scripts/gport_layers.py --run gd1_phase4_parity_v1
+py -m eval run --config eval/configs/val_detector_count.yaml     # ~5 phút
 ```
 
 ## Lệnh tái lập M1

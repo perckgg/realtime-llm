@@ -1,13 +1,13 @@
 """Nezha dataset loader that emits packages.schemas.TelemetryWindow.
 
 This is the wrapper promised in the Week 1 "Tuần sau" note: it
-reuses the Week 1 labelling logic in scripts/nezha_windows.py (window
+reuses the Week 1 labelling logic in packages/schemas/nezha.py (formerly scripts/nezha_windows.py) (window
 definition, wall-clock vs epoch join, pod -> service mapping) so that no
 service downstream has to parse the Nezha CSVs itself and risk repeating the
 timestamp bug documented in docs/label-audit.md §5 / docs/experiment-log.md
 QĐ-002.
 
-Week 1's scripts/nezha_windows.py deliberately only produced a label (fault or
+Week 1's nezha_windows module deliberately only produced a label (fault or
 normal) per window, not the metric values, because Week 1 was not allowed to
 write pipeline code (docs/CURRENT-WEEK.md). This module adds the metric
 values, wrapped in the TelemetryWindow/MetricPoint schema from
@@ -31,7 +31,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 from packages.schemas.models import MetricPoint, TelemetryWindow, WindowLabel
-from scripts.nezha_windows import (
+from packages.schemas.nezha import (
     DEFAULT_TIME_SOURCE,
     LABEL_AFTER_SECONDS,
     LABEL_BEFORE_SECONDS,
@@ -73,7 +73,7 @@ def iter_telemetry_windows(
     """Yield labelled TelemetryWindow objects from the Nezha metric CSVs.
 
     Args:
-        root: dataset root, defaults to scripts.nezha_windows.dataset_root().
+        root: dataset root, defaults to packages.schemas.nezha.dataset_root().
         time_source: "wall" (default, matches the committed splits) or
             "epoch" (reproduces the Phase 1 bug-for-bug labelling — see
             docs/experiment-log.md QĐ-002). Never hardcode this in a caller;

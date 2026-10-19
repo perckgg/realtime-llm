@@ -19,7 +19,7 @@ Two stores, same `query()`:
 - `InMemoryEvidenceStore` -- a fixed list of docs, e.g. GD1's processed corpus
   via `load_gd1_corpus()` for the parity gates (G-port, G-paper), or tests.
 
-Service names come from `scripts.nezha_windows.pod_to_service`, the same
+Service names come from `packages.schemas.nezha.pod_to_service`, the same
 mapping as TelemetryWindow.service.
 """
 
@@ -36,7 +36,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Literal
 
-from scripts.nezha_windows import dataset_root, load_known_services, pod_to_service
+from packages.schemas.nezha import dataset_root, load_known_services, pod_to_service
 
 # legacy/src/preprocessing/log_preprocessing.py NOISE_PATTERNS
 NOISE_PATTERNS = [re.compile(r"periodic healthcheck succeeded", re.IGNORECASE)]
@@ -261,6 +261,16 @@ class NezhaEvidenceStore:
         while len(self._cache) > self.cache_files:
             self._cache.popitem(last=False)
         return docs
+
+    def has_telemetry(self, start: datetime, end: datetime, margin: timedelta = timedelta(minutes=8)) -> bool:
+        """True if Nezha has any log or trace file within `margin` of [start, end].
+
+        QD-017: Nezha only ships logs/traces for minutes around fault
+        injections, so the main metrics are computed on windows where this is
+        true. Uses only the dataset's file list, never labels."""
+        lo = bisect_left(self._minutes, start - margin - timedelta(minutes=1))
+        hi = bisect_right(self._minutes, end + margin + timedelta(minutes=2))
+        return hi > lo
 
     def query(
         self, start: datetime, end: datetime, services: Collection[str] | None = None

@@ -16,6 +16,13 @@ the "GD1 candidates" input M2's G-port compares retrieval against.
 
     py scripts/dump_gd1_prompts.py                     # -> data/gd1_parity/paper_500_hybrid_bm25_top6.jsonl
     py scripts/dump_gd1_prompts.py --split paper_300
+    py scripts/dump_gd1_prompts.py --split phase4 --max-total-calls 40
+
+`--split phase4` replays GD1 Phase 4 (legacy/nezha_setup/config/
+experiment_phase4_benchmark.yaml: first 300 windows, its own retrieval
+weights, search_k 500, budget 30) -- the input of M2's gate G-port. Raise
+`--max-total-calls` to 40 there so all 40 Phase 4 candidates are retrieved;
+compare verdicts only on the 30 GD1 actually judged.
 
 Runs from legacy/ (GD1 resolves its data paths relative to it). Takes a few
 minutes: GD1 fits its detector and scores every window of the split.
@@ -41,6 +48,7 @@ GD1_RUN = "outputs/phase2/step7_rerun/quality_full_budget"
 CONFIGS = {
     "paper_300": "nezha_setup/config/experiment_phase2_topology_fusion_300w.yaml",
     "paper_500": "nezha_setup/config/experiment_phase2_topology_fusion_500w.yaml",
+    "phase4": "nezha_setup/config/experiment_phase4_benchmark.yaml",
 }
 
 
@@ -78,24 +86,27 @@ def main() -> int:
     from src.ingestion.metric_loader import load_metrics
     from src.preprocessing.metric_preprocessing import create_metric_windows
 
-    freeze = json.loads(Path("outputs/phase2/input_freeze.json").read_text(encoding="utf-8"))
-    with Path("outputs/phase2/window_index.csv").open(encoding="utf-8", newline="") as handle:
-        rows = list(csv.DictReader(handle))
-    selected = list(dict.fromkeys(r["window_id"] for r in rows if r.get("split") == args.split and r["window_id"]))
-    meta = freeze["window_sets"][args.split]
-    digest = hashlib.sha256("".join(f"{w}\n" for w in selected).encode("utf-8")).hexdigest()
-    if len(selected) != int(meta["rows"]) or digest != meta["window_id_sha256"]:
-        raise SystemExit(f"{args.split}: window set does not match input_freeze.json")
-
     config = copy.deepcopy(load_config(CONFIGS[args.split]))
-    windows = create_metric_windows(
-        load_metrics(config["data"]["metric_path"]),
-        int(config["preprocessing"]["window_size"]),
-        int(config["preprocessing"]["stride"]),
-        str(config["preprocessing"]["normalization"]),
-    )
-    index = {w.window_id: i for i, w in enumerate(windows)}
-    indices = [index[w] for w in selected]
+    indices: list[int] | None = None
+    if args.split != "phase4":
+        freeze = json.loads(Path("outputs/phase2/input_freeze.json").read_text(encoding="utf-8"))
+        with Path("outputs/phase2/window_index.csv").open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        selected = list(
+            dict.fromkeys(r["window_id"] for r in rows if r.get("split") == args.split and r["window_id"])
+        )
+        meta = freeze["window_sets"][args.split]
+        digest = hashlib.sha256("".join(f"{w}\n" for w in selected).encode("utf-8")).hexdigest()
+        if len(selected) != int(meta["rows"]) or digest != meta["window_id_sha256"]:
+            raise SystemExit(f"{args.split}: window set does not match input_freeze.json")
+        windows = create_metric_windows(
+            load_metrics(config["data"]["metric_path"]),
+            int(config["preprocessing"]["window_size"]),
+            int(config["preprocessing"]["stride"]),
+            str(config["preprocessing"]["normalization"]),
+        )
+        index = {w.window_id: i for i, w in enumerate(windows)}
+        indices = [index[w] for w in selected]
 
     # legacy/scripts/phase2/run_step7_view_a.py _step7_config, judge forced to mock.
     config["evaluation"]["max_llm_calls"] = args.max_total_calls
@@ -103,7 +114,8 @@ def main() -> int:
     config["evaluation"]["audit_dir"] = str(REPO / "data" / "gd1_parity" / "legacy_audit")
     config["llm_gate"]["max_total_calls"] = args.max_total_calls
     config["llm"].update({"provider": "mock", "model": "mock-judge"})
-    config["retrieval"].update({"backend": "hybrid_bm25", "vector_db": "hybrid_bm25", "top_k": 6})
+    if args.split != "phase4":
+        config["retrieval"].update({"backend": "hybrid_bm25", "vector_db": "hybrid_bm25", "top_k": 6})
 
     captured: list[dict[str, Any]] = []
     original = gd1_main.compose_prompt

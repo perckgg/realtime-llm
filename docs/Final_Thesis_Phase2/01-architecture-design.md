@@ -380,21 +380,27 @@ Màn hình 3 và 4 là hai màn hình gây ấn tượng nhất khi bảo vệ. 
 
 ### 6.8 `eval/harness`
 
-CLI độc lập:
+CLI độc lập (M2: `run`; `compare`, `ablation` thêm khi cần ở M4/M7):
 
 ```bash
-python -m eval run --config eval/configs/graph_rag.yaml
-python -m eval compare --runs bm25_baseline,temporal,graph,cross_modal,hybrid
-python -m eval ablation --config eval/configs/rescue_ablation.yaml
+py -m eval run --config eval/configs/<tên>.yaml
 ```
 
-Output vào `eval/results/<run_id>/`:
+`eval/harness/runner.py` replay Nezha theo thời gian (lịch sử liên tục, QĐ-015) qua
+detector → gate GĐ1 (tùy chọn) → retrieval → judge; `metrics.py` tính P/R/F1/FPR (recall trên
+**mọi** fault window), coverage, độ trễ, token, số lần gọi, chi phí — trên tập **có
+telemetry** (chính) và toàn bộ (phụ) (QĐ-017); `stats.py`: bootstrap CI 95% + McNemar chính xác.
+`stages: detector` chỉ chạy detector (đếm candidate). Không ghi đè `eval/results/<run_id>/`.
+
+Output vào `eval/results/<run_id>/` (`02` §3.3):
 ```text
-metrics.json      # chỉ số tổng hợp + confidence interval
-per_window.csv    # một dòng mỗi window: verdict, ground truth, latency, tokens
-retrieval.jsonl   # debug trace của retrieval, phục vụ chấm context precision
+metrics.json         # chỉ số tổng hợp + CI, hai tập telemetry / all
+per_window.csv       # một dòng mỗi window: nhãn, has_telemetry, điểm, gate, verdict, latency, token
+retrieval.jsonl      # RetrievalResult của mỗi lần retrieve
+judged.jsonl         # JudgedAlert của mỗi lần chấm
 config.snapshot.yaml
 git_commit.txt
+runtime.json         # thời gian, số lần gọi LLM/API, cache hit rate
 ```
 
 ---

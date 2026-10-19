@@ -6,9 +6,10 @@ sklearn. It exists to answer the Week 1 label questions in
 docs/Final_Thesis_Phase2/02-data-and-experiment-protocol.md §1.2 and to produce
 the reproducible split required by §2.
 
-Week 2 will wrap these functions in packages/schemas/loaders.py so they emit
-TelemetryWindow objects (docs/Final_Thesis_Phase2/03-schemas-and-contracts.md
-§1.1). Until then nothing here imports from packages/ or services/.
+packages/schemas/loaders.py wraps these functions so they emit TelemetryWindow
+objects (docs/Final_Thesis_Phase2/03-schemas-and-contracts.md §1.1). Moved here
+from scripts/nezha_windows.py in milestone M2 (D6) so that packages/ no longer
+imports from scripts/; it still depends on nothing but the standard library.
 
 Window definition
 -----------------
@@ -72,7 +73,7 @@ DEFAULT_TIME_SOURCE: TimeSource = "wall"
 # hash and the pod suffix: "frontend-579b9bff58-t2dbm" -> "frontend".
 _POD_SUFFIX_RE = re.compile(r"^(?P<service>.+?)(?:-[0-9a-z]{8,10})?(?:-[0-9a-z]{5})?$")
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def dataset_root() -> Path:

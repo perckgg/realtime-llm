@@ -25,6 +25,10 @@ Adaptations, each recorded in docs/experiment-log.md:
   `observe()`).
 - QD-015 (D3): pushing is idempotent per window_id, so calling `score()`
   twice on the same window does not corrupt the history.
+- QD-017 (V9): `top_features(window)` reports the 3 metrics whose features
+  deviate most from the training mean, in training standard deviations --
+  GD1's `_top_contributing_features` -- so the judge prompt's
+  `top_features` is not empty.
 
 The Rescue Score gate (SS6.2's "else" branch) is NOT implemented here -- see
 QD-009; it belongs to milestone M7. This detector therefore only ever emits
@@ -86,6 +90,9 @@ def _buffer_key(window: TelemetryWindow) -> str:
     return window.pod or window.service
 
 
+_FEATURES_PER_METRIC = 7  # mean, std, min, max, last, delta, missing_fraction
+
+
 def _vectorize(history: list[tuple[dict[str, float], dict[str, bool]]], feature_names: list[str]) -> list[float]:
     """GD1's per-metric mean/std/min/max/last/delta over `history` (oldest
     first, 1..buffer_size filled points), plus the fraction of those points
@@ -137,6 +144,9 @@ class IsolationForestDetector:
         self._defaults: dict[str, float] = {}
         self._train_scores: list[float] = []
         self._buffers: dict[str, _KeyBuffer] = {}
+        self._center: list[float] = []
+        self._scale: list[float] = []
+        self._last_vector: dict[str, tuple[str, list[float]]] = {}
 
     def fit(self, windows: Iterable[TelemetryWindow], train_ids: set[str] | None = None) -> None:
         """Fit on the windows in `train_ids` (all of `windows` if None).
@@ -180,7 +190,11 @@ class IsolationForestDetector:
         )
         self._model.fit(vectors)
         self._train_scores = sorted(-float(s) for s in self._model.score_samples(vectors))
+        columns = list(zip(*vectors, strict=True))
+        self._center = [statistics.fmean(column) for column in columns]
+        self._scale = [statistics.pstdev(column) or 1.0 for column in columns]
         self._buffers = {}
+        self._last_vector = {}
 
     def observe(self, window: TelemetryWindow) -> None:
         """Push a context window into its buffer without scoring it (QD-015,
@@ -196,8 +210,25 @@ class IsolationForestDetector:
         self._require_fitted()
         history = self._live_buffer(window).push(window, self._feature_names, self._defaults)
         vector = _vectorize(history, self._feature_names)
+        self._last_vector[_buffer_key(window)] = (window.window_id, vector)
         raw_score = -float(self._model.score_samples([vector])[0])  # type: ignore[union-attr]
         return round(_percentile(raw_score, self._train_scores), 4)
+
+    def top_features(self, window: TelemetryWindow, k: int = 3) -> list[str]:
+        """The `k` metrics of the last scored `window` that deviate most from
+        the training mean (max over each metric's features of |x - mean| / std),
+        as GD1's `_top_contributing_features`. [] if `window` was not the last
+        window scored for its pod."""
+        last = self._last_vector.get(_buffer_key(window))
+        if last is None or last[0] != window.window_id:
+            return []
+        by_metric: dict[str, float] = {}
+        for index, value in enumerate(last[1]):
+            name = self._feature_names[index // _FEATURES_PER_METRIC]
+            deviation = abs(value - self._center[index]) / self._scale[index]
+            by_metric[name] = max(deviation, by_metric.get(name, 0.0))
+        ranked = sorted(by_metric.items(), key=lambda item: item[1], reverse=True)
+        return [name for name, _ in ranked[:k]]
 
     def is_candidate(self, window: TelemetryWindow, score: float) -> bool:
         """Never promotes during a key's cold start (its rolling buffer not

@@ -298,7 +298,7 @@ Kết quả review 2026-10-18 (cũng có trong `docs/milestones/M0-nen-tang.md` 
 | # | Câu hỏi | Mặc định nếu không có ý kiến khác | Hạn |
 |---|---|---|---|
 | ~~Q1~~ | ~~Judge chính~~ | **Đã chốt 2026-10-18 (QĐ-013):** `gemini-2.5-flash-lite` qua API, không local, không fallback — §4.1 | — |
-| Q2 | Đánh giá trên toàn `val`/`test` (≈ 1:135 normal) hay thêm tập cố định kiểu `paper_500`? | Toàn split cho kết quả chính; ngân sách gọi LLM giới hạn + cache | M2 (cần số candidate thật) |
+| ~~Q2~~ | ~~Toàn split hay tập cố định~~ | **Đã chốt 2026-10-19 (QĐ-017):** chỉ số chính trên cửa sổ có telemetry (có file log/trace Nezha trong ±8 phút); toàn split là số phụ | — |
 | ~~Q3~~ | ~~D1~~ | **Đã chốt 2026-10-18:** giá trị gần nhất của cùng pod + cột chỉ báo thiếu | — |
 | ~~Q4~~ | ~~D2~~ | **Đã chốt 2026-10-18:** có — split chỉ quyết định cửa sổ nào được chấm | — |
 | Q5 | Mốc bảo vệ (M12) có cố định không? | Cố định, tuần 2027-02-08 | Ngay |

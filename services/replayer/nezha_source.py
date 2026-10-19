@@ -27,7 +27,7 @@ from pathlib import Path
 
 from packages.schemas.loaders import iter_telemetry_windows, load_split_window_ids
 from packages.schemas.models import TelemetryWindow
-from scripts.nezha_windows import DEFAULT_TIME_SOURCE, TimeSource
+from packages.schemas.nezha import DEFAULT_TIME_SOURCE, TimeSource
 
 
 class NezhaReplaySource:

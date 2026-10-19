@@ -1,0 +1,68 @@
+# Cổng chặn G-port (M2, QĐ-012): tái lập GĐ1 Phase 4 `hybrid_bm25_top6`
+# (legacy/nezha_setup/config/experiment_phase4_benchmark.yaml) bằng pipeline GĐ2.
+#
+# Mọi tham số là của GĐ1, KHÔNG dùng cho kết quả khoa học:
+# - cửa sổ: 300 cửa sổ GĐ1 đầu tiên (= paper_300) ánh xạ sang GĐ2 bằng
+#   scripts/map_gd1_windows.py (mẫu cuối của cửa sổ 120 s), nhãn GĐ1;
+# - đồng hồ epoch như GĐ1 (QĐ-002); detector fit trên 1.000 cửa sổ GĐ1 đầu tiên;
+# - gate 0,80/0,98, ngân sách 30 lần gọi; hết ngân sách -> route_alert (hành vi
+#   của lần chạy Phase 4 đã commit: 10/13 FP của Phase 4 đến từ đây — QĐ-018);
+# - corpus bằng chứng GĐ1 (lọc theo nhãn, QĐ-016), tìm toàn corpus, truy vấn có
+#   fault type (parity_query_terms — đọc nhãn, chỉ để tái lập lỗi của GĐ1);
+# - judge mock, không require_evidence, ngưỡng 0,80.
+run_id: gd1_phase4_parity_v1
+seed: 42
+time_source: epoch
+
+window_set:
+  path: eval/configs/gd1_phase4_windows.csv
+  role: evaluated
+  labels: gd1
+
+detector:
+  type: isolation_forest
+  threshold: 0.95
+  contamination: 0.05
+  n_estimators: 100
+  random_state: 42
+  buffer_size: 2
+  min_fit_windows: 20
+  fit:
+    strategy: window_set
+    path: eval/configs/gd1_phase4_windows.csv
+    role: warmup
+
+gate:
+  enabled: true
+  low_threshold: 0.80
+  high_threshold: 0.98
+  high_score_action: call_llm
+  max_llm_calls: 30
+  budget_exhausted_action: route_alert
+
+evidence:
+  store: gd1_corpus
+  path: legacy/nezha_setup/processed/logs.jsonl
+
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 1000000000
+  timeout_ms: 1000000000
+  parity_query_terms: true
+  params:
+    pool: global
+    time_margin_minutes: 8
+    search_k: 500
+    semantic_weight: 0.35
+    time_weight: 0.25
+    metadata_weight: 0.25
+    signal_weight: 0.15
+
+judge:
+  backend: mock
+  require_evidence: false
+  confidence_threshold: 0.80
+
+storage:
+  clickhouse: false

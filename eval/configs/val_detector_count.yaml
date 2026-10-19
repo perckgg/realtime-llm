@@ -1,0 +1,19 @@
+# M2 việc 5: đếm candidate thật trên `val` để ước chi phí API mỗi run (QĐ-017/Q2).
+# Chỉ chạy detector (cấu hình GĐ2 mặc định: threshold 0,85, buffer 2, fit trên dev,
+# lịch sử liên tục — QĐ-015); không retrieval, không judge, không gọi API.
+run_id: val_detector_count_v1
+seed: 42
+split: val
+time_source: wall
+stages: detector
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  contamination: 0.05
+  n_estimators: 100
+  random_state: 42
+  fit:
+    strategy: split
+    split: dev

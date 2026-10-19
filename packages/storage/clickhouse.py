@@ -12,7 +12,7 @@ from typing import Any
 
 import clickhouse_connect
 
-# Column order for fact_alert_evaluation, verbatim from infra/clickhouse/init.sql.
+# Columns written to fact_alert_evaluation: init.sql plus migration 001 (M1).
 FACT_ALERT_EVALUATION_COLUMNS = [
     "run_id",
     "window_id",
@@ -30,11 +30,17 @@ FACT_ALERT_EVALUATION_COLUMNS = [
     "context_tokens",
     "retrieval_truncated",
     "verdict",
+    "raw_verdict",  # CTAV columns: infra/clickhouse/migrations/001_ctav_columns.sql
+    "routing_tier",
+    "evidence_origin",
+    "threshold_applied",
     "confidence",
     "judge_backend",
     "llm_latency_ms",
     "cache_hit",
     "downgraded",
+    "downgraded_gating",
+    "downgraded_anchoring",
     "label_is_fault",
     "label_fault_type",
     "label_root_cause",
@@ -88,6 +94,35 @@ def insert_alert_evaluations(rows: list[dict[str, Any]], client: Any | None = No
             client.close()
 
 
+FACT_RETRIEVAL_TRACE_COLUMNS = [
+    "run_id",
+    "window_id",
+    "event_id",
+    "modality",
+    "service",
+    "event_ts",
+    "score",
+    "rank",
+    "origin",
+    "graph_distance",
+    "debug_json",
+]
+
+
+def insert_retrieval_trace(rows: list[dict[str, Any]], client: Any | None = None) -> None:
+    """Insert rows into fact_retrieval_trace (03 SS3.2 + migration 001)."""
+    if not rows:
+        return
+    owns_client = client is None
+    client = client or get_client()
+    try:
+        data = [[row[column] for column in FACT_RETRIEVAL_TRACE_COLUMNS] for row in rows]
+        client.insert("fact_retrieval_trace", data, column_names=FACT_RETRIEVAL_TRACE_COLUMNS)
+    finally:
+        if owns_client:
+            client.close()
+
+
 def pending_alert_evaluation_row(
     run_id: str,
     window_id: str,
@@ -124,11 +159,17 @@ def pending_alert_evaluation_row(
         "context_tokens": 0,
         "retrieval_truncated": 0,
         "verdict": "NONE",
+        "raw_verdict": "",
+        "routing_tier": 0,
+        "evidence_origin": "none",
+        "threshold_applied": None,
         "confidence": None,
         "judge_backend": "none",
         "llm_latency_ms": None,
         "cache_hit": 0,
         "downgraded": 0,
+        "downgraded_gating": 0,
+        "downgraded_anchoring": 0,
         "label_is_fault": int(label_is_fault),
         "label_fault_type": label_fault_type,
         "label_root_cause": label_root_cause or "",

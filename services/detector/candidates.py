@@ -5,17 +5,20 @@ docs/experiment-log.md QD-009 for why the Rescue Score gate (that section's
 "else" branch) is deferred to Month 2.
 
 QD-016: the candidate also carries what retrieval and the judge prompt read
-from the window -- pod, end of window, the window's metric values. The
-detector does not yet report per-feature contributions, so `top_features`
-stays empty (GD1's IsolationForest reported the top-3 deviating features).
+from the window -- pod, end of window, the window's metric values -- and,
+from the detector, the top deviating metrics (QD-017, V9).
 """
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from packages.schemas.models import AlertCandidate, TelemetryWindow
 
 
-def build_alert_candidate(window: TelemetryWindow, score: float, is_candidate: bool) -> AlertCandidate | None:
+def build_alert_candidate(
+    window: TelemetryWindow, score: float, is_candidate: bool, top_features: Sequence[str] = ()
+) -> AlertCandidate | None:
     if not is_candidate:
         return None
     return AlertCandidate(
@@ -28,4 +31,5 @@ def build_alert_candidate(window: TelemetryWindow, score: float, is_candidate: b
         pod=window.pod,
         end_ts=window.end_ts,
         metric_snapshot={point.name: point.value for point in window.metrics},
+        top_features=list(top_features),
     )

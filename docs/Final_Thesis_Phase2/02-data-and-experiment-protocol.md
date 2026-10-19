@@ -173,6 +173,12 @@ Thư mục này được **commit vào git**. Đây là bằng chứng tái lậ
 
 **Lưu ý quan trọng về Recall:** phải tính trên **toàn bộ fault window trong split**, không chỉ trên các window mà detector đã sinh candidate. Nếu chỉ tính trên candidate, Recall sẽ bị thổi phồng.
 
+**Tập chấm chính (QĐ-017):** chỉ số chính tính trên các cửa sổ **có telemetry** — Nezha có
+ít nhất một file log/trace trong ±8 phút quanh cửa sổ. Nezha chỉ ghi log/trace quanh các
+lần tiêm lỗi (100% fault nhưng ~25% normal có), nên trên toàn split, judge có
+`require_evidence` "đúng" một cách tầm thường với ~75% normal. Toàn split vẫn báo cáo làm
+số phụ. Mask tính từ danh sách file của dataset, không dùng nhãn.
+
 ### 4.2 Nhánh A — chất lượng retrieval
 
 | Chỉ số | Định nghĩa |

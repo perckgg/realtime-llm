@@ -24,7 +24,6 @@ from __future__ import annotations
 import csv
 import json
 import sys
-from bisect import bisect_left, bisect_right
 from collections import Counter
 from datetime import timedelta
 from pathlib import Path
@@ -69,7 +68,6 @@ def main() -> int:
 
 def split_file_coverage(store: NezhaEvidenceStore, margin_minutes: int = 8) -> dict[str, dict[str, object]]:
     """Share of split windows with at least one log/trace minute file within the margin."""
-    minutes = store._minutes
     margin = timedelta(minutes=margin_minutes)
     with (REPO / "data" / "window_index.csv").open(encoding="utf-8", newline="") as handle:
         index = {row["window_id"]: row for row in csv.DictReader(handle)}
@@ -80,10 +78,8 @@ def split_file_coverage(store: NezhaEvidenceStore, margin_minutes: int = 8) -> d
             row = index[window_id]
             start = parse_timestamp(row["start_ts"])
             label = "fault" if row["is_fault"] == "1" else "normal"
-            lo = bisect_left(minutes, start - margin - timedelta(minutes=1))
-            hi = bisect_right(minutes, start + timedelta(minutes=1) + margin + timedelta(minutes=2))
             counts[f"{label}_n"] += 1
-            counts[f"{label}_covered"] += hi > lo
+            counts[f"{label}_covered"] += store.has_telemetry(start, start + timedelta(seconds=60), margin)
         out[split] = {
             **dict(counts),
             **{f"{label}_coverage": round(counts[f"{label}_covered"] / counts[f"{label}_n"], 4)

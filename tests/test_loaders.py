@@ -12,7 +12,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from packages.schemas.loaders import _row_to_window
-from scripts.nezha_windows import DEFAULT_TIME_SOURCE
+from packages.schemas.nezha import DEFAULT_TIME_SOURCE
 
 
 def _row(**overrides: str) -> dict[str, str]:

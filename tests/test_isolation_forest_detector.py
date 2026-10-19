@@ -142,6 +142,21 @@ class TestIsolationForestDetector:
         anomaly_score = detector.score(_window("checkout", base + timedelta(minutes=2), 500.0, 50000.0))
         assert anomaly_score > normal_score
 
+    def test_top_features_names_the_deviating_metric(self):
+        # QD-017 (V9): GD1's top-contributing-feature rule.
+        detector = IsolationForestDetector(min_fit_windows=20)
+        detector.fit(_normal_windows("checkout", 40))
+        base = BASE + timedelta(minutes=100)
+        detector.score(_window("checkout", base, 10.0, 500.0))
+        spike = _window("checkout", base + timedelta(minutes=1), 10.1, 50000.0)
+        detector.score(spike)
+        assert detector.top_features(spike)[0] == "mem"
+        assert set(detector.top_features(spike)) == {"mem", "cpu"}  # only two metrics exist
+        assert detector.top_features(spike, k=1) == ["mem"]
+        # Not the last scored window of its pod -> no stale explanation.
+        detector.score(_window("checkout", base + timedelta(minutes=2), 10.0, 500.0))
+        assert detector.top_features(spike) == []
+
     def test_cold_start_first_point_can_look_unusual(self):
         # Documents a real property of the buffer_size>1 design (QD-009): a
         # key's very first scored window has a single-point history.
@@ -233,6 +248,14 @@ class TestBuildAlertCandidate:
         assert candidate.source == "metric"
         assert candidate.window_id == window.window_id
         assert candidate.candidate_id == f"cand-{window.window_id}"
+
+    def test_candidate_carries_window_context_and_top_features(self):
+        window = _normal_windows("checkout", 1, pod="checkout-abc")[0]
+        candidate = build_alert_candidate(window, 0.9, True, ["cpu"])
+        assert candidate is not None
+        assert candidate.pod == "checkout-abc" and candidate.end_ts == window.end_ts
+        assert candidate.metric_snapshot == {"cpu": 10.0, "mem": 500.0}
+        assert candidate.top_features == ["cpu"]
 
     def test_candidate_id_is_deterministic(self):
         window = _normal_windows("checkout", 1)[0]
