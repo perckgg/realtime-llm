@@ -1,0 +1,11 @@
+{
+  "run_id": "val_detector_count_v1",
+  "finished_at": "2026-10-19T08:11:42.008404+00:00",
+  "wall_seconds": 267.2,
+  "detector_fit_seconds": 28.6,
+  "evaluated_windows": 28898,
+  "llm_calls": 0,
+  "api_calls": 0,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "none"
+}

@@ -1,0 +1,11 @@
+{
+  "run_id": "gd1_phase4_parity_v1",
+  "finished_at": "2026-10-19T08:06:59.598000+00:00",
+  "wall_seconds": 34.6,
+  "detector_fit_seconds": 17.0,
+  "evaluated_windows": 300,
+  "llm_calls": 30,
+  "api_calls": 0,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "mock"
+}

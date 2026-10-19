@@ -1,0 +1,49 @@
+run_id: gd1_phase4_parity_v1
+seed: 42
+time_source: epoch
+window_set:
+  path: eval/configs/gd1_phase4_windows.csv
+  role: evaluated
+  labels: gd1
+detector:
+  type: isolation_forest
+  threshold: 0.95
+  contamination: 0.05
+  n_estimators: 100
+  random_state: 42
+  buffer_size: 2
+  min_fit_windows: 20
+  fit:
+    strategy: window_set
+    path: eval/configs/gd1_phase4_windows.csv
+    role: warmup
+gate:
+  enabled: true
+  low_threshold: 0.8
+  high_threshold: 0.98
+  high_score_action: call_llm
+  max_llm_calls: 30
+  budget_exhausted_action: route_alert
+evidence:
+  store: gd1_corpus
+  path: legacy/nezha_setup/processed/logs.jsonl
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 1000000000
+  timeout_ms: 1000000000
+  parity_query_terms: true
+  params:
+    pool: global
+    time_margin_minutes: 8
+    search_k: 500
+    semantic_weight: 0.35
+    time_weight: 0.25
+    metadata_weight: 0.25
+    signal_weight: 0.15
+judge:
+  backend: mock
+  require_evidence: false
+  confidence_threshold: 0.8
+storage:
+  clickhouse: false
