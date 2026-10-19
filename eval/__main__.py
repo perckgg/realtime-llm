@@ -26,6 +26,10 @@ def main() -> int:
             f"{subset:9s} P={p['precision']:.4f} R={p['recall']:.4f} F1={p['f1']:.4f} FPR={p['fpr']:.4f} "
             f"TP={p['tp']} FP={p['fp']} FN={p['fn']} TN={p['tn']}"
         )
+    errors = json.loads((out_dir / "runtime.json").read_text(encoding="utf-8")).get("judge_errors", 0)
+    if errors:
+        print(f"WARNING: {errors} judge call(s) failed and were counted as manual review; "
+              "re-run under a new run_id to retry them (successful answers come from the cache)")
     print(f"wrote {out_dir}")
     return 0
 

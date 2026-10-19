@@ -1,0 +1,573 @@
+{
+  "nodes": [
+    "adservice",
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "emailservice",
+    "frontend",
+    "paymentservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "shippingservice",
+    "ts-admin-basic-info-service",
+    "ts-admin-order-service",
+    "ts-admin-route-service",
+    "ts-admin-travel-service",
+    "ts-admin-user-service",
+    "ts-assurance-service",
+    "ts-auth-service",
+    "ts-avatar-service",
+    "ts-basic-service",
+    "ts-cancel-service",
+    "ts-config-service",
+    "ts-consign-price-service",
+    "ts-consign-service",
+    "ts-contacts-service",
+    "ts-delivery-service",
+    "ts-execute-service",
+    "ts-food-delivery-service",
+    "ts-food-service",
+    "ts-gateway-service",
+    "ts-inside-payment-service",
+    "ts-news-service",
+    "ts-notification-service",
+    "ts-order-other-service",
+    "ts-order-service",
+    "ts-payment-service",
+    "ts-preserve-other-service",
+    "ts-preserve-service",
+    "ts-price-service",
+    "ts-rebook-service",
+    "ts-route-plan-service",
+    "ts-route-service",
+    "ts-seat-service",
+    "ts-security-service",
+    "ts-station-food-service",
+    "ts-station-service",
+    "ts-ticket-office-service",
+    "ts-train-food-service",
+    "ts-train-service",
+    "ts-travel-plan-service",
+    "ts-travel-service",
+    "ts-travel2-service",
+    "ts-ui-dashboard",
+    "ts-user-service",
+    "ts-verification-code-service",
+    "ts-voucher-service",
+    "ts-wait-order-service"
+  ],
+  "edges": [
+    {
+      "source": "frontend",
+      "target": "productcatalogservice",
+      "weight": 369044,
+      "trace_count": 74737,
+      "avg_duration_ms": 6.037
+    },
+    {
+      "source": "frontend",
+      "target": "currencyservice",
+      "weight": 234934,
+      "trace_count": 65046,
+      "avg_duration_ms": 3.085
+    },
+    {
+      "source": "frontend",
+      "target": "cartservice",
+      "weight": 71127,
+      "trace_count": 70838,
+      "avg_duration_ms": 3.538
+    },
+    {
+      "source": "frontend",
+      "target": "recommendationservice",
+      "weight": 56460,
+      "trace_count": 56226,
+      "avg_duration_ms": 60.043
+    },
+    {
+      "source": "recommendationservice",
+      "target": "productcatalogservice",
+      "weight": 56460,
+      "trace_count": 56226,
+      "avg_duration_ms": 11.897
+    },
+    {
+      "source": "frontend",
+      "target": "adservice",
+      "weight": 45153,
+      "trace_count": 44943,
+      "avg_duration_ms": 29.857
+    },
+    {
+      "source": "frontend",
+      "target": "shippingservice",
+      "weight": 17192,
+      "trace_count": 17115,
+      "avg_duration_ms": 6.478
+    },
+    {
+      "source": "ts-seat-service",
+      "target": "ts-config-service",
+      "weight": 10825,
+      "trace_count": 3972,
+      "avg_duration_ms": 3.048
+    },
+    {
+      "source": "checkoutservice",
+      "target": "productcatalogservice",
+      "weight": 7510,
+      "trace_count": 2963,
+      "avg_duration_ms": 5.273
+    },
+    {
+      "source": "ts-seat-service",
+      "target": "ts-order-service",
+      "weight": 7478,
+      "trace_count": 2114,
+      "avg_duration_ms": 11.296
+    },
+    {
+      "source": "ts-travel-service",
+      "target": "ts-seat-service",
+      "weight": 7022,
+      "trace_count": 2114,
+      "avg_duration_ms": 48.904
+    },
+    {
+      "source": "ts-basic-service",
+      "target": "ts-station-service",
+      "weight": 6721,
+      "trace_count": 4204,
+      "avg_duration_ms": 4.027
+    },
+    {
+      "source": "checkoutservice",
+      "target": "cartservice",
+      "weight": 5862,
+      "trace_count": 2995,
+      "avg_duration_ms": 3.083
+    },
+    {
+      "source": "checkoutservice",
+      "target": "shippingservice",
+      "weight": 5828,
+      "trace_count": 2961,
+      "avg_duration_ms": 3.564
+    },
+    {
+      "source": "ts-basic-service",
+      "target": "ts-route-service",
+      "weight": 4981,
+      "trace_count": 4117,
+      "avg_duration_ms": 17.691
+    },
+    {
+      "source": "ts-basic-service",
+      "target": "ts-train-service",
+      "weight": 4981,
+      "trace_count": 4117,
+      "avg_duration_ms": 5.334
+    },
+    {
+      "source": "ts-basic-service",
+      "target": "ts-price-service",
+      "weight": 4968,
+      "trace_count": 4104,
+      "avg_duration_ms": 6.574
+    },
+    {
+      "source": "ts-seat-service",
+      "target": "ts-order-other-service",
+      "weight": 4133,
+      "trace_count": 1875,
+      "avg_duration_ms": 4.649
+    },
+    {
+      "source": "ts-travel2-service",
+      "target": "ts-seat-service",
+      "weight": 3820,
+      "trace_count": 1875,
+      "avg_duration_ms": 34.341
+    },
+    {
+      "source": "frontend",
+      "target": "checkoutservice",
+      "weight": 3021,
+      "trace_count": 2995,
+      "avg_duration_ms": 448.741
+    },
+    {
+      "source": "checkoutservice",
+      "target": "paymentservice",
+      "weight": 2898,
+      "trace_count": 2872,
+      "avg_duration_ms": 0.331
+    },
+    {
+      "source": "checkoutservice",
+      "target": "emailservice",
+      "weight": 2841,
+      "trace_count": 2815,
+      "avg_duration_ms": 13.217
+    },
+    {
+      "source": "ts-travel-service",
+      "target": "ts-basic-service",
+      "weight": 2256,
+      "trace_count": 2218,
+      "avg_duration_ms": 157.005
+    },
+    {
+      "source": "ts-travel2-service",
+      "target": "ts-basic-service",
+      "weight": 2024,
+      "trace_count": 1986,
+      "avg_duration_ms": 161.669
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-travel-service",
+      "weight": 1865,
+      "trace_count": 1837,
+      "avg_duration_ms": 414.613
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-travel2-service",
+      "weight": 1751,
+      "trace_count": 1717,
+      "avg_duration_ms": 303.448
+    },
+    {
+      "source": "ts-security-service",
+      "target": "ts-order-other-service",
+      "weight": 922,
+      "trace_count": 908,
+      "avg_duration_ms": 11.963
+    },
+    {
+      "source": "ts-security-service",
+      "target": "ts-order-service",
+      "weight": 922,
+      "trace_count": 908,
+      "avg_duration_ms": 43.917
+    },
+    {
+      "source": "ts-execute-service",
+      "target": "ts-order-service",
+      "weight": 905,
+      "trace_count": 691,
+      "avg_duration_ms": 9.29
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-execute-service",
+      "weight": 703,
+      "trace_count": 694,
+      "avg_duration_ms": 29.114
+    },
+    {
+      "source": "ts-food-service",
+      "target": "ts-delivery-service",
+      "weight": 620,
+      "trace_count": 306,
+      "avg_duration_ms": 5.797
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-auth-service",
+      "weight": 615,
+      "trace_count": 605,
+      "avg_duration_ms": 268.352
+    },
+    {
+      "source": "ts-auth-service",
+      "target": "ts-verification-code-service",
+      "weight": 605,
+      "trace_count": 595,
+      "avg_duration_ms": 5.564
+    },
+    {
+      "source": "ts-inside-payment-service",
+      "target": "ts-order-service",
+      "weight": 541,
+      "trace_count": 302,
+      "avg_duration_ms": 11.988
+    },
+    {
+      "source": "ts-cancel-service",
+      "target": "ts-order-service",
+      "weight": 539,
+      "trace_count": 322,
+      "avg_duration_ms": 10.517
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-inside-payment-service",
+      "weight": 535,
+      "trace_count": 527,
+      "avg_duration_ms": 139.824
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-preserve-service",
+      "weight": 533,
+      "trace_count": 523,
+      "avg_duration_ms": 993.643
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-security-service",
+      "weight": 531,
+      "trace_count": 521,
+      "avg_duration_ms": 77.694
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-contacts-service",
+      "weight": 523,
+      "trace_count": 513,
+      "avg_duration_ms": 15.056
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-travel-service",
+      "weight": 502,
+      "trace_count": 492,
+      "avg_duration_ms": 441.771
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-food-service",
+      "weight": 479,
+      "trace_count": 467,
+      "avg_duration_ms": 146.298
+    },
+    {
+      "source": "ts-food-service",
+      "target": "ts-train-food-service",
+      "weight": 466,
+      "trace_count": 454,
+      "avg_duration_ms": 10.3
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-basic-service",
+      "weight": 465,
+      "trace_count": 461,
+      "avg_duration_ms": 75.054
+    },
+    {
+      "source": "ts-food-service",
+      "target": "ts-travel-service",
+      "weight": 456,
+      "trace_count": 444,
+      "avg_duration_ms": 64.774
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-seat-service",
+      "weight": 456,
+      "trace_count": 452,
+      "avg_duration_ms": 134.593
+    },
+    {
+      "source": "ts-travel-service",
+      "target": "ts-route-service",
+      "weight": 456,
+      "trace_count": 444,
+      "avg_duration_ms": 13.819
+    },
+    {
+      "source": "ts-food-service",
+      "target": "ts-station-food-service",
+      "weight": 452,
+      "trace_count": 440,
+      "avg_duration_ms": 17.81
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-order-service",
+      "weight": 446,
+      "trace_count": 443,
+      "avg_duration_ms": 44.998
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-user-service",
+      "weight": 433,
+      "trace_count": 430,
+      "avg_duration_ms": 9.283
+    },
+    {
+      "source": "ts-execute-service",
+      "target": "ts-order-other-service",
+      "weight": 414,
+      "trace_count": 268,
+      "avg_duration_ms": 5.351
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-preserve-other-service",
+      "weight": 400,
+      "trace_count": 396,
+      "avg_duration_ms": 756.642
+    },
+    {
+      "source": "ts-inside-payment-service",
+      "target": "ts-payment-service",
+      "weight": 399,
+      "trace_count": 391,
+      "avg_duration_ms": 29.665
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-security-service",
+      "weight": 398,
+      "trace_count": 394,
+      "avg_duration_ms": 69.712
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-contacts-service",
+      "weight": 396,
+      "trace_count": 392,
+      "avg_duration_ms": 17.396
+    },
+    {
+      "source": "ts-inside-payment-service",
+      "target": "ts-order-other-service",
+      "weight": 381,
+      "trace_count": 213,
+      "avg_duration_ms": 5.908
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-travel2-service",
+      "weight": 363,
+      "trace_count": 359,
+      "avg_duration_ms": 306.701
+    },
+    {
+      "source": "ts-cancel-service",
+      "target": "ts-inside-payment-service",
+      "weight": 328,
+      "trace_count": 322,
+      "avg_duration_ms": 67.097
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-cancel-service",
+      "weight": 328,
+      "trace_count": 322,
+      "avg_duration_ms": 165.981
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-basic-service",
+      "weight": 323,
+      "trace_count": 319,
+      "avg_duration_ms": 77.647
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-order-other-service",
+      "weight": 313,
+      "trace_count": 309,
+      "avg_duration_ms": 15.935
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-seat-service",
+      "weight": 313,
+      "trace_count": 309,
+      "avg_duration_ms": 51.834
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-user-service",
+      "weight": 272,
+      "trace_count": 271,
+      "avg_duration_ms": 8.89
+    },
+    {
+      "source": "ts-cancel-service",
+      "target": "ts-order-other-service",
+      "weight": 234,
+      "trace_count": 116,
+      "avg_duration_ms": 6.06
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-assurance-service",
+      "weight": 216,
+      "trace_count": 214,
+      "avg_duration_ms": 18.253
+    },
+    {
+      "source": "ts-cancel-service",
+      "target": "ts-user-service",
+      "weight": 211,
+      "trace_count": 206,
+      "avg_duration_ms": 9.646
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "ts-food-service",
+      "weight": 184,
+      "trace_count": 181,
+      "avg_duration_ms": 26.892
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-assurance-service",
+      "weight": 144,
+      "trace_count": 143,
+      "avg_duration_ms": 18.36
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "ts-food-service",
+      "weight": 126,
+      "trace_count": 125,
+      "avg_duration_ms": 15.929
+    }
+  ],
+  "summary": {
+    "trace_files": 307,
+    "spans": 4180244,
+    "parent_links": 4090762,
+    "same_service_links": 3130759,
+    "root_spans": 89482,
+    "min_edge_count": 5,
+    "edges_dropped_below_min": 0,
+    "service_count": 56,
+    "directed_edge_count": 68,
+    "undirected_edge_count": 68,
+    "edge_density_directed": 0.02207792207792208,
+    "isolated_services": [
+      "ts-admin-basic-info-service",
+      "ts-admin-order-service",
+      "ts-admin-route-service",
+      "ts-admin-travel-service",
+      "ts-admin-user-service",
+      "ts-avatar-service",
+      "ts-consign-price-service",
+      "ts-consign-service",
+      "ts-food-delivery-service",
+      "ts-news-service",
+      "ts-notification-service",
+      "ts-rebook-service",
+      "ts-route-plan-service",
+      "ts-ticket-office-service",
+      "ts-travel-plan-service",
+      "ts-ui-dashboard",
+      "ts-voucher-service",
+      "ts-wait-order-service"
+    ],
+    "connected_components": 20,
+    "largest_component_size": 28
+  }
+}

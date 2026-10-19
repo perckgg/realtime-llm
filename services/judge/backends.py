@@ -1,4 +1,10 @@
-"""Judge backends: `gemini-2.5-flash-lite` over the API (QD-013) and `mock`.
+"""Judge backends: one fixed Gemini model over the API and `mock`.
+
+Judge of every GD2 experiment: `JUDGE_MODEL` = `gemini-2.5-flash` (QD-021,
+replacing `gemini-2.5-flash-lite` of QD-013). `PAPER_MODEL` =
+`gemini-2.5-flash-lite` is only used to replay the paper's cache (G-paper).
+The model is always passed explicitly -- there is no default -- so no caller
+switches model by accident.
 
 `GeminiBackend` is GD1's `JudgeClient._gemini_response`
 (legacy/src/llm/judge_client.py): same request (temperature 0, thinking
@@ -29,6 +35,15 @@ from urllib import request
 from urllib.error import HTTPError, URLError
 
 from services.judge.cache import ResponseCache, cache_extra, make_key
+
+JUDGE_MODEL = "gemini-2.5-flash"  # QD-021
+PAPER_MODEL = "gemini-2.5-flash-lite"  # QD-013; the paper's cache (G-paper) only
+# USD per 1M tokens (input, output), Google's published standard-tier prices
+# as known on 2026-10-19 -- verify against the billing page; used for estimates only.
+PRICES_PER_1M = {
+    "gemini-2.5-flash-lite": (0.10, 0.40),
+    "gemini-2.5-flash": (0.30, 2.50),
+}
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
@@ -135,7 +150,7 @@ class GeminiBackend:
     def __init__(
         self,
         cache: ResponseCache,
-        model: str = "gemini-2.5-flash-lite",
+        model: str,
         max_output_tokens: int = 1024,  # GD1 Step 7 (paper) value; part of the cache key
         timeout_seconds: float = 60.0,
         max_retries: int = 5,

@@ -1,0 +1,38 @@
+# QĐ-021: C1 (`hybrid_bm25_graph`, bm25_pool=window — có giới hạn ±8 phút, V13) trên kho
+# Nezha đầy đủ, 1.000 cửa sổ dev đầu tiên; judge mock (không gọi API). Đo độ trễ retrieval,
+# phân bố origin local/graph và khoảng cách thời gian của bằng chứng. Không phải kết quả khoa học.
+run_id: m3_c1_window_smoke_v1
+seed: 42
+split: dev
+n_windows: 1000
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+
+retrieval:
+  type: hybrid_bm25_graph
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params:
+    bm25_pool: window
+    alpha: 0.35
+    beta: 0.25
+    gamma: 0.40
+    tau_seconds: 300
+    bm25_k: 60
+    graph_max_distance: 2
+    graph_per_service_limit: 20
+    time_margin_minutes: 8
+
+judge:
+  backend: mock

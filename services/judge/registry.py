@@ -2,7 +2,7 @@
 
     judge:
       backend: api | mock      # QD-013: one fixed API model; mock only for G-port
-      model: gemini-2.5-flash-lite
+      model: gemini-2.5-flash  # QD-021; gemini-2.5-flash-lite only for G-paper
       max_output_tokens: 1024
       require_evidence: true
       confidence_threshold: 0.80
@@ -19,7 +19,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from services.judge.backends import GeminiBackend, JudgeBackend, MockBackend
+from services.judge.backends import JUDGE_MODEL, GeminiBackend, JudgeBackend, MockBackend
 from services.judge.cache import ResponseCache
 from services.judge.llm_judge import LLMJudge
 
@@ -32,7 +32,7 @@ def build_judge(config: Mapping[str, Any]) -> LLMJudge:
     if backend_name == "mock":
         backend = MockBackend()
     elif backend_name == "api":
-        model = str(config.get("model", "gemini-2.5-flash-lite"))
+        model = str(config.get("model", JUDGE_MODEL))
         if not model.startswith("gemini"):
             raise ValueError(f"only Gemini models are supported (QD-013), got {model!r}")
         if float(config.get("temperature", 0)) != 0:

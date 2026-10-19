@@ -1,0 +1,15 @@
+aa859f01bbe431f159ea3409b58c3f17dbae5195
+modified tracked files at run time:
+  .gitignore
+  eval/harness/runner.py
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  scripts/check_gd1_parity.py
+  scripts/judge_smoke.py
+  services/judge/backends.py
+  services/judge/prompt.py
+  services/judge/registry.py
+  services/retrieval/registry.py
+  tests/test_judge.py

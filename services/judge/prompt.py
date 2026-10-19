@@ -93,6 +93,7 @@ def context_payload(event: ContextEvent) -> dict[str, Any]:
         "source": event.debug.get("source"),
         "severity": event.debug.get("severity"),
         "event_type": event.debug.get("event_type"),
-        "score": round(event.score, 4),
+        # GD1 rounded the prompt score per strategy: BM25 4 decimals, topology 6.
+        "score": event.debug.get("prompt_score", round(event.score, 4)),
         "message": event.content,
     }

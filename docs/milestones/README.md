@@ -11,6 +11,7 @@ nằm ở `docs/experiment-log.md`; báo cáo mốc tổng hợp lại và dẫn
 | M0 | [M0-nen-tang.md](M0-nen-tang.md) | 2026-10-18 | QUA (viết bù sau review) |
 | M1 | [M1-detector-bm25-judge.md](M1-detector-bm25-judge.md) | 2026-10-19 | QUA; V7–V9 đã chốt (QĐ-017) |
 | M2 | [M2-harness-gport.md](M2-harness-gport.md) | 2026-10-19 | QUA — V10 (a), V11 đã chốt (QĐ-019) |
+| M3 | [M3-graph-c1-gpaper.md](M3-graph-c1-gpaper.md) | 2026-10-19 | QUA — G-paper đạt; chờ người dùng (V16, V17) |
 
 ## Mẫu
 

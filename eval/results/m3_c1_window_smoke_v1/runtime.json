@@ -1,0 +1,15 @@
+{
+  "run_id": "m3_c1_window_smoke_v1",
+  "finished_at": "2026-10-19T09:28:18.763057+00:00",
+  "wall_seconds": 623.6,
+  "detector_fit_seconds": 30.0,
+  "replay_and_retrieval_seconds": 593.5,
+  "judge_seconds": 0.0,
+  "judge_workers": 8,
+  "evaluated_windows": 1000,
+  "llm_calls": 196,
+  "api_calls": 0,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "mock",
+  "judge_errors": 0
+}

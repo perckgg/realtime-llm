@@ -11,7 +11,13 @@ from typing import Any
 import pytest
 
 from packages.schemas.models import AlertCandidate, ContextEvent, RetrievalResult
-from services.judge.backends import BackendResponse, GeminiBackend, MockBackend
+from services.judge.backends import (
+    JUDGE_MODEL,
+    PAPER_MODEL,
+    BackendResponse,
+    GeminiBackend,
+    MockBackend,
+)
 from services.judge.cache import ResponseCache, cache_extra, make_key
 from services.judge.llm_judge import LLMJudge
 from services.judge.prompt import compose_prompt
@@ -88,7 +94,7 @@ def _answer(label: str, confidence: float = 0.9, evidence: list[str] | None = No
 def test_prompt_and_key_reproduce_gd1_cache_entries():
     cases = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"]
     gd1_keys = {json.loads(line)["key"] for line in GD1_CACHE.open(encoding="utf-8")}
-    backend = GeminiBackend(ResponseCache(None))
+    backend = GeminiBackend(ResponseCache(None), model=PAPER_MODEL)
     for case in cases:
         prompt = compose_prompt(case["alert"], case["contexts"])
         assert backend.cache_key(prompt) == case["cache_key"]
@@ -117,14 +123,14 @@ def test_cache_key_is_gd1_key_for_repeat_0_and_new_for_repeat_n():
 def test_gd1_cache_hit_needs_no_api_key(monkeypatch):
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     case = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"][0]
-    backend = GeminiBackend(ResponseCache(None, [GD1_CACHE]))
+    backend = GeminiBackend(ResponseCache(None, [GD1_CACHE]), model=PAPER_MODEL)
     response = backend.complete(compose_prompt(case["alert"], case["contexts"]), case["contexts"])
     assert response.cache_hit and response.error is None and json.loads(response.raw)["label"]
 
 
 def test_cache_miss_without_key_is_manual_review(monkeypatch, tmp_path):
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    judge = LLMJudge(GeminiBackend(ResponseCache(tmp_path / "c.jsonl")))
+    judge = LLMJudge(GeminiBackend(ResponseCache(tmp_path / "c.jsonl"), model=JUDGE_MODEL))
     judged = judge.evaluate(_candidate(), _context(_event("e1")))
     assert judged.verdict == "UNCERTAIN" and judged.debug["status"] == "manual_review"
     assert "GEMINI_API_KEY" in judged.debug["error"] and not judged.cache_hit

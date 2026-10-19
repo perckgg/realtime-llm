@@ -3,7 +3,7 @@
 Fits IsolationForestDetector on dev exactly like scripts/replay_smoke.py,
 replays dev in time order until N candidates appear, retrieves evidence for
 each from the full Nezha log/trace store (`bm25_hybrid`, GD2 window pool) and
-judges it twice: with the `mock` backend and with `gemini-2.5-flash-lite`
+judges it twice: with the `mock` backend and with the GD2 judge model (QD-021)
 through the cache (data/llm_cache/gemini.jsonl; GEMINI_API_KEY from .env is
 only needed on a cache miss). Writes, under eval/results/<run_id>/:
 
@@ -64,7 +64,7 @@ def main() -> int:
     budget = RetrievalBudget()
     judges = {"mock": build_judge({"backend": "mock"})}
     if not args.skip_gemini:
-        judges["gemini"] = build_judge({"backend": "api", "model": "gemini-2.5-flash-lite"})
+        judges["gemini"] = build_judge({"backend": "api"})
 
     out_dir.mkdir(parents=True)
     picked = 0

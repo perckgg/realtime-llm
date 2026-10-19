@@ -271,9 +271,18 @@ Hai khác biệt có chủ đích: (1) truy vấn **không chứa fault type** (
 kho Nezha đầy đủ, thống kê BM25 tính trên tập đó. `pool="global"` + `extra_query_terms`
 giữ đúng hành vi GĐ1 (tìm toàn corpus rồi mới lọc thời gian), chỉ dùng cho G-port/G-paper.
 
-Mỗi `ContextEvent` phải ghi `origin` (`local` = cùng service `s_0` hoặc lấy từ BM25;
-`graph` = có được nhờ mở rộng topology) và `graph_distance` — chính sách C2/C3 ở
-`services/judge` cần hai trường này (`03` §1.3).
+**`hybrid_bm25_graph`** (C1, M3, QĐ-021) — port nguyên văn `TopologyAwareRetriever` của GĐ1:
+pool = top-60 BM25 + mở rộng đồ thị vô hướng 2-hop (20 event gần thời điểm giữa cửa sổ nhất
+mỗi service, trong ±8 phút); Fusion Score A4 (α 0,35, β 0,25, γ 0,40, τ 300 s), tie-break như
+GĐ1. Cờ `bm25_pool`: `global` = đúng paper (BM25 toàn corpus, **không giới hạn thời gian**,
+chỉ trên corpus cố định — parity, cấm trên val/test); `window` = GĐ2 (bằng chứng các service
+trong 2-hop, ±8 phút, kho đầy đủ). Trên dữ liệu đầy đủ, với A4 không event lân cận nào vào
+được top-6 (QĐ-021, Phát hiện 4).
+
+Mỗi `ContextEvent` phải ghi `origin` và `graph_distance` — chính sách C2/C3 ở
+`services/judge` cần hai trường này (`03` §1.3). QĐ-021 (V14): `origin = local` khi event
+nằm ở `s_0` (d_G = 0), ngược lại `graph`; kênh tìm thấy (bm25 / graph) ghi ở
+`debug.source_flags`.
 
 > **Đã cắt ở QĐ-011** (giữ mô tả bên dưới để tham chiếu): `temporal` và `graph` thuần
 > trở thành ablation của `hybrid_bm25_graph` (β = 1, γ = 1); `cross_modal` và chế độ RRF

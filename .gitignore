@@ -26,6 +26,8 @@ volumes/
 data/*
 !data/splits/
 !data/splits/**
+!data/graph/
+!data/graph/**
 legacy/nezha_setup/outputs/llm_response_cache*.jsonl
 archive/phase1_extra/data/
 

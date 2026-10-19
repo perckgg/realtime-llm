@@ -1,0 +1,15 @@
+{
+  "run_id": "m3_flash_judge_smoke_v2",
+  "finished_at": "2026-10-19T09:13:14.087123+00:00",
+  "wall_seconds": 113.3,
+  "detector_fit_seconds": 29.6,
+  "replay_and_retrieval_seconds": 81.7,
+  "judge_seconds": 2.0,
+  "judge_workers": 8,
+  "evaluated_windows": 1000,
+  "llm_calls": 196,
+  "api_calls": 1,
+  "cache_hit_rate": 0.9948979591836735,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 0
+}

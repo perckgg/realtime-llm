@@ -11,56 +11,50 @@
 | Mốc | Trạng thái | Báo cáo / quyết định |
 |---|---|---|
 | M0 | QUA | `docs/milestones/M0-nen-tang.md` |
-| M1 | QUA | `docs/milestones/M1-detector-bm25-judge.md`; QĐ-015, QĐ-016, QĐ-017 |
-| M2 | **QUA** (đóng 2026-10-19) | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
-| M3 | **Chưa mở** — đã khảo sát (QĐ-020), chờ chốt V12–V15 | Mục dưới |
+| M1 | QUA | `docs/milestones/M1-detector-bm25-judge.md`; QĐ-015..017 |
+| M2 | QUA | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
+| M3 | **QUA** (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
+| M4 | **Chưa mở — chờ V16, V17** | Mục dưới |
 
-Việc đã xong gần nhất (QĐ-019, QĐ-020): judge song song 8 worker + `RateLimiter` 200 lần/phút
-(196 lần gọi Gemini trong 60 s, 0 lỗi); chặn lệch model (`ModelVersionMismatch`); dump và tái
-lập được 489/489 prompt topology của paper; 104 test pass, mypy + ruff sạch.
+M3 tóm tắt: đồ thị trùng GĐ1 (68/68 cạnh); C1 đã port; **G-paper đạt cả hai biến thể**
+(BM25 F1 0,7030 / FP 7, Topology F1 0,4759 / FP 137, cache hit 489/489, không gọi API); judge
+GĐ2 = `gemini-2.5-flash` (V12). Phát hiện 4: C1 với trọng số paper không đưa bằng chứng lân
+cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V16 trước H0.
+
+---
+
+## Mốc tiếp theo: M4 — H0: tái lập vấn đề trên split GĐ2
+## Dự kiến bắt đầu: khi chốt V16, V17
+
+### Việc (dự kiến, chi tiết ở báo cáo M3 §4)
+
+1. - [ ] V17: tăng tốc retrieval C1 (mục tiêu < 0,5 s/lần, giữ ngữ nghĩa)
+2. - [ ] Nếu V16 (b): `k_graph` (quota bằng chứng lân cận) trong C1 + test; chọn `k_graph` trên `val`
+3. - [ ] Ablation retrieval-only lưới α, β, γ trên `val` (gồm β = 1, γ = 1)
+4. - [ ] H0 trên `val` (tập có telemetry, `gemini-2.5-flash`): BM25, C1-paper, (C1-quota), LLM-không-RAG, detector-only; CI + McNemar; ngân sách toàn bộ + 120
+5. - [ ] Nháp chương "Bài toán" từ paper + Phát hiện 1–4
+
+### Vấn đề cần chốt
+
+| # | Vấn đề | Khuyến nghị | Chặn gì |
+|---|---|---|---|
+| **V16** | C1 đúng paper không đưa bằng chứng lân cận vào prompt trên dữ liệu đầy đủ (điểm hạng 6 local 0,84 > tối đa lân cận 0,80) | (b): giữ C1-paper làm baseline + thêm C1-quota (`k_graph` chỗ cho bằng chứng d ≥ 1) làm tầng 2 của CTAV; báo cáo trung thực cả hai | **H0 / M4** |
+| **V17** | C1 chậm (~2,9 s/lần ⇒ ~85 phút retrieval mỗi run `val`) | (a): cache thống kê token theo file, BM25 numpy sparse, song song theo process | Thời gian M4 |
+| V1 | Mail GVHD — kèm Phát hiện 1–4 và V16 | Gửi trước M4 | Nên |
+| V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
+| V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
 ---
 
-## Mốc tiếp theo: M3 — Service graph + C1 + cổng chặn G-paper
-## Dự kiến bắt đầu: ngay khi chốt V12–V15 · Hạn mục tiêu: 2026-11-08
+## Lệnh tái lập M3
 
-### Việc (theo `04` M3, đã điều chỉnh theo khảo sát QĐ-020)
-
-1. - [ ] `packages/graph/` + `scripts/build_service_graph.py`: port `legacy/src/phase2/retrieval/graph_builder.py`; đồ thị có hướng (cho C3) + vô hướng (cho C1, như paper); pod → service bằng `packages/schemas/nezha.py`. Kiểm tra trùng 68 cạnh của GĐ1
-2. - [ ] `docs/graph-coverage.md`: 3 chỉ số `02` §1.3 — số đã đo sơ bộ: 56 service, 68 cạnh, 18 cô lập; fault window trên service có cạnh 100% ở cả 3 split
-3. - [ ] `services/retrieval/hybrid_bm25_graph.py` (C1): port `topology_aware_retriever.py`, `fusion_ranker.py`, `topology_candidate_expander.py`; α 0,35 / β 0,25 / γ 0,40, τ 300 s, 2-hop, 20 event/service; chế độ parity (corpus GĐ1, BM25 toàn corpus không giới hạn thời gian, truy vấn có fault type); điền `origin`, `graph_distance`; registry + `01` §6.3 + bảng `debug` `03` §1.3 (R-F1)
-4. - [ ] Nửa topology của G-paper: `scripts/check_gd1_parity.py --variant topology_aware_fusion_top6` → 489/489 top-6, prompt, key; verdict từ cache ⇒ F1 0,4759 / FP 137. `eval/configs/paper_viewA_replay.yaml`
-5. - [ ] Chặn `parity_query_terms` khi `split` là `val`/`test` (R4 của báo cáo M2)
-6. - [ ] Nếu V12 đổi model: chạy lại smoke `m2_parallel_judge_smoke` với model mới (run_id mới), cập nhật QĐ-013
-
-### DoD (`04` M3)
-
-- [ ] Tái lập Table 1 của paper từ cache, không gọi API: BM25 F1 0,7030 / FP 7 (**đã đạt ở M1**); Topology F1 0,4759 / FP 137
-- [ ] Cache hit 100% cho cả hai biến thể
-- [ ] `docs/graph-coverage.md` có ba chỉ số; coverage fault window < 60% ⇒ ghi fallback (hiện 100%)
-- [ ] pytest / mypy / ruff sạch; báo cáo `docs/milestones/M3-*.md`
-
-### Vấn đề cần chốt trước / trong M3
-
-| # | Vấn đề | Phương án | Khuyến nghị | Chặn gì |
-|---|---|---|---|---|
-| **V12** | **Đổi judge lên Flash bậc cao hơn** (yêu cầu của bạn 2026-10-19). QĐ-013 chốt `gemini-2.5-flash-lite` để so được với paper. Thử 1 request (Bảng QĐ-020-2): mọi model nhận cấu hình hiện tại; `gemini-3.5-flash` và `gemini-3.7-flash` bị API **chuyển ngầm** sang 3.6/3.8 | (a) `gemini-2.5-flash` — đúng model được gọi, phiên bản "001", cùng thế hệ với paper (chỉ đổi cỡ model); (b) `gemini-3.8-flash` — mới và mạnh nhất, nhưng dòng 3.x đang được chuyển ngầm, rủi ro bị đổi giữa M4–M8 (harness sẽ dừng run nếu xảy ra); (c) giữ flash-lite | **(a)**: rủi ro tái lập thấp nhất trong 3–4 tháng còn lại, và so sánh với paper chỉ khác cỡ model. Giữ `thinkingBudget: 0`, temperature 0. G-paper vẫn dùng cache flash-lite. Giá: tôi không có bảng giá hiện hành đáng tin, sẽ đo từ token thật ở smoke; ước chừng vài USD mỗi run `val`, trong ngân sách ~80 USD | Không chặn M3 (G-paper dùng flash-lite); **chặn M4** |
-| **V13** | **C1 có giới hạn thời gian hay không** (Phát hiện 3): 80% context topology của paper nằm ngoài ±8 phút, 100% normal có bằng chứng | (a) C1 GĐ2 giới hạn BM25 trong ±8 phút như `bm25_hybrid`, parity giữ nguyên paper; (b) giữ đúng paper; (c) làm cả hai qua cờ `bm25_pool`, đo cả hai ở H0 (M4) | **(c)**: H0 cần biết vấn đề của paper còn không khi bỏ lỗi lệch thời gian. Nếu C1-có-giới-hạn không còn tăng FPR thì câu chuyện CTAV phải viết lại — cần biết sớm | Thiết kế C1 (việc 3) |
-| **V14** | Định nghĩa `origin` của `ContextEvent` cho C2/C3: event của chính `s0` lấy qua mở rộng đồ thị là local hay graph? | (a) Theo khoảng cách: d = 0 ⇒ local, d ≥ 1 ⇒ graph, cờ nguồn (bm25/graph) ghi ở `debug`; (b) theo kênh lấy được | **(a)**: C2/C3 hỏi "bằng chứng có nằm ở `s0` không", không hỏi "lấy bằng kênh nào" | Việc 3 |
-| **V15** | Đồ thị có hướng hay vô hướng | C1 dùng vô hướng (như paper, để parity); C3 dùng có hướng (đường gọi tới `s0`) | Dựng cả hai ở việc 1 | Không |
-| V1 | Mail GVHD — nên kèm V7, V8 và Phát hiện 3 | | | Nên trước M4 |
-| V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | | Không |
-| V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | | Không |
-
-### Rủi ro đã biết
-
-- Prompt topology làm tròn `score` 6 chữ số (BM25: 4) ⇒ `context_payload` phải làm tròn theo strategy, nếu không sẽ cache miss.
-- Thứ tự sắp xếp và tie-break của `FusionRanker` (score, bm25_norm, time_sim, distance, doc_id) và `bm25_raw` tính trên thống kê toàn corpus phải giữ nguyên từng chi tiết.
-- Mở rộng đồ thị trên kho Nezha đầy đủ: mỗi truy vấn đọc log/trace của mọi service trong 2-hop ±8 phút — cần đo độ trễ.
-
-**Không làm ở mốc này:** H0 trên `val` (M4); C2–C4 (M6).
-
----
+```bash
+py scripts/build_service_graph.py
+py scripts/dump_gd1_prompts.py --variant topology_aware_fusion_top6
+py scripts/check_gd1_parity.py --variant hybrid_bm25_top6
+py scripts/check_gd1_parity.py --variant topology_aware_fusion_top6
+py -m eval run --config eval/configs/m3_c1_window_smoke.yaml       # run_id mới
+```
 
 ## Lệnh tái lập M0
 
@@ -69,7 +63,7 @@ bash scripts/download_nezha.sh          # nếu chưa có data/Nezha/
 py scripts/verify_labels.py             # -> docs/label-audit.md (~80 s)
 py scripts/make_splits.py --check       # xác nhận split không đổi
 docker compose --profile dev up -d      # clickhouse + postgres
-py -m pytest tests/ -q                  # 100 test (sau QĐ-018)
+py -m pytest tests/ -q                  # 115 test (sau QĐ-021)
 py scripts/replay_smoke.py --windows 50 --run-id <run_id-mới>   # fit + replay + ghi ClickHouse
 ```
 

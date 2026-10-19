@@ -865,3 +865,86 @@ Một run luôn do đúng một model chấm.
 
 **Hệ quả cho M3–M4.** V12–V15 trong `docs/CURRENT-MILESTONE.md` (chờ người dùng). G-paper
 không bị ảnh hưởng bởi việc đổi model: nó phát lại cache `gemini-2.5-flash-lite` của paper.
+
+---
+
+## 2026-10-19 — QĐ-021. Chốt V12–V15; M3: đồ thị, C1, cổng G-paper đạt; C1 của paper không đưa được bằng chứng lân cận trên dữ liệu đầy đủ
+
+**Quyết định (người dùng duyệt toàn bộ đề xuất của QĐ-020).**
+
+- **V12 → `gemini-2.5-flash`** là judge của mọi thực nghiệm GĐ2 (thay QĐ-013 ở điểm này);
+  temperature 0, `thinkingBudget: 0`, cùng prompt. `gemini-2.5-flash-lite` chỉ còn dùng để
+  phát lại cache của paper (G-paper). `GeminiBackend` không còn model mặc định
+  (`JUDGE_MODEL`, `PAPER_MODEL` trong `services/judge/backends.py`).
+- **V13 → C1 có cờ `bm25_pool`**: `global` = đúng paper (không giới hạn thời gian, chỉ trên
+  corpus cố định — parity); `window` = GĐ2 (bằng chứng của các service trong 2-hop, ±8 phút,
+  kho Nezha đầy đủ).
+- **V14 → `origin`** theo khoảng cách: event ở `s0` là `local`, còn lại là `graph`; kênh tìm
+  thấy ghi ở `debug.source_flags`.
+- **V15 → dựng cả hai đồ thị**: vô hướng cho d_G của C1, có hướng cho C3.
+
+**Kết quả M3.**
+
+| Việc | Kết quả |
+|---|---|
+| Đồ thị (`packages/graph/service_graph.py`, `scripts/build_service_graph.py` → `data/graph/service_graph.json`) | 56 service, 68 cạnh; **trùng GĐ1 68/68 cạnh, cùng trọng số, 56/56 node**; 30 s |
+| `docs/graph-coverage.md` (sinh tự động) | Service coverage 38/56 = 67,9% (< 80% → cảnh báo; 18 service train-ticket cô lập, không bị tiêm lỗi); edge density 0,0221; fault window có service trong graph 100% ở dev/val/test ⇒ không fallback |
+| C1 `services/retrieval/hybrid_bm25_graph.py` | Port `TopologyAwareRetriever` + `FusionRanker` + `TopologyCandidateExpander`; registry; điểm prompt làm tròn 6 chữ số như GĐ1 |
+| G-paper (`py scripts/check_gd1_parity.py --variant ...` → `eval/results/gpaper_viewA_paper500.json`) | Bảng QĐ-021-1 |
+| Chặn chế độ parity trên `val`/`test` (`load_config`) | `parity_query_terms`, corpus GĐ1, `bm25_pool: global` bị từ chối |
+
+Bảng QĐ-021-1. Cổng G-paper: tái lập Table 1 của paper (full budget) từ cache, không gọi API.
+
+| Biến thể | Top-6 trùng | Prompt trùng | Cache hit | TP | FP | P | R | F1 | Paper |
+|---|---|---|---|---|---|---|---|---|---|
+| BM25 | 489/489 | 489/489 | 489/489 | 58 | 7 | 0,8923 | 0,58 | **0,7030** | 0,7030 / FP 7 |
+| Topology | 489/489 | 489/489 | 489/489 | 74 | 137 | 0,3507 | 0,74 | **0,4759** | 0,4759 / FP 137 |
+
+**Smoke judge `gemini-2.5-flash`** (`eval/configs/m3_flash_judge_smoke.yaml`, cùng 196
+candidate dev với smoke flash-lite QĐ-019):
+
+Bảng QĐ-021-2. flash so với flash-lite trên cùng 196 candidate (BM25 GĐ2, 8 worker, 200 lần/phút).
+
+| | flash-lite (QĐ-019) | flash |
+|---|---|---|
+| Thời gian pha judge | 60 s | 74 s |
+| Chi phí ước tính | 0,056 USD | 0,229 USD (≈ 0,00117 USD/lần — giá công bố tôi biết: 0,30 / 2,50 USD mỗi 1 M token, cần đối chiếu billing) |
+| Độ trễ trung bình | 2,4 s | 2,9 s |
+| Verdict thô TRUE / FP / UNCERTAIN | 26 / 124 / 46 | 40 / 155 / 1 |
+| TP / FP / FN (pipeline, toàn bộ 1.000 cửa sổ) | 5 / 5 / 16 | 8 / 25 / 13 |
+| confidence = `anomaly_score` | 16 | 1 |
+| Verdict thô trùng nhau | 102 / 196 (52%) | |
+| Lỗi | 0 | 1 × HTTP 403 (tạm thời; chạy lại run_id `_v2`: 1 lần gọi API, 195 cache hit, 0 lỗi) |
+
+flash gần như không trả UNCERTAIN và chép `anomaly_score` ít hẳn. Ước một run trên tập chính
+của `val` (1.749 lần gọi): ≈ 2 USD, judge ≈ 9–10 phút. `runtime.json` giờ ghi `judge_errors` và
+CLI cảnh báo khi > 0 (chạy lại với run_id mới chỉ hỏi lại các câu lỗi).
+
+**Phát hiện 4 — C1 với trọng số của paper không đưa được bằng chứng lân cận trên dữ liệu
+đầy đủ.** Smoke C1 `bm25_pool: window` (`eval/configs/m3_c1_window_smoke.yaml`, 1.000 cửa
+sổ dev đầu, judge mock):
+
+Bảng QĐ-021-3. C1 (A4, `window`) trên kho Nezha đầy đủ, 196 lần retrieval.
+
+| Chỉ số | Giá trị |
+|---|---|
+| Event được chọn (top-6) | 810, **100% local (d = 0)** |
+| Prompt có ít nhất một bằng chứng lân cận | **0 / 196** |
+| Ứng viên đồ thị trong pool (trung vị) | 200, trên 10 service tới được |
+| Điểm của event hạng 6 (trung vị) | 0,841 |
+| Điểm tối đa có thể của event lân cận d = 1 (BM25_norm = 1, TimeSim = 1) | 0,35 + 0,25 + 0,40 × 0,5 = **0,80** |
+| Retrieval rỗng (không có telemetry) | 61 / 196 |
+| Bằng chứng ngoài ±8 phút | 0 |
+| Độ trễ retrieval trung bình / trung vị / P95 | 2,89 s / 2,63 s / 7,85 s (pool trung vị 146.667 event) |
+
+Về cấu trúc: GraphSim(s0) = 1 > GraphSim(d = 1) = 0,5, và truy vấn chứa tên service/pod của
+`s0` nên BM25 cũng ưu tiên `s0`. Khi `s0` có ≥ 6 event khớp trong cửa sổ, không event lân
+cận nào vượt được. Trong paper bằng chứng lân cận xuất hiện (QĐ-020: 548 context ở d = 1–2)
+vì corpus GĐ1 đã lọc theo nhãn rất thưa. Hệ quả: trên giao thức GĐ2, C1 đúng như công bố gần
+như **trùng tầng 1 cục bộ** — H0 ("topology tăng recall và FPR") có nguy cơ không tái lập.
+Cần quyết định trước M4 (báo cáo M3 §3, V16). Độ trễ ~2,9 s/lần ⇒ ~85 phút retrieval mỗi
+run `val` (V17).
+
+**Kiểm chứng.** 115 test pass (thêm: đồ thị, C1 so trực tiếp `TopologyAwareRetriever` GĐ1,
+2 ca prompt topology thật của paper, time bounding, origin, chặn parity trên val/test,
+lệch model); mypy, ruff sạch.

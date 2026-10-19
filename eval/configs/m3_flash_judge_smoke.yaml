@@ -1,0 +1,35 @@
+# QĐ-021: cùng smoke QĐ-019 nhưng judge = gemini-2.5-flash (V12), để đo chi phí / độ trễ thật
+# và so verdict với flash-lite trên cùng 196 candidate (8 worker, 200 lần gọi/phút)
+# trên 1.000 cửa sổ dev đầu tiên theo thời gian. Smoke kỹ thuật, không phải kết quả khoa học.
+run_id: m3_flash_judge_smoke_v2
+seed: 42
+split: dev
+n_windows: 1000
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8

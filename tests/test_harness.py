@@ -233,3 +233,23 @@ def test_response_cache_is_safe_under_concurrent_writes(tmp_path: Path):
     reloaded = ResponseCache(path)
     assert len(reloaded) == 200
     assert all(reloaded.get(f"k{i}")["n"] == i for i in range(200))  # type: ignore[index]
+
+
+PARITY_SWITCHES = [
+    {"retrieval": {"type": "bm25_hybrid", "parity_query_terms": True}, "judge": {}},
+    {"evidence": {"store": "gd1_corpus", "path": "x"}, "retrieval": {"type": "bm25_hybrid"}, "judge": {}},
+    {"retrieval": {"type": "hybrid_bm25_graph", "params": {"bm25_pool": "global"}}, "judge": {}},
+]
+
+
+@pytest.mark.parametrize("extra", PARITY_SWITCHES)
+def test_parity_switches_are_forbidden_on_val_and_test(tmp_path: Path, extra: dict):
+    import yaml
+
+    path = tmp_path / "c.yaml"
+    for split in ("val", "test"):
+        path.write_text(yaml.safe_dump({"run_id": "x", "split": split, "detector": {}, **extra}), encoding="utf-8")
+        with pytest.raises(ValueError):
+            load_config(path)
+    path.write_text(yaml.safe_dump({"run_id": "x", "split": "dev", "detector": {}, **extra}), encoding="utf-8")
+    load_config(path)  # allowed on dev (parity checks)

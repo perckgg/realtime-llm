@@ -21,11 +21,13 @@ from typing import Any
 from packages.schemas.models import RetrievalBudget
 from packages.schemas.protocols import RetrievalStrategy
 from services.retrieval.bm25_hybrid import Bm25HybridRetriever, EvidenceSource
+from services.retrieval.hybrid_bm25_graph import HybridBm25GraphRetriever
 
 StrategyFactory = Callable[..., RetrievalStrategy]
 
 STRATEGIES: dict[str, StrategyFactory] = {
     "bm25_hybrid": Bm25HybridRetriever,
+    "hybrid_bm25_graph": HybridBm25GraphRetriever,  # C1 (M3)
 }
 
 

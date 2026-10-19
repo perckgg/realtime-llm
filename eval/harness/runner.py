@@ -54,6 +54,7 @@ from packages.schemas.loaders import load_split_window_ids
 from packages.schemas.models import AlertCandidate, JudgedAlert, RetrievalResult, TelemetryWindow
 from services.detector.candidates import build_alert_candidate
 from services.detector.isolation_forest import IsolationForestDetector
+from services.judge.backends import JUDGE_MODEL, PRICES_PER_1M
 from services.judge.llm_judge import LLMJudge
 from services.judge.registry import build_judge
 from services.replayer.nezha_source import NezhaReplaySource
@@ -91,6 +92,14 @@ def load_config(path: Path) -> dict[str, Any]:
             raise ValueError(f"{path}: missing `{key}`")
     if ("split" in config) == ("window_set" in config):
         raise ValueError(f"{path}: give exactly one of `split` or `window_set`")
+    if config.get("split") in {"val", "test"}:
+        # QD-016/QD-021: GD1-parity switches read labels or label-filtered data.
+        if (config.get("retrieval") or {}).get("parity_query_terms"):
+            raise ValueError(f"{path}: parity_query_terms reads the label; forbidden on {config['split']}")
+        if (config.get("evidence") or {}).get("store", "nezha") != "nezha":
+            raise ValueError(f"{path}: only the full Nezha evidence store is allowed on {config['split']}")
+        if ((config.get("retrieval") or {}).get("params") or {}).get("bm25_pool") == "global":
+            raise ValueError(f"{path}: bm25_pool=global is the paper's parity mode; forbidden on {config['split']}")
     return config
 
 
@@ -291,12 +300,13 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
             judged_out.write(_jsonl(judged.model_dump(mode="json")))
 
     judge_config = config.get("judge") or {}
+    price_in, price_out = PRICES_PER_1M.get(str(judge_config.get("model", JUDGE_MODEL)), (0.0, 0.0))
     metrics = summarize(
         rows,
         n_boot=int(config.get("n_boot", 1000)),
         seed=int(config.get("seed", 42)),
-        price_in=float(judge_config.get("input_cost_per_1m_tokens", 0.10)),
-        price_out=float(judge_config.get("output_cost_per_1m_tokens", 0.40)),
+        price_in=float(judge_config.get("input_cost_per_1m_tokens", price_in)),
+        price_out=float(judge_config.get("output_cost_per_1m_tokens", price_out)),
     )
     runtime = {
         "run_id": run_id,
@@ -311,6 +321,9 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
         "api_calls": metrics["all"]["operations"]["api_calls"],
         "cache_hit_rate": metrics["all"]["operations"]["cache_hit_rate"],
         "judge_backend": judge.backend.name if full else "none",
+        # A failed judge call becomes UNCERTAIN/manual_review; re-running the same
+        # config under a new run_id re-asks only those (the rest are cached).
+        "judge_errors": metrics["all"]["operations"]["judge_errors"],
     }
     _write_outputs(out_dir, config, rows, metrics, runtime)
     if use_clickhouse:

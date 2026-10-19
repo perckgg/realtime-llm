@@ -121,6 +121,12 @@ không trùng η1..η3 của Rescue Score, QĐ-008). Fusion Score giữ α, β, 
 
 ### 4.1 Judge: một LLM API cố định, không chạy LLM local (QĐ-013)
 
+> **Cập nhật QĐ-021 (2026-10-19):** judge của mọi thực nghiệm GĐ2 là `gemini-2.5-flash`
+> (cùng thế hệ, lớn hơn flash-lite), temperature 0, `thinkingBudget: 0`, cùng prompt; mọi câu
+> trả lời phải có `modelVersion` đúng model này, lệch thì run dừng. `gemini-2.5-flash-lite`
+> chỉ còn dùng để phát lại cache của paper (G-paper). Các lập luận dưới đây (một model cố
+> định, không local-first, không fallback) giữ nguyên.
+
 **Quyết định.** Mọi thực nghiệm chính dùng **một** model API cố định:
 `gemini-2.5-flash-lite`, temperature 0, cùng prompt. Không có local-first, không có
 fallback sang model khác. LLM local (Ollama) không chạy trong GĐ2.
