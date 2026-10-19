@@ -77,8 +77,7 @@ khảo sát M3 (QĐ-020) · `5595e61` M3 (QĐ-021) · commit bàn giao này.
 - Chi phí API của phiên: ≈ 0,30 USD (smoke M1 5 lần, thử model 5 lần, smoke flash-lite 196 lần
   ≈ 0,056, smoke flash 197 lần ≈ 0,23).
 - Docker `clickhouse`, `postgres` đang chạy; volume mới cần `py scripts/apply_clickhouse_migrations.py`.
-- Đường dẫn khi viết patch: heredoc `py - <<'EOF'` làm hỏng chuỗi có `
-` — dùng file script riêng.
+- Khi sửa file bằng script: heredoc `py - <<'EOF'` làm hỏng chuỗi chứa ký tự xuống dòng thoát (backslash-n) — viết script ra file riêng rồi chạy.
 - V17 gợi ý: nút thắt là BM25 thuần Python trên pool trung vị ~147 nghìn event/truy vấn.
 
 ---
