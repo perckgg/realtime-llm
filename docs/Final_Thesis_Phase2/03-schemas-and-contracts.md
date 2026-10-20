@@ -113,7 +113,7 @@ class RetrievalResult(BaseModel):
 | `temporal` | `window_size_sec` đã chọn, `score_mapping` |
 | `cross_modal` | `channel`, `channel_rank`, `fusion_weight` |
 | `graph` | `graph_distance`, `decay_applied`, `path` |
-| `hybrid_bm25_graph` | `rank`, `source_flags` (bm25 / graph), `bm25_raw`, `bm25_norm`, `time_sim`, `graph_sim`, `score_final`, `graph_distance`, `time_distance_sec`, `prompt_score` (6 chữ số như GĐ1), `pod`, `severity`, `event_type`, `source`, `trace_id`, `span_id`, `parent_span_id`, `duration_ms`. `RetrievalResult.debug`: `query`, `bm25_pool`, `pool_corpus_size`, `bm25_candidates`, `graph_candidates`, `candidate_pool_size`, `duplicates_removed`, `reachable_services`, `weights`, `tau_seconds`, `timeout_exceeded`. RRF đã cắt (QĐ-011). `origin`: `local` nếu event ở `s0`, còn lại `graph` (QĐ-021) |
+| `hybrid_bm25_graph` | `rank`, `source_flags` (bm25 / graph), `bm25_raw`, `bm25_norm`, `time_sim`, `graph_sim`, `score_final`, `graph_distance`, `time_distance_sec`, `prompt_score` (6 chữ số như GĐ1), `pod`, `severity`, `event_type`, `source`, `trace_id`, `span_id`, `parent_span_id`, `duration_ms`. `RetrievalResult.debug`: `query`, `bm25_pool`, `pool_corpus_size`, `bm25_candidates`, `graph_candidates`, `candidate_pool_size`, `duplicates_removed`, `reachable_services`, `weights`, `tau_seconds`, `timeout_exceeded`, `engine` (`vectorized` / `reference`), `k_graph`, `quota_promoted` (số event lân cận được quota đẩy vào top-k) — QĐ-022. RRF đã cắt (QĐ-011). `origin`: `local` nếu event ở `s0`, còn lại `graph` (QĐ-021) |
 
 ### 1.4 JudgedAlert
 

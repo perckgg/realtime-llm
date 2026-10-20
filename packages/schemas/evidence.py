@@ -43,6 +43,20 @@ NOISE_PATTERNS = [re.compile(r"periodic healthcheck succeeded", re.IGNORECASE)]
 
 _FILE_RE = re.compile(r"^(?P<hour>\d{2})_(?P<minute>\d{2})_(?P<kind>log|trace)\.csv$")
 
+# id(known) -> (known, pod -> service); holding `known` keeps its id unique.
+_SERVICE_MEMO: dict[int, tuple[dict[str, str], dict[str, str]]] = {}
+
+
+def _service_of(pod: str, known: dict[str, str]) -> str:
+    """`pod_to_service(pod, known)[0]`, memoised per pod (QD-022: ~25% of file parsing)."""
+    entry = _SERVICE_MEMO.get(id(known))
+    if entry is None or entry[0] is not known:
+        entry = _SERVICE_MEMO[id(known)] = (known, {})
+    service = entry[1].get(pod)
+    if service is None:
+        service = entry[1][pod] = pod_to_service(pod, known)[0]
+    return service
+
 
 @dataclass(frozen=True, slots=True)
 class EvidenceDoc:
@@ -111,7 +125,7 @@ def log_doc(raw: dict[str, str], day: str, known: dict[str, str]) -> EvidenceDoc
         doc_id=f"log-{day}-{raw.get('TraceID', '')}-{raw.get('SpanID', '')}-{raw.get('TimeUnixNano', '')}",
         ts=ts,
         pod=pod,
-        service=pod_to_service(pod, known)[0],
+        service=_service_of(pod, known),
         severity=severity,
         event_type="application_log",
         source="nezha_log",
@@ -138,7 +152,7 @@ def trace_doc(raw: dict[str, str], day: str, known: dict[str, str]) -> EvidenceD
         doc_id=f"trace-{day}-{raw.get('TraceID', '')}-{raw.get('SpanID', '')}",
         ts=ts,
         pod=pod,
-        service=pod_to_service(pod, known)[0],
+        service=_service_of(pod, known),
         severity="WARN" if duration_ms >= 1000 else "INFO",
         event_type="trace_span",
         source="nezha_trace",
@@ -272,13 +286,21 @@ class NezhaEvidenceStore:
         hi = bisect_right(self._minutes, end + margin + timedelta(minutes=2))
         return hi > lo
 
+    def files_for(self, start: datetime, end: datetime) -> list[_MinuteFile]:
+        """The per-minute files `query(start, end)` reads, in the order it reads them."""
+        lo = bisect_left(self._minutes, start - timedelta(minutes=1))
+        hi = bisect_right(self._minutes, end + timedelta(minutes=2))
+        return self._files[lo:hi]
+
+    def load_file(self, file: _MinuteFile) -> list[EvidenceDoc]:
+        """Every parsed doc of one file, unfiltered, in file order (shared LRU)."""
+        return self._load(file)
+
     def query(
         self, start: datetime, end: datetime, services: Collection[str] | None = None
     ) -> list[EvidenceDoc]:
-        lo = bisect_left(self._minutes, start - timedelta(minutes=1))
-        hi = bisect_right(self._minutes, end + timedelta(minutes=2))
         selected: list[EvidenceDoc] = []
-        for file in self._files[lo:hi]:
+        for file in self.files_for(start, end):
             selected.extend(
                 d
                 for d in self._load(file)

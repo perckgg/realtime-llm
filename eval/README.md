@@ -14,7 +14,7 @@ py -m eval run --config eval/configs/val_detector_count.yaml  # đếm candidate
 
 | File | Nội dung |
 |---|---|
-| `harness/runner.py` | Config → pipeline → 7 file output (+ ClickHouse nếu `storage.clickhouse: true`). Pha 1 tuần tự (replay, detector, gate, retrieval), pha 2 judge song song `judge.workers` (mặc định 8) — QĐ-019 |
+| `harness/runner.py` | Config → pipeline → 7 file output (+ ClickHouse nếu `storage.clickhouse: true`). Pha 1 tuần tự (replay, detector, gate, retrieval), pha 2 judge song song `judge.workers` (mặc định 8) — QĐ-019. `retrieval.workers` > 1 (chỉ kho Nezha, không `parity_query_terms`): retrieval chạy sau replay trên N process, chia đoạn liên tục theo thời gian; kết quả trùng tuần tự, riêng `latency_ms` đo dưới tải song song nên chỉ để tham khảo — QĐ-022 |
 | `harness/metrics.py` | P/R/F1/FPR, coverage, độ trễ, token, chi phí; tập có telemetry (chính) và toàn bộ (QĐ-017) |
 | `harness/stats.py` | `bootstrap_ci`, `bootstrap_confusion_ci`, `mcnemar_exact` |
 | `configs/gd1_phase4_parity.yaml` | Cấu hình GĐ1 Phase 4 (chỉ cho G-port) |

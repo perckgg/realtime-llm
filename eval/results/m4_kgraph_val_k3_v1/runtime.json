@@ -1,0 +1,16 @@
+{
+  "run_id": "m4_kgraph_val_k3_v1",
+  "finished_at": "2026-10-20T06:07:29.399805+00:00",
+  "wall_seconds": 468.9,
+  "detector_fit_seconds": 30.2,
+  "replay_and_retrieval_seconds": 437.5,
+  "judge_seconds": 0.5,
+  "judge_workers": 8,
+  "retrieval_workers": 6,
+  "evaluated_windows": 28898,
+  "llm_calls": 5677,
+  "api_calls": 0,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "mock",
+  "judge_errors": 0
+}

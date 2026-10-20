@@ -20,7 +20,7 @@ from services.judge.backends import (
 )
 from services.judge.cache import ResponseCache, cache_extra, make_key
 from services.judge.llm_judge import LLMJudge
-from services.judge.prompt import compose_prompt
+from services.judge.prompt import alert_payload, compose_prompt
 from services.judge.registry import build_judge
 from tests.gd1 import LEGACY, gd1
 
@@ -107,6 +107,34 @@ def test_prompt_is_gd1_compose_prompt():
     case = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"][0]
     alert = models.AlertCandidate(**case["alert"])
     assert compose_prompt(case["alert"], case["contexts"]) == composer.compose_prompt(alert, case["contexts"])
+
+
+def test_drop_metrics_leaves_metric_out_of_prompt_and_default_keeps_gd1_prompt():
+    candidate = _candidate().model_copy(
+        update={
+            "metric_snapshot": {"CpuUsage(m)": 1.23456789, "PodSuccessRate(%)": 0.0},
+            "top_features": ["PodSuccessRate(%)", "CpuUsage(m)"],
+        }
+    )
+    full = alert_payload(candidate)
+    assert full["metric_snapshot"] == {"CpuUsage(m)": 1.2346, "PodSuccessRate(%)": 0.0}
+    assert full["top_features"] == ["PodSuccessRate(%)", "CpuUsage(m)"]
+    dropped = alert_payload(candidate, ["PodSuccessRate(%)"])
+    assert dropped["metric_snapshot"] == {"CpuUsage(m)": 1.2346}
+    assert dropped["top_features"] == ["CpuUsage(m)"]
+
+    prompts: list[str] = []
+
+    class Capture(_Fixed):
+        def complete(self, prompt: str, contexts: list[dict[str, Any]], repeat: int = 0) -> BackendResponse:
+            prompts.append(prompt)
+            return super().complete(prompt, contexts, repeat)
+
+    for config in ({}, {"drop_metrics": ["PodSuccessRate(%)"]}):
+        judge = build_judge({"backend": "mock", **config})
+        LLMJudge(Capture(_answer("uncertain")), drop_metrics=judge.drop_metrics).evaluate(candidate, _context())
+    assert "PodSuccessRate" in prompts[0]
+    assert "PodSuccessRate" not in prompts[1]
 
 
 def test_cache_key_is_gd1_key_for_repeat_0_and_new_for_repeat_n():

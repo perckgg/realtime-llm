@@ -18,10 +18,10 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | Mốc | Tên | Loại | Hạn mục tiêu | Trạng thái |
 |---|---|---|---|---|
 | M0 | Nền tảng dữ liệu + hạ tầng | Cổng chặn (nhãn) | 2026-09-07 | **Xong** — báo cáo `docs/milestones/M0-nen-tang.md` |
-| M1 | Sửa detector, hợp đồng dữ liệu, port BM25 + judge | | 2026-10-25 | **Đang làm** |
-| M2 | Eval harness + kiểm tra port | **Cổng chặn G-port** | 2026-11-01 | |
-| M3 | Service graph + C1 + tái lập paper | **Cổng chặn G-paper** | 2026-11-08 | |
-| M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | |
+| M1 | Sửa detector, hợp đồng dữ liệu, port BM25 + judge | | 2026-10-25 | **Xong** (2026-10-19) — `docs/milestones/M1-detector-bm25-judge.md` |
+| M2 | Eval harness + kiểm tra port | **Cổng chặn G-port** | 2026-11-01 | **Xong** (2026-10-19) — `docs/milestones/M2-harness-gport.md` |
+| M3 | Service graph + C1 + tái lập paper | **Cổng chặn G-paper** | 2026-11-08 | **Xong** (2026-10-19) — `docs/milestones/M3-graph-c1-gpaper.md` |
+| M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Đang làm** (mở 2026-10-20) — nháp `docs/milestones/M4-h0.md` |
 | M5 | H1 — cơ chế thiên lệch xác nhận | | 2026-11-22 | |
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | |
@@ -70,7 +70,7 @@ Gộp Tuần 1–2 của bản gốc.
 
 ---
 
-## M1 — Sửa detector, hợp đồng dữ liệu, port BM25 + judge
+## M1 — Sửa detector, hợp đồng dữ liệu, port BM25 + judge (xong)
 
 Phần việc Tuần 3 của bản gốc, cộng các điểm sửa từ review.
 
@@ -92,7 +92,7 @@ Phần việc Tuần 3 của bản gốc, cộng các điểm sửa từ review.
 
 ---
 
-## M2 — Eval harness + cổng chặn G-port
+## M2 — Eval harness + cổng chặn G-port (xong)
 
 | Việc | Output |
 |---|---|
@@ -114,7 +114,7 @@ Lệch hơn mức trên = port sai. **Dừng và sửa**, không sang M3.
 
 ---
 
-## M3 — Service graph + C1 + cổng chặn G-paper
+## M3 — Service graph + C1 + cổng chặn G-paper (xong)
 
 | Việc | Output |
 |---|---|
@@ -134,9 +134,14 @@ Lệch hơn mức trên = port sai. **Dừng và sửa**, không sang M3.
 
 | Việc | Output |
 |---|---|
-| BM25, C1 chưa hiệu chỉnh, LLM-không-RAG, detector-only trên `val`; Gemini; ngân sách giới hạn + toàn bộ | `eval/results/h0_*` |
+| Tăng tốc C1 giữ nguyên ngữ nghĩa (V17, QĐ-022) — **xong** | `engine: vectorized`, `retrieval.workers` |
+| C1-quota `k_graph` (V16 b, QĐ-022); chọn `k_graph` trên `val` (V18, QĐ-024) — **xong, `k_graph = 1`** | `services/retrieval/hybrid_bm25_graph.py`; `eval/results/m4_kgraph_*` |
+| Chốt judge + prompt GĐ2 (V19, V20, QĐ-023) — **xong**: `gemini-2.5-flash`, `drop_metrics: ["PodSuccessRate(%)"]` | `judge.drop_metrics` |
+| BM25, C1-paper (`k_graph = 0`), C1-quota (`k_graph = 1`), LLM-không-RAG, detector-only trên `val` (tập có telemetry); Gemini; ngân sách giới hạn + toàn bộ | `eval/results/h0_*` |
 | Ablation retrieval-only (không gọi LLM) lưới α, β, γ — gồm temporal-only (β = 1), graph-only (γ = 1) | Bảng ablation C1 |
-| Nháp chương "Bài toán" của luận văn từ paper | Nháp chương |
+| Nháp chương "Bài toán" của luận văn từ paper + Phát hiện 1–5 | Nháp chương |
+
+Cập nhật 2026-10-20: ba dòng đầu được thêm sau M3 (V16–V20, xem báo cáo M3 §3 và QĐ-022..024).
 
 **DoD M4 — cổng chặn hướng nghiên cứu:** bảng H0 có CI + McNemar. Nếu **không** tái lập
 được (topology không tăng FPR trên split GĐ2): dừng, ghi experiment-log, trao đổi GVHD

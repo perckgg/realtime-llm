@@ -1,0 +1,36 @@
+# QĐ-023 (V20): như m3_flash_judge_smoke (gemini-2.5-flash) nhưng bỏ PodSuccessRate(%) — hằng 0 trên
+# 48.214 cửa sổ dev+val — khỏi prompt. Smoke kỹ thuật trên 196 candidate dev, không phải kết quả khoa học.
+# _v1 có 1 lần gọi lỗi; _v2 hỏi lại câu đó, phần còn lại từ cache.
+run_id: m4_v20_g25_smoke_v2
+seed: 42
+split: dev
+n_windows: 1000
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]

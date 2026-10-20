@@ -279,6 +279,13 @@ chỉ trên corpus cố định — parity, cấm trên val/test); `window` = G�
 trong 2-hop, ±8 phút, kho đầy đủ). Trên dữ liệu đầy đủ, với A4 không event lân cận nào vào
 được top-6 (QĐ-021, Phát hiện 4).
 
+QĐ-022 (V16, V17): `k_graph` (mặc định 0 = C1-paper) giữ tối thiểu min(`k_graph`, số có sẵn)
+chỗ trong top-k cho event có d_G ≥ 1 có Fusion Score cao nhất; phần còn lại theo thứ hạng,
+thứ tự cuối vẫn theo Fusion Score (C1-quota). `engine`: `vectorized` (mặc định, chỉ mục theo
+file phút + BM25 numpy, `services/retrieval/window_index.py`) hoặc `reference` (đường thuần
+Python của port — oracle và phương án dự phòng); hai engine cho cùng top-k, cùng điểm từng bit.
+Harness có thể chạy retrieval trên `retrieval.workers` process (chỉ kho Nezha).
+
 Mỗi `ContextEvent` phải ghi `origin` và `graph_distance` — chính sách C2/C3 ở
 `services/judge` cần hai trường này (`03` §1.3). QĐ-021 (V14): `origin = local` khi event
 nằm ở `s_0` (d_G = 0), ngược lại `graph`; kênh tìm thấy (bm25 / graph) ghi ở

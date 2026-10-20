@@ -1,0 +1,30 @@
+run_id: m4_v20_g25_smoke_v1
+seed: 42
+split: dev
+n_windows: 1000
+time_source: wall
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+evidence:
+  store: nezha
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.8
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics:
+  - PodSuccessRate(%)

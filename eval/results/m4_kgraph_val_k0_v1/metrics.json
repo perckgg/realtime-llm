@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 109,
+      "fp": 1172,
+      "fn": 100,
+      "tn": 6255,
+      "precision": 0.08508977361436378,
+      "recall": 0.5215311004784688,
+      "f1": 0.14630872483221477,
+      "fpr": 0.15780261209101926,
+      "precision_ci95": [
+        0.07037867642390282,
+        0.10024394420536453
+      ],
+      "recall_ci95": [
+        0.452727434257285,
+        0.5879541246904378
+      ],
+      "f1_ci95": [
+        0.1226732052065589,
+        0.17027087586946743
+      ],
+      "fpr_ci95": [
+        0.14942917778799972,
+        0.16583815068472132
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 1640,
+      "fn": 100,
+      "tn": 5787,
+      "precision": 0.062321326472269865,
+      "recall": 0.5215311004784688,
+      "f1": 0.11133810010214504,
+      "fpr": 0.22081594183384948,
+      "precision_ci95": [
+        0.05196681976496328,
+        0.07415954866803245
+      ],
+      "recall_ci95": [
+        0.4541272701741247,
+        0.5892134706579727
+      ],
+      "f1_ci95": [
+        0.09373037095841952,
+        0.1311142764538305
+      ],
+      "fpr_ci95": [
+        0.21112292259031257,
+        0.23002573067580231
+      ]
+    },
+    "operations": {
+      "windows": 7636,
+      "fault_windows": 209,
+      "candidates": 1749,
+      "retrieval_calls": 1749,
+      "llm_calls": 1749,
+      "api_calls": 0,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 468,
+      "context_coverage": 0.5215311004784688,
+      "candidate_context_coverage": 0.7352773013150372,
+      "avg_context_events": 4.411663807890223,
+      "avg_context_tokens": 27.904516866781016,
+      "retrieval_latency_ms_avg": 257.26894797026875,
+      "retrieval_latency_ms_p95": 1657.999,
+      "llm_latency_ms_avg": 0.061881646655231555,
+      "llm_latency_ms_p95": 0.015,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "downgraded_by_evidence_rule": 0,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 109,
+      "fp": 1172,
+      "fn": 100,
+      "tn": 27517,
+      "precision": 0.08508977361436378,
+      "recall": 0.5215311004784688,
+      "f1": 0.14630872483221477,
+      "fpr": 0.04085189445432047,
+      "precision_ci95": [
+        0.07053266696143355,
+        0.1002371430816056
+      ],
+      "recall_ci95": [
+        0.4545338589981447,
+        0.5911159420289855
+      ],
+      "f1_ci95": [
+        0.12263810074147176,
+        0.1700421224913703
+      ],
+      "fpr_ci95": [
+        0.03847256302467438,
+        0.04303010243188628
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 5568,
+      "fn": 100,
+      "tn": 23121,
+      "precision": 0.01920028183899947,
+      "recall": 0.5215311004784688,
+      "f1": 0.037037037037037035,
+      "fpr": 0.1940813552232563,
+      "precision_ci95": [
+        0.015794434523196597,
+        0.02267187125142463
+      ],
+      "recall_ci95": [
+        0.4535864491973124,
+        0.5891114785752434
+      ],
+      "f1_ci95": [
+        0.030544818864644472,
+        0.04363679101288234
+      ],
+      "fpr_ci95": [
+        0.18941427627966642,
+        0.19867557719283999
+      ]
+    },
+    "operations": {
+      "windows": 28898,
+      "fault_windows": 209,
+      "candidates": 5677,
+      "retrieval_calls": 5677,
+      "llm_calls": 5677,
+      "api_calls": 0,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 4396,
+      "context_coverage": 0.5215311004784688,
+      "candidate_context_coverage": 0.22652809582525982,
+      "avg_context_events": 1.359168574951559,
+      "avg_context_tokens": 8.59697023075568,
+      "retrieval_latency_ms_avg": 79.36393147789325,
+      "retrieval_latency_ms_p95": 312.798,
+      "llm_latency_ms_avg": 0.040261229522635195,
+      "llm_latency_ms_p95": 0.012,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "downgraded_by_evidence_rule": 0,
+      "judge_errors": 0
+    }
+  }
+}

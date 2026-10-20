@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Collection
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, ValidationError
@@ -79,15 +80,17 @@ class LLMJudge:
         require_evidence: bool = True,
         confidence_threshold: float | None = 0.80,
         repeat: int = 0,
+        drop_metrics: Collection[str] = (),
     ) -> None:
         self.backend = backend
         self.require_evidence = require_evidence
         self.confidence_threshold = confidence_threshold
         self.repeat = repeat
+        self.drop_metrics = frozenset(drop_metrics)
 
     def evaluate(self, candidate: AlertCandidate, context: RetrievalResult) -> JudgedAlert:
         contexts = [context_payload(event) for event in context.events]
-        prompt = compose_prompt(alert_payload(candidate), contexts)
+        prompt = compose_prompt(alert_payload(candidate, self.drop_metrics), contexts)
         started = time.perf_counter()
         response = self.backend.complete(prompt, contexts, repeat=self.repeat)
         latency = (time.perf_counter() - started) * 1000

@@ -1,0 +1,35 @@
+# QĐ-022: thử đổi judge (yêu cầu người dùng 2026-10-20). Cùng smoke QĐ-019/QĐ-021 (196 candidate
+# dev, BM25 GĐ2, 8 worker, 200 lần/phút) nhưng judge = gemini-3.6-flash, để so với gemini-2.5-flash
+# (m3_flash_judge_smoke_v2). Smoke kỹ thuật, không phải kết quả khoa học.
+run_id: m4_judge_g36_smoke_v1
+seed: 42
+split: dev
+n_windows: 1000
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+
+judge:
+  backend: api
+  model: gemini-3.6-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8

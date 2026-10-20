@@ -948,3 +948,217 @@ run `val` (V17).
 **Kiểm chứng.** 115 test pass (thêm: đồ thị, C1 so trực tiếp `TopologyAwareRetriever` GĐ1,
 2 ca prompt topology thật của paper, time bounding, origin, chặn parity trên val/test,
 lệch model); mypy, ruff sạch.
+
+## 2026-10-20 — QĐ-022. V16 (b) C1-quota, V17 (a) tăng tốc C1 giữ ngữ nghĩa; thử đổi judge sang Gemini 3.x; phương án dự phòng
+
+**Quyết định (người dùng, 2026-10-20).** V1 đã gửi. Làm V16 theo (b), V17 theo (a), bắt buộc có
+phương án dự phòng. Thử đổi judge từ `gemini-2.5-flash` sang 3.8-flash hoặc 3.5-flash.
+
+**V17 — tăng tốc C1, giữ nguyên ngữ nghĩa.**
+
+- `services/retrieval/window_index.py` (mới): chỉ mục theo file phút (LRU 48 file), posting list
+  numpy, BM25 cộng dồn theo đúng thứ tự token của truy vấn, cosine tính lại bằng `cosine()` gốc ở
+  các ca mà thứ tự cộng float có thể khác. C1 có tham số `engine: vectorized` (mặc định) /
+  `reference` (đường thuần Python cũ). `NezhaEvidenceStore` thêm `files_for()`, `load_file()`,
+  memo `pod_to_service`.
+- `eval/harness/runner.py`: `retrieval.workers` > 1 ⇒ retrieval chạy sau replay trên N process
+  (đoạn liên tục theo thời gian). Retrieval là hàm thuần của (candidate, kho) nên kết quả không
+  đổi; `latency_ms` đo dưới tải song song chỉ để tham khảo.
+- Công cụ đo: `scripts/retrieval_bench.py` (`collect` / `run` / `compare`, kết quả ở `data/bench/`,
+  không commit).
+
+Bảng QĐ-022-1. C1 `window` trên 196 candidate của smoke M3 (dev, 1.000 cửa sổ đầu).
+
+| | Tham chiếu (`reference`) | `vectorized`, 1 process | `vectorized`, 6 process (harness) |
+|---|---|---|---|
+| Top-6 trùng tham chiếu | — | 196/196, lệch điểm tối đa 0,0 | 196/196 event, score, origin; `per_window.csv` chỉ lệch cột latency |
+| Độ trễ trung bình / trung vị / P95 | 3,56 s / 2,58 s / 10,7 s | 0,62 s / 0,15 s / 3,1 s | (tham khảo) 1,7 s / 0,25 s |
+| Wall | 702 s (bench) · 593 s replay+retrieval (`m3_c1_window_smoke_v1`) | 122 s (bench) | **88 s replay+retrieval** (`m4_c1_vec_smoke_v1`), ≈ 0,45 s/lần theo throughput |
+
+Phần còn lại chủ yếu là đọc + token hoá file phút lần đầu (~0,7 s/file); bản thân tìm kiếm
+≈ 0,1 s/truy vấn. Ước run `val`: ~85 phút → ~12–15 phút retrieval với 6 process.
+Khác biệt debug duy nhất: `timeout_exceeded` (phụ thuộc thời gian, 82/196) và 3 key mới.
+
+**V16 — C1-quota.** `k_graph` (mặc định 0 = C1-paper): giữ tối thiểu min(`k_graph`, số có sẵn) chỗ
+trong top-k cho event d_G ≥ 1 có Fusion Score cao nhất, phần còn lại theo thứ hạng, thứ tự cuối
+vẫn theo Fusion Score; `debug.quota_promoted` ghi số event được đẩy vào. Không đổi trọng số
+α, β, γ, không đổi signature Protocol.
+
+Bảng QĐ-022-2. Ảnh hưởng của `k_graph` (cùng 196 candidate, top-6, retrieval-only, chưa có judge).
+
+| `k_graph` | Prompt có ≥ 1 bằng chứng lân cận | Bằng chứng lân cận / prompt | Tỷ lệ bằng chứng lân cận |
+|---|---|---|---|
+| 0 (C1-paper) | 0 / 196 (0%) | 0 | 0% |
+| 1 | 135 / 196 (68,9%) | 0,69 | 16,7% |
+| 2 | 135 / 196 (68,9%) | 1,38 | 33,3% |
+| 3 | 135 / 196 (68,9%) | 2,07 | 50,0% |
+
+61 candidate không có telemetry nên retrieval rỗng; vậy mọi candidate có bằng chứng đều nhận
+được bằng chứng lân cận khi `k_graph` ≥ 1. Chọn `k_graph` trên `val` cần tiêu chí, chưa chốt (V18).
+
+**Kiểm chứng.** `tests/test_window_index.py` (12 test): chỉ mục ≡ `_Corpus` tham chiếu trên kho
+ngẫu nhiên có trùng lặp, ts trùng, file chồng nhau; engine vectorized ≡ reference (k_graph 0 và 2,
+service cô lập); kho không có file; quota (k = 0 ≡ paper, giữ thứ tự, ít lân cận hơn k, tham số sai).
+124 test pass (bỏ `tests/test_storage.py` vì máy thiếu `clickhouse_connect` — lỗi môi trường có sẵn);
+mypy sạch; ruff sạch trên các file đã sửa.
+
+**Thử đổi judge.** `scripts/probe_gemini_models.py`: 1 lần gọi/model, prompt paper #0, so
+`modelVersion` API trả về.
+
+| Id gọi | `modelVersion` trả về | Dùng được? |
+|---|---|---|
+| `gemini-2.5-flash` | `gemini-2.5-flash` | Có (judge hiện tại) |
+| `gemini-3.5-flash` | **`gemini-3.6-flash`** (bị chuyển ngầm) | **Không** — harness dừng với `ModelVersionMismatch` (QĐ-020) |
+| `gemini-3.6-flash` | `gemini-3.6-flash` | Có |
+| `gemini-3.8-flash` | `gemini-3.8-flash` | Có |
+| `gemini-3.8-flash-001` | 404 | Không |
+
+Giá 3.6/3.8-flash (0,75 / 3,75 USD mỗi 1 M token, giá khuyến mãi tới 31/12/2026) lấy từ trang
+theo dõi giá bên thứ ba, **chưa đối chiếu trang giá Google** — chỉ dùng ước tính.
+
+Bảng QĐ-022-3. Smoke judge trên cùng 196 candidate (BM25 GĐ2, 8 worker, 200 lần/phút). Không phải
+kết quả khoa học.
+
+| | 2.5-flash (`m3_flash_judge_smoke_v2`) | 3.6-flash (`m4_judge_g36_smoke_v1`) | 3.8-flash (`m4_judge_g38_smoke_v2`) |
+|---|---|---|---|
+| Verdict thô TRUE / FP / UNCERTAIN | 40 / **156** / 0 | 141 / **2** / 53 | 94 / **2** / 100 |
+| Verdict cuối TRUE / FP / UNCERTAIN | 33 / 156 / 7 | 128 / 2 / 66 | 46 / 2 / **148** |
+| Hạ cấp do thiếu bằng chứng hợp lệ | 7 | 13 | **48** |
+| JSON hỏng | 0 | 0 | 1 (cắt cụt sau 28 token, nằm trong cache — chạy lại không hỏi lại) |
+| TP / FP / FN (pipeline, 1.000 cửa sổ) | 8 / 25 / 13 | 11 / 117 / 10 | 6 / 40 / 15 |
+| Độ trễ trung bình (lần gọi API thật) | 2,9 s | 2,5 s | 4,1 s |
+| Chi phí ước tính | 0,229 USD | 0,330 USD | 0,315 USD |
+| Verdict thô trùng 2.5-flash | — | 37 / 196 | 21 / 196 |
+
+Dòng 3.x gần như **không bao giờ bác bỏ cảnh báo** (FALSE_POSITIVE 1%), thay bằng UNCERTAIN
+(= chuyển người duyệt). CTAV cần judge biết bác bỏ báo động giả (H-FP); với 3.8, 75% candidate
+rơi về người duyệt, và 3.8 thường không trích `evidence_event_ids` hợp lệ. Đổi model cũng
+nghĩa là phải đổi/hiệu chỉnh lại prompt và làm lại baseline — ngoài phạm vi M4.
+**Khuyến nghị: giữ `gemini-2.5-flash`** (V19, chờ người dùng chốt).
+
+**Phương án dự phòng.**
+
+| Rủi ro | Dự phòng |
+|---|---|
+| Engine vectorized có lỗi chưa phát hiện | `engine: reference` (oracle, đúng port); `scripts/retrieval_bench.py compare` đối chiếu bất kỳ lúc nào |
+| Song song theo process lỗi / thiếu RAM (~1–1,5 GB/process) | `retrieval.workers: 1` (tuần tự, vẫn nhanh ~5,8×); giảm số process |
+| C1-quota không tái lập được H0 | Báo cáo trung thực C1-paper (V16 a) + viết lại câu chuyện theo `08` §5.1; chỉnh GraphSim chỉ làm ablation (V16 c) |
+| Model judge bị chuyển ngầm / ngừng hỗ trợ giữa chừng | Cache giữ mọi câu trả lời đã có ⇒ run cũ vẫn tái lập; run mới dừng (`ModelVersionMismatch`) ⇒ chốt một model trước H0, mọi run H dùng cùng model; dự phòng là `gemini-2.5-flash` |
+| Giá 3.x tăng sau 2026 | Không phụ thuộc nếu giữ 2.5-flash |
+
+**Phát hiện 5 — vì sao Gemini 3.x không bác bỏ cảnh báo: cột `PodSuccessRate(%)` của Nezha luôn
+bằng 0.** `PodSuccessRate(%)` = 0,0 ở **95.660 / 95.660** dòng metric của Nezha (112 file) và ở
+196/196 candidate smoke — cột chết (không có dữ liệu), nhưng `metric_snapshot` đưa nguyên giá trị
+vào prompt (như paper). Prompt vì vậy luôn nói "tỷ lệ thành công 0%".
+
+| Reasoning nhắc "success"/"0%" | 2.5-flash | 3.6-flash | 3.8-flash |
+|---|---|---|---|
+| … và trả FALSE_POSITIVE | 135 (coi nhẹ: "workload thấp", "trace bình thường") | 1 | 1 |
+| … và trả TRUE_ALERT | 33 | 141 | 94 |
+| … và trả UNCERTAIN | 0 | 44 | 93 |
+| Reasoning nêu "thiếu log/bằng chứng" | 0 | 39 | 46 |
+
+Giải thích: 3.x đọc "0% success" theo nghĩa đen là sự cố → không dám bác bỏ; khi bằng chứng
+(log/trace) bình thường hoặc vắng thì 3.8 chọn `uncertain` đúng theo luật prompt "Use uncertain
+when evidence is weak or unrelated". Ở 61 candidate không có telemetry, 3.8 thường trả TRUE_ALERT
+với danh sách evidence rỗng → luật `require_evidence` hạ xuống UNCERTAIN (48 lần). 2.5-flash "đoán"
+tín hiệu này là nhiễu nên bác bỏ nhiều, đúng hướng hơn với dữ liệu nhưng bằng suy diễn chứ không
+nhờ bằng chứng. Hệ quả: hành vi judge phụ thuộc mạnh vào một cột lỗi của dataset — cũng ảnh hưởng
+2.5-flash (33 TRUE_ALERT dựa vào "0%"). Bỏ cột chết khỏi prompt là thay đổi prompt (lệch parity
+G-paper, phải làm lại smoke) ⇒ V20, chờ người dùng.
+
+## 2026-10-20 — QĐ-023. Chốt V19 (judge giữ `gemini-2.5-flash`) và V20 (bỏ metric chết khỏi prompt GĐ2)
+
+**Quyết định (người dùng, 2026-10-20).** Chốt theo khuyến nghị QĐ-022:
+
+- **V20 → `judge.drop_metrics`**: danh sách metric bị bỏ khỏi `metric_snapshot` và `top_features`
+  của prompt (`alert_payload`, `LLMJudge`, registry). Mặc định `[]` = prompt GĐ1 từng byte
+  (G-paper, G-port không đổi). Mọi run GĐ2 có judge thật từ nay đặt
+  `drop_metrics: ["PodSuccessRate(%)"]`. Chỉ thay đổi prompt; retrieval không đổi.
+- **V19 → `gemini-2.5-flash`** tiếp tục là judge GĐ2 (QĐ-021 giữ nguyên), xác nhận bằng smoke
+  sau V20 bên dưới.
+
+**Căn cứ chọn cột (không đụng `test`).** Trên 48.214 cửa sổ dev + val (`iter_telemetry_windows`),
+chỉ `PodSuccessRate(%)` là hằng (luôn 0,0); không metric nào khác hằng. Cột này không bao giờ vào
+`top_features` (IForest không dùng được cột hằng) và không vào truy vấn BM25 (truy vấn lấy các
+metric có |giá trị| lớn nhất).
+
+Bảng QĐ-023-1. Smoke 196 candidate dev (BM25 GĐ2, 8 worker), tập có telemetry, pipeline. Không phải
+kết quả khoa học (21 fault window, CI rộng).
+
+| | 2.5-flash trước | **2.5-flash V20** | 3.8-flash trước | 3.8-flash V20 |
+|---|---|---|---|---|
+| Run | `m3_flash_judge_smoke_v2` | `m4_v20_g25_smoke_v2` | `m4_judge_g38_smoke_v2` | `m4_v20_g38_smoke_v1` |
+| TP / FP / FN | 8 / 25 / 13 | **7 / 1 / 14** | 6 / 40 / 15 | 3 / 0 / 18 |
+| P / R / F1 | 0,242 / 0,381 / 0,296 | **0,875 / 0,333 / 0,483** | 0,130 / 0,286 / 0,179 | 1,000 / 0,143 / 0,250 |
+| F1 CI95 | [0,14; 0,45] | [0,24; 0,69] | [0,06; 0,30] | [0,00; 0,47] |
+| FPR | 0,040 | **0,002** | 0,064 | 0,000 |
+| Verdict thô TRUE / FP / UNC | 40 / 156 / 0 | 12 / 181 / 3 | 94 / 2 / 100 | 4 / 152 / 40 |
+| Hạ cấp do thiếu bằng chứng | 7 | 4 | 48 | 1 |
+| Pha judge / chi phí | 74 s / 0,229 USD | 76 s / 0,232 USD | — / 0,315 USD | 87 s, 3,4 s/lần / 0,332 USD |
+| Verdict thô trùng bản trước | | 165 / 196 | | 15 / 196 |
+
+Nhận xét:
+- Bỏ "0% success" đổi hẳn hành vi 3.8 (trùng bản trước 15/196): giờ bác bỏ nhiều như 2.5 —
+  xác nhận Phát hiện 5 là nguyên nhân. Nhưng 3.8 thận trọng hơn: recall 0,14 so với 0,33.
+- 2.5-flash: 28 TRUE_ALERT trước đây dựa vào "0%" thành FALSE_POSITIVE; FP pipeline 25 → 1,
+  mất 1 TP. 2.5-flash vẫn rẻ hơn, nhanh hơn, recall cao hơn 3.8 ⇒ giữ (V19).
+- Phát hiện 5 hệ quả cho luận văn: một cột lỗi của dataset làm lệch judge mạnh hơn cả việc đổi
+  model; paper (GĐ1) có cùng cột này trong prompt.
+
+**Vấn đề mới (V21).** Câu trả lời JSON hỏng vẫn được ghi vào cache, nên chạy lại với run_id mới
+không hỏi lại (`api_calls: 0` ở `m4_v20_g25_smoke_v2`): 1/196 ở 2.5 V20 (chuỗi bị cắt giữa
+`evidence`), 1/196 ở 3.8 trước. Lỗi HTTP thì không bị cache nên vẫn hỏi lại được. Hiện câu lỗi
+tính là UNCERTAIN/manual review (QĐ-016), không bao giờ thành TRUE_ALERT.
+
+**Kiểm chứng.** Thêm test `drop_metrics` (prompt mặc định vẫn có cột, có `drop_metrics` thì không;
+`top_features` cũng lọc). Docker `--profile dev` chạy: **127 test pass, gồm `tests/test_storage.py`**
+(ClickHouse + Postgres thật; đã cài lại `clickhouse-connect`, `psycopg` có sẵn trong
+`pyproject.toml`; `apply_clickhouse_migrations.py` chạy lại); mypy sạch.
+
+---
+
+## QĐ-024 — V18: quét `k_graph` trên `val` (2026-10-20)
+
+**Thiết lập.** `m4_kgraph_val_k{0,1,2,3}_v1` (config `eval/configs/m4_kgraph_val_k*.yaml`): split
+`val`, C1 window, `engine: vectorized`, `retrieval.workers: 6`, judge **mock** (chỉ để chạy
+pipeline; không dùng số judge). Wall time 8 m 43 s / 7 m 41 s / 7 m 49 s / 7 m 52 s. Chọn bằng
+`py scripts/kgraph_select.py` → `eval/results/m4_kgraph_selection_v2.json` (`_v1` cùng nội dung
+nhưng ghi `NaN` không hợp lệ JSON; giữ nguyên, không ghi đè).
+
+**Kết quả theo tiêu chí đã chốt (proxy root hit).** Tập xét: 109 fault window có telemetry, có
+root label, có retrieval.
+
+Bảng QĐ-024-1. Root hit trong top-6 (`val`, retrieval-only).
+
+| `k_graph` | Root hit | CI95 | s0 = root | s0 ≠ root | Fault window có bằng chứng lân cận | McNemar vs k0 |
+|---|---|---|---|---|---|---|
+| 0 | 109/109 | [1,00; 1,00] | 109/109 | 0/0 | 0 | — |
+| 1 | 109/109 | [1,00; 1,00] | 109/109 | 0/0 | 109 | p = 1 |
+| 2 | 109/109 | [1,00; 1,00] | 109/109 | 0/0 | 109 | p = 1 |
+| 3 | 109/109 | [1,00; 1,00] | 109/109 | 0/0 | 109 | p = 1 |
+
+Quy tắc (hoà ⇒ k nhỏ nhất) cho **`k_graph = 1`**, nhưng **proxy suy biến**: trong nhãn GĐ2,
+mọi fault window đều là cửa sổ của chính service gốc (`service == label_root_cause` ở 209/209
+fault window; nhóm s0 ≠ root rỗng). Bằng chứng local luôn chứa root ⇒ proxy không phân biệt
+được k. Đây là lỗi thiết kế tiêu chí (tôi đề xuất), không phải lỗi code.
+
+**Số đo bổ sung (retrieval-only, có thông tin).** 1.640 candidate không lỗi có telemetry;
+166 trong số đó trùng thời điểm với fault ở service khác.
+
+Bảng QĐ-024-2. Candidate không lỗi (`val`).
+
+| `k_graph` | Có bằng chứng lân cận | Top-6 chứa service gốc đang lỗi cùng lúc (/166) | Tỷ lệ chỗ local trong top-6 |
+|---|---|---|---|
+| 0 | 3 | 0 | 0,997 |
+| 1 | 1.177 | 7 | 0,831 |
+| 2 | 1.177 | 10 | 0,665 |
+| 3 | 1.177 | 16 | 0,499 |
+
+Nhận xét: k tăng chỉ thay chỗ local bằng lân cận; bằng chứng lan truyền thật (root đang lỗi)
+rất hiếm (≤ 16/166 = 9,6%) vì root đồng thời thường không phải lân cận hoặc không có telemetry.
+Ảnh hưởng thật của k lên FP/recall chỉ đo được bằng judge thật.
+
+**Trạng thái.** Đã chốt (a) (người dùng, 2026-10-20): **`k_graph = 1`** cho C1-quota ở H0. Luận
+văn phải ghi rõ proxy suy biến; ảnh hưởng thật của k đo ở H0 (C1-paper k = 0 vs C1-quota k = 1).
+Sửa kèm: `summarize` ghi `null` thay `NaN`, `kgraph_select.py` dùng `allow_nan=False`.

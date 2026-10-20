@@ -28,6 +28,17 @@ topology_aware_retriever.py, fusion_ranker.py, topology_candidate_expander.py):
 
 `origin` (QD-021, V14): "local" when the event is at s0 (d_G = 0), otherwise
 "graph"; which channel found it (bm25 / graph) is in `debug["source_flags"]`.
+
+`k_graph` (QD-022, V16 (b) -- "C1-quota"): after ranking the whole pool by the
+Fusion Score, the top-k must hold at least min(k_graph, available) events with
+origin "graph" -- the best-scoring ones; the remaining slots go to the best
+events of any origin; the selection keeps Fusion Score order. `k_graph = 0`
+(default) is C1-paper exactly.
+
+`engine` (QD-022, V17): "vectorized" (default) runs `bm25_pool: window` on
+`window_index.WindowIndex` -- identical output, ~10x faster; "reference" is
+the original pure-Python path, kept as fallback and test oracle. `global`
+always uses the reference path.
 """
 
 from __future__ import annotations
@@ -38,6 +49,8 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any, Literal
+
+import numpy as np
 
 from packages.graph.service_graph import ServiceGraph, load_graph
 from packages.schemas.evidence import EvidenceDoc
@@ -51,13 +64,14 @@ from services.retrieval.bm25_hybrid import (
     estimate_tokens,
     tokenize,
 )
+from services.retrieval.window_index import WindowIndex, to_us
 
 EPSILON = 1e-9
 
 
 @dataclass
 class _Candidate:
-    item: _Indexed
+    doc: EvidenceDoc
     bm25_raw: float
     graph_distance: int | None
     source_flags: set[str] = field(default_factory=set)
@@ -99,11 +113,17 @@ class HybridBm25GraphRetriever:
         window_seconds: int = 60,
         bm25_pool: Literal["window", "global"] = "window",
         extra_query_terms: Callable[[AlertCandidate], Sequence[str]] | None = None,
+        k_graph: int = 0,
+        engine: Literal["vectorized", "reference"] = "vectorized",
     ) -> None:
         if min(alpha, beta, gamma) < 0 or not math.isclose(alpha + beta + gamma, 1.0, abs_tol=1e-9):
             raise ValueError("alpha, beta, gamma must be >= 0 and sum to 1")
         if tau_seconds <= 0:
             raise ValueError("tau_seconds must be positive")
+        if k_graph < 0:
+            raise ValueError("k_graph must be >= 0")
+        if engine not in {"vectorized", "reference"}:
+            raise ValueError(f"unknown engine {engine!r}")
         self.store = store
         self.graph = graph or load_graph()
         self.alpha, self.beta, self.gamma = alpha, beta, gamma
@@ -115,8 +135,11 @@ class HybridBm25GraphRetriever:
         self.window = timedelta(seconds=window_seconds)
         self.bm25_pool = bm25_pool
         self.extra_query_terms = extra_query_terms
+        self.k_graph = k_graph
+        self.engine = engine
         self._global: _Corpus | None = None
         self._indexed: dict[str, _Indexed] = {}
+        self._window_index: WindowIndex | None = None
 
     def _item(self, doc: EvidenceDoc) -> _Indexed:
         item = self._indexed.get(doc.doc_id)
@@ -146,32 +169,34 @@ class HybridBm25GraphRetriever:
         query = build_query(candidate, extra)
         near = self.graph.distances(candidate.service, self.graph_max_distance)
         all_distances = self.graph.distances(candidate.service)
-        corpus = self._corpus(lo, hi, set(near) or {candidate.service})
-        query_tokens = tokenize(query)
+        reachable = set(near) or {candidate.service}
+        if self.bm25_pool == "window" and self.engine == "vectorized":
+            lexical, expanded, corpus_size = self._gather_vectorized(query, near, reachable, lo, hi, t0)
+        else:
+            lexical, expanded, corpus_size = self._gather_reference(query, near, reachable, lo, hi, t0)
 
         pool: dict[str, _Candidate] = {}
-        lexical = corpus.search(query, top_n=self.bm25_k) if self.bm25_k > 0 else []
-        for _, bm25, item in lexical:
-            entry = pool.get(item.doc.doc_id)
+        for doc, bm25 in lexical:
+            entry = pool.get(doc.doc_id)
             if entry is None:
-                pool[item.doc.doc_id] = _Candidate(item, bm25, all_distances.get(item.doc.service), {"bm25"})
+                pool[doc.doc_id] = _Candidate(doc, bm25, all_distances.get(doc.service), {"bm25"})
             else:
                 entry.source_flags.add("bm25")
-        expanded = self._expand(corpus, near, lo, hi, t0)
-        for item, distance in expanded:
-            entry = pool.get(item.doc.doc_id)
+        for doc, distance, bm25 in expanded:
+            entry = pool.get(doc.doc_id)
             if entry is None:
-                pool[item.doc.doc_id] = _Candidate(item, corpus._bm25(query_tokens, item), distance, {"graph"})
+                pool[doc.doc_id] = _Candidate(doc, bm25, distance, {"graph"})
             else:
                 entry.source_flags.add("graph")
                 entry.graph_distance = distance if entry.graph_distance is None else min(entry.graph_distance, distance)
 
-        ranked = self._rank(list(pool.values()), t0, budget.top_k)
+        ranked_all = self._rank(list(pool.values()), t0, budget.top_k)
+        ranked, promoted = self._select(ranked_all, budget.top_k, candidate.service)
         events: list[ContextEvent] = []
         tokens = 0
         truncated = False
         for rank, entry in enumerate(ranked, start=1):
-            cost = estimate_tokens(entry.item.doc.message[:240])
+            cost = estimate_tokens(entry.doc.message[:240])
             if events and tokens + cost > budget.max_tokens:
                 truncated = True
                 break
@@ -187,7 +212,8 @@ class HybridBm25GraphRetriever:
             debug={
                 "query": query,
                 "bm25_pool": self.bm25_pool,
-                "pool_corpus_size": len(corpus.items),
+                "engine": self.engine if self.bm25_pool == "window" else "reference",
+                "pool_corpus_size": corpus_size,
                 "bm25_candidates": len(lexical),
                 "graph_candidates": len(expanded),
                 "candidate_pool_size": len(pool),
@@ -195,9 +221,69 @@ class HybridBm25GraphRetriever:
                 "reachable_services": len(near),
                 "weights": {"alpha": self.alpha, "beta": self.beta, "gamma": self.gamma},
                 "tau_seconds": self.tau_seconds,
+                "k_graph": self.k_graph,
+                "quota_promoted": promoted,
                 "timeout_exceeded": latency > budget.timeout_ms,
             },
         )
+
+    def _gather_reference(
+        self, query: str, near: dict[str, int], reachable: set[str], lo: datetime, hi: datetime, t0: datetime
+    ) -> tuple[list[tuple[EvidenceDoc, float]], list[tuple[EvidenceDoc, int, float]], int]:
+        """Lexical top-`bm25_k` (doc, bm25) and graph expansion (doc, d, bm25) -- pure Python."""
+        corpus = self._corpus(lo, hi, reachable)
+        query_tokens = tokenize(query)
+        lexical = (
+            [(item.doc, bm25) for _, bm25, item in corpus.search(query, top_n=self.bm25_k)] if self.bm25_k > 0 else []
+        )
+        expanded = [
+            (item.doc, distance, corpus._bm25(query_tokens, item))
+            for item, distance in self._expand(corpus, near, lo, hi, t0)
+        ]
+        return lexical, expanded, len(corpus.items)
+
+    def _gather_vectorized(
+        self, query: str, near: dict[str, int], reachable: set[str], lo: datetime, hi: datetime, t0: datetime
+    ) -> tuple[list[tuple[EvidenceDoc, float]], list[tuple[EvidenceDoc, int, float]], int]:
+        """Same output as `_gather_reference` for bm25_pool='window', on WindowIndex."""
+        if self._window_index is None:
+            self._window_index = WindowIndex(self.store)
+        index = self._window_index
+        found = index.search(lo, hi, reachable, query, self.bm25_k if self.bm25_k > 0 else 0)
+        docs = found.docs
+        lexical = [(docs[i], float(found.bm25[i])) for i in found.top]
+        expanded: list[tuple[EvidenceDoc, int, float]] = []
+        limit = self.graph_per_service_limit
+        if near and limit > 0 and docs:
+            # Every doc of the window corpus is in a reachable service and in [lo, hi].
+            dt = np.abs(found.ts - to_us(t0))
+            for service, distance in near.items():
+                sid = index.services.get(service)
+                if sid is None:
+                    continue
+                rows = np.flatnonzero(found.svc == sid)
+                if len(rows) > limit:
+                    kth = np.partition(dt[rows], limit - 1)[limit - 1]
+                    rows = rows[dt[rows] <= kth]
+                best = sorted(rows.tolist(), key=lambda i: (int(dt[i]), docs[i].doc_id))[:limit]
+                expanded.extend((docs[i], distance, float(found.bm25[i])) for i in best)
+            expanded.sort(key=lambda e: (e[1], abs((e[0].ts - t0).total_seconds()), e[0].doc_id))
+        return lexical, expanded, len(docs)
+
+    def _select(self, ranked: list[_Candidate], top_k: int, s0: str) -> tuple[list[_Candidate], int]:
+        """Top-k with at least min(k_graph, available) origin-"graph" events (C1-quota).
+        Returns the selection in Fusion Score order and how many events the quota promoted."""
+        plain = ranked[: max(top_k, 0)]
+        if self.k_graph <= 0 or top_k <= 0:
+            return plain, 0
+        graph = [c for c in ranked if c.doc.service != s0]
+        reserved = graph[: min(self.k_graph, top_k)]
+        taken = {id(c) for c in reserved}
+        rest = [c for c in ranked if id(c) not in taken][: top_k - len(reserved)]
+        taken.update(id(c) for c in rest)
+        selected = [c for c in ranked if id(c) in taken]
+        plain_ids = {id(c) for c in plain}
+        return selected, sum(1 for c in selected if id(c) not in plain_ids)
 
     def _expand(
         self, corpus: _Corpus, near: dict[str, int], lo: datetime, hi: datetime, t0: datetime
@@ -218,14 +304,14 @@ class HybridBm25GraphRetriever:
         return chosen
 
     def _rank(self, pool: list[_Candidate], t0: datetime, top_k: int) -> list[_Candidate]:
-        """GD1 FusionRanker.rank."""
+        """GD1 FusionRanker.rank, returning the whole ranked pool (callers cut to top-k)."""
         if top_k <= 0 or not pool:
             return []
         low = min(c.bm25_raw for c in pool)
         high = max(c.bm25_raw for c in pool)
         for c in pool:
             c.bm25_norm = _normalize(c.bm25_raw, low, high)
-            c.time_sim = _clamp01(math.exp(-abs((c.item.doc.ts - t0).total_seconds()) / self.tau_seconds))
+            c.time_sim = _clamp01(math.exp(-abs((c.doc.ts - t0).total_seconds()) / self.tau_seconds))
             c.graph_sim = 0.0 if c.graph_distance is None else _clamp01(1.0 / (1.0 + c.graph_distance))
             c.score_final = _clamp01(self.alpha * c.bm25_norm + self.beta * c.time_sim + self.gamma * c.graph_sim)
         pool.sort(
@@ -234,14 +320,14 @@ class HybridBm25GraphRetriever:
                 -c.bm25_norm,
                 -c.time_sim,
                 c.graph_distance if c.graph_distance is not None else 10**9,
-                c.item.doc.doc_id,
+                c.doc.doc_id,
             )
         )
-        return pool[:top_k]
+        return pool
 
 
 def _event(rank: int, c: _Candidate, start: datetime, end: datetime, s0: str) -> ContextEvent:
-    doc = c.item.doc
+    doc = c.doc
     if start <= doc.ts <= end:
         time_distance = 0.0
     else:

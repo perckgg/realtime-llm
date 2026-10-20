@@ -6,7 +6,7 @@
 
 ---
 
-## Trạng thái — 2026-10-19
+## Trạng thái — 2026-10-20
 
 | Mốc | Trạng thái | Báo cáo / quyết định |
 |---|---|---|
@@ -14,7 +14,7 @@
 | M1 | QUA | `docs/milestones/M1-detector-bm25-judge.md`; QĐ-015..017 |
 | M2 | QUA | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
 | M3 | **QUA** (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
-| M4 | **Chưa mở — chờ V16, V17** | Mục dưới |
+| M4 | **ĐANG LÀM** — V16 (b), V17 (a), V18 (a, `k_graph = 1`), V19, V20 đã chốt; tiếp theo ablation α/β/γ, H0 | Nháp `docs/milestones/M4-h0.md`; QĐ-022..024; mục dưới |
 
 M3 tóm tắt: đồ thị trùng GĐ1 (68/68 cạnh); C1 đã port; **G-paper đạt cả hai biến thể**
 (BM25 F1 0,7030 / FP 7, Topology F1 0,4759 / FP 137, cache hit 489/489, không gọi API); judge
@@ -23,30 +23,46 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 
 ---
 
-## Mốc tiếp theo: M4 — H0: tái lập vấn đề trên split GĐ2
-## Dự kiến bắt đầu: khi chốt V16, V17
+## Mốc hiện tại: M4 — H0: tái lập vấn đề trên split GĐ2
+## Mở 2026-10-20 (QĐ-022)
 
-### Việc (dự kiến, chi tiết ở báo cáo M3 §4)
+### Việc (chi tiết ở báo cáo M3 §4; tiến độ ở nháp `docs/milestones/M4-h0.md`)
 
-1. - [ ] V17: tăng tốc retrieval C1 (mục tiêu < 0,5 s/lần, giữ ngữ nghĩa)
-2. - [ ] Nếu V16 (b): `k_graph` (quota bằng chứng lân cận) trong C1 + test; chọn `k_graph` trên `val`
-3. - [ ] Ablation retrieval-only lưới α, β, γ trên `val` (gồm β = 1, γ = 1)
-4. - [ ] H0 trên `val` (tập có telemetry, `gemini-2.5-flash`): BM25, C1-paper, (C1-quota), LLM-không-RAG, detector-only; CI + McNemar; ngân sách toàn bộ + 120
-5. - [ ] Nháp chương "Bài toán" từ paper + Phát hiện 1–4
+1. - [x] V17: engine `vectorized` + `retrieval.workers` — 196/196 top-6 trùng từng bit; 593 s → 88 s (6 process, ≈ 0,45 s/lần); một run `val` judge mock ≈ 8 phút; dự phòng `engine: reference` (QĐ-022)
+2. - [x] V16 (b): `k_graph` đã cài + test (k ≥ 1 ⇒ 68,9% prompt có bằng chứng lân cận, k = 0: 0%); quét `val` k = 0..3 (QĐ-024) ⇒ **`k_graph = 1`** (V18 (a))
+3. - [ ] Ablation retrieval-only lưới α, β, γ trên `val` (gồm β = 1, γ = 1) — chỉ số chờ V22
+4. - [ ] H0 trên `val` (tập có telemetry, `gemini-2.5-flash`, `drop_metrics: ["PodSuccessRate(%)"]` — QĐ-023): BM25, C1-paper (`k_graph = 0`), C1-quota (`k_graph = 1`), LLM-không-RAG, detector-only; CI + McNemar; ngân sách toàn bộ + 120; ≈ 8–10 USD
+5. - [ ] Nháp chương "Bài toán" từ paper + Phát hiện 1–5
 
 ### Vấn đề cần chốt
 
 | # | Vấn đề | Khuyến nghị | Chặn gì |
 |---|---|---|---|
-| **V16** | C1 đúng paper không đưa bằng chứng lân cận vào prompt trên dữ liệu đầy đủ (điểm hạng 6 local 0,84 > tối đa lân cận 0,80) | (b): giữ C1-paper làm baseline + thêm C1-quota (`k_graph` chỗ cho bằng chứng d ≥ 1) làm tầng 2 của CTAV; báo cáo trung thực cả hai | **H0 / M4** |
-| **V17** | C1 chậm (~2,9 s/lần ⇒ ~85 phút retrieval mỗi run `val`) | (a): cache thống kê token theo file, BM25 numpy sparse, song song theo process | Thời gian M4 |
-| V1 | Mail GVHD — bản cập nhật đã soạn: `docs/drafts/2026-10-19-mail-gvhd-ctav.md` (kèm Phát hiện 1–4, V16, judge mới) | Bạn đọc, sửa và gửi trước M4 | Nên |
+| ~~V18~~ | Đã chốt (a) (2026-10-20, QĐ-024): **`k_graph = 1`** theo quy tắc hoà ⇒ k nhỏ nhất; proxy suy biến (fault window luôn là cửa sổ của service gốc), ghi rõ trong luận văn | Ảnh hưởng thật của k lên FP/recall đo ở H0 (C1-paper k = 0 vs C1-quota k = 1) | |
+| ~~V19~~ | Đã chốt (2026-10-20, QĐ-023): giữ `gemini-2.5-flash` | Sau V20: 2.5 F1 0,48 / FP 1; 3.8 F1 0,25 / FP 0 (recall 0,14) | |
+| ~~V20~~ | Đã chốt (QĐ-023): `judge.drop_metrics: ["PodSuccessRate(%)"]` cho mọi run GĐ2 có judge thật; mặc định `[]` = prompt GĐ1 (G-paper) | Smoke 2.5-flash: FP 25 → 1, F1 0,30 → 0,48 | |
+| V21 | Câu trả lời JSON hỏng bị ghi vào cache ⇒ chạy lại không hỏi lại được (1/196 mỗi smoke) | (a) giữ như hiện tại: tính UNCERTAIN/manual review, báo cáo tỷ lệ; (b) không cache JSON hỏng — đổi hành vi cache (QĐ-013) | Không (nhỏ) |
+| V22 | Chỉ số cho ablation α/β/γ: root hit đã suy biến (QĐ-024) | (a) tỷ lệ bằng chứng lân cận + "root đang lỗi cùng lúc" trong top-6 của candidate không lỗi; (b) bỏ ablation retrieval-only, đo bằng judge ở M6 — khuyến nghị (a) | Việc 3 |
+| ~~V16~~ | Đã chốt (b) — QĐ-022 | C1-paper baseline + C1-quota `k_graph`; dự phòng (a)/(c) | |
+| ~~V17~~ | Đã chốt (a) — QĐ-022 | `engine: vectorized`, dự phòng `reference`, `retrieval.workers` | |
+| ~~V1~~ | Đã gửi (2026-10-20) | | |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
 ---
 
-## Ghi chú bàn giao — dừng phiên 2026-10-19, làm tiếp từ đây
+## Ghi chú bàn giao — phiên 2026-10-20
+
+**Trạng thái:** M4 đã mở; nháp báo cáo `docs/milestones/M4-h0.md`. V16 (b) và V17 (a) đã cài, test, đo (QĐ-022, kèm bảng phương án dự
+phòng). V19, V20 đã chốt (QĐ-023); V18 đã chốt (a): `k_graph = 1` (QĐ-024, `m4_kgraph_val_k*_v1`). Docker `--profile dev` cần chạy cho `tests/test_storage.py`.
+**Chưa commit** (người dùng hoãn) — nên commit trước H0.
+Test: 131 pass (gồm `test_storage`, `test_window_index`, `test_kgraph_select`).
+Chi phí API phiên 2026-10-20 ≈ 1,2 USD (probe 5 lần, smoke 3.8 ≈ 0,315, 3.6 ≈ 0,33, V20: 2.5 ≈ 0,23, 3.8 ≈ 0,33); quét V18 dùng judge mock (0 USD).
+Config mới: `m4_c1_vec_smoke.yaml` (V17, judge mock), `m4_judge_g36_smoke.yaml`,
+`m4_judge_g38_smoke.yaml`, `m4_v20_g25_smoke.yaml`, `m4_v20_g38_smoke.yaml`, `m4_kgraph_val_k{0..3}.yaml` (V18, judge mock). Đo retrieval: `py scripts/retrieval_bench.py run --config ... --name ... --set k_graph=1`.
+Chọn k: `scripts/kgraph_select.py` + `eval/harness/kgraph.py`.
+
+## Ghi chú bàn giao — dừng phiên 2026-10-19
 
 **Trạng thái:** M0–M3 đã đóng; M4 chưa mở. Phiên kế tiếp bắt đầu bằng việc người dùng chốt
 **V16** (C1-quota hay giữ đúng paper) và **V17** (tăng tốc C1) — xem bảng trên và
@@ -81,6 +97,15 @@ khảo sát M3 (QĐ-020) · `5595e61` M3 (QĐ-021) · commit bàn giao này.
 - V17 gợi ý: nút thắt là BM25 thuần Python trên pool trung vị ~147 nghìn event/truy vấn.
 
 ---
+
+## Lệnh tái lập M4 (tới nay)
+
+```bash
+py -m eval run --config eval/configs/m4_c1_vec_smoke.yaml          # V17, run_id mới
+py -m eval run --config eval/configs/m4_v20_g25_smoke.yaml         # V20, cần GEMINI_API_KEY
+py -m eval run --config eval/configs/m4_kgraph_val_k0.yaml         # V18: k0..k3, ~8 phút/run
+py scripts/kgraph_select.py --runs 0=m4_kgraph_val_k0_v1,1=m4_kgraph_val_k1_v1,2=m4_kgraph_val_k2_v1,3=m4_kgraph_val_k3_v1 --out <file-mới>.json
+```
 
 ## Lệnh tái lập M3
 

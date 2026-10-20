@@ -1,0 +1,20 @@
+63a9176ffb44bce9f649f6d77fd25c536e4bac6d
+modified tracked files at run time:
+  docs/CURRENT-MILESTONE.md
+  docs/Final_Thesis_Phase2/01-architecture-design.md
+  docs/Final_Thesis_Phase2/03-schemas-and-contracts.md
+  docs/experiment-log.md
+  eval/README.md
+  eval/harness/runner.py
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  packages/schemas/evidence.py
+  services/judge/README.md
+  services/judge/backends.py
+  services/judge/llm_judge.py
+  services/judge/prompt.py
+  services/judge/registry.py
+  services/retrieval/hybrid_bm25_graph.py
+  tests/test_judge.py

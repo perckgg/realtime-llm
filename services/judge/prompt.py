@@ -8,6 +8,7 @@ GD1's cache). Only the adapters from GD2 objects to GD1's dict shapes live here.
 from __future__ import annotations
 
 import json
+from collections.abc import Collection
 from typing import Any
 
 from packages.schemas.evidence import isoformat
@@ -67,10 +68,14 @@ def compose_prompt(alert: dict[str, Any], contexts: list[dict[str, Any]]) -> str
     return json.dumps(payload, separators=(",", ":"), ensure_ascii=True)
 
 
-def alert_payload(candidate: AlertCandidate) -> dict[str, Any]:
+def alert_payload(candidate: AlertCandidate, drop_metrics: Collection[str] = ()) -> dict[str, Any]:
     """GD2 AlertCandidate -> GD1 alert fields. GD1 rounded the score and
-    metric values to 4 decimals (legacy/src/detectors, raw_metric_snapshot)."""
+    metric values to 4 decimals (legacy/src/detectors, raw_metric_snapshot).
+
+    `drop_metrics` (QD-023, V20) leaves those metrics out of `metric_snapshot`
+    and `top_features`; empty keeps GD1's prompt byte for byte (G-paper)."""
     end = candidate.end_ts
+    drop = set(drop_metrics)
     return {
         "alert_id": candidate.candidate_id,
         "time_window": {
@@ -80,8 +85,10 @@ def alert_payload(candidate: AlertCandidate) -> dict[str, Any]:
         "node_id": candidate.pod or candidate.service,
         "service_id": candidate.service,
         "anomaly_score": round(candidate.anomaly_score, 4),
-        "metric_snapshot": {name: round(value, 4) for name, value in candidate.metric_snapshot.items()},
-        "top_features": list(candidate.top_features),
+        "metric_snapshot": {
+            name: round(value, 4) for name, value in candidate.metric_snapshot.items() if name not in drop
+        },
+        "top_features": [name for name in candidate.top_features if name not in drop],
     }
 
 

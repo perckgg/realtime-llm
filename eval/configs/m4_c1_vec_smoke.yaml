@@ -1,0 +1,41 @@
+# QĐ-022 (V17): như m3_c1_window_smoke nhưng engine vectorized + retrieval song song 6 process.
+# Kiểm tra: retrieval/quyết định phải trùng từng event với m3_c1_window_smoke_v1. Judge mock.
+run_id: m4_c1_vec_smoke_v1
+seed: 42
+split: dev
+n_windows: 1000
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+
+retrieval:
+  type: hybrid_bm25_graph
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  workers: 6
+  params:
+    bm25_pool: window
+    alpha: 0.35
+    beta: 0.25
+    gamma: 0.40
+    tau_seconds: 300
+    bm25_k: 60
+    graph_max_distance: 2
+    graph_per_service_limit: 20
+    time_margin_minutes: 8
+    engine: vectorized
+    k_graph: 0
+
+judge:
+  backend: mock
+

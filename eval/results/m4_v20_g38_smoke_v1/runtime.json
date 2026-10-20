@@ -1,0 +1,16 @@
+{
+  "run_id": "m4_v20_g38_smoke_v1",
+  "finished_at": "2026-10-20T05:22:34.769013+00:00",
+  "wall_seconds": 192.6,
+  "detector_fit_seconds": 27.8,
+  "replay_and_retrieval_seconds": 77.7,
+  "judge_seconds": 87.1,
+  "judge_workers": 8,
+  "retrieval_workers": 1,
+  "evaluated_windows": 1000,
+  "llm_calls": 196,
+  "api_calls": 196,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "gemini-3.8-flash",
+  "judge_errors": 0
+}

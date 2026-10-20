@@ -1,0 +1,16 @@
+{
+  "run_id": "m4_v20_g25_smoke_v1",
+  "finished_at": "2026-10-20T05:19:19.348722+00:00",
+  "wall_seconds": 186.7,
+  "detector_fit_seconds": 28.2,
+  "replay_and_retrieval_seconds": 82.5,
+  "judge_seconds": 75.8,
+  "judge_workers": 8,
+  "retrieval_workers": 1,
+  "evaluated_windows": 1000,
+  "llm_calls": 196,
+  "api_calls": 196,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 1
+}

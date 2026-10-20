@@ -7,6 +7,7 @@
       require_evidence: true
       confidence_threshold: 0.80
       repeat: 0
+      drop_metrics: []         # QD-023 (V20): metrics left out of the prompt; [] = GD1 prompt
       max_calls_per_minute: 200   # shared by all workers (QD-019)
       workers: 8                  # parallel judge threads in the harness (QD-019)
       cache_path: data/llm_cache/gemini.jsonl
@@ -56,4 +57,5 @@ def build_judge(config: Mapping[str, Any]) -> LLMJudge:
         require_evidence=bool(config.get("require_evidence", True)),
         confidence_threshold=None if threshold is None else float(threshold),
         repeat=int(config.get("repeat", 0)),
+        drop_metrics=[str(name) for name in config.get("drop_metrics") or []],
     )

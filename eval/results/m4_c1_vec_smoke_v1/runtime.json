@@ -1,0 +1,16 @@
+{
+  "run_id": "m4_c1_vec_smoke_v1",
+  "finished_at": "2026-10-20T04:40:04.937920+00:00",
+  "wall_seconds": 122.1,
+  "detector_fit_seconds": 34.1,
+  "replay_and_retrieval_seconds": 87.9,
+  "judge_seconds": 0.0,
+  "judge_workers": 8,
+  "retrieval_workers": 6,
+  "evaluated_windows": 1000,
+  "llm_calls": 196,
+  "api_calls": 0,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "mock",
+  "judge_errors": 0
+}

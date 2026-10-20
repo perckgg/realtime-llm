@@ -5,7 +5,8 @@
 Replays Nezha in time order through detector -> gate -> retrieval -> judge
 in two phases (QD-019): (1) sequential replay -- detector (stateful), gate and
 budget (depend only on candidate order), retrieval (CPU-bound, keeps the
-evidence LRU warm); (2) the judge calls, which are network-bound, run on
+evidence LRU warm; with `retrieval.workers` > 1 it runs after the replay on
+that many processes, in contiguous time-ordered chunks -- QD-022); (2) the judge calls, which are network-bound, run on
 `judge.workers` threads (default 8) sharing the backend's rate limiter.
 Results are written in candidate order, so the output does not depend on the
 number of workers. It writes the six files of 02 SS3.3 (plus `judged.jsonl`) to
@@ -40,7 +41,7 @@ import json
 import subprocess
 import time
 from collections.abc import Iterable, Sequence
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -211,6 +212,38 @@ def judge_all(
         return list(pool.map(lambda job: judge.evaluate(*job), jobs))
 
 
+_WORKER: dict[str, Any] = {}
+
+
+def _init_retrieval_worker(retrieval_config: dict[str, Any]) -> None:
+    _WORKER["strategy"] = build_strategy(retrieval_config, NezhaEvidenceStore())
+    _WORKER["budget"] = build_budget(retrieval_config)
+
+
+def _retrieve_chunk(candidates: list[AlertCandidate]) -> list[RetrievalResult]:
+    return [_WORKER["strategy"].retrieve(c, _WORKER["budget"]) for c in candidates]
+
+
+def retrieve_all(
+    retrieval_config: dict[str, Any], candidates: Sequence[AlertCandidate], workers: int
+) -> list[RetrievalResult]:
+    """Retrieval for every candidate on `workers` processes (QD-022, V17), in input order.
+
+    Candidates are cut into contiguous, time-ordered chunks so each process keeps
+    its evidence LRU warm. Retrieval is a pure function of (candidate, evidence),
+    so the output equals the sequential run; only `latency_ms` (measured inside
+    a loaded machine) differs."""
+    if not candidates:
+        return []
+    n_chunks = min(len(candidates), workers * 4)
+    size = -(-len(candidates) // n_chunks)
+    chunks = [list(candidates[i : i + size]) for i in range(0, len(candidates), size)]
+    with ProcessPoolExecutor(
+        max_workers=workers, initializer=_init_retrieval_worker, initargs=(retrieval_config,)
+    ) as pool:
+        return [result for part in pool.map(_retrieve_chunk, chunks) for result in part]
+
+
 def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
     run_id = str(config["run_id"])
     out_dir = results_root / run_id
@@ -238,6 +271,9 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
     full = config.get("stages", "full") == "full"
     retrieval_config = dict(config.get("retrieval") or {"type": "none"})
     parity_terms = bool(retrieval_config.pop("parity_query_terms", False))
+    retrieval_workers = int(retrieval_config.get("workers", 1))
+    if retrieval_workers > 1 and (parity_terms or (config.get("evidence") or {}).get("store", "nezha") != "nezha"):
+        raise ValueError("retrieval.workers > 1 needs the Nezha evidence store and no parity_query_terms")
     query_terms: dict[str, list[str]] = {}
     if full:
         strategy = build_strategy(retrieval_config, _evidence(config, nezha))
@@ -252,6 +288,7 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
 
     rows: list[dict[str, Any]] = []
     jobs: list[tuple[AlertCandidate, RetrievalResult]] = []
+    pending: list[AlertCandidate] = []
     job_rows: list[dict[str, Any]] = []
     out_dir.mkdir(parents=True)
     replay = NezhaReplaySource(
@@ -277,12 +314,17 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
                     "anomaly" if score >= threshold else "normal",
                     label.fault_type if label.is_fault else "none",
                 ]
-                jobs.append((candidate, strategy.retrieve(candidate, budget)))
+                if retrieval_workers > 1:
+                    pending.append(candidate)
+                else:
+                    jobs.append((candidate, strategy.retrieve(candidate, budget)))
                 job_rows.append(row)
                 gate.calls += 1
         row["gate_action"] = gate_action
         row["decision"] = _decision(gate_action, gate, None)
         rows.append(row)
+    if pending:
+        jobs = list(zip(pending, retrieve_all(retrieval_config, pending, retrieval_workers), strict=True))
     replay_seconds = time.perf_counter() - started
 
     # Phase 2: judge calls in parallel; written back in candidate order.
@@ -316,6 +358,7 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
         "replay_and_retrieval_seconds": round(replay_seconds - fit_seconds, 1),
         "judge_seconds": round(judge_seconds, 1),
         "judge_workers": workers,
+        "retrieval_workers": retrieval_workers,
         "evaluated_windows": len(rows),
         "llm_calls": metrics["all"]["operations"]["llm_calls"],
         "api_calls": metrics["all"]["operations"]["api_calls"],

@@ -43,6 +43,10 @@ PAPER_MODEL = "gemini-2.5-flash-lite"  # QD-013; the paper's cache (G-paper) onl
 PRICES_PER_1M = {
     "gemini-2.5-flash-lite": (0.10, 0.40),
     "gemini-2.5-flash": (0.30, 2.50),
+    # QD-022: third-party price trackers, 2026-10-20 (introductory until 2026-12-31,
+    # expected to double in 2027) -- not from Google's page; estimates only.
+    "gemini-3.6-flash": (0.75, 3.75),
+    "gemini-3.8-flash": (0.75, 3.75),
 }
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
