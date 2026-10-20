@@ -179,3 +179,29 @@ def test_invalid_engine_and_k_graph():
         HybridBm25GraphRetriever(InMemoryEvidenceStore([]), graph=_graph(), k_graph=-1)
     with pytest.raises(ValueError):
         HybridBm25GraphRetriever(InMemoryEvidenceStore([]), graph=_graph(), engine="fast")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("weights", [(0.35, 0.25, 0.40), (1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)])
+@pytest.mark.parametrize("k_graph", [0, 1, 3])
+def test_reweighted_pool_equals_fresh_retriever(weights, k_graph):
+    """Fusion ablation (QD-025): one pool re-ranked per grid point == retrieve() with those weights."""
+    store = _random_store(7)
+    args = {"graph": _graph(), "graph_per_service_limit": 5, "bm25_k": 12}
+    base = HybridBm25GraphRetriever(store, **args)
+    alpha, beta, gamma = weights
+    fresh = HybridBm25GraphRetriever(store, alpha=alpha, beta=beta, gamma=gamma, k_graph=k_graph, **args)
+    variant = base.reweighted(alpha, beta, gamma, k_graph)
+    for service, minute in (("cart", 10), ("redis", 20), ("lonely", 12)):
+        candidate = _candidate(service, minute, ["latency", "cpu"])
+        pool = base.build_pool(candidate)
+        variant.top_events(pool, RetrievalBudget(top_k=6))  # re-ranking the same pool twice is harmless
+        events = variant.top_events(pool, RetrievalBudget(top_k=6))[0]
+        expected = fresh.retrieve(candidate, RetrievalBudget(top_k=6)).events
+        assert [(e.event_id, e.score, e.origin, e.debug) for e in events] == [
+            (e.event_id, e.score, e.origin, e.debug) for e in expected
+        ]
+    assert (base.alpha, base.k_graph) == (0.35, 0)
+    with pytest.raises(ValueError):
+        base.reweighted(0.5, 0.5, 0.5, 0)
+    with pytest.raises(ValueError):
+        base.reweighted(1.0, 0.0, 0.0, -1)

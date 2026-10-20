@@ -1,0 +1,22 @@
+{
+  "windows": 28898,
+  "candidates": 5677,
+  "grid_points": 32,
+  "workers": 6,
+  "replay_seconds": 286.6,
+  "rank_seconds": 258.8,
+  "verify_against": {
+    "m4_kgraph_val_k0_v1": {
+      "point": "a0.35_b0.25_g0.4_k0",
+      "identical": 5677,
+      "different": 0,
+      "missing": 0
+    },
+    "m4_kgraph_val_k1_v1": {
+      "point": "a0.35_b0.25_g0.4_k1",
+      "identical": 5677,
+      "different": 0,
+      "missing": 0
+    }
+  }
+}

@@ -1,0 +1,8 @@
+4695008c4151ed73fd612a964e5516b17ea8b869
+modified tracked files at run time:
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  services/retrieval/hybrid_bm25_graph.py
+  tests/test_window_index.py

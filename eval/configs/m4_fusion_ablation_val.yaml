@@ -1,0 +1,52 @@
+# QĐ-025 (M4 việc 3, V22 (a)): ablation retrieval-only của C1 — lưới α, β, γ × k_graph trên val.
+# Không gọi LLM. Pool dựng một lần mỗi candidate, xếp hạng lại cho từng điểm lưới.
+# Chạy: py scripts/fusion_ablation.py --config eval/configs/m4_fusion_ablation_val.yaml
+run_id: m4_fusion_ablation_val_v1
+stages: retrieval_only
+seed: 42
+split: val
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+
+retrieval:
+  type: hybrid_bm25_graph
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  workers: 6
+  params:
+    bm25_pool: window
+    alpha: 0.35
+    beta: 0.25
+    gamma: 0.40
+    tau_seconds: 300
+    bm25_k: 60
+    graph_max_distance: 2
+    graph_per_service_limit: 20
+    time_margin_minutes: 8
+    engine: vectorized
+    k_graph: 0
+
+ablation:
+  # Lưới đơn hình bước 0,25 (15 điểm, gồm lexical-only (1,0,0), temporal-only (0,1,0), graph-only (0,0,1))
+  # + trọng số paper; mỗi điểm với k_graph = 0 (C1-paper) và 1 (C1-quota, QĐ-024).
+  grid_step: 0.25
+  extra_points:
+    - [0.35, 0.25, 0.40]
+  k_graph: [0, 1]
+  # Giữ event id ở trọng số paper để đối chiếu từng event với run harness V18.
+  keep_ids_for:
+    - [0.35, 0.25, 0.40]
+  verify_against:
+    0: m4_kgraph_val_k0_v1
+    1: m4_kgraph_val_k1_v1

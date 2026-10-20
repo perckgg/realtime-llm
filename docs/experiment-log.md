@@ -1162,3 +1162,69 @@ rất hiếm (≤ 16/166 = 9,6%) vì root đồng thời thường không phải
 **Trạng thái.** Đã chốt (a) (người dùng, 2026-10-20): **`k_graph = 1`** cho C1-quota ở H0. Luận
 văn phải ghi rõ proxy suy biến; ảnh hưởng thật của k đo ở H0 (C1-paper k = 0 vs C1-quota k = 1).
 Sửa kèm: `summarize` ghi `null` thay `NaN`, `kgraph_select.py` dùng `allow_nan=False`.
+
+---
+
+## QĐ-025 — V22 (a) + M4 việc 3: ablation retrieval-only α, β, γ × `k_graph` trên `val` (2026-10-20)
+
+**Quyết định (người dùng, 2026-10-20).** V22 → (a): ablation không gọi LLM, đo bằng (1) bằng
+chứng lân cận trong top-6 (fault / không lỗi) và (2) "root đang lỗi cùng lúc": trong các
+candidate không lỗi có fault ở service khác cùng timestamp, tỷ lệ top-6 chứa bằng chứng của
+service đó. Root hit của fault window chỉ là kiểm tra hợp lý (suy biến, QĐ-024).
+
+**Cài đặt.** `HybridBm25GraphRetriever.retrieve()` tách thành `build_pool()` (không phụ thuộc
+α, β, γ, `k_graph`) + `top_events()`; `reweighted()` tạo bản sao với trọng số khác. Refactor
+thuần: test cũ pass, test mới `test_reweighted_pool_equals_fresh_retriever` (4 bộ trọng số ×
+k ∈ {0, 1, 3}) xác nhận pool xếp hạng lại ≡ `retrieve()` của retriever mới. Module
+`eval/harness/fusion_ablation.py`, CLI `scripts/fusion_ablation.py`, config
+`eval/configs/m4_fusion_ablation_val.yaml`. Lưới: đơn hình bước 0,25 (15 điểm, gồm lexical-only
+(1, 0, 0), temporal-only (0, 1, 0), graph-only (0, 0, 1)) + trọng số paper, × `k_graph` ∈ {0, 1}
+= 32 điểm. Không đổi signature Protocol.
+
+**Run `m4_fusion_ablation_val_v1`.** 28.898 cửa sổ, 5.677 candidate, 6 process; replay 287 s,
+dựng pool + xếp hạng 32 điểm 259 s (wall 9 m 10 s; 32 run harness riêng sẽ mất ~4 giờ).
+**Đối chiếu:** ở trọng số paper, top-6 trùng từng event với `m4_kgraph_val_k0_v1` và
+`m4_kgraph_val_k1_v1`: 5.677/5.677 mỗi run.
+
+Tập xét: candidate có telemetry — 109 fault, 1.640 không lỗi (463 có retrieval rỗng), 166 không
+lỗi có fault đồng thời ở service khác.
+
+Bảng QĐ-025-1. `k_graph = 0` (C1-paper), các điểm có bằng chứng lân cận + đối chứng.
+
+| α / β / γ | Không lỗi có lân cận (/1.177) | Tỷ lệ lân cận (không lỗi / fault) | Root đang lỗi cùng lúc (/166) | Root hit (/109) |
+|---|---|---|---|---|
+| **0,35 / 0,25 / 0,40 (paper)** | 3 | 0,003 / 0,000 | 0 | 109 |
+| 0 / 0 / 1 (graph-only) | 3 | 0,003 / 0,000 | 0 | 109 |
+| 1 / 0 / 0 (lexical-only) | 115 | 0,052 / 0,037 | 0 | 108 |
+| 0,75 / 0,25 / 0 | 104 | 0,046 / 0,021 | 0 | 108 |
+| 0,5 / 0,5 / 0 | 95 | 0,039 / 0,020 | 0 | 109 |
+| 0,25 / 0,75 / 0 | 94 | 0,031 / 0,028 | 1 | 109 |
+| **0 / 1 / 0 (temporal-only)** | 1.171 | **0,906 / 0,945** | 4 | **9** |
+| 9 điểm còn lại có γ ≥ 0,25 | 3–66 | ≤ 0,032 / 0,000 | 0 | 109 |
+
+Bảng QĐ-025-2. `k_graph = 1` (C1-quota) — mọi điểm có 1.177/1.177 prompt không lỗi và 109/109
+fault có lân cận.
+
+| α / β / γ | Tỷ lệ lân cận (không lỗi / fault) | Root đang lỗi cùng lúc (/166) | CI95 |
+|---|---|---|---|
+| **0,35 / 0,25 / 0,40 (paper)** | 0,169 / 0,167 | 7 (4,2%) | [1,2%; 7,8%] |
+| 0 / 0 / 1 (graph-only) | 0,169 / 0,167 | 9 (5,4%) | [2,4%; 9,0%] |
+| 1 / 0 / 0 (lexical-only) | 0,203 / 0,187 | 11 (6,6%) | [3,0%; 10,8%] |
+| **0,25 / 0,75 / 0** (cao nhất) | 0,184 / 0,174 | **14 (8,4%)** | [4,2%; 13,3%] |
+| 0 / 1 / 0 (temporal-only) | 0,907 / 0,950 | 4 (2,4%) | [0,6%; 4,8%]; root hit 9/109 |
+| 11 điểm còn lại | 0,169–0,198 / 0,167–0,176 | 5–11 | |
+
+**Phát hiện 6 — trọng số Fusion gần như không điều khiển được bằng chứng lân cận.**
+1. Với `k_graph = 0`, mọi điểm có γ ≥ 0,25 đều giữ top-6 gần như toàn local (≤ 66/1.177 prompt
+   có lân cận; trọng số paper: 3). Lý do như Phát hiện 4: GraphSim local = 1 > lân cận ≤ 0,5,
+   cộng thêm BM25 của local cao hơn. Bỏ γ (γ = 0) chỉ đưa vào ≤ 5,2% lân cận; chỉ **temporal-only** đảo
+   ngược hẳn (91–95% lân cận), và khi đó mất bằng chứng của chính service gốc (root hit 9/109).
+   Không có điểm lưới nào trộn local + lân cận một cách cân bằng ⇒ cần quota (V16 b) chứ không
+   phải chỉnh trọng số (V16 c) — củng cố lựa chọn C1-quota.
+2. Bằng chứng lan truyền thật (root đang lỗi cùng lúc) hiếm ở mọi điểm: tối đa 14/166 (8,4%).
+   CI của điểm cao nhất chồng lên CI của trọng số paper ⇒ không có căn cứ đổi trọng số.
+3. Với `k_graph = 1`, trọng số chỉ chọn *lân cận nào* vào chỗ quota; tỷ lệ lân cận gần như cố
+   định (≈ 1/6).
+
+**Hệ quả cho H0.** Giữ trọng số paper (0,35 / 0,25 / 0,40) cho cả C1-paper (`k_graph = 0`) và
+C1-quota (`k_graph = 1`); ablation này là kết quả mô tả, không dùng để tune. Không gọi API (0 USD).

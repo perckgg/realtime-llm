@@ -39,10 +39,15 @@ events of any origin; the selection keeps Fusion Score order. `k_graph = 0`
 `window_index.WindowIndex` -- identical output, ~10x faster; "reference" is
 the original pure-Python path, kept as fallback and test oracle. `global`
 always uses the reference path.
+
+`retrieve()` = `build_pool()` (independent of alpha, beta, gamma, k_graph) +
+`top_events()`; `reweighted()` gives a copy with other weights so the
+retrieval-only ablation (QD-025) re-ranks one pool per grid point.
 """
 
 from __future__ import annotations
 
+import copy
 import math
 import time
 from collections.abc import Callable, Sequence
@@ -80,6 +85,21 @@ class _Candidate:
     graph_sim: float = 0.0
     score_final: float = 0.0
 
+
+@dataclass
+class CandidatePool:
+    """Output of `HybridBm25GraphRetriever.build_pool` (weights not applied yet)."""
+
+    entries: list[_Candidate]
+    service: str
+    start: datetime
+    end: datetime
+    t0: datetime
+    query: str
+    corpus_size: int
+    n_lexical: int
+    n_expanded: int
+    n_reachable: int
 
 def _clamp01(value: float) -> float:
     if not math.isfinite(value):
@@ -161,6 +181,36 @@ class HybridBm25GraphRetriever:
 
     def retrieve(self, candidate: AlertCandidate, budget: RetrievalBudget) -> RetrievalResult:
         started = time.perf_counter()
+        pool = self.build_pool(candidate)
+        events, tokens, truncated, promoted = self.top_events(pool, budget)
+        latency = (time.perf_counter() - started) * 1000
+        return RetrievalResult(
+            strategy=self.name,
+            events=events,
+            latency_ms=latency,
+            token_estimate=tokens,
+            truncated=truncated,
+            debug={
+                "query": pool.query,
+                "bm25_pool": self.bm25_pool,
+                "engine": self.engine if self.bm25_pool == "window" else "reference",
+                "pool_corpus_size": pool.corpus_size,
+                "bm25_candidates": pool.n_lexical,
+                "graph_candidates": pool.n_expanded,
+                "candidate_pool_size": len(pool.entries),
+                "duplicates_removed": pool.n_lexical + pool.n_expanded - len(pool.entries),
+                "reachable_services": pool.n_reachable,
+                "weights": {"alpha": self.alpha, "beta": self.beta, "gamma": self.gamma},
+                "tau_seconds": self.tau_seconds,
+                "k_graph": self.k_graph,
+                "quota_promoted": promoted,
+                "timeout_exceeded": latency > budget.timeout_ms,
+            },
+        )
+
+    def build_pool(self, candidate: AlertCandidate) -> CandidatePool:
+        """Candidate pool of one alert: lexical top-`bm25_k` + graph expansion, deduplicated.
+        Independent of alpha, beta, gamma and k_graph (they only rank/select it)."""
         start = candidate.ts
         end = candidate.end_ts or candidate.ts + self.window
         t0 = start + (end - start) / 2
@@ -189,9 +239,26 @@ class HybridBm25GraphRetriever:
             else:
                 entry.source_flags.add("graph")
                 entry.graph_distance = distance if entry.graph_distance is None else min(entry.graph_distance, distance)
+        return CandidatePool(
+            entries=list(pool.values()),
+            service=candidate.service,
+            start=start,
+            end=end,
+            t0=t0,
+            query=query,
+            corpus_size=corpus_size,
+            n_lexical=len(lexical),
+            n_expanded=len(expanded),
+            n_reachable=len(near),
+        )
 
-        ranked_all = self._rank(list(pool.values()), t0, budget.top_k)
-        ranked, promoted = self._select(ranked_all, budget.top_k, candidate.service)
+    def top_events(
+        self, pool: CandidatePool, budget: RetrievalBudget
+    ) -> tuple[list[ContextEvent], int, bool, int]:
+        """Rank `pool` with this retriever's weights, apply k_graph and the token budget.
+        Returns (events, tokens, truncated, quota_promoted); `pool` can be re-ranked again."""
+        ranked_all = self._rank(list(pool.entries), pool.t0, budget.top_k)
+        ranked, promoted = self._select(ranked_all, budget.top_k, pool.service)
         events: list[ContextEvent] = []
         tokens = 0
         truncated = False
@@ -201,31 +268,19 @@ class HybridBm25GraphRetriever:
                 truncated = True
                 break
             tokens += cost
-            events.append(_event(rank, entry, start, end, candidate.service))
-        latency = (time.perf_counter() - started) * 1000
-        return RetrievalResult(
-            strategy=self.name,
-            events=events,
-            latency_ms=latency,
-            token_estimate=tokens,
-            truncated=truncated,
-            debug={
-                "query": query,
-                "bm25_pool": self.bm25_pool,
-                "engine": self.engine if self.bm25_pool == "window" else "reference",
-                "pool_corpus_size": corpus_size,
-                "bm25_candidates": len(lexical),
-                "graph_candidates": len(expanded),
-                "candidate_pool_size": len(pool),
-                "duplicates_removed": len(lexical) + len(expanded) - len(pool),
-                "reachable_services": len(near),
-                "weights": {"alpha": self.alpha, "beta": self.beta, "gamma": self.gamma},
-                "tau_seconds": self.tau_seconds,
-                "k_graph": self.k_graph,
-                "quota_promoted": promoted,
-                "timeout_exceeded": latency > budget.timeout_ms,
-            },
-        )
+            events.append(_event(rank, entry, pool.start, pool.end, pool.service))
+        return events, tokens, truncated, promoted
+
+    def reweighted(self, alpha: float, beta: float, gamma: float, k_graph: int) -> HybridBm25GraphRetriever:
+        """Same retriever (store, graph, caches shared) with other Fusion weights / quota --
+        for the retrieval-only ablation (QD-025)."""
+        if min(alpha, beta, gamma) < 0 or not math.isclose(alpha + beta + gamma, 1.0, abs_tol=1e-9):
+            raise ValueError("alpha, beta, gamma must be >= 0 and sum to 1")
+        if k_graph < 0:
+            raise ValueError("k_graph must be >= 0")
+        clone = copy.copy(self)
+        clone.alpha, clone.beta, clone.gamma, clone.k_graph = alpha, beta, gamma, k_graph
+        return clone
 
     def _gather_reference(
         self, query: str, near: dict[str, int], reachable: set[str], lo: datetime, hi: datetime, t0: datetime

@@ -14,7 +14,7 @@
 | M1 | QUA | `docs/milestones/M1-detector-bm25-judge.md`; QĐ-015..017 |
 | M2 | QUA | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
 | M3 | **QUA** (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
-| M4 | **ĐANG LÀM** — V16 (b), V17 (a), V18 (a, `k_graph = 1`), V19, V20 đã chốt; tiếp theo ablation α/β/γ, H0 | Nháp `docs/milestones/M4-h0.md`; QĐ-022..024; mục dưới |
+| M4 | **ĐANG LÀM** — V16–V20, V22 đã chốt; `k_graph = 1`; ablation α/β/γ xong (QĐ-025); tiếp theo H0 | Nháp `docs/milestones/M4-h0.md`; QĐ-022..025; mục dưới |
 
 M3 tóm tắt: đồ thị trùng GĐ1 (68/68 cạnh); C1 đã port; **G-paper đạt cả hai biến thể**
 (BM25 F1 0,7030 / FP 7, Topology F1 0,4759 / FP 137, cache hit 489/489, không gọi API); judge
@@ -30,9 +30,9 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 
 1. - [x] V17: engine `vectorized` + `retrieval.workers` — 196/196 top-6 trùng từng bit; 593 s → 88 s (6 process, ≈ 0,45 s/lần); một run `val` judge mock ≈ 8 phút; dự phòng `engine: reference` (QĐ-022)
 2. - [x] V16 (b): `k_graph` đã cài + test (k ≥ 1 ⇒ 68,9% prompt có bằng chứng lân cận, k = 0: 0%); quét `val` k = 0..3 (QĐ-024) ⇒ **`k_graph = 1`** (V18 (a))
-3. - [ ] Ablation retrieval-only lưới α, β, γ trên `val` (gồm β = 1, γ = 1) — chỉ số chờ V22
+3. - [x] Ablation retrieval-only lưới α, β, γ × `k_graph` trên `val` (QĐ-025, `m4_fusion_ablation_val_v1`, 9 phút, 0 USD): γ ≥ 0,25 ⇒ gần như không có lân cận nếu không có quota; chỉ temporal-only đảo ngược (mất root); "root đang lỗi cùng lúc" ≤ 8,4% ⇒ **giữ trọng số paper cho H0** (Phát hiện 6)
 4. - [ ] H0 trên `val` (tập có telemetry, `gemini-2.5-flash`, `drop_metrics: ["PodSuccessRate(%)"]` — QĐ-023): BM25, C1-paper (`k_graph = 0`), C1-quota (`k_graph = 1`), LLM-không-RAG, detector-only; CI + McNemar; ngân sách toàn bộ + 120; ≈ 8–10 USD
-5. - [ ] Nháp chương "Bài toán" từ paper + Phát hiện 1–5
+5. - [ ] Nháp chương "Bài toán" từ paper + Phát hiện 1–6
 
 ### Vấn đề cần chốt
 
@@ -42,7 +42,7 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 | ~~V19~~ | Đã chốt (2026-10-20, QĐ-023): giữ `gemini-2.5-flash` | Sau V20: 2.5 F1 0,48 / FP 1; 3.8 F1 0,25 / FP 0 (recall 0,14) | |
 | ~~V20~~ | Đã chốt (QĐ-023): `judge.drop_metrics: ["PodSuccessRate(%)"]` cho mọi run GĐ2 có judge thật; mặc định `[]` = prompt GĐ1 (G-paper) | Smoke 2.5-flash: FP 25 → 1, F1 0,30 → 0,48 | |
 | V21 | Câu trả lời JSON hỏng bị ghi vào cache ⇒ chạy lại không hỏi lại được (1/196 mỗi smoke) | (a) giữ như hiện tại: tính UNCERTAIN/manual review, báo cáo tỷ lệ; (b) không cache JSON hỏng — đổi hành vi cache (QĐ-013) | Không (nhỏ) |
-| V22 | Chỉ số cho ablation α/β/γ: root hit đã suy biến (QĐ-024) | (a) tỷ lệ bằng chứng lân cận + "root đang lỗi cùng lúc" trong top-6 của candidate không lỗi; (b) bỏ ablation retrieval-only, đo bằng judge ở M6 — khuyến nghị (a) | Việc 3 |
+| ~~V22~~ | Đã chốt (a) (2026-10-20, QĐ-025): chỉ số ablation = bằng chứng lân cận + "root đang lỗi cùng lúc" | | |
 | ~~V16~~ | Đã chốt (b) — QĐ-022 | C1-paper baseline + C1-quota `k_graph`; dự phòng (a)/(c) | |
 | ~~V17~~ | Đã chốt (a) — QĐ-022 | `engine: vectorized`, dự phòng `reference`, `retrieval.workers` | |
 | ~~V1~~ | Đã gửi (2026-10-20) | | |
@@ -56,11 +56,12 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 **Trạng thái:** M4 đã mở; nháp báo cáo `docs/milestones/M4-h0.md`. V16 (b) và V17 (a) đã cài, test, đo (QĐ-022, kèm bảng phương án dự
 phòng). V19, V20 đã chốt (QĐ-023); V18 đã chốt (a): `k_graph = 1` (QĐ-024, `m4_kgraph_val_k*_v1`). Docker `--profile dev` cần chạy cho `tests/test_storage.py`.
 **Commit:** `20fe298` (M4 tới V18, QĐ-022..024).
-Test: 131 pass (gồm `test_storage`, `test_window_index`, `test_kgraph_select`).
+Test: 145 pass (gồm `test_fusion_ablation`, `test_storage`, `test_window_index`, `test_kgraph_select`).
 Chi phí API phiên 2026-10-20 ≈ 1,2 USD (probe 5 lần, smoke 3.8 ≈ 0,315, 3.6 ≈ 0,33, V20: 2.5 ≈ 0,23, 3.8 ≈ 0,33); quét V18 dùng judge mock (0 USD).
 Config mới: `m4_c1_vec_smoke.yaml` (V17, judge mock), `m4_judge_g36_smoke.yaml`,
 `m4_judge_g38_smoke.yaml`, `m4_v20_g25_smoke.yaml`, `m4_v20_g38_smoke.yaml`, `m4_kgraph_val_k{0..3}.yaml` (V18, judge mock). Đo retrieval: `py scripts/retrieval_bench.py run --config ... --name ... --set k_graph=1`.
 Chọn k: `scripts/kgraph_select.py` + `eval/harness/kgraph.py`.
+Ablation α/β/γ (QĐ-025, 0 USD): `scripts/fusion_ablation.py` + `eval/harness/fusion_ablation.py`, config `m4_fusion_ablation_val.yaml` (lưới bước 0,25 — tôi chọn, chưa hỏi), kết quả `eval/results/m4_fusion_ablation_val_v1/`. C1 tách `build_pool`/`top_events`/`reweighted` (refactor thuần, có test). Chưa commit.
 
 ## Ghi chú bàn giao — dừng phiên 2026-10-19
 
@@ -105,6 +106,7 @@ py -m eval run --config eval/configs/m4_c1_vec_smoke.yaml          # V17, run_id
 py -m eval run --config eval/configs/m4_v20_g25_smoke.yaml         # V20, cần GEMINI_API_KEY
 py -m eval run --config eval/configs/m4_kgraph_val_k0.yaml         # V18: k0..k3, ~8 phút/run
 py scripts/kgraph_select.py --runs 0=m4_kgraph_val_k0_v1,1=m4_kgraph_val_k1_v1,2=m4_kgraph_val_k2_v1,3=m4_kgraph_val_k3_v1 --out <file-mới>.json
+py scripts/fusion_ablation.py --config eval/configs/m4_fusion_ablation_val.yaml  # QĐ-025, đổi run_id; ~9 phút
 ```
 
 ## Lệnh tái lập M3

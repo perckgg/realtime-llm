@@ -1,0 +1,48 @@
+run_id: m4_fusion_ablation_val_v1
+stages: retrieval_only
+seed: 42
+split: val
+time_source: wall
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+evidence:
+  store: nezha
+retrieval:
+  type: hybrid_bm25_graph
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  workers: 6
+  params:
+    bm25_pool: window
+    alpha: 0.35
+    beta: 0.25
+    gamma: 0.4
+    tau_seconds: 300
+    bm25_k: 60
+    graph_max_distance: 2
+    graph_per_service_limit: 20
+    time_margin_minutes: 8
+    engine: vectorized
+    k_graph: 0
+ablation:
+  grid_step: 0.25
+  extra_points:
+  - - 0.35
+    - 0.25
+    - 0.4
+  k_graph:
+  - 0
+  - 1
+  keep_ids_for:
+  - - 0.35
+    - 0.25
+    - 0.4
+  verify_against:
+    0: m4_kgraph_val_k0_v1
+    1: m4_kgraph_val_k1_v1
