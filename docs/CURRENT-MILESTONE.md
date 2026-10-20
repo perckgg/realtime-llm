@@ -31,7 +31,7 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 1. - [x] V17: engine `vectorized` + `retrieval.workers` — 196/196 top-6 trùng từng bit; 593 s → 88 s (6 process, ≈ 0,45 s/lần); một run `val` judge mock ≈ 8 phút; dự phòng `engine: reference` (QĐ-022)
 2. - [x] V16 (b): `k_graph` đã cài + test (k ≥ 1 ⇒ 68,9% prompt có bằng chứng lân cận, k = 0: 0%); quét `val` k = 0..3 (QĐ-024) ⇒ **`k_graph = 1`** (V18 (a))
 3. - [x] Ablation retrieval-only lưới α, β, γ × `k_graph` trên `val` (QĐ-025, `m4_fusion_ablation_val_v1`, 9 phút, 0 USD): γ ≥ 0,25 ⇒ gần như không có lân cận nếu không có quota; chỉ temporal-only đảo ngược (mất root); "root đang lỗi cùng lúc" ≤ 8,4% ⇒ **giữ trọng số paper cho H0** (Phát hiện 6)
-4. - [ ] H0 trên `val` (tập có telemetry, `gemini-2.5-flash`, `drop_metrics: ["PodSuccessRate(%)"]` — QĐ-023): BM25, C1-paper (`k_graph = 0`), C1-quota (`k_graph = 1`), LLM-không-RAG, detector-only; CI + McNemar; ngân sách toàn bộ + 120; ≈ 8–10 USD
+4. - [ ] H0 trên `val` (tập có telemetry, `gemini-2.5-flash`, `drop_metrics: ["PodSuccessRate(%)"]` — QĐ-023): BM25, C1-paper (`k_graph = 0`), C1-quota (`k_graph = 1`), LLM-không-RAG, detector-only; CI + McNemar; ngân sách toàn bộ + 120. Người dùng chốt: judge toàn bộ 5.677 candidate; LLM-không-RAG số chính `require_evidence: false` (+ bản `true`); ngân sách 120 chạy lại từ cache. **Đã cài** retrieval `none`, `py -m eval compare`, 9 config `h0_val_*` (QĐ-026, 148 test pass). **Đang chặn (V23):** run BM25 dừng ở 4.722/5.677 lần gọi (≈ 3,0 USD, đã vào cache) — API 429 "monthly spending cap". Còn ≈ 4.800 lần gọi ≈ 3,6 USD (thực đo ≈ 0,00074 USD/lần)
 5. - [ ] Nháp chương "Bài toán" từ paper + Phát hiện 1–6
 
 ### Vấn đề cần chốt
@@ -42,6 +42,7 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 | ~~V19~~ | Đã chốt (2026-10-20, QĐ-023): giữ `gemini-2.5-flash` | Sau V20: 2.5 F1 0,48 / FP 1; 3.8 F1 0,25 / FP 0 (recall 0,14) | |
 | ~~V20~~ | Đã chốt (QĐ-023): `judge.drop_metrics: ["PodSuccessRate(%)"]` cho mọi run GĐ2 có judge thật; mặc định `[]` = prompt GĐ1 (G-paper) | Smoke 2.5-flash: FP 25 → 1, F1 0,30 → 0,48 | |
 | V21 | Câu trả lời JSON hỏng bị ghi vào cache ⇒ chạy lại không hỏi lại được (1/196 mỗi smoke) | (a) giữ như hiện tại: tính UNCERTAIN/manual review, báo cáo tỷ lệ; (b) không cache JSON hỏng — đổi hành vi cache (QĐ-013) | Không (nhỏ) |
+| V23 | Gemini API: project vượt **spend cap hàng tháng** (AI Studio → https://ai.studio/spend) | Nâng cap thêm ≥ 5 USD rồi chạy theo thứ tự: `h0_val_bm25` (v2) → `c1_k0` → `c1_k1` → `norag` → `norag_reqev` + 4 `*_b120` (cache) → `py -m eval compare`. Dự phòng: đợi sang tháng mới; hoặc chạy H0 thu hẹp (BM25 vs C1-k0) trước | **H0 (việc 4)** |
 | ~~V22~~ | Đã chốt (a) (2026-10-20, QĐ-025): chỉ số ablation = bằng chứng lân cận + "root đang lỗi cùng lúc" | | |
 | ~~V16~~ | Đã chốt (b) — QĐ-022 | C1-paper baseline + C1-quota `k_graph`; dự phòng (a)/(c) | |
 | ~~V17~~ | Đã chốt (a) — QĐ-022 | `engine: vectorized`, dự phòng `reference`, `retrieval.workers` | |

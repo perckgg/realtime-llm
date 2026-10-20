@@ -1,0 +1,33 @@
+# QĐ-026 (H0): BM25 baseline trên val, judge gemini-2.5-flash + drop_metrics (V19, V20), ngân sách toàn bộ.
+# _v1 dừng giữa chừng 2026-10-20: API trả 429 'monthly spending cap' sau 4.722/5.677 lần gọi (đã vào cache); thư mục v1 rỗng.
+run_id: h0_val_bm25_v2
+seed: 42
+split: val
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+retrieval:
+  type: bm25_hybrid
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  workers: 6
+  params: {}
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]

@@ -250,12 +250,14 @@ Phải ghi lại `rescue_score` và các thành phần vào ClickHouse cho mọi
 
 ### 6.3 `services/retrieval`
 
-Trách nhiệm: chứa 2 strategy, chọn theo config (QĐ-011 — thu gọn từ 5).
+Trách nhiệm: chứa 2 strategy, chọn theo config (QĐ-011 — thu gọn từ 5), cộng `none` — baseline
+LLM-không-RAG của H0 (QĐ-026), không phải phương pháp retrieval.
 
 ```text
 retrieval/
   bm25_hybrid.py       # baseline, port từ GĐ1 (M1)
   hybrid_bm25_graph.py # C1 của CTAV: Weighted Context Fusion, port từ legacy/src/phase2/retrieval/ (M3)
+  no_retrieval.py      # `none`: không bằng chứng — LLM-không-RAG của H0 (M4, QĐ-026)
   registry.py          # name -> class, dùng bởi config loader (M1)
 ```
 

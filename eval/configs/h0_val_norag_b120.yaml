@@ -1,0 +1,35 @@
+# QĐ-026 (H0): như h0_val_norag nhưng ngân sách 120 lần gọi LLM theo thứ tự thời gian (candidate sau đó = manual_review, không alert). 100% từ cache.
+run_id: h0_val_norag_b120_v1
+seed: 42
+split: val
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+gate:
+  enabled: false
+  max_llm_calls: 120
+  budget_exhausted_action: manual_review
+retrieval:
+  type: none
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: false
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]

@@ -22,12 +22,14 @@ from packages.schemas.models import RetrievalBudget
 from packages.schemas.protocols import RetrievalStrategy
 from services.retrieval.bm25_hybrid import Bm25HybridRetriever, EvidenceSource
 from services.retrieval.hybrid_bm25_graph import HybridBm25GraphRetriever
+from services.retrieval.no_retrieval import NoRetrieval
 
 StrategyFactory = Callable[..., RetrievalStrategy]
 
 STRATEGIES: dict[str, StrategyFactory] = {
     "bm25_hybrid": Bm25HybridRetriever,
     "hybrid_bm25_graph": HybridBm25GraphRetriever,  # C1 (M3)
+    "none": NoRetrieval,  # LLM-without-RAG baseline of H0 (M4, QD-026), not a retrieval method
 }
 
 

@@ -7,6 +7,7 @@
 |---|---|---|---|
 | `bm25_hybrid` — baseline, port GĐ1 | `bm25_hybrid.py` | M1 | Xong (QĐ-016) |
 | `hybrid_bm25_graph` — C1 Fusion Score topology | `hybrid_bm25_graph.py` | M3 | Xong (QĐ-021); cờ `bm25_pool` = `global` (paper, parity) / `window` (GĐ2) |
+| `none` — LLM-không-RAG (baseline H0, không phải phương pháp retrieval) | `no_retrieval.py` | M4 | Xong (QĐ-026); prompt trùng prompt của candidate có retrieval rỗng ⇒ chung cache |
 
 `registry.py` — `build_strategy(config["retrieval"], store)` và `build_budget(...)`. Thêm
 strategy = cập nhật registry + `01` §6.3 + bảng `debug` ở `03` §1.3 (R-F1).

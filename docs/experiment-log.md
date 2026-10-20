@@ -1228,3 +1228,27 @@ fault có lân cận.
 
 **Hệ quả cho H0.** Giữ trọng số paper (0,35 / 0,25 / 0,40) cho cả C1-paper (`k_graph = 0`) và
 C1-quota (`k_graph = 1`); ablation này là kết quả mô tả, không dùng để tune. Không gọi API (0 USD).
+
+---
+
+## QĐ-026 — M4 việc 4: thiết lập H0 trên `val` (2026-10-20, đang chạy)
+
+**Người dùng chốt (2026-10-20).** (1) Judge **toàn bộ** 5.677 candidate (chỉ số chính vẫn trên tập
+có telemetry, phụ trên toàn bộ — QĐ-017). (2) LLM-không-RAG: số chính `require_evidence: false`
+(với `true` recall = 0 theo cấu trúc), báo cáo thêm bản `true`. (3) Thêm ngân sách 120 lần gọi
+theo thứ tự thời gian, chạy lại từ cache (0 USD).
+
+**Cài đặt.** Retrieval `none` (`services/retrieval/no_retrieval.py`) — baseline LLM-không-RAG nằm
+trong roadmap M4, không phải strategy thứ 3 (QĐ-011). Prompt chỉ phụ thuộc candidate + context
+⇒ candidate có retrieval rỗng (4.391/5.677 ở C1) có prompt giống hệt giữa BM25 / C1 / không-RAG
+và dùng chung cache. `py -m eval compare` (`eval/harness/compare.py`): P/R/F1/FPR + CI, hiệu số
+so với run tham chiếu kèm CI bootstrap **có cặp** (multinomial trên 8 ô nhãn × dự đoán A × B),
+McNemar chính xác trên mọi cửa sổ / fault / normal. Config `eval/configs/h0_val_*.yaml`: judge
+`gemini-2.5-flash`, nhiệt độ 0, ngưỡng 0,80, `drop_metrics: ["PodSuccessRate(%)"]`, trọng số
+C1 paper (QĐ-025), `k_graph` 0 / 1. Test: `tests/test_compare.py`; 148 test pass.
+
+**Sự cố.** `h0_val_bm25_v1` dừng sau 4.722/5.677 lần gọi: API trả 429 "Your project has exceeded
+its monthly spending cap". Câu trả lời đã nhận nằm trong cache; thư mục `h0_val_bm25_v1` rỗng,
+không có kết quả; config chuyển sang `_v2`. Chi phí thực đo ≈ 0,00074 USD/lần (prompt ≈ 1.080
+token, output ≈ 165 token) — tới lúc dừng ≈ 3,0 USD; còn ≈ 4.800 lần gọi ≈ 3,6 USD. Chờ người
+dùng nâng spend cap (V23).

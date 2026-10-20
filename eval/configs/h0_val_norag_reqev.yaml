@@ -1,0 +1,31 @@
+# QĐ-026 (H0): LLM-không-RAG với require_evidence=true như các baseline khác — recall = 0 theo cấu trúc; 100% từ cache của h0_val_norag.
+run_id: h0_val_norag_reqev_v1
+seed: 42
+split: val
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+retrieval:
+  type: none
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]

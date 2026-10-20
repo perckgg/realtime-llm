@@ -1,4 +1,5 @@
-"""`py -m eval run --config eval/configs/<name>.yaml` (02 SS3)."""
+"""`py -m eval run --config eval/configs/<name>.yaml` (02 SS3);
+`py -m eval compare --runs a=run_a,b=run_b [--detector-only run] --out name` (eval/harness/compare.py)."""
 
 from __future__ import annotations
 
@@ -8,7 +9,19 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from eval.harness.runner import REPO, load_config, run
+from eval.harness.runner import REPO, RESULTS, _git_commit, load_config, run
+
+
+def _compare(args: argparse.Namespace) -> int:
+    from eval.harness.compare import compare, parse_methods, table, write
+
+    report = compare(parse_methods(args.runs, args.detector_only), RESULTS, n_boot=args.n_boot, seed=args.seed)
+    report["git_commit"] = _git_commit()
+    path = write(report, RESULTS / args.out)
+    print(table(report, "telemetry"))
+    print(table(report, "all"))
+    print(f"wrote {path}")
+    return 0
 
 
 def main() -> int:
@@ -16,7 +29,15 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     run_parser = sub.add_parser("run", help="run one config, write eval/results/<run_id>/")
     run_parser.add_argument("--config", type=Path, required=True)
+    compare_parser = sub.add_parser("compare", help="paired comparison of runs, write eval/results/<out>/")
+    compare_parser.add_argument("--runs", required=True, help="name=run_id,... (first = reference)")
+    compare_parser.add_argument("--detector-only", help="run whose candidates give the detector-only baseline")
+    compare_parser.add_argument("--out", required=True, help="new directory name under eval/results/")
+    compare_parser.add_argument("--n-boot", type=int, default=1000)
+    compare_parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
+    if args.command == "compare":
+        return _compare(args)
     load_dotenv(REPO / ".env")
     out_dir = run(load_config(args.config))
     metrics = json.loads((out_dir / "metrics.json").read_text(encoding="utf-8"))
