@@ -55,7 +55,7 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 
 **Trạng thái:** M4 đã mở; nháp báo cáo `docs/milestones/M4-h0.md`. V16 (b) và V17 (a) đã cài, test, đo (QĐ-022, kèm bảng phương án dự
 phòng). V19, V20 đã chốt (QĐ-023); V18 đã chốt (a): `k_graph = 1` (QĐ-024, `m4_kgraph_val_k*_v1`). Docker `--profile dev` cần chạy cho `tests/test_storage.py`.
-**Chưa commit** (người dùng hoãn) — nên commit trước H0.
+**Commit:** `20fe298` (M4 tới V18, QĐ-022..024).
 Test: 131 pass (gồm `test_storage`, `test_window_index`, `test_kgraph_select`).
 Chi phí API phiên 2026-10-20 ≈ 1,2 USD (probe 5 lần, smoke 3.8 ≈ 0,315, 3.6 ≈ 0,33, V20: 2.5 ≈ 0,23, 3.8 ≈ 0,33); quét V18 dùng judge mock (0 USD).
 Config mới: `m4_c1_vec_smoke.yaml` (V17, judge mock), `m4_judge_g36_smoke.yaml`,
