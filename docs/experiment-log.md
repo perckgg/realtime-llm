@@ -1252,3 +1252,7 @@ its monthly spending cap". Câu trả lời đã nhận nằm trong cache; thư 
 không có kết quả; config chuyển sang `_v2`. Chi phí thực đo ≈ 0,00074 USD/lần (prompt ≈ 1.080
 token, output ≈ 165 token) — tới lúc dừng ≈ 3,0 USD; còn ≈ 4.800 lần gọi ≈ 3,6 USD. Chờ người
 dùng nâng spend cap (V23).
+
+Người dùng báo đã nâng cap; thử lại mỗi phút trong ≈ 25 phút (tài liệu Google: trễ billing ≈ 10
+phút) vẫn 429 ⇒ dừng, commit phần chuẩn bị `a351ca5`. Cần kiểm tra cap đặt đúng project của
+`GEMINI_API_KEY`. Kết quả H0 sẽ ghi tiếp vào mục này.

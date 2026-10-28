@@ -14,7 +14,7 @@
 | M1 | QUA | `docs/milestones/M1-detector-bm25-judge.md`; QĐ-015..017 |
 | M2 | QUA | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
 | M3 | **QUA** (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
-| M4 | **ĐANG LÀM** — V16–V20, V22 đã chốt; `k_graph = 1`; ablation α/β/γ xong (QĐ-025); tiếp theo H0 | Nháp `docs/milestones/M4-h0.md`; QĐ-022..025; mục dưới |
+| M4 | **ĐANG LÀM** — V16–V20, V22 đã chốt; `k_graph = 1`; ablation α/β/γ xong (QĐ-025); code H0 xong (QĐ-026), **run H0 chờ V23** (spend cap Gemini) | Nháp `docs/milestones/M4-h0.md`; QĐ-022..026; mục dưới |
 
 M3 tóm tắt: đồ thị trùng GĐ1 (68/68 cạnh); C1 đã port; **G-paper đạt cả hai biến thể**
 (BM25 F1 0,7030 / FP 7, Topology F1 0,4759 / FP 137, cache hit 489/489, không gọi API); judge
@@ -42,7 +42,7 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 | ~~V19~~ | Đã chốt (2026-10-20, QĐ-023): giữ `gemini-2.5-flash` | Sau V20: 2.5 F1 0,48 / FP 1; 3.8 F1 0,25 / FP 0 (recall 0,14) | |
 | ~~V20~~ | Đã chốt (QĐ-023): `judge.drop_metrics: ["PodSuccessRate(%)"]` cho mọi run GĐ2 có judge thật; mặc định `[]` = prompt GĐ1 (G-paper) | Smoke 2.5-flash: FP 25 → 1, F1 0,30 → 0,48 | |
 | V21 | Câu trả lời JSON hỏng bị ghi vào cache ⇒ chạy lại không hỏi lại được (1/196 mỗi smoke) | (a) giữ như hiện tại: tính UNCERTAIN/manual review, báo cáo tỷ lệ; (b) không cache JSON hỏng — đổi hành vi cache (QĐ-013) | Không (nhỏ) |
-| V23 | Gemini API: project vượt **spend cap hàng tháng** (AI Studio → https://ai.studio/spend) | Nâng cap thêm ≥ 5 USD rồi chạy theo thứ tự: `h0_val_bm25` (v2) → `c1_k0` → `c1_k1` → `norag` → `norag_reqev` + 4 `*_b120` (cache) → `py -m eval compare`. Dự phòng: đợi sang tháng mới; hoặc chạy H0 thu hẹp (BM25 vs C1-k0) trước | **H0 (việc 4)** |
+| V23 | Gemini API: project vượt **spend cap hàng tháng** (AI Studio → https://ai.studio/spend). Đã nâng nhưng sau ~25 phút vẫn 429 | Kiểm tra cap đặt cho **đúng project** của `GEMINI_API_KEY`, cap mới > số đã chi ≥ 5 USD, còn credit (Prepay); rồi chạy theo "Lệnh tái lập M4". Dự phòng: đợi sang tháng mới (1/11); hoặc chạy H0 thu hẹp (BM25 vs C1-k0) trước | **H0 (việc 4)** |
 | ~~V22~~ | Đã chốt (a) (2026-10-20, QĐ-025): chỉ số ablation = bằng chứng lân cận + "root đang lỗi cùng lúc" | | |
 | ~~V16~~ | Đã chốt (b) — QĐ-022 | C1-paper baseline + C1-quota `k_graph`; dự phòng (a)/(c) | |
 | ~~V17~~ | Đã chốt (a) — QĐ-022 | `engine: vectorized`, dự phòng `reference`, `retrieval.workers` | |
@@ -55,14 +55,17 @@ cận nào vào prompt trên dữ liệu đầy đủ (0/196) ⇒ cần chốt V
 ## Ghi chú bàn giao — phiên 2026-10-20
 
 **Trạng thái:** M4 đã mở; nháp báo cáo `docs/milestones/M4-h0.md`. V16 (b) và V17 (a) đã cài, test, đo (QĐ-022, kèm bảng phương án dự
-phòng). V19, V20 đã chốt (QĐ-023); V18 đã chốt (a): `k_graph = 1` (QĐ-024, `m4_kgraph_val_k*_v1`). Docker `--profile dev` cần chạy cho `tests/test_storage.py`.
-**Commit:** `20fe298` (M4 tới V18, QĐ-022..024).
-Test: 145 pass (gồm `test_fusion_ablation`, `test_storage`, `test_window_index`, `test_kgraph_select`).
-Chi phí API phiên 2026-10-20 ≈ 1,2 USD (probe 5 lần, smoke 3.8 ≈ 0,315, 3.6 ≈ 0,33, V20: 2.5 ≈ 0,23, 3.8 ≈ 0,33); quét V18 dùng judge mock (0 USD).
+phòng). V19, V20 đã chốt (QĐ-023); V18 đã chốt (a): `k_graph = 1` (QĐ-024, `m4_kgraph_val_k*_v1`); ablation α/β/γ xong (QĐ-025); code H0 xong (QĐ-026), run H0 đang chờ V23. Docker `--profile dev` cần chạy cho `tests/test_storage.py`.
+**Commit:** `20fe298` (M4 tới V18, QĐ-022..024) · `4695008` (ghi hash) · `59012f4` (ablation, QĐ-025) · `a351ca5` (chuẩn bị H0, QĐ-026). Chưa push.
+Test: 148 pass (gồm `test_compare`, `test_fusion_ablation`, `test_storage`, `test_window_index`, `test_kgraph_select`).
+Chi phí API phiên 2026-10-20 ≈ 4,2 USD: ≈ 1,2 USD trước H0 (probe 5 lần, smoke 3.8 ≈ 0,315, 3.6 ≈ 0,33, V20: 2.5 ≈ 0,23, 3.8 ≈ 0,33) + ≈ 3,0 USD cho `h0_val_bm25_v1` (4.722 lần gọi, dừng vì spend cap); quét V18 và ablation dùng judge mock / không gọi LLM (0 USD).
+Cache Gemini `data/llm_cache/gemini.jsonl`: 5.903 entry (không commit — giữ file này, H0 chạy tiếp từ đây).
+**Việc đầu tiên phiên sau:** kiểm tra API hết 429 (spend cap đúng project của `GEMINI_API_KEY`), rồi chạy H0 theo "Lệnh tái lập M4" bên dưới.
 Config mới: `m4_c1_vec_smoke.yaml` (V17, judge mock), `m4_judge_g36_smoke.yaml`,
 `m4_judge_g38_smoke.yaml`, `m4_v20_g25_smoke.yaml`, `m4_v20_g38_smoke.yaml`, `m4_kgraph_val_k{0..3}.yaml` (V18, judge mock). Đo retrieval: `py scripts/retrieval_bench.py run --config ... --name ... --set k_graph=1`.
 Chọn k: `scripts/kgraph_select.py` + `eval/harness/kgraph.py`.
-Ablation α/β/γ (QĐ-025, 0 USD): `scripts/fusion_ablation.py` + `eval/harness/fusion_ablation.py`, config `m4_fusion_ablation_val.yaml` (lưới bước 0,25 — tôi chọn, chưa hỏi), kết quả `eval/results/m4_fusion_ablation_val_v1/`. C1 tách `build_pool`/`top_events`/`reweighted` (refactor thuần, có test). Chưa commit.
+Ablation α/β/γ (QĐ-025, 0 USD): `scripts/fusion_ablation.py` + `eval/harness/fusion_ablation.py`, config `m4_fusion_ablation_val.yaml` (lưới bước 0,25 — tôi chọn, chưa hỏi), kết quả `eval/results/m4_fusion_ablation_val_v1/`. C1 tách `build_pool`/`top_events`/`reweighted` (refactor thuần, có test).
+H0 (QĐ-026): retrieval `none` (`services/retrieval/no_retrieval.py`), `py -m eval compare` (`eval/harness/compare.py`), 9 config `eval/configs/h0_val_*.yaml`. `h0_val_bm25_v1/` là thư mục rỗng do run dừng — để nguyên (không ghi đè), run tiếp là `_v2`.
 
 ## Ghi chú bàn giao — dừng phiên 2026-10-19
 
@@ -108,6 +111,15 @@ py -m eval run --config eval/configs/m4_v20_g25_smoke.yaml         # V20, cần 
 py -m eval run --config eval/configs/m4_kgraph_val_k0.yaml         # V18: k0..k3, ~8 phút/run
 py scripts/kgraph_select.py --runs 0=m4_kgraph_val_k0_v1,1=m4_kgraph_val_k1_v1,2=m4_kgraph_val_k2_v1,3=m4_kgraph_val_k3_v1 --out <file-mới>.json
 py scripts/fusion_ablation.py --config eval/configs/m4_fusion_ablation_val.yaml  # QĐ-025, đổi run_id; ~9 phút
+
+# H0 (QĐ-026) — cần GEMINI_API_KEY, chạy đúng thứ tự (các run sau dùng lại cache của run trước)
+py -m eval run --config eval/configs/h0_val_bm25.yaml          # _v2; ~950 lần gọi mới
+py -m eval run --config eval/configs/h0_val_c1_k0.yaml
+py -m eval run --config eval/configs/h0_val_c1_k1.yaml
+py -m eval run --config eval/configs/h0_val_norag.yaml         # require_evidence: false
+py -m eval run --config eval/configs/h0_val_norag_reqev.yaml   # 100% cache
+py -m eval run --config eval/configs/h0_val_bm25_b120.yaml     # + c1_k0/c1_k1/norag _b120, 100% cache
+py -m eval compare --runs bm25=h0_val_bm25_v2,c1_k0=h0_val_c1_k0_v1,c1_k1=h0_val_c1_k1_v1,norag=h0_val_norag_v1 --detector-only h0_val_bm25_v2 --out h0_val_compare_v1
 ```
 
 ## Lệnh tái lập M3
