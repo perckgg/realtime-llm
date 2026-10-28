@@ -270,3 +270,21 @@ def test_model_version_mismatch_stops_and_is_not_cached(monkeypatch, tmp_path):
     assert len(cache) == 0
     body["modelVersion"] = "gemini-3.7-flash"
     assert backend.complete("p", []).error is None and len(cache) == 1
+
+
+@pytest.mark.parametrize("error", [TimeoutError("The read operation timed out"), ConnectionResetError("reset")])
+def test_read_errors_are_retried_then_reported(monkeypatch, error):
+    # H0 run h0_val_bm25_v2 (2026-10-28) crashed on a TimeoutError raised while reading the body
+    from services.judge import backends
+
+    calls = []
+
+    def fake_urlopen(req, timeout):
+        calls.append(1)
+        raise error
+
+    monkeypatch.setattr(backends.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(backends.time, "sleep", lambda seconds: None)
+    with pytest.raises(backends._RequestFailed) as info:
+        backends._post_json_with_retry(object(), retries=2, timeout_seconds=1.0)
+    assert len(calls) == 3 and info.value.retry_count == 2

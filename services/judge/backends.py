@@ -30,9 +30,10 @@ import re
 import threading
 import time
 from dataclasses import dataclass, field
+from http.client import HTTPException
 from typing import Any, Protocol
 from urllib import request
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 
 from services.judge.cache import ResponseCache, cache_extra, make_key
 
@@ -264,7 +265,9 @@ def _post_json_with_retry(
             if exc.code not in {429, 500, 502, 503, 504} or attempt >= retries:
                 raise _RequestFailed(f"HTTP {exc.code}: {exc.reason}", attempt) from exc
             time.sleep(_backoff_seconds(exc, attempt))
-        except URLError as exc:
+        except (OSError, HTTPException) as exc:
+            # URLError, and also errors raised while reading the body (TimeoutError,
+            # ConnectionResetError, RemoteDisconnected, IncompleteRead), which urllib does not wrap
             if attempt >= retries:
                 raise _RequestFailed(str(exc), attempt) from exc
             time.sleep(min(60.0, 2.0 * (2**attempt)) + random.uniform(0, 1.0))
