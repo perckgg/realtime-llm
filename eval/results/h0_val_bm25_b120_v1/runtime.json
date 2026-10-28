@@ -1,0 +1,16 @@
+{
+  "run_id": "h0_val_bm25_b120_v1",
+  "finished_at": "2026-10-28T05:33:52.311342+00:00",
+  "wall_seconds": 279.0,
+  "detector_fit_seconds": 26.7,
+  "replay_and_retrieval_seconds": 252.2,
+  "judge_seconds": 0.0,
+  "judge_workers": 8,
+  "retrieval_workers": 6,
+  "evaluated_windows": 28898,
+  "llm_calls": 120,
+  "api_calls": 0,
+  "cache_hit_rate": 1.0,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 0
+}

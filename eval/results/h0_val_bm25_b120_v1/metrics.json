@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 2,
+      "fp": 44,
+      "fn": 207,
+      "tn": 7383,
+      "precision": 0.043478260869565216,
+      "recall": 0.009569377990430622,
+      "f1": 0.01568627450980392,
+      "fpr": 0.005924330146761815,
+      "precision_ci95": [
+        0.0,
+        0.11540697674418603
+      ],
+      "recall_ci95": [
+        0.0,
+        0.024755553913600313
+      ],
+      "f1_ci95": [
+        0.0,
+        0.04066295292582555
+      ],
+      "fpr_ci95": [
+        0.004173355832191433,
+        0.007673770568143836
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 1640,
+      "fn": 100,
+      "tn": 5787,
+      "precision": 0.062321326472269865,
+      "recall": 0.5215311004784688,
+      "f1": 0.11133810010214504,
+      "fpr": 0.22081594183384948,
+      "precision_ci95": [
+        0.05196681976496328,
+        0.07415954866803245
+      ],
+      "recall_ci95": [
+        0.4541272701741247,
+        0.5892134706579727
+      ],
+      "f1_ci95": [
+        0.09373037095841952,
+        0.1311142764538305
+      ],
+      "fpr_ci95": [
+        0.21112292259031257,
+        0.23002573067580231
+      ]
+    },
+    "operations": {
+      "windows": 7636,
+      "fault_windows": 209,
+      "candidates": 1749,
+      "retrieval_calls": 108,
+      "llm_calls": 108,
+      "api_calls": 0,
+      "cache_hits": 108,
+      "cache_hit_rate": 1.0,
+      "manual_review": 1642,
+      "context_coverage": 0.03349282296650718,
+      "candidate_context_coverage": 0.06060606060606061,
+      "avg_context_events": 5.888888888888889,
+      "avg_context_tokens": 38.648148148148145,
+      "retrieval_latency_ms_avg": 1776.5924259259261,
+      "retrieval_latency_ms_p95": 8042.423,
+      "llm_latency_ms_avg": 0.9823055555555555,
+      "llm_latency_ms_p95": 3.426,
+      "prompt_tokens": 210161,
+      "completion_tokens": 38480,
+      "estimated_cost_usd": 0.1592483,
+      "downgraded_by_evidence_rule": 0,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 2,
+      "fp": 44,
+      "fn": 207,
+      "tn": 28645,
+      "precision": 0.043478260869565216,
+      "recall": 0.009569377990430622,
+      "f1": 0.01568627450980392,
+      "fpr": 0.0015336888702987207,
+      "precision_ci95": [
+        0.0,
+        0.11115591397849457
+      ],
+      "recall_ci95": [
+        0.0,
+        0.024885044474596708
+      ],
+      "f1_ci95": [
+        0.0,
+        0.04048994437312794
+      ],
+      "fpr_ci95": [
+        0.0010805149176732322,
+        0.0019857392666906637
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 5568,
+      "fn": 100,
+      "tn": 23121,
+      "precision": 0.01920028183899947,
+      "recall": 0.5215311004784688,
+      "f1": 0.037037037037037035,
+      "fpr": 0.1940813552232563,
+      "precision_ci95": [
+        0.015794434523196597,
+        0.02267187125142463
+      ],
+      "recall_ci95": [
+        0.4535864491973124,
+        0.5891114785752434
+      ],
+      "f1_ci95": [
+        0.030544818864644472,
+        0.04363679101288234
+      ],
+      "fpr_ci95": [
+        0.18941427627966642,
+        0.19867557719283999
+      ]
+    },
+    "operations": {
+      "windows": 28898,
+      "fault_windows": 209,
+      "candidates": 5677,
+      "retrieval_calls": 120,
+      "llm_calls": 120,
+      "api_calls": 0,
+      "cache_hits": 120,
+      "cache_hit_rate": 1.0,
+      "manual_review": 5565,
+      "context_coverage": 0.03349282296650718,
+      "candidate_context_coverage": 0.018671833714990312,
+      "avg_context_events": 5.3,
+      "avg_context_tokens": 34.78333333333333,
+      "retrieval_latency_ms_avg": 1598.938325,
+      "retrieval_latency_ms_p95": 7692.118,
+      "llm_latency_ms_avg": 0.8849666666666667,
+      "llm_latency_ms_p95": 3.205,
+      "prompt_tokens": 217511,
+      "completion_tokens": 39209,
+      "estimated_cost_usd": 0.1632758,
+      "downgraded_by_evidence_rule": 5,
+      "judge_errors": 0
+    }
+  }
+}

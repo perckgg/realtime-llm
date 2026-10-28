@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 18,
+      "fp": 166,
+      "fn": 191,
+      "tn": 7261,
+      "precision": 0.09782608695652174,
+      "recall": 0.0861244019138756,
+      "f1": 0.09160305343511452,
+      "fpr": 0.022350881917328664,
+      "precision_ci95": [
+        0.058807967631497045,
+        0.14136496097994666
+      ],
+      "recall_ci95": [
+        0.052374746106973596,
+        0.12834028454079688
+      ],
+      "f1_ci95": [
+        0.05641025641025641,
+        0.13372259358288766
+      ],
+      "fpr_ci95": [
+        0.019119043274625797,
+        0.025976036200534916
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 1640,
+      "fn": 100,
+      "tn": 5787,
+      "precision": 0.062321326472269865,
+      "recall": 0.5215311004784688,
+      "f1": 0.11133810010214504,
+      "fpr": 0.22081594183384948,
+      "precision_ci95": [
+        0.05196681976496328,
+        0.07415954866803245
+      ],
+      "recall_ci95": [
+        0.4541272701741247,
+        0.5892134706579727
+      ],
+      "f1_ci95": [
+        0.09373037095841952,
+        0.1311142764538305
+      ],
+      "fpr_ci95": [
+        0.21112292259031257,
+        0.23002573067580231
+      ]
+    },
+    "operations": {
+      "windows": 7636,
+      "fault_windows": 209,
+      "candidates": 1749,
+      "retrieval_calls": 1749,
+      "llm_calls": 1749,
+      "api_calls": 1283,
+      "cache_hits": 466,
+      "cache_hit_rate": 0.2664379645511721,
+      "manual_review": 674,
+      "context_coverage": 0.0,
+      "candidate_context_coverage": 0.0,
+      "avg_context_events": 0.0,
+      "avg_context_tokens": 0.0,
+      "retrieval_latency_ms_avg": 0.0,
+      "retrieval_latency_ms_p95": 0.0,
+      "llm_latency_ms_avg": 1777.1530743281876,
+      "llm_latency_ms_p95": 2618.126,
+      "prompt_tokens": 1072015,
+      "completion_tokens": 106757,
+      "estimated_cost_usd": 0.588497,
+      "downgraded_by_evidence_rule": 0,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 18,
+      "fp": 613,
+      "fn": 191,
+      "tn": 28076,
+      "precision": 0.028526148969889066,
+      "recall": 0.0861244019138756,
+      "f1": 0.04285714285714286,
+      "fpr": 0.021367074488479906,
+      "precision_ci95": [
+        0.016887195632005598,
+        0.04233637377563303
+      ],
+      "recall_ci95": [
+        0.05188679245283019,
+        0.1250163612565445
+      ],
+      "f1_ci95": [
+        0.025315655555377747,
+        0.06259034378558782
+      ],
+      "fpr_ci95": [
+        0.01972411127873065,
+        0.022962732714923717
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 5568,
+      "fn": 100,
+      "tn": 23121,
+      "precision": 0.01920028183899947,
+      "recall": 0.5215311004784688,
+      "f1": 0.037037037037037035,
+      "fpr": 0.1940813552232563,
+      "precision_ci95": [
+        0.015794434523196597,
+        0.02267187125142463
+      ],
+      "recall_ci95": [
+        0.4535864491973124,
+        0.5891114785752434
+      ],
+      "f1_ci95": [
+        0.030544818864644472,
+        0.04363679101288234
+      ],
+      "fpr_ci95": [
+        0.18941427627966642,
+        0.19867557719283999
+      ]
+    },
+    "operations": {
+      "windows": 28898,
+      "fault_windows": 209,
+      "candidates": 5677,
+      "retrieval_calls": 5677,
+      "llm_calls": 5677,
+      "api_calls": 1283,
+      "cache_hits": 4394,
+      "cache_hit_rate": 0.7740003522987493,
+      "manual_review": 1726,
+      "context_coverage": 0.0,
+      "candidate_context_coverage": 0.0,
+      "avg_context_events": 0.0,
+      "avg_context_tokens": 0.0,
+      "retrieval_latency_ms_avg": 0.0,
+      "retrieval_latency_ms_p95": 0.0,
+      "llm_latency_ms_avg": 547.5222679231989,
+      "llm_latency_ms_p95": 2484.405,
+      "prompt_tokens": 3457015,
+      "completion_tokens": 350884,
+      "estimated_cost_usd": 1.9143145000000001,
+      "downgraded_by_evidence_rule": 0,
+      "judge_errors": 0
+    }
+  }
+}

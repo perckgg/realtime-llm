@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 53,
+      "fp": 585,
+      "fn": 156,
+      "tn": 6842,
+      "precision": 0.08307210031347963,
+      "recall": 0.2535885167464115,
+      "f1": 0.12514757969303425,
+      "fpr": 0.07876666217853777,
+      "precision_ci95": [
+        0.06122292953878799,
+        0.10455513628102651
+      ],
+      "recall_ci95": [
+        0.1971796295011448,
+        0.3152838994036816
+      ],
+      "f1_ci95": [
+        0.0942648709315376,
+        0.15579998697089623
+      ],
+      "fpr_ci95": [
+        0.07277325293133637,
+        0.08467058975297365
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 1640,
+      "fn": 100,
+      "tn": 5787,
+      "precision": 0.062321326472269865,
+      "recall": 0.5215311004784688,
+      "f1": 0.11133810010214504,
+      "fpr": 0.22081594183384948,
+      "precision_ci95": [
+        0.05196681976496328,
+        0.07415954866803245
+      ],
+      "recall_ci95": [
+        0.4541272701741247,
+        0.5892134706579727
+      ],
+      "f1_ci95": [
+        0.09373037095841952,
+        0.1311142764538305
+      ],
+      "fpr_ci95": [
+        0.21112292259031257,
+        0.23002573067580231
+      ]
+    },
+    "operations": {
+      "windows": 7636,
+      "fault_windows": 209,
+      "candidates": 1749,
+      "retrieval_calls": 1749,
+      "llm_calls": 1749,
+      "api_calls": 1283,
+      "cache_hits": 466,
+      "cache_hit_rate": 0.2664379645511721,
+      "manual_review": 153,
+      "context_coverage": 0.5215311004784688,
+      "candidate_context_coverage": 0.7352773013150372,
+      "avg_context_events": 4.411663807890223,
+      "avg_context_tokens": 30.012006861063465,
+      "retrieval_latency_ms_avg": 281.4730137221269,
+      "retrieval_latency_ms_p95": 1482.999,
+      "llm_latency_ms_avg": 2281.8680291595197,
+      "llm_latency_ms_p95": 3422.407,
+      "prompt_tokens": 2863009,
+      "completion_tokens": 427176,
+      "estimated_cost_usd": 1.9268427,
+      "downgraded_by_evidence_rule": 79,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 53,
+      "fp": 585,
+      "fn": 156,
+      "tn": 28104,
+      "precision": 0.08307210031347963,
+      "recall": 0.2535885167464115,
+      "f1": 0.12514757969303425,
+      "fpr": 0.020391090661926174,
+      "precision_ci95": [
+        0.061933183990721424,
+        0.10477874541614174
+      ],
+      "recall_ci95": [
+        0.19784401596746254,
+        0.3165868937447418
+      ],
+      "f1_ci95": [
+        0.09511359398855969,
+        0.1565873614417132
+      ],
+      "fpr_ci95": [
+        0.018755398064792282,
+        0.02191910699177957
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 5568,
+      "fn": 100,
+      "tn": 23121,
+      "precision": 0.01920028183899947,
+      "recall": 0.5215311004784688,
+      "f1": 0.037037037037037035,
+      "fpr": 0.1940813552232563,
+      "precision_ci95": [
+        0.015794434523196597,
+        0.02267187125142463
+      ],
+      "recall_ci95": [
+        0.4535864491973124,
+        0.5891114785752434
+      ],
+      "f1_ci95": [
+        0.030544818864644472,
+        0.04363679101288234
+      ],
+      "fpr_ci95": [
+        0.18941427627966642,
+        0.19867557719283999
+      ]
+    },
+    "operations": {
+      "windows": 28898,
+      "fault_windows": 209,
+      "candidates": 5677,
+      "retrieval_calls": 5677,
+      "llm_calls": 5677,
+      "api_calls": 1283,
+      "cache_hits": 4394,
+      "cache_hit_rate": 0.7740003522987493,
+      "manual_review": 1652,
+      "context_coverage": 0.5215311004784688,
+      "candidate_context_coverage": 0.22652809582525982,
+      "avg_context_events": 1.359168574951559,
+      "avg_context_tokens": 9.246256825788269,
+      "retrieval_latency_ms_avg": 86.90187775233399,
+      "retrieval_latency_ms_p95": 355.821,
+      "llm_latency_ms_avg": 703.0153348599612,
+      "llm_latency_ms_p95": 3071.163,
+      "prompt_tokens": 5248009,
+      "completion_tokens": 671303,
+      "estimated_cost_usd": 3.2526602,
+      "downgraded_by_evidence_rule": 549,
+      "judge_errors": 0
+    }
+  }
+}

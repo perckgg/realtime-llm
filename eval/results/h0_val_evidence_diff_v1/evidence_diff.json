@@ -1,0 +1,111 @@
+{
+  "a": "h0_val_bm25_v3",
+  "b": "h0_val_c1_k0_v1",
+  "runs": {
+    "h0_val_bm25_v3": {
+      "normal": {
+        "candidates": 1640,
+        "with_evidence": 1174,
+        "mean_events": 4.295,
+        "trace_share": 0.7943,
+        "neighbor_share": 0.0,
+        "median_abs_dt_s": 167.5,
+        "raw_verdict": {
+          "FALSE_POSITIVE": 1071,
+          "TRUE_ALERT": 495,
+          "UNCERTAIN": 74
+        },
+        "decision": {
+          "suppress": 1071,
+          "alert": 417,
+          "manual_review": 152
+        }
+      },
+      "fault": {
+        "candidates": 109,
+        "with_evidence": 109,
+        "mean_events": 6.0,
+        "trace_share": 0.8578,
+        "neighbor_share": 0.0,
+        "median_abs_dt_s": 139.1,
+        "raw_verdict": {
+          "FALSE_POSITIVE": 75,
+          "TRUE_ALERT": 34
+        },
+        "decision": {
+          "suppress": 75,
+          "alert": 34
+        }
+      },
+      "near_fault": {
+        "fp_alert": {
+          "n": 417,
+          "same_service_10min": 0.0,
+          "any_service_2min": 0.2422,
+          "any_service_5min": 0.3909
+        },
+        "normal_not_alert": {
+          "n": 1223,
+          "same_service_10min": 0.0,
+          "any_service_2min": 0.3115,
+          "any_service_5min": 0.4563
+        }
+      }
+    },
+    "h0_val_c1_k0_v1": {
+      "normal": {
+        "candidates": 1640,
+        "with_evidence": 1177,
+        "mean_events": 4.306,
+        "trace_share": 0.9837,
+        "neighbor_share": 0.0025,
+        "median_abs_dt_s": 66.1,
+        "raw_verdict": {
+          "FALSE_POSITIVE": 881,
+          "TRUE_ALERT": 684,
+          "UNCERTAIN": 75
+        },
+        "decision": {
+          "suppress": 881,
+          "alert": 606,
+          "manual_review": 153
+        }
+      },
+      "fault": {
+        "candidates": 109,
+        "with_evidence": 109,
+        "mean_events": 6.0,
+        "trace_share": 0.9618,
+        "neighbor_share": 0.0,
+        "median_abs_dt_s": 73.2,
+        "raw_verdict": {
+          "TRUE_ALERT": 55,
+          "FALSE_POSITIVE": 54
+        },
+        "decision": {
+          "alert": 55,
+          "suppress": 54
+        }
+      },
+      "near_fault": {
+        "fp_alert": {
+          "n": 606,
+          "same_service_10min": 0.0,
+          "any_service_2min": 0.2904,
+          "any_service_5min": 0.4307
+        },
+        "normal_not_alert": {
+          "n": 1034,
+          "same_service_10min": 0.0,
+          "any_service_2min": 0.2959,
+          "any_service_5min": 0.4449
+        }
+      }
+    }
+  },
+  "overlap": {
+    "prompts_both_with_evidence": 1283,
+    "mean_shared_events": 1.667,
+    "identical_event_sets": 161
+  }
+}

@@ -1231,7 +1231,7 @@ C1-quota (`k_graph = 1`); ablation này là kết quả mô tả, không dùng �
 
 ---
 
-## QĐ-026 — M4 việc 4: thiết lập H0 trên `val` (2026-10-20, đang chạy)
+## QĐ-026 — M4 việc 4: H0 trên `val` (thiết lập 2026-10-20, chạy xong 2026-10-28)
 
 **Người dùng chốt (2026-10-20).** (1) Judge **toàn bộ** 5.677 candidate (chỉ số chính vẫn trên tập
 có telemetry, phụ trên toàn bộ — QĐ-017). (2) LLM-không-RAG: số chính `require_evidence: false`
@@ -1256,3 +1256,93 @@ dùng nâng spend cap (V23).
 Người dùng báo đã nâng cap; thử lại mỗi phút trong ≈ 25 phút (tài liệu Google: trễ billing ≈ 10
 phút) vẫn 429 ⇒ dừng, commit phần chuẩn bị `a351ca5`. Cần kiểm tra cap đặt đúng project của
 `GEMINI_API_KEY`. Kết quả H0 sẽ ghi tiếp vào mục này.
+
+### 2026-10-28 — chạy H0, kết quả
+
+**V23 hết chặn.** Người dùng nâng spend cap; một lần gọi thử (`scripts/probe_gemini_models.py`)
+trả `modelVersion = gemini-2.5-flash`.
+
+**Sự cố thứ hai — timeout khi đọc response làm sập run.** `h0_val_bm25_v2` dừng sau 206 lần gọi
+mới: `TimeoutError: The read operation timed out` ném ra trong `response.read()`, không phải
+`URLError`, nên `_post_json_with_retry` không retry và lỗi lan lên làm sập `judge_all`. Sửa
+(`services/judge/backends.py`): bắt `OSError` + `http.client.HTTPException` (gồm `URLError`,
+`TimeoutError`, `ConnectionResetError`, `RemoteDisconnected`, `IncompleteRead`) — đúng như
+docstring "retry … network errors"; hết retry thì câu đó thành `judge_errors` (không cache), run
+chạy tiếp. Test `test_read_errors_are_retried_then_reported`; 150 test pass. Không đổi ngữ nghĩa
+thực nghiệm. Thư mục `h0_val_bm25_v2` rỗng, để nguyên; BM25 chạy lại là `_v3` (206 câu đã vào cache).
+
+**Chạy.** 9 run `h0_val_*` + `py -m eval compare` (`h0_val_compare_v1`), 11:01 → 12:54. Lần gọi API
+mới: BM25 749, C1-k0 1.286, C1-k1 1.283, không-RAG 1.283 (+ 206 của `_v2`, + 1 probe) = 4.808 ≈
+**3,6 USD** (theo đơn giá thực đo 0,00074 USD/lần). Cache: 5.903 → 10.710 entry. JSON hỏng: 0/5.677
+ở mọi run (V21: phương án (a) đủ). Lỗi judge: 1 ở `h0_val_c1_k0_v1` (tính manual review, 1 cửa sổ
+normal). Bốn run `_b120` và `norag_reqev` 100% từ cache.
+
+Bảng QĐ-026-1. H0 trên `val`, tập có telemetry (7.636 cửa sổ, 209 fault) — số chính. CI95
+bootstrap (`n_boot` mặc định, seed mặc định của `compare`).
+
+| Phương pháp | TP | FP | P | R [CI95] | F1 [CI95] | FPR [CI95] |
+|---|---|---|---|---|---|---|
+| Detector-only | 109 | 1.640 | 0,062 | 0,522 [0,454; 0,589] | 0,111 [0,094; 0,131] | 0,221 [0,211; 0,230] |
+| BM25 | 34 | 417 | 0,075 | 0,163 [0,115; 0,214] | 0,103 [0,072; 0,133] | 0,056 [0,051; 0,061] |
+| C1-paper (k = 0) | 55 | 606 | 0,083 | 0,263 [0,205; 0,326] | 0,126 [0,095; 0,156] | 0,082 [0,075; 0,087] |
+| C1-quota (k = 1) | 53 | 585 | 0,083 | 0,254 [0,197; 0,315] | 0,125 [0,094; 0,156] | 0,079 [0,073; 0,085] |
+| LLM không RAG (`require_evidence: false`) | 18 | 166 | 0,098 | 0,086 [0,052; 0,128] | 0,092 [0,056; 0,134] | 0,022 [0,019; 0,026] |
+| LLM không RAG (`require_evidence: true`) | 0 | 0 | — | 0 | 0 | 0 |
+
+Bảng QĐ-026-2. Hiệu số so với BM25 (CI95 bootstrap có cặp) và McNemar chính xác (tập có telemetry).
+
+| So sánh | ΔRecall | ΔFPR | ΔF1 | McNemar p (fault / normal) |
+|---|---|---|---|---|
+| C1-paper − BM25 | **+0,100 [+0,052; +0,155]** | **+0,025 [+0,020; +0,031]** | +0,023 [−0,004; +0,052] | 5,1 × 10⁻⁴ / 5,0 × 10⁻²⁴ |
+| C1-quota − BM25 | **+0,091 [+0,040; +0,145]** | **+0,023 [+0,018; +0,028]** | +0,022 [−0,004; +0,051] | 1,3 × 10⁻³ / 2,2 × 10⁻²⁰ |
+| C1-quota − C1-paper | −0,010 [−0,044; +0,028] | −0,003 [−0,006; +0,001] | −0,001 [−0,017; +0,016] | 0,79 / 0,16 |
+| Không RAG − BM25 | −0,077 [−0,124; −0,034] | −0,034 [−0,040; −0,028] | −0,011 [−0,050; +0,022] | 2,5 × 10⁻³ / 4,0 × 10⁻³¹ |
+| Detector-only − BM25 | +0,359 [+0,296; +0,426] | +0,165 [+0,156; +0,173] | +0,008 [−0,020; +0,036] | 5,3 × 10⁻²³ / ≈ 0 |
+
+Toàn split (28.898 cửa sổ, số phụ): TP/FP như trên ở mọi biến thể có RAG (candidate không có
+telemetry đều có retrieval rỗng ⇒ bị `require_evidence` chặn); FPR BM25 0,0145, C1-paper 0,0211,
+C1-quota 0,0204; không-RAG `false` có FP 613 (thêm 447 trên cửa sổ không telemetry).
+
+Ngân sách 120 lần gọi (theo thứ tự thời gian, từ cache), tập có telemetry: BM25 TP 2 / FP 44;
+C1-paper và C1-quota cùng TP 3 / FP 52; không-RAG TP 0 / FP 8. 120 lần chỉ phủ ≈ 7% của 1.749
+candidate có telemetry ⇒ một điểm ngân sách này không có thông tin; H4 cần đường cong ngân sách.
+
+**Phân tích bằng chứng** (`py scripts/h0_evidence_diff.py --a h0_val_bm25_v3 --b h0_val_c1_k0_v1
+--out h0_val_evidence_diff_v1`, chỉ đọc kết quả run).
+
+Bảng QĐ-026-3. Bằng chứng trong prompt, candidate có telemetry.
+
+| | BM25 normal | C1-paper normal | BM25 fault | C1-paper fault |
+|---|---|---|---|---|
+| Prompt có bằng chứng | 1.174 / 1.640 | 1.177 / 1.640 | 109 / 109 | 109 / 109 |
+| Số event trung bình | 4,30 | 4,31 | 6,00 | 6,00 |
+| Tỷ lệ bằng chứng lân cận | 0 | 0,0025 | 0 | 0 |
+| Tỷ lệ trace span | 0,794 | **0,984** | 0,858 | **0,962** |
+| Trung vị \|t_e − t_0\| | 167 s | **66 s** | 139 s | **73 s** |
+| Verdict thô TRUE_ALERT | 495 | **684** | 34 | **55** |
+
+Hai run chỉ chung trung bình 1,67/6 event mỗi prompt; 161/1.283 prompt có cùng tập event.
+FP không tập trung quanh sự cố: 0% FP nằm trong ±10 phút của một fault window cùng service; tỷ lệ
+gần fault của service khác (±5 phút: BM25 39%, C1 43%) ngang nhóm candidate normal không bị báo
+(46%, 44%).
+
+**Phát hiện 7 — H0 tái lập về hiện tượng, không tái lập về cơ chế.**
+1. *Hiện tượng:* topology chưa hiệu chỉnh tăng recall (+0,10) và tăng FPR (+0,025) so với BM25, có
+   ý nghĩa ở cả fault lẫn normal (McNemar); ΔF1 có CI chứa 0. Cùng chiều paper nhưng nhỏ hơn
+   nhiều (paper: FPR 0,0175 → 0,3425).
+2. *Cơ chế:* hiệu ứng **không** đến từ bằng chứng của service lân cận. C1-paper gần như không có
+   lân cận (0,25% event ở normal, 0 ở fault — Phát hiện 4) mà đã tạo đủ hiệu ứng; thêm quota lân
+   cận (C1-quota) không đổi gì (McNemar p = 0,79 / 0,16). Khác biệt nằm ở **bằng chứng cục bộ nào**
+   được chọn: Fusion Score (β · TimeSim) kéo về các trace span sát thời điểm cửa sổ (trung vị 66–73 s
+   so với 139–167 s), và judge xác nhận nhiều hơn ở cả fault lẫn normal. "Thiên lệch xác nhận do
+   ngữ cảnh lân cận" của paper vì vậy không phải giải thích đúng trên giao thức GĐ2; giả thuyết cạnh
+   tranh là **độ gần thời gian / loại bằng chứng** (cần H1 kiểm, không kết luận ở đây).
+3. *Mức hiệu năng:* trên giao thức không lộ nhãn, mọi biến thể có judge có precision 0,075–0,098 và
+   F1 0,09–0,13, không khác detector-only (ΔF1 CI chứa 0). Judge xác nhận 30–42% candidate normal có
+   bằng chứng (495 và 684 / 1.640). Kết quả của paper (F1 0,70 BM25) không chuyển sang được khi bằng
+   chứng không còn trùng nhãn (Phát hiện 1).
+
+**Hệ quả.** Theo DoD M4, cần quyết định tiếp tục / viết lại câu chuyện (V24, báo cáo M4 §3): C2
+(gating theo nguồn gốc lân cận) mất cơ sở vì không có bằng chứng lân cận nào tạo ra FP; C3
+(neo bằng chứng) và H1 (cơ chế) vẫn có nghĩa nếu đổi trục từ "khoảng cách đồ thị" sang "nội dung /
+thời điểm của bằng chứng". Chưa đổi gì trong `08` trước khi người dùng và GVHD xem.

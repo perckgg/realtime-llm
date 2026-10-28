@@ -1,6 +1,7 @@
 # QĐ-026 (H0): BM25 baseline trên val, judge gemini-2.5-flash + drop_metrics (V19, V20), ngân sách toàn bộ.
 # _v1 dừng giữa chừng 2026-10-20: API trả 429 'monthly spending cap' sau 4.722/5.677 lần gọi (đã vào cache); thư mục v1 rỗng.
-run_id: h0_val_bm25_v2
+# _v2 dừng 2026-10-28 sau 206 lần gọi mới: TimeoutError khi đọc response không được retry (đã sửa trong backends.py); thư mục v2 rỗng.
+run_id: h0_val_bm25_v3
 seed: 42
 split: val
 time_source: wall

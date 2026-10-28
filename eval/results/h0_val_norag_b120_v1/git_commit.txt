@@ -1,0 +1,11 @@
+1b04c885108fe1ad4d2382c398f296c849f91e2b
+modified tracked files at run time:
+  docs/CURRENT-MILESTONE.md
+  docs/milestones/M4-h0.md
+  eval/configs/h0_val_bm25.yaml
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  services/judge/backends.py
+  tests/test_judge.py

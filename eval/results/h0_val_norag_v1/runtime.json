@@ -1,0 +1,16 @@
+{
+  "run_id": "h0_val_norag_v1",
+  "finished_at": "2026-10-28T05:23:22.864383+00:00",
+  "wall_seconds": 688.5,
+  "detector_fit_seconds": 26.8,
+  "replay_and_retrieval_seconds": 250.9,
+  "judge_seconds": 410.4,
+  "judge_workers": 8,
+  "retrieval_workers": 1,
+  "evaluated_windows": 28898,
+  "llm_calls": 5677,
+  "api_calls": 1283,
+  "cache_hit_rate": 0.7740003522987493,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 0
+}
