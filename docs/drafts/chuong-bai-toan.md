@@ -3,7 +3,7 @@
 > Nháp ngày 2026-10-28. Nguồn: paper ICAETM 2026 (`docs/submission_docs/paper/draft.md`,
 > `docs/Final_Thesis_Phase2/08-research-direction.md` §2), Phát hiện 1–6 trong
 > `docs/experiment-log.md` (QĐ-016, QĐ-019, QĐ-020, QĐ-021, QĐ-022, QĐ-025). Mỗi số liệu ghi
-> kèm QĐ gốc để đối chiếu. Mục 6 = kết quả H0 (QĐ-026, 2026-10-28). Số chương/bảng là tạm,
+> kèm QĐ gốc để đối chiếu. Mục 6 = kết quả H0 (QĐ-026) và vấn đề phát biểu lại (QĐ-027, chốt tạm). Số chương/bảng là tạm,
 > đánh lại khi ghép vào luận văn.
 
 ---
@@ -317,3 +317,21 @@ cửa sổ sự cố cùng service.
    precision 0,075–0,098 và F1 không khác detector-only. Judge xác nhận 30–42% ứng viên bình thường
    có bằng chứng. Vấn đề cần giải quyết vì vậy rộng hơn topology: judge xác nhận quá dễ khi được
    đưa telemetry bình thường, bất kể nguồn của telemetry.
+
+### 6.4 Vấn đề nghiên cứu sau H0
+
+> Theo QĐ-027 (2026-10-29, chốt tạm, chờ ý kiến GVHD).
+
+H0 cho thấy vấn đề mà paper chỉ ra là có thật trên giao thức không lộ nhãn, nhưng cơ chế khác với
+giải thích của paper. Luận văn vì vậy phát biểu vấn đề là **thiên lệch xác nhận theo nội dung bằng
+chứng**: khi được đưa telemetry bình thường của chính service bị cảnh báo, judge vẫn xác nhận sự cố,
+và cách chọn bằng chứng (độ gần thời gian, loại bằng chứng) làm mức thiên lệch thay đổi.
+
+> Có thể giữ được mức tăng recall của tầng truy xuất topology mà không tăng báo động giả, trong cùng
+> ngân sách LLM, bằng cách hiệu chỉnh quyết định của judge theo hồ sơ của bằng chứng mà nó trích dẫn
+> và buộc mỗi xác nhận phải dựa trên ít nhất một bằng chứng bất thường tại service bị cảnh báo không?
+
+Câu hỏi này dẫn tới ba thay đổi so với kế hoạch ban đầu của CTAV, trình bày ở chương Giải pháp:
+ngưỡng bất đối xứng (C2) tính theo hồ sơ bằng chứng thay vì theo khoảng cách trên đồ thị; luật neo
+bằng chứng (C3) yêu cầu bằng chứng bất thường tại `s₀`; thí nghiệm cơ chế (H1) can thiệp vào độ gần
+thời gian, loại và thứ tự của bằng chứng, với tỷ lệ bằng chứng lân cận chỉ còn là đối chứng âm.

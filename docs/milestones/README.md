@@ -12,7 +12,7 @@ nằm ở `docs/experiment-log.md`; báo cáo mốc tổng hợp lại và dẫn
 | M1 | [M1-detector-bm25-judge.md](M1-detector-bm25-judge.md) | 2026-10-19 | QUA; V7–V9 đã chốt (QĐ-017) |
 | M2 | [M2-harness-gport.md](M2-harness-gport.md) | 2026-10-19 | QUA — V10 (a), V11 đã chốt (QĐ-019) |
 | M3 | [M3-graph-c1-gpaper.md](M3-graph-c1-gpaper.md) | 2026-10-19 | QUA — G-paper đạt; V16, V17 đã chốt ở M4 (QĐ-022) |
-| M4 | [M4-h0.md](M4-h0.md) | — | **NHÁP, đang làm** — H0 xong (Phát hiện 7: tái lập hiện tượng, không tái lập cơ chế); nháp chương Bài toán xong; chờ V24 |
+| M4 | [M4-h0.md](M4-h0.md) | 2026-10-29 | QUA CÓ ĐIỀU KIỆN — H0 tái lập hiện tượng, không tái lập cơ chế (Phát hiện 7); V24 (b) chốt tạm chờ GVHD (QĐ-027) |
 
 ## Mẫu
 

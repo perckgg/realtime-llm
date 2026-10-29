@@ -56,7 +56,7 @@ Danh sách đóng. Nếu một việc không nằm ở đây, mặc định là 
 - [x] C3 Evidence anchoring (bằng chứng phải neo vào `s_0` hoặc đường gọi lỗi/chậm tới `s_0`) — `services/judge/policy.py`
 - [x] C4 Adaptive Two-Tier Routing (BM25 trước, topology khi cần) — `services/judge/routing.py`
 - [x] Baseline so sánh: detector-only, LLM-không-RAG, BM25, C1 chưa hiệu chỉnh
-- [x] Thí nghiệm cơ chế H1 (tỷ lệ bằng chứng graph trong prompt)
+- [x] Thí nghiệm cơ chế H1 (độ gần thời gian / loại bằng chứng trong prompt; tỷ lệ bằng chứng graph làm đối chứng âm — QĐ-027)
 - [x] Interface chung `RetrievalStrategy` để hoán đổi bằng config
 - [x] Service dependency graph dựng từ trace Nezha
 - [x] Eval harness sinh P/R/F1/FPR/coverage/latency/tokens/chi phí có bootstrap CI + McNemar

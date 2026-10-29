@@ -1,6 +1,7 @@
 # 08 — Giải pháp GĐ2 và kế hoạch chứng minh
 
-> Chốt ngày 2026-10-18 (QĐ-011 trong `docs/experiment-log.md`). Đây là tài liệu gốc
+> Chốt ngày 2026-10-18 (QĐ-011 trong `docs/experiment-log.md`); **cập nhật 2026-10-29 theo QĐ-027**
+> (chốt tạm, chờ GVHD: đổi trục C2, C3, H1 sau Phát hiện 7 — xem các khối "Cập nhật QĐ-027"). Đây là tài liệu gốc
 > cho câu hỏi "luận văn đề xuất gì và chứng minh bằng cách nào". `00`, `04`, `06` đã
 > được cập nhật theo file này; nếu mâu thuẫn, file này thắng và phải sửa file kia.
 >
@@ -61,6 +62,15 @@ prompt); chạy một lần; trọng số chọn có nhìn `paper_500`; truy v�
 type; chỉ thẩm định cảnh báo, chưa RCA. Hướng tiếp paper đã hứa: Asymmetric Confidence
 Gating, Causal Span Grounding, Adaptive Multi-Tier Routing.
 
+> **Cập nhật QĐ-027 (2026-10-29, chốt tạm).** Trên giao thức GĐ2, H0 tái lập **hiện tượng**
+> (topology tăng recall +0,10 và FPR +0,025 so với BM25, McNemar có ý nghĩa) nhưng **không tái lập
+> cơ chế**: hiệu ứng không đến từ bằng chứng của service lân cận (C1-quota ≡ C1-paper) mà từ việc C1
+> chọn bằng chứng cục bộ sát thời điểm cửa sổ (chủ yếu trace span); judge xác nhận 30–42% candidate
+> normal có bằng chứng (QĐ-026, Phát hiện 7). Vấn đề nghiên cứu được phát biểu lại là **thiên lệch
+> xác nhận theo nội dung bằng chứng**: judge xác nhận sự cố khi đọc telemetry bình thường của chính
+> service bị cảnh báo, và cách chọn bằng chứng (độ gần thời gian, loại bằng chứng) làm mức thiên lệch
+> thay đổi. Mục tiêu GĐ2 (§3) giữ nguyên.
+
 ---
 
 ## 3. GĐ1 → paper → GĐ2
@@ -96,7 +106,7 @@ AlertCandidate (detector, + Rescue Score)
    │
    ▼  Chính sách quyết định
        C2: ngưỡng theo nguồn gốc bằng chứng  θ_topo > θ_local
-       C3: TRUE_ALERT phải có bằng chứng neo vào s0 hoặc đường gọi lỗi/chậm tới s0
+       C3: TRUE_ALERT phải trích bằng chứng bất thường tại s0 (QĐ-027)
    │
    ▼  JudgedAlert ─► RCA Agent (grouping → propagation → summary)
 ```
@@ -104,8 +114,8 @@ AlertCandidate (detector, + Rescue Score)
 | # | Thành phần | Giải quyết điểm yếu nào của paper | Hiện thực |
 |---|---|---|---|
 | C1 | **Fusion Score topology** — giữ nguyên công thức paper | Recall thấp của BM25 (network_delay) | `services/retrieval/hybrid_bm25_graph.py`, port từ `legacy/src/phase2/retrieval/` |
-| C2 | **Asymmetric Confidence Gating** — TRUE_ALERT chỉ dựa trên bằng chứng mở rộng qua graph cần `confidence ≥ θ_topo`; dựa trên bằng chứng cục bộ cần `≥ θ_local`; `θ_topo > θ_local` | FP 7 → 137 | `services/judge/policy.py`; chạy trên verdict đã cache — không tốn thêm lần gọi LLM |
-| C3 | **Evidence anchoring** — TRUE_ALERT phải trích ít nhất một bằng chứng tại `s_0`, hoặc một span lỗi/chậm nằm trên đường gọi tới `s_0`; không thì hạ xuống UNCERTAIN | Gần ≠ nguyên nhân | `services/judge/policy.py`; mở rộng `require_evidence` sẵn có |
+| C2 | **Asymmetric Confidence Gating** — ~~theo nguồn gốc đồ thị~~ (QĐ-027): ngưỡng bất đối xứng theo **hồ sơ bằng chứng** judge trích — tầng sinh ra (BM25 / C1), độ gần thời gian, loại (trace / log); hồ sơ rủi ro cần `confidence ≥ θ_topo > θ_local`; đặc trưng cụ thể chốt sau H1 | FP tăng khi chọn bằng chứng sát thời điểm (Phát hiện 7) | `services/judge/policy.py`; chạy trên verdict đã cache — không tốn thêm lần gọi LLM |
+| C3 | **Evidence anchoring** (QĐ-027) — TRUE_ALERT phải trích ít nhất một bằng chứng **bất thường** tại `s_0`: log mức lỗi, hoặc span có `duration_ms` vượt ngưỡng nền của cùng service + operation (phân vị tính trên `dev`); không thì hạ xuống UNCERTAIN. Biến thể phụ: span lỗi/chậm trên đường gọi tới `s_0` | Judge xác nhận 30–42% normal có bằng chứng (Phát hiện 7) | `services/judge/policy.py`; mở rộng `require_evidence` sẵn có |
 | C4 | **Adaptive Two-Tier Routing** — chạy BM25 trước; chỉ mở rộng topology khi tầng 1 UNCERTAIN hoặc không có bằng chứng | Chi phí ×2.7 | `services/judge/routing.py` |
 | C5 | **Rescue Score** (η1, η2, η3, τ) — đưa cửa sổ detector bỏ sót vào pipeline | Detector bỏ sót | Đã có trong kế hoạch, giữ nguyên công thức QĐ-008 |
 | B | **RCA Agent** — grouping theo thời gian + topology → backward propagation → báo cáo JSON | SRE cần biết sự cố nào, gốc ở đâu | `services/rca_agent/`; Nezha có nhãn root-cause mức pod 100% (QĐ-001) ⇒ Hit@k hợp lệ (điểm 4 của GVHD) |
@@ -199,7 +209,7 @@ Ngưỡng định lượng (Δ tối thiểu, θ) điền sau khi có số liệ
 | | Giả thuyết | Thí nghiệm | Kiểm định | Bác bỏ khi |
 |---|---|---|---|---|
 | **H0** tái lập vấn đề | Trên split GĐ2, topology chưa hiệu chỉnh tăng recall nhưng tăng FPR so với BM25 | BM25 vs C1, cùng judge, cùng ngân sách | Bootstrap CI ΔRecall, ΔFPR; McNemar | Không tái lập ⇒ viết lại câu chuyện (vấn đề không tổng quát) |
-| **H1** cơ chế | FP tăng theo **tỷ lệ bằng chứng xa** trong prompt, không phải do số lượng hay thứ tự | Trên mẫu normal cố định: giữ k = 6, thay tỷ lệ bằng chứng graph 0/33/67/100%; xáo thứ tự | Xu hướng đơn điệu + CI | Không có quan hệ ⇒ C2/C3 mất cơ sở lý thuyết, báo cáo trung thực |
+| **H1** cơ chế (QĐ-027) | Tỷ lệ TRUE_ALERT trên normal tăng theo **độ gần thời gian** và **loại bằng chứng** (trace), không phải do số lượng hay thứ tự | Trên mẫu cố định của `val`: giữ k = 6, thay (i) tỷ lệ event trong ±60 s quanh t₀ 0/33/67/100%, (ii) trace ↔ log, (iii) xáo thứ tự; nhánh tỷ lệ lân cận 0/100% làm đối chứng âm | Xu hướng đơn điệu + CI | Không có quan hệ ⇒ C2 mất cơ sở (C3 vẫn kiểm được ở H3), báo cáo trung thực |
 | **H2** giải pháp | CTAV: recall ≥ C1 − δ và FPR không tệ hơn BM25 có ý nghĩa ⇒ F1(CTAV) > F1(BM25) | CTAV vs BM25 vs C1 vs LLM-không-RAG vs detector-only | McNemar cặp; CI ΔF1 | CI ΔF1 chứa 0 |
 | **H3** từng thành phần | Bỏ C2 ⇒ FPR tăng; bỏ C3 ⇒ precision giảm; bỏ C4 ⇒ chi phí tăng mà F1 không tăng | Ablation một-thành-phần-một-lần trên `val`, xác nhận trên `test` | CI từng Δ | Thành phần không đóng góp ⇒ bỏ khỏi phương pháp, ghi lại |
 | **H4** chi phí | Ở ngân sách 120 lần gọi, CTAV ≥ LLM-không-RAG; đường cong F1 theo ngân sách của CTAV trội | Quét ngân sách | CI | |
@@ -242,13 +252,13 @@ Replayer → Detector (+Rescue) → CTAV (BM25 → topology khi cần → policy
 | Màn hình | Cho hội đồng thấy gì về CTAV |
 |---|---|
 | Timeline | Luồng alert theo thời gian, màu theo verdict và tầng routing |
-| Alert detail | Top-k bằng chứng, nguồn gốc local/graph, vì sao bị gating/anchoring hạ xuống |
+| Alert detail | Top-k bằng chứng, hồ sơ bằng chứng (tầng, thời gian, loại, bất thường hay không), vì sao bị gating/anchoring hạ xuống |
 | Incident detail | Đồ thị lan truyền, root cause, báo cáo JSON |
 | Experiment comparison | Bảng H0–H4: BM25 vs topology vs CTAV, có CI |
 
 **Kịch bản demo 5 phút:**
 1. `docker compose --profile dev up -d` → replay chạy, alert vào Timeline.
-2. Mở một alert normal mà topology chưa hiệu chỉnh xác nhận nhầm → CTAV hạ xuống vì bằng chứng chỉ đến từ service xa, không neo được vào `s_0` (C2/C3).
+2. Mở một alert normal mà topology chưa hiệu chỉnh xác nhận nhầm → CTAV hạ xuống vì judge chỉ dựa trên telemetry bình thường của `s_0`, không có bằng chứng bất thường để neo (C3, QĐ-027).
 3. Mở một network_delay mà BM25 bỏ sót → tầng 2 topology tìm được span chậm ở downstream, CTAV xác nhận (C1/C4).
 4. Cascade fault → nhiều alert gom thành một Incident → đồ thị lan truyền chỉ đúng root cause.
 5. Tab Experiment → bảng so sánh sinh tự động từ `eval/results/`.

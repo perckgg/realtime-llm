@@ -21,8 +21,8 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M1 | Sửa detector, hợp đồng dữ liệu, port BM25 + judge | | 2026-10-25 | **Xong** (2026-10-19) — `docs/milestones/M1-detector-bm25-judge.md` |
 | M2 | Eval harness + kiểm tra port | **Cổng chặn G-port** | 2026-11-01 | **Xong** (2026-10-19) — `docs/milestones/M2-harness-gport.md` |
 | M3 | Service graph + C1 + tái lập paper | **Cổng chặn G-paper** | 2026-11-08 | **Xong** (2026-10-19) — `docs/milestones/M3-graph-c1-gpaper.md` |
-| M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Đang làm** (mở 2026-10-20) — H0 xong (QĐ-026, Phát hiện 7), nháp chương xong; chờ V24 để đóng — nháp `docs/milestones/M4-h0.md` |
-| M5 | H1 — cơ chế thiên lệch xác nhận | | 2026-11-22 | |
+| M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Xong có điều kiện** (2026-10-29; V24 (b) chốt tạm chờ GVHD, QĐ-027) — `docs/milestones/M4-h0.md` |
+| M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | Chưa mở — chờ người dùng bắt đầu |
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | |
@@ -130,7 +130,7 @@ Lệch hơn mức trên = port sai. **Dừng và sửa**, không sang M3.
 
 ---
 
-## M4 — H0: tái lập vấn đề trên split GĐ2
+## M4 — H0: tái lập vấn đề trên split GĐ2 (xong có điều kiện, 2026-10-29)
 
 | Việc | Output |
 |---|---|
@@ -147,17 +147,30 @@ Cập nhật 2026-10-20: ba dòng đầu được thêm sau M3 (V16–V20, xem b
 được (topology không tăng FPR trên split GĐ2): dừng, ghi experiment-log, trao đổi GVHD
 trước khi đi tiếp — câu chuyện luận văn phải viết lại.
 
+Kết quả: tái lập hiện tượng, không tái lập cơ chế (Phát hiện 7) ⇒ V24 (b): đổi trục C2, C3, H1
+từ "khoảng cách đồ thị" sang "độ gần thời gian / loại bằng chứng", giữ khung CTAV (QĐ-027, chốt tạm
+chờ GVHD).
+
 ---
 
 ## M5 — H1: cơ chế thiên lệch xác nhận
 
+Đổi trục theo QĐ-027: biến can thiệp là độ gần thời gian và loại bằng chứng, không còn là khoảng
+cách đồ thị.
+
 | Việc | Output |
 |---|---|
-| Mẫu cố định (seed 42): cửa sổ normal + toàn bộ fault candidate của `val` | `eval/samples/h1_val.json` |
-| Giữ k = 6, tỷ lệ bằng chứng graph 0 / 33 / 67 / 100%; biến thể xáo thứ tự | `eval/results/h1_*` |
+| Mẫu cố định (seed 42): candidate normal có telemetry + toàn bộ fault candidate của `val`; pool bằng chứng cục bộ của mỗi candidate lấy từ `build_pool` | `eval/samples/h1_val.json` |
+| Giữ k = 6, tỷ lệ event trong ±60 s quanh t₀: 0 / 33 / 67 / 100% (cùng loại bằng chứng) | `eval/results/h1_time_*` |
+| Giữ k = 6 và độ gần thời gian, đổi thành phần trace ↔ log | `eval/results/h1_modality_*` |
+| Xáo thứ tự cùng một tập event | `eval/results/h1_order_*` |
+| Đối chứng âm: tỷ lệ lân cận 0 / 100% (k = 6) | `eval/results/h1_graph_*` |
 | Đo phương sai LLM: `repeat ∈ {0, 1, 2}` trên tập con (QĐ-013) | Độ lệch giữa các lần gọi |
 
-**DoD M5:** đồ thị FPR theo tỷ lệ bằng chứng graph, có CI; kết luận H1 (giữ / bác bỏ) ghi experiment-log.
+Chi phí ước tính: mỗi điều kiện ≈ 1.200 lần gọi ≈ 1,6–1,9 USD (QĐ-027).
+
+**DoD M5:** đường tỷ lệ TRUE_ALERT trên normal (và recall trên fault) theo từng biến can thiệp, có
+CI; kết luận H1 (giữ / bác bỏ) và đặc trưng chọn cho C2 ghi experiment-log.
 
 ---
 
@@ -165,7 +178,8 @@ trước khi đi tiếp — câu chuyện luận văn phải viết lại.
 
 | Việc | Output |
 |---|---|
-| `services/judge/policy.py` — asymmetric gating (θ_local, θ_topo) + evidence anchoring; áp lên verdict **đã cache** từ M4 | Module + unit test |
+| Ngưỡng nền `duration_ms` theo service + operation trên `dev` (cho C3, QĐ-027) | `data/span_baseline.parquet` |
+| `services/judge/policy.py` — asymmetric gating theo hồ sơ bằng chứng (θ_local, θ_topo; đặc trưng từ H1) + evidence anchoring vào bằng chứng bất thường tại s₀ (QĐ-027); áp lên verdict **đã cache** từ M4 | Module + unit test |
 | Quét θ_topo; chọn trên `val` | Đường cong θ_topo vs (Recall, FPR) |
 | `services/judge/routing.py` — BM25 trước, topology khi UNCERTAIN / thiếu bằng chứng | Module + unit test |
 | Quét ngân sách gọi LLM (H4) | Đường cong F1 theo ngân sách |

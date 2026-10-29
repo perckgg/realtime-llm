@@ -1272,8 +1272,12 @@ chạy tiếp. Test `test_read_errors_are_retried_then_reported`; 150 test pass.
 thực nghiệm. Thư mục `h0_val_bm25_v2` rỗng, để nguyên; BM25 chạy lại là `_v3` (206 câu đã vào cache).
 
 **Chạy.** 9 run `h0_val_*` + `py -m eval compare` (`h0_val_compare_v1`), 11:01 → 12:54. Lần gọi API
-mới: BM25 749, C1-k0 1.286, C1-k1 1.283, không-RAG 1.283 (+ 206 của `_v2`, + 1 probe) = 4.808 ≈
-**3,6 USD** (theo đơn giá thực đo 0,00074 USD/lần). Cache: 5.903 → 10.710 entry. JSON hỏng: 0/5.677
+mới: BM25 749, C1-k0 1.286, C1-k1 1.283, không-RAG 1.283 (+ 206 của `_v2`, + 1 probe) = 4.808.
+Chi phí theo token thật (trường `usage` của 4.807 entry cache mới: 6,56 M token prompt, 0,97 M token
+output, giá 0,30 / 2,50 USD mỗi 1 M) ≈ **4,40 USD**; **billing người dùng báo: 5 USD, ≈ 8k request**
+(chưa đối chiếu được: log có ≈ 4.830 request HTTP gồm retry; khung thời gian của dashboard chưa rõ).
+Ước tính 3,6 USD ghi lúc đầu là sai: dùng đơn giá của BM25 (≈ 600 token prompt / 60 output mỗi lần
+gọi mới) cho C1, trong khi prompt C1 dài ≈ 2.000 / 310 token. Cache: 5.903 → 10.710 entry. JSON hỏng: 0/5.677
 ở mọi run (V21: phương án (a) đủ). Lỗi judge: 1 ở `h0_val_c1_k0_v1` (tính manual review, 1 cửa sổ
 normal). Bốn run `_b120` và `norag_reqev` 100% từ cache.
 
@@ -1346,3 +1350,39 @@ gần fault của service khác (±5 phút: BM25 39%, C1 43%) ngang nhóm candid
 (gating theo nguồn gốc lân cận) mất cơ sở vì không có bằng chứng lân cận nào tạo ra FP; C3
 (neo bằng chứng) và H1 (cơ chế) vẫn có nghĩa nếu đổi trục từ "khoảng cách đồ thị" sang "nội dung /
 thời điểm của bằng chứng". Chưa đổi gì trong `08` trước khi người dùng và GVHD xem.
+
+---
+
+## QĐ-027 — V24 (b): đổi trục CTAV sau Phát hiện 7, giữ khung; đóng M4 có điều kiện (2026-10-29, chốt tạm)
+
+**Quyết định (người dùng, 2026-10-29).** V24 → **(b) đổi trục, giữ khung**. **Chốt tạm**: chờ ý
+kiến GVHD (mail `docs/drafts/2026-10-29-mail-gvhd-h0.md`); nếu GVHD không đồng ý thì mở lại V24.
+
+**Căn cứ (QĐ-026, Phát hiện 7).** Trên giao thức GĐ2, topology vẫn tăng recall và FPR so với BM25,
+nhưng không do bằng chứng của service lân cận (C1-quota ≡ C1-paper); khác biệt đến từ việc C1 chọn
+bằng chứng cục bộ sát thời điểm cửa sổ (chủ yếu trace span). Mọi biến thể có judge xác nhận 30–42%
+candidate normal có bằng chứng; F1 không khác detector-only.
+
+**Vấn đề nghiên cứu, phát biểu lại.** *Thiên lệch xác nhận theo nội dung bằng chứng*: khi được đưa
+telemetry bình thường của chính service bị cảnh báo, judge vẫn xác nhận sự cố; cách chọn bằng chứng
+(độ gần thời gian, loại bằng chứng) làm mức thiên lệch thay đổi. Câu hỏi: giữ được mức tăng recall
+của tầng topology mà không tăng báo động giả, trong cùng ngân sách LLM.
+
+**Thay đổi so với `08` (QĐ-011).**
+
+| Thành phần | Trước (QĐ-011) | Sau (QĐ-027) |
+|---|---|---|
+| C1 | Fusion Score topology | Giữ nguyên công thức, trọng số paper. Tầng 2 mặc định C1-paper (`k_graph = 0`) vì C1-quota không khác (QĐ-026); `k_graph` chốt lại ở M6 trên `val` |
+| C2 | Ngưỡng bất đối xứng θ_local / θ_topo theo nguồn gốc *đồ thị* của bằng chứng | Ngưỡng bất đối xứng theo **hồ sơ bằng chứng** mà judge trích: tầng sinh ra (BM25 / C1), độ gần thời gian, loại (trace / log). Đặc trưng cụ thể chốt sau H1 (M5); vẫn chạy trên verdict đã cache |
+| C3 | TRUE_ALERT phải có bằng chứng tại s₀ hoặc span lỗi/chậm trên đường gọi tới s₀ | TRUE_ALERT phải trích ít nhất một bằng chứng **bất thường** tại s₀: log ERROR/WARN, hoặc span có `duration_ms` vượt ngưỡng nền của cùng service + operation (phân vị tính trên `dev`); không có ⇒ UNCERTAIN. Nhắm thẳng vào việc judge xác nhận normal; chạy offline trên verdict đã cache (0 USD). Nhánh "đường gọi tới s₀" giữ làm biến thể phụ |
+| C4 | BM25 trước, topology khi UNCERTAIN / thiếu bằng chứng | Giữ nguyên |
+| H1 | FP tăng theo **tỷ lệ bằng chứng xa trên đồ thị** (0/33/67/100%) | FP tăng theo **độ gần thời gian** và **loại bằng chứng**, không theo số lượng hay thứ tự: trên mẫu cố định của `val`, giữ k = 6, thay (i) tỷ lệ event trong ±60 s quanh t₀ 0/33/67/100%, (ii) trace ↔ log, (iii) xáo thứ tự; một nhánh tỷ lệ lân cận 0/100% giữ làm đối chứng âm |
+| H2–H5 | | Giữ hình thức; H2 so CTAV với BM25, C1, không-RAG, detector-only như cũ |
+
+**Đóng M4.** DoD đạt (bảng H0 có CI + McNemar; quyết định ghi tại đây); báo cáo
+`docs/milestones/M4-h0.md` đủ 4 phần; người dùng đã xem. Kết luận **QUA CÓ ĐIỀU KIỆN** — điều kiện:
+GVHD không phản đối (b). Ngày đóng 2026-10-29 (hạn 2026-11-15, sớm 17 ngày).
+
+**Chưa làm.** Chưa viết code nào cho C2/C3 mới hay H1; `08`, `04` và nháp chương Bài toán đã sửa
+theo bảng trên. Chi phí ước tính M5: mỗi điều kiện H1 ≈ 1.200 lần gọi ≈ 1,6 USD theo token (prompt
+≈ 2.000 / 310 token), ≈ 1,9 USD nếu billing cao hơn token ≈ 14% như ngày 2026-10-28.
