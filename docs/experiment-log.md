@@ -1353,7 +1353,7 @@ thời điểm của bằng chứng". Chưa đổi gì trong `08` trước khi n
 
 ---
 
-## QĐ-027 — V24 (b): đổi trục CTAV sau Phát hiện 7, giữ khung; đóng M4 có điều kiện (2026-10-29, chốt tạm)
+## QĐ-027 — V24 (b): đổi trục CTAV sau Phát hiện 7, giữ khung; đóng M4 (2026-10-29)
 
 **Quyết định (người dùng, 2026-10-29).** V24 → **(b) đổi trục, giữ khung**. **Chốt tạm**: chờ ý
 kiến GVHD (mail `docs/drafts/2026-10-29-mail-gvhd-h0.md`); nếu GVHD không đồng ý thì mở lại V24.
@@ -1382,6 +1382,8 @@ của tầng topology mà không tăng báo động giả, trong cùng ngân sá
 **Đóng M4.** DoD đạt (bảng H0 có CI + McNemar; quyết định ghi tại đây); báo cáo
 `docs/milestones/M4-h0.md` đủ 4 phần; người dùng đã xem. Kết luận **QUA CÓ ĐIỀU KIỆN** — điều kiện:
 GVHD không phản đối (b). Ngày đóng 2026-10-29 (hạn 2026-11-15, sớm 17 ngày).
+
+**GVHD đồng ý (2026-10-29, người dùng báo).** V25 xong; điều kiện của M4 đạt ⇒ M4 **QUA**; mở M5.
 
 **Chưa làm.** Chưa viết code nào cho C2/C3 mới hay H1; `08`, `04` và nháp chương Bài toán đã sửa
 theo bảng trên. Chi phí ước tính M5: mỗi điều kiện H1 ≈ 1.200 lần gọi ≈ 1,6 USD theo token (prompt

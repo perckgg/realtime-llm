@@ -3,7 +3,7 @@
 > Nháp ngày 2026-10-28. Nguồn: paper ICAETM 2026 (`docs/submission_docs/paper/draft.md`,
 > `docs/Final_Thesis_Phase2/08-research-direction.md` §2), Phát hiện 1–6 trong
 > `docs/experiment-log.md` (QĐ-016, QĐ-019, QĐ-020, QĐ-021, QĐ-022, QĐ-025). Mỗi số liệu ghi
-> kèm QĐ gốc để đối chiếu. Mục 6 = kết quả H0 (QĐ-026) và vấn đề phát biểu lại (QĐ-027, chốt tạm). Số chương/bảng là tạm,
+> kèm QĐ gốc để đối chiếu. Mục 6 = kết quả H0 (QĐ-026) và vấn đề phát biểu lại (QĐ-027, GVHD đồng ý). Số chương/bảng là tạm,
 > đánh lại khi ghép vào luận văn.
 
 ---
@@ -320,7 +320,7 @@ cửa sổ sự cố cùng service.
 
 ### 6.4 Vấn đề nghiên cứu sau H0
 
-> Theo QĐ-027 (2026-10-29, chốt tạm, chờ ý kiến GVHD).
+> Theo QĐ-027 (2026-10-29; GVHD đồng ý cùng ngày).
 
 H0 cho thấy vấn đề mà paper chỉ ra là có thật trên giao thức không lộ nhãn, nhưng cơ chế khác với
 giải thích của paper. Luận văn vì vậy phát biểu vấn đề là **thiên lệch xác nhận theo nội dung bằng

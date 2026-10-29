@@ -14,23 +14,23 @@
 | M1 | QUA | `docs/milestones/M1-detector-bm25-judge.md`; QĐ-015..017 |
 | M2 | QUA | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
 | M3 | QUA (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
-| M4 | **QUA CÓ ĐIỀU KIỆN** (đóng 2026-10-29) — điều kiện: GVHD không phản đối V24 (b) | `docs/milestones/M4-h0.md`; QĐ-022..027 |
-| M5 | **Chưa mở** — chờ người dùng bắt đầu | Mục dưới; `04` M5 |
+| M4 | QUA (đóng 2026-10-29; GVHD đồng ý V24 (b)) | `docs/milestones/M4-h0.md`; QĐ-022..027 |
+| M5 | **ĐANG LÀM** (mở 2026-10-29) | Mục dưới; `04` M5 |
 
 M4 tóm tắt: H0 trên `val` tái lập **hiện tượng** (C1-paper − BM25: ΔRecall +0,100 [+0,052; +0,155],
 ΔFPR +0,025 [+0,020; +0,031], McNemar có ý nghĩa; ΔF1 CI chứa 0) nhưng **không tái lập cơ chế**
 (Phát hiện 7): C1-quota ≡ C1-paper; khác biệt do C1 chọn trace span sát t₀; mọi biến thể có judge F1
 ≈ detector-only. V24 → (b) đổi trục C2, C3, H1 sang độ gần thời gian / loại bằng chứng, giữ khung
-CTAV (QĐ-027, chốt tạm chờ GVHD).
+CTAV (QĐ-027; GVHD đồng ý 2026-10-29).
 
 ---
 
-## Mốc kế tiếp: M5 — H1: cơ chế thiên lệch xác nhận (theo QĐ-027)
-## Chưa mở — chỉ bắt đầu khi người dùng bảo
+## Mốc hiện tại: M5 — H1: cơ chế thiên lệch xác nhận (theo QĐ-027)
+## Mở 2026-10-29 (GVHD đồng ý V24 (b))
 
 ### Việc (chi tiết ở báo cáo M4 §4 và `04` M5)
 
-1. - [ ] Người dùng gửi mail GVHD `docs/drafts/2026-10-29-mail-gvhd-h0.md`
+1. - [x] Người dùng gửi mail GVHD; GVHD đồng ý V24 (b) (2026-10-29)
 2. - [ ] Mẫu cố định `eval/samples/h1_val.json` (seed 42): candidate normal có telemetry + 109 fault candidate của `val`; pool cục bộ từ `build_pool`
 3. - [ ] Prompt can thiệp, giữ k = 6: tỷ lệ event trong ±60 s quanh t₀ 0/33/67/100%; trace ↔ log; xáo thứ tự; đối chứng âm tỷ lệ lân cận 0/100%. Kiểm tra trước số candidate dựng được mọi điều kiện
 4. - [ ] Judge thật từng điều kiện (chạy một điều kiện thử trước); `repeat ∈ {0, 1, 2}` trên tập con
@@ -43,7 +43,7 @@ CI; kết luận H1 (giữ / bác bỏ) và đặc trưng cho C2 ghi experiment-
 
 | # | Vấn đề | Khuyến nghị | Chặn gì |
 |---|---|---|---|
-| V25 | Ý kiến GVHD về V24 (b) | Gửi mail; nếu GVHD phản đối ⇒ dừng M5, mở lại V24 | Điều kiện của M4 |
+| ~~V25~~ | Ý kiến GVHD về V24 (b) | GVHD đồng ý 2026-10-29 | |
 | V26 | Billing 5 USD / ≈ 8k request so với ≈ 4,4 USD / ≈ 4.830 request trong log (QĐ-026) | Người dùng cho biết khung thời gian của dashboard ⇒ đối chiếu; ước ngân sách M5 (≈ 16–23 USD) theo kết quả | Ngân sách M5 |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |

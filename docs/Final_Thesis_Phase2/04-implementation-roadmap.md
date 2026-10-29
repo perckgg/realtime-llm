@@ -21,8 +21,8 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M1 | Sửa detector, hợp đồng dữ liệu, port BM25 + judge | | 2026-10-25 | **Xong** (2026-10-19) — `docs/milestones/M1-detector-bm25-judge.md` |
 | M2 | Eval harness + kiểm tra port | **Cổng chặn G-port** | 2026-11-01 | **Xong** (2026-10-19) — `docs/milestones/M2-harness-gport.md` |
 | M3 | Service graph + C1 + tái lập paper | **Cổng chặn G-paper** | 2026-11-08 | **Xong** (2026-10-19) — `docs/milestones/M3-graph-c1-gpaper.md` |
-| M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Xong có điều kiện** (2026-10-29; V24 (b) chốt tạm chờ GVHD, QĐ-027) — `docs/milestones/M4-h0.md` |
-| M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | Chưa mở — chờ người dùng bắt đầu |
+| M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Xong** (2026-10-29; V24 (b), GVHD đồng ý, QĐ-027) — `docs/milestones/M4-h0.md` |
+| M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Đang làm** (mở 2026-10-29) |
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | |
@@ -130,7 +130,7 @@ Lệch hơn mức trên = port sai. **Dừng và sửa**, không sang M3.
 
 ---
 
-## M4 — H0: tái lập vấn đề trên split GĐ2 (xong có điều kiện, 2026-10-29)
+## M4 — H0: tái lập vấn đề trên split GĐ2 (xong, 2026-10-29)
 
 | Việc | Output |
 |---|---|
@@ -148,8 +148,8 @@ Cập nhật 2026-10-20: ba dòng đầu được thêm sau M3 (V16–V20, xem b
 trước khi đi tiếp — câu chuyện luận văn phải viết lại.
 
 Kết quả: tái lập hiện tượng, không tái lập cơ chế (Phát hiện 7) ⇒ V24 (b): đổi trục C2, C3, H1
-từ "khoảng cách đồ thị" sang "độ gần thời gian / loại bằng chứng", giữ khung CTAV (QĐ-027, chốt tạm
-chờ GVHD).
+từ "khoảng cách đồ thị" sang "độ gần thời gian / loại bằng chứng", giữ khung CTAV (QĐ-027; GVHD
+đồng ý 2026-10-29).
 
 ---
 

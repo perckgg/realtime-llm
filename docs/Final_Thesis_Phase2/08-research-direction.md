@@ -1,7 +1,7 @@
 # 08 — Giải pháp GĐ2 và kế hoạch chứng minh
 
 > Chốt ngày 2026-10-18 (QĐ-011 trong `docs/experiment-log.md`); **cập nhật 2026-10-29 theo QĐ-027**
-> (chốt tạm, chờ GVHD: đổi trục C2, C3, H1 sau Phát hiện 7 — xem các khối "Cập nhật QĐ-027"). Đây là tài liệu gốc
+> (GVHD đồng ý 2026-10-29: đổi trục C2, C3, H1 sau Phát hiện 7 — xem các khối "Cập nhật QĐ-027"). Đây là tài liệu gốc
 > cho câu hỏi "luận văn đề xuất gì và chứng minh bằng cách nào". `00`, `04`, `06` đã
 > được cập nhật theo file này; nếu mâu thuẫn, file này thắng và phải sửa file kia.
 >
@@ -62,7 +62,7 @@ prompt); chạy một lần; trọng số chọn có nhìn `paper_500`; truy v�
 type; chỉ thẩm định cảnh báo, chưa RCA. Hướng tiếp paper đã hứa: Asymmetric Confidence
 Gating, Causal Span Grounding, Adaptive Multi-Tier Routing.
 
-> **Cập nhật QĐ-027 (2026-10-29, chốt tạm).** Trên giao thức GĐ2, H0 tái lập **hiện tượng**
+> **Cập nhật QĐ-027 (2026-10-29; GVHD đồng ý).** Trên giao thức GĐ2, H0 tái lập **hiện tượng**
 > (topology tăng recall +0,10 và FPR +0,025 so với BM25, McNemar có ý nghĩa) nhưng **không tái lập
 > cơ chế**: hiệu ứng không đến từ bằng chứng của service lân cận (C1-quota ≡ C1-paper) mà từ việc C1
 > chọn bằng chứng cục bộ sát thời điểm cửa sổ (chủ yếu trace span); judge xác nhận 30–42% candidate
