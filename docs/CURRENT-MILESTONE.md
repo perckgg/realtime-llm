@@ -15,7 +15,8 @@
 | M2 | QUA | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
 | M3 | QUA (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
 | M4 | QUA (đóng 2026-10-29; GVHD đồng ý V24 (b)) | `docs/milestones/M4-h0.md`; QĐ-022..027 |
-| M5 | **CHỜ XEM + V28** (mở 2026-10-29) | `docs/milestones/M5-h1.md`; QĐ-028 |
+| M5 | QUA (đóng 2026-11-01; H1 giữ một phần, V28 (b)) | `docs/milestones/M5-h1.md`; QĐ-028, QĐ-029 |
+| M6 | **ĐANG LÀM** (mở 2026-11-01) | Mục dưới; `04` M6 |
 
 M4 tóm tắt: H0 trên `val` tái lập **hiện tượng** (C1-paper − BM25: ΔRecall +0,100 [+0,052; +0,155],
 ΔFPR +0,025 [+0,020; +0,031], McNemar có ý nghĩa; ΔF1 CI chứa 0) nhưng **không tái lập cơ chế**
@@ -23,21 +24,27 @@ M4 tóm tắt: H0 trên `val` tái lập **hiện tượng** (C1-paper − BM25:
 ≈ detector-only. V24 → (b) đổi trục C2, C3, H1 sang độ gần thời gian / loại bằng chứng, giữ khung
 CTAV (QĐ-027; GVHD đồng ý 2026-10-29).
 
+M5 tóm tắt: H1 giữ một phần (QĐ-028). TRUE_ALERT tăng theo độ gần thời gian và cao hơn với trace, nhưng
+chững lại từ 67% và tác động cả recall. Không chọn đặc trưng C2 từ H1; V28 (b): M6 chỉ quét θ trên verdict
+đã cache, trọng tâm giảm FP sang C3 (QĐ-029).
+
 ---
 
-## Mốc hiện tại: M5 — H1: cơ chế thiên lệch xác nhận (theo QĐ-027)
-## Mở 2026-10-29 (GVHD đồng ý V24 (b))
+## Mốc hiện tại: M6 — CTAV: C2 + C3 + C4, chốt cấu hình (theo QĐ-029)
+## Mở 2026-11-01
 
-### Việc (chi tiết ở báo cáo M4 §4 và `04` M5)
+### Việc (chi tiết ở `04` M6 và báo cáo M5 §4)
 
-1. - [x] Người dùng gửi mail GVHD; GVHD đồng ý V24 (b) (2026-10-29)
-2. - [x] Mẫu cố định `eval/samples/h1_val_v1.json.gz` (seed 42; `py scripts/h1.py collect`, 15 phút, 0 USD): 1.749 candidate có telemetry; dựng được `ref`/`ref_flat`/`order_rev` 1.177 normal + 109 fault, `time_*` 563 + 56, `near_trace` 602 + 57, `near_log` 432 + 57, `neighbor_trace` 602 + 57
-3. - [x] Prompt can thiệp (`eval/harness/h1.py`, `tests/test_h1.py`): điểm hiển thị cố định theo vị trí; `ref` tái tạo đúng prompt H0 (1.286/1.286 trúng cache)
-4. - [x] Judge thật: `ref`, `ref_flat` (`_v2`; `_v1` hỏng vì thiếu key — để nguyên), `order_rev`, `time_0/33/67`, `near_trace`, `near_log`, `neighbor_trace`; `repeat` 1, 2 trên `ref`, `near_trace` (752 lần gọi; 2026-11-01)
-5. - [ ] Phân tích và kết luận H1 **xong** (QĐ-028, `docs/milestones/M5-h1.md`). **Còn** đặc trưng cho C2 (V28) và người dùng xem báo cáo
+1. - [ ] Ngưỡng nền `duration_ms` theo service + operation trên `dev` (cho C3) ⇒ `data/span_baseline.parquet`
+2. - [ ] `services/judge/policy.py`: C3 (trọng tâm) + gating θ (C2); áp lên verdict **đã cache** từ M4; unit test
+3. - [ ] Quét θ, chọn trên `val`, không gọi thêm LLM
+4. - [ ] `services/judge/routing.py`: BM25 trước, topology khi UNCERTAIN / thiếu bằng chứng; unit test
+5. - [ ] Quét ngân sách gọi LLM (H4)
+6. - [ ] Ablation H3: CTAV đầy đủ, bỏ C2, bỏ C3, bỏ C4; C2 không đóng góp ⇒ bỏ khỏi phương pháp (QĐ-029)
+7. - [ ] Song song: `rca_agent/grouping.py` bản khởi động (timestamp + graph)
 
-**DoD M5:** đường tỷ lệ TRUE_ALERT trên normal (và recall trên fault) theo từng biến can thiệp có
-CI; kết luận H1 (giữ / bác bỏ) và đặc trưng cho C2 ghi experiment-log. Hạn 2026-11-22.
+**DoD M6:** `eval/configs/ctav_final.yaml` chốt; bảng H3 trên `val` có CI; θ chọn ghi experiment-log.
+Hạn 2026-12-06.
 
 ### Vấn đề cần chốt
 
@@ -45,12 +52,13 @@ CI; kết luận H1 (giữ / bác bỏ) và đặc trưng cho C2 ghi experiment-
 |---|---|---|---|
 | ~~V25~~ | Ý kiến GVHD về V24 (b) | GVHD đồng ý 2026-10-29 | |
 | V26 | Billing 5 USD / ≈ 8k request so với ≈ 4,4 USD / ≈ 4.830 request trong log (QĐ-026) | Người dùng cho biết khung thời gian của dashboard ⇒ đối chiếu. Nếu billing thật cao hơn token > 1,3× thì tính lại bảng ngân sách dưới | Không (theo dõi) |
-| V28 | Chưa có đặc trưng C2 tách được normal và fault (QĐ-028, báo cáo M5 §3) | (b) M6 chỉ quét θ trên verdict đã cache, trọng tâm sang C3, báo GVHD | **M6** |
+| ~~V28~~ | Đặc trưng C2 sau H1 | Người dùng chốt (b) (QĐ-029) | |
+| V29 | GVHD chưa được báo V28 (b); cần biết thêm loại báo cáo tháng 11 (tiến độ hay kết quả) | Người dùng báo GVHD; GVHD phản đối ⇒ mở lại V28 | Không (M6 đang chạy song song) |
 | V27 | Phạm vi chấm ở M8 (`test`): toàn bộ candidate (như H0, ≈ 14 USD) hay chỉ cửa sổ có telemetry (số chính, ≈ 5 USD) | Quyết định khi mở M8, theo số credit còn lại lúc đó | M8 |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
-Các vấn đề V16–V24 đã chốt: xem báo cáo M4 §3 và QĐ-022..027.
+Các vấn đề V16–V24 đã chốt: xem báo cáo M4 §3 và QĐ-022..027. V28: báo cáo M5 §3 và QĐ-029.
 
 ---
 
@@ -91,10 +99,9 @@ M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`r
 
 ## Ghi chú bàn giao — phiên 2026-11-01
 
-**Trạng thái:** M5 xong run và phân tích (QĐ-028, `h1_val_analysis_v2`), H1 giữ một phần. Chưa đóng mốc:
-chờ người dùng xem `docs/milestones/M5-h1.md` và chốt V28. Không mở M6 trước khi có hai việc này.
-Test: 159 pass. Đính chính M4 (JSON bị cắt 1/5.677) đã ghi ở QĐ-028.
-**Việc đầu tiên phiên sau:** hỏi V28 và số billing cho V26.
+**Trạng thái:** M5 đóng (QĐ-028, QĐ-029, `h1_val_analysis_v2`): H1 giữ một phần, V28 (b). M6 đã mở,
+**chưa viết code M6**. Test: 159 pass. Đính chính M4 (JSON bị cắt 1/5.677) đã ghi ở QĐ-028.
+**Việc đầu tiên phiên sau:** hỏi kết quả báo GVHD (V29) và số billing cho V26, rồi làm M6 việc 1.
 
 ## Ghi chú bàn giao — phiên 2026-10-29
 

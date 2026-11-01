@@ -13,7 +13,7 @@ nằm ở `docs/experiment-log.md`; báo cáo mốc tổng hợp lại và dẫn
 | M2 | [M2-harness-gport.md](M2-harness-gport.md) | 2026-10-19 | QUA — V10 (a), V11 đã chốt (QĐ-019) |
 | M3 | [M3-graph-c1-gpaper.md](M3-graph-c1-gpaper.md) | 2026-10-19 | QUA — G-paper đạt; V16, V17 đã chốt ở M4 (QĐ-022) |
 | M4 | [M4-h0.md](M4-h0.md) | 2026-10-29 | QUA — H0 tái lập hiện tượng, không tái lập cơ chế (Phát hiện 7); V24 (b), GVHD đồng ý (QĐ-027) |
-| M5 | [M5-h1.md](M5-h1.md) | 2026-11-01 (báo cáo) | Chờ người dùng xem + V28 — H1 giữ một phần (QĐ-028) |
+| M5 | [M5-h1.md](M5-h1.md) | 2026-11-01 | QUA — H1 giữ một phần (QĐ-028); V28 (b), trọng tâm sang C3 (QĐ-029) |
 
 ## Mẫu
 

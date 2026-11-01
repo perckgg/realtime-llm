@@ -1441,3 +1441,24 @@ số 1,14 chỉ suy từ một lần đối chiếu và không được coi là 
 
 **Sửa code.** `analyze` thêm `gate`, `cited_near_share`, `repeat_stability`. `h1_val.yaml` thêm `run_id`
 để `test_committed_configs_load` pass (không đổi prompt).
+
+## QĐ-029 — V28 (b): giảm vai trò C2, trọng tâm sang C3; đóng M5, mở M6 (2026-11-01)
+
+**Người dùng chốt.** Kết luận H1 **giữ một phần** (QĐ-028). V28 chọn **(b)**.
+
+**Nội dung (b).**
+- Không chọn đặc trưng C2 nào từ H1: độ gần, loại bằng chứng và confidence chưa tách được normal và fault
+  trên các điều kiện đã đo.
+- C2 không bị bỏ ngay vì chưa được đo trên verdict H0 thật. M6 chỉ quét θ trên verdict đã cache, không gọi
+  thêm LLM.
+- Trọng tâm giảm FP của CTAV chuyển sang C3 (bằng chứng bất thường tại `s_0`).
+- C2 được giữ hay bỏ theo tiêu chí có sẵn của H3 (`08` §5.1): ablation trên `val` không cho thấy C2 đóng
+  góp ⇒ bỏ khỏi phương pháp và ghi lại. Tiêu chí này ghi trước khi quét để tránh chọn sau khi xem số.
+
+**Đóng M5.** QUA, ngày 2026-11-01 (hạn 2026-11-22, sớm 21 ngày). DoD "đặc trưng cho C2" đạt theo nghĩa đã
+ghi quyết định không chọn đặc trưng nào, với lý do và số liệu ở QĐ-028.
+
+**GVHD.** Chưa được báo tại thời điểm ghi QĐ này. (b) đổi trọng tâm phương pháp nên người dùng cần báo
+GVHD; nếu GVHD phản đối thì mở lại V28.
+
+**Sửa tài liệu.** `08` §4, §5.1 và `04` M5, M6 theo nội dung trên. Chưa viết code M6.

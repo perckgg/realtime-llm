@@ -22,8 +22,8 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M2 | Eval harness + kiểm tra port | **Cổng chặn G-port** | 2026-11-01 | **Xong** (2026-10-19) — `docs/milestones/M2-harness-gport.md` |
 | M3 | Service graph + C1 + tái lập paper | **Cổng chặn G-paper** | 2026-11-08 | **Xong** (2026-10-19) — `docs/milestones/M3-graph-c1-gpaper.md` |
 | M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Xong** (2026-10-29; V24 (b), GVHD đồng ý, QĐ-027) — `docs/milestones/M4-h0.md` |
-| M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Chờ xem + V28** (mở 2026-10-29; QĐ-028) — `docs/milestones/M5-h1.md` |
-| M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | |
+| M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Xong** (2026-11-01; H1 giữ một phần, V28 (b), QĐ-028, QĐ-029) — `docs/milestones/M5-h1.md` |
+| M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | **Đang làm** (mở 2026-11-01) |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | |
 | M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | |
@@ -179,11 +179,11 @@ CI; kết luận H1 (giữ / bác bỏ) và đặc trưng chọn cho C2 ghi expe
 | Việc | Output |
 |---|---|
 | Ngưỡng nền `duration_ms` theo service + operation trên `dev` (cho C3, QĐ-027) | `data/span_baseline.parquet` |
-| `services/judge/policy.py` — asymmetric gating theo hồ sơ bằng chứng (θ_local, θ_topo; đặc trưng từ H1) + evidence anchoring vào bằng chứng bất thường tại s₀ (QĐ-027); áp lên verdict **đã cache** từ M4 | Module + unit test |
+| `services/judge/policy.py` — evidence anchoring vào bằng chứng bất thường tại s₀ (C3, trọng tâm, QĐ-029) + gating theo θ (C2, không có đặc trưng từ H1); áp lên verdict **đã cache** từ M4 | Module + unit test |
 | Quét θ_topo; chọn trên `val` | Đường cong θ_topo vs (Recall, FPR) |
 | `services/judge/routing.py` — BM25 trước, topology khi UNCERTAIN / thiếu bằng chứng | Module + unit test |
 | Quét ngân sách gọi LLM (H4) | Đường cong F1 theo ngân sách |
-| Ablation H3: CTAV đầy đủ, bỏ C2, bỏ C3, bỏ C4 | Bảng ablation `val` |
+| Ablation H3: CTAV đầy đủ, bỏ C2, bỏ C3, bỏ C4; C2 không đóng góp ⇒ bỏ khỏi phương pháp (QĐ-029) | Bảng ablation `val` |
 | **Song song:** `rca_agent/grouping.py` bản khởi động (chỉ cần timestamp + graph) | Module chạy độc lập |
 
 **DoD M6:** `eval/configs/ctav_final.yaml` chốt; bảng H3 trên `val` có CI; θ chọn ghi experiment-log.
