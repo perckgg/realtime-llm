@@ -1,0 +1,60 @@
+{
+  "git_commit": "07f75335497d875ab45f39b73cff1844f6d5d43e",
+  "created_at": "2026-11-01T09:24:01.460259+00:00",
+  "trace_files": 303,
+  "span_reasons": {
+    "not_dev": 3409584,
+    "during_injection": 518468,
+    "kept": 123613,
+    "fault_window": 41636,
+    "duplicate": 26836,
+    "no_window": 3811
+  },
+  "keys": 106,
+  "keys_with_min_spans": 96,
+  "min_spans": 30,
+  "keys_compared_during_injection": 52,
+  "median_p95_ratio_during_vs_clean": 1.0364132265696713,
+  "share_keys_p95_higher_during": 0.6346153846153846,
+  "coverage": {
+    "h0_val_bm25_v3": {
+      "trace_events": 6156,
+      "covered": 2041,
+      "covered_share": 0.3315464587394412,
+      "over_p95_share_of_covered": 0.07496325330720235,
+      "over_p99_share_of_covered": 0.04899559039686428,
+      "uncovered_by_service": {
+        "checkoutservice": 989,
+        "adservice": 886,
+        "ts-inside-payment-service": 723,
+        "ts-order-service": 526,
+        "ts-seat-service": 279,
+        "ts-route-service": 242,
+        "ts-payment-service": 174,
+        "productcatalogservice": 84,
+        "ts-user-service": 59,
+        "currencyservice": 42
+      }
+    },
+    "h0_val_c1_k0_v1": {
+      "trace_events": 7576,
+      "covered": 2412,
+      "covered_share": 0.3183738120380148,
+      "over_p95_share_of_covered": 0.10074626865671642,
+      "over_p99_share_of_covered": 0.07960199004975124,
+      "uncovered_by_service": {
+        "ts-inside-payment-service": 1110,
+        "checkoutservice": 1065,
+        "adservice": 888,
+        "ts-seat-service": 746,
+        "ts-order-service": 562,
+        "ts-route-service": 246,
+        "ts-payment-service": 174,
+        "productcatalogservice": 87,
+        "ts-user-service": 60,
+        "ts-food-service": 48
+      }
+    }
+  },
+  "wall_seconds": 52.9
+}

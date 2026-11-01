@@ -1462,3 +1462,53 @@ ghi quyết định không chọn đặc trưng nào, với lý do và số li�
 GVHD; nếu GVHD phản đối thì mở lại V28.
 
 **Sửa tài liệu.** `08` §4, §5.1 và `04` M5, M6 theo nội dung trên. Chưa viết code M6.
+
+## QĐ-030 — M6 việc 1: baseline `dev` chỉ phủ ≈ 32% span trên `val`; chờ V30 (2026-11-01)
+
+**Thiết lập.** `services/judge/span_baseline.py`, `scripts/build_span_baseline.py`; p50/90/95/99 của
+`duration_ms` theo (service, operation), khóa cần ≥ 30 span. Vì nhãn chỉ theo pod, span được giữ phải thuộc
+cửa sổ normal của `dev` **và** nằm ngoài mọi khoảng tiêm lỗi [−60 s; +360 s] của cùng hệ thống. Kết quả:
+`data/span_baseline.parquet` (không commit), `eval/results/m6_span_baseline_v1/summary.json`. 0 lần gọi LLM.
+
+**Bảng M6-1. Phân loại span trong 303 file trace.**
+
+| Loại | Span |
+|---|---:|
+| Giữ lại | 123.613 |
+| Cửa sổ normal của `dev` nhưng đang có tiêm lỗi trong hệ thống | 518.468 |
+| Cửa sổ fault của `dev` | 41.636 |
+| Không thuộc `dev` | 3.409.584 |
+| Không có cửa sổ | 3.811 |
+| Trùng do các file phút chồng lấn | 26.836 |
+
+**Kết quả.** 106 khóa, 96 khóa đủ mẫu. 80,7% span normal của `dev` nằm trong lúc tiêm lỗi, nhưng trung vị p95
+lúc tiêm lỗi / lúc sạch chỉ là 1,036 (52 khóa so sánh được; 63,5% khóa cao hơn). Bộ lọc đúng nguyên tắc nhưng
+tác động lên ngưỡng nhỏ.
+
+**Phát hiện 8 — đặc tả "phân vị tính trên `dev`" không thực hiện được cho đa số span.** Baseline chỉ phủ
+33,2% span cục bộ retrieval của `h0_val_bm25_v3` và 31,8% của `h0_val_c1_k0_v1`. Nguyên nhân là split: normal
+chia theo `day|pod`, nên `adservice`, `checkoutservice`, `ts-order-service`, `ts-seat-service`,
+`ts-inside-payment-service` không có cửa sổ normal nào trong `dev`. Nới lỏng bộ lọc gần như không giúp: giữ cả
+span trong lúc tiêm lỗi chỉ tăng độ phủ từ 2.041 lên 2.055 event (BM25). Không được sinh lại split.
+
+**Bảng M6-2. Thử baseline trượt** (`scripts/span_baseline_probe.py`,
+`eval/results/m6_rolling_probe_v1/summary.json`): cùng khóa, trong N phút trước cửa sổ alert, kết thúc 60 s
+trước cửa sổ, cần ≥ 30 span. Không dùng nhãn.
+
+| Run | Baseline | Độ phủ | Event vượt p95 trong phần phủ | Trung vị p95 trượt / p95 `dev` |
+|---|---|---|---|---|
+| BM25 | `dev` | 33,2% | 7,5% | |
+| BM25 | trượt 10 phút | 71,6% | 12,7% | 0,281 |
+| BM25 | trượt 30 phút | 84,6% | 11,5% | 0,273 |
+| BM25 | trượt 60 phút | 93,2% | 13,2% | 0,277 |
+| C1 | `dev` | 31,8% | 10,1% | |
+| C1 | trượt 10 phút | 68,3% | 7,1% | 0,326 |
+| C1 | trượt 30 phút | 84,2% | 7,1% | 0,327 |
+| C1 | trượt 60 phút | 92,7% | 7,3% | 0,371 |
+
+**Chưa giải thích được.** Trên khóa có cả hai baseline, p95 trượt chỉ bằng ≈ 0,3 lần p95 `dev`. Chưa kiểm
+nguyên nhân (khác ngày, khác tải, khác pod đều có thể). Chênh lệch này khiến việc trộn hai loại ngưỡng không an
+toàn. Baseline trượt có thể lẫn span lỗi nếu lỗi bắt đầu trước cửa sổ alert. Mọi số trên chưa dùng nhãn, chưa
+cho biết C3 có tách được normal và fault hay không.
+
+**Chờ V30.** Đổi nguồn baseline là đổi đặc tả C3 trong `08`, người dùng quyết định.

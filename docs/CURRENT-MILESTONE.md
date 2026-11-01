@@ -35,7 +35,7 @@ chững lại từ 67% và tác động cả recall. Không chọn đặc trưng
 
 ### Việc (chi tiết ở `04` M6 và báo cáo M5 §4)
 
-1. - [ ] Ngưỡng nền `duration_ms` theo service + operation trên `dev` (cho C3) ⇒ `data/span_baseline.parquet`
+1. - [ ] Ngưỡng nền `duration_ms` theo service + operation (cho C3): baseline `dev` đã dựng nhưng chỉ phủ ≈ 32% span trên `val` (Phát hiện 8, QĐ-030). **Chờ V30**
 2. - [ ] `services/judge/policy.py`: C3 (trọng tâm) + gating θ (C2); áp lên verdict **đã cache** từ M4; unit test
 3. - [ ] Quét θ, chọn trên `val`, không gọi thêm LLM
 4. - [ ] `services/judge/routing.py`: BM25 trước, topology khi UNCERTAIN / thiếu bằng chứng; unit test
@@ -53,6 +53,7 @@ Hạn 2026-12-06.
 | ~~V25~~ | Ý kiến GVHD về V24 (b) | GVHD đồng ý 2026-10-29 | |
 | V26 | Billing 5 USD / ≈ 8k request so với ≈ 4,4 USD / ≈ 4.830 request trong log (QĐ-026) | Người dùng cho biết khung thời gian của dashboard ⇒ đối chiếu. Nếu billing thật cao hơn token > 1,3× thì tính lại bảng ngân sách dưới | Không (theo dõi) |
 | ~~V28~~ | Đặc trưng C2 sau H1 | Người dùng chốt (b) (QĐ-029) | |
+| V30 | Nguồn ngưỡng nền cho C3: baseline `dev` phủ ≈ 32% span trên `val` (QĐ-030) | Baseline trượt 60 phút (phủ ≈ 93%), đổi đặc tả C3 trong `08` | **M6 việc 2** |
 | V29 | GVHD chưa được báo V28 (b); cần biết thêm loại báo cáo tháng 11 (tiến độ hay kết quả) | Người dùng báo GVHD; GVHD phản đối ⇒ mở lại V28 | Không (M6 đang chạy song song) |
 | V27 | Phạm vi chấm ở M8 (`test`): toàn bộ candidate (như H0, ≈ 14 USD) hay chỉ cửa sổ có telemetry (số chính, ≈ 5 USD) | Quyết định khi mở M8, theo số credit còn lại lúc đó | M8 |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
@@ -100,8 +101,10 @@ M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`r
 ## Ghi chú bàn giao — phiên 2026-11-01
 
 **Trạng thái:** M5 đóng (QĐ-028, QĐ-029, `h1_val_analysis_v2`): H1 giữ một phần, V28 (b). M6 đã mở,
-**chưa viết code M6**. Test: 159 pass. Đính chính M4 (JSON bị cắt 1/5.677) đã ghi ở QĐ-028.
-**Việc đầu tiên phiên sau:** hỏi kết quả báo GVHD (V29) và số billing cho V26, rồi làm M6 việc 1.
+M6 việc 1 dừng ở QĐ-030: baseline `dev` phủ ≈ 32% span trên `val`, chờ V30. Đính chính M4 (JSON bị cắt
+1/5.677) đã ghi ở QĐ-028.
+**Việc đầu tiên phiên sau:** hỏi V30, kết quả báo GVHD (V29) và số billing cho V26. Không làm M6 việc 2
+trước khi có V30.
 
 ## Ghi chú bàn giao — phiên 2026-10-29
 

@@ -1,0 +1,69 @@
+{
+  "guard_seconds": 60,
+  "min_spans": 30,
+  "keys_in_corpus": 302,
+  "runs": {
+    "h0_val_bm25_v3": {
+      "trace_events": 6156,
+      "dev_covered": 2041,
+      "dev_covered_share": 0.3315464587394412,
+      "rolling": {
+        "10": {
+          "covered": 4408,
+          "covered_share": 0.7160493827160493,
+          "only_rolling": 2735,
+          "over_p95_share_of_covered": 0.12681488203266789,
+          "median_rolling_over_dev_p95": 0.28074442564530083,
+          "pairs_compared": 1673
+        },
+        "30": {
+          "covered": 5208,
+          "covered_share": 0.8460038986354775,
+          "only_rolling": 3399,
+          "over_p95_share_of_covered": 0.11482334869431643,
+          "median_rolling_over_dev_p95": 0.27301092686363754,
+          "pairs_compared": 1809
+        },
+        "60": {
+          "covered": 5739,
+          "covered_share": 0.932261208576998,
+          "only_rolling": 3801,
+          "over_p95_share_of_covered": 0.13173026659696813,
+          "median_rolling_over_dev_p95": 0.2768994721377015,
+          "pairs_compared": 1938
+        }
+      }
+    },
+    "h0_val_c1_k0_v1": {
+      "trace_events": 7576,
+      "dev_covered": 2412,
+      "dev_covered_share": 0.3183738120380148,
+      "rolling": {
+        "10": {
+          "covered": 5178,
+          "covered_share": 0.6834741288278775,
+          "only_rolling": 3241,
+          "over_p95_share_of_covered": 0.070876786404017,
+          "median_rolling_over_dev_p95": 0.3257546405282076,
+          "pairs_compared": 1937
+        },
+        "30": {
+          "covered": 6378,
+          "covered_share": 0.8418690601900739,
+          "only_rolling": 4225,
+          "over_p95_share_of_covered": 0.07086861084979618,
+          "median_rolling_over_dev_p95": 0.32742728193121573,
+          "pairs_compared": 2153
+        },
+        "60": {
+          "covered": 7025,
+          "covered_share": 0.9272703273495249,
+          "only_rolling": 4736,
+          "over_p95_share_of_covered": 0.07316725978647687,
+          "median_rolling_over_dev_p95": 0.3711514940667342,
+          "pairs_compared": 2289
+        }
+      }
+    }
+  }
+}
