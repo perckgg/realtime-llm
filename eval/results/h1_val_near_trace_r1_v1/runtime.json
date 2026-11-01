@@ -1,0 +1,18 @@
+{
+  "run_id": "h1_val_near_trace_r1_v1",
+  "condition": "near_trace",
+  "repeat": 1,
+  "subset_normal": 200,
+  "sample": "eval/samples/h1_val_v1.json.gz",
+  "sample_git_commit": "eb20df49d20a324bf059396b3cbec8dc77f7fdf6",
+  "git_commit": "8942e0b53e33cbb9921ff722861719ba7695bdaa",
+  "finished_at": "2026-11-01T08:18:57.681528+00:00",
+  "wall_seconds": 55.0,
+  "calls": 127,
+  "api_calls": 127,
+  "cache_hits": 0,
+  "errors": 0,
+  "prompt_tokens_api": 242621,
+  "completion_tokens_api": 34844,
+  "estimated_usd_by_tokens": 0.1599
+}

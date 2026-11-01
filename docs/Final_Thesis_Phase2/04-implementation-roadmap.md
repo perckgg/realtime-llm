@@ -22,7 +22,7 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M2 | Eval harness + kiểm tra port | **Cổng chặn G-port** | 2026-11-01 | **Xong** (2026-10-19) — `docs/milestones/M2-harness-gport.md` |
 | M3 | Service graph + C1 + tái lập paper | **Cổng chặn G-paper** | 2026-11-08 | **Xong** (2026-10-19) — `docs/milestones/M3-graph-c1-gpaper.md` |
 | M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Xong** (2026-10-29; V24 (b), GVHD đồng ý, QĐ-027) — `docs/milestones/M4-h0.md` |
-| M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Đang làm** (mở 2026-10-29) |
+| M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Chờ xem + V28** (mở 2026-10-29; QĐ-028) — `docs/milestones/M5-h1.md` |
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | |

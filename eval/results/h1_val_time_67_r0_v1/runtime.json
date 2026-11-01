@@ -1,0 +1,18 @@
+{
+  "run_id": "h1_val_time_67_r0_v1",
+  "condition": "time_67",
+  "repeat": 0,
+  "subset_normal": 0,
+  "sample": "eval/samples/h1_val_v1.json.gz",
+  "sample_git_commit": "eb20df49d20a324bf059396b3cbec8dc77f7fdf6",
+  "git_commit": "8942e0b53e33cbb9921ff722861719ba7695bdaa",
+  "finished_at": "2026-10-29T05:08:34.031383+00:00",
+  "wall_seconds": 280.4,
+  "calls": 619,
+  "api_calls": 619,
+  "cache_hits": 0,
+  "errors": 0,
+  "prompt_tokens_api": 1183580,
+  "completion_tokens_api": 163886,
+  "estimated_usd_by_tokens": 0.7648
+}

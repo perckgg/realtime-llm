@@ -1,0 +1,18 @@
+{
+  "run_id": "h1_val_ref_flat_r0_v1",
+  "condition": "ref_flat",
+  "repeat": 0,
+  "subset_normal": 0,
+  "sample": "eval/samples/h1_val_v1.json.gz",
+  "sample_git_commit": "eb20df49d20a324bf059396b3cbec8dc77f7fdf6",
+  "git_commit": "eb20df49d20a324bf059396b3cbec8dc77f7fdf6",
+  "finished_at": "2026-10-29T04:37:49.576170+00:00",
+  "wall_seconds": 0.4,
+  "calls": 1286,
+  "api_calls": 0,
+  "cache_hits": 0,
+  "errors": 1286,
+  "prompt_tokens_api": 0,
+  "completion_tokens_api": 0,
+  "estimated_usd_by_tokens": 0.0
+}

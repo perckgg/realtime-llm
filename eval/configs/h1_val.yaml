@@ -1,0 +1,48 @@
+# QĐ-027 (M5, H1): mẫu can thiệp trên val. Replay + detector + C1-paper (tham chiếu `ref`) giống hệt h0_val_c1_k0; judge giống H0.
+run_id: h1_val   # chỉ cho load_config; run thật: h1_val_<điều kiện>_r<repeat>_v<n> (scripts/h1.py --run-id)
+seed: 42
+split: val
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+retrieval:
+  type: hybrid_bm25_graph
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  workers: 6
+  params:
+    bm25_pool: window
+    alpha: 0.35
+    beta: 0.25
+    gamma: 0.40
+    tau_seconds: 300
+    bm25_k: 60
+    graph_max_distance: 2
+    graph_per_service_limit: 20
+    time_margin_minutes: 8
+    engine: vectorized
+    k_graph: 0
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]
+h1:
+  sample: eval/samples/h1_val_v1.json.gz
+  seed: 42
+  near_s: 60       # |t - t0| <= 60 s: "sát thời điểm"
+  far_min_s: 180   # |t - t0| >= 180 s: "xa" (trong lề ±8 phút của C1)

@@ -1278,7 +1278,7 @@ output, giá 0,30 / 2,50 USD mỗi 1 M) ≈ **4,40 USD**; **billing người dù
 (chưa đối chiếu được: log có ≈ 4.830 request HTTP gồm retry; khung thời gian của dashboard chưa rõ).
 Ước tính 3,6 USD ghi lúc đầu là sai: dùng đơn giá của BM25 (≈ 600 token prompt / 60 output mỗi lần
 gọi mới) cho C1, trong khi prompt C1 dài ≈ 2.000 / 310 token. Cache: 5.903 → 10.710 entry. JSON hỏng: 0/5.677
-ở mọi run (V21: phương án (a) đủ). Lỗi judge: 1 ở `h0_val_c1_k0_v1` (tính manual review, 1 cửa sổ
+ở mọi run (V21: phương án (a) đủ; **đính chính ở QĐ-028:** 1/5.677 ở `c1_k0`, (a) vẫn đủ). Lỗi judge: 1 ở `h0_val_c1_k0_v1` (tính manual review, 1 cửa sổ
 normal). Bốn run `_b120` và `norag_reqev` 100% từ cache.
 
 Bảng QĐ-026-1. H0 trên `val`, tập có telemetry (7.636 cửa sổ, 209 fault) — số chính. CI95
@@ -1388,3 +1388,56 @@ GVHD không phản đối (b). Ngày đóng 2026-10-29 (hạn 2026-11-15, sớm 
 **Chưa làm.** Chưa viết code nào cho C2/C3 mới hay H1; `08`, `04` và nháp chương Bài toán đã sửa
 theo bảng trên. Chi phí ước tính M5: mỗi điều kiện H1 ≈ 1.200 lần gọi ≈ 1,6 USD theo token (prompt
 ≈ 2.000 / 310 token), ≈ 1,9 USD nếu billing cao hơn token ≈ 14% như ngày 2026-10-28.
+
+## QĐ-028 — M5: kết quả H1 trên `val`, chưa chọn được đặc trưng C2 (2026-11-01)
+
+**Thiết lập.** Mẫu `eval/samples/h1_val_v1.json.gz` (seed 42), judge `gemini-2.5-flash`, 9 điều kiện,
+`repeat` 1, 2 trên `ref` và `near_trace` (`--subset 200`). Phân tích:
+`eval/results/h1_val_analysis_v2/h1_analysis.json`; bảng đầy đủ ở `docs/milestones/M5-h1.md`.
+
+**Kiểm tra trước khi phân tích (không gọi API).** Dựng lại prompt của 8 điều kiện đã chạy bằng code hiện
+tại: cache trúng 100%, 0 verdict lệch so với `judged.jsonl`. Không có file code, config hay mẫu nào bị
+sửa sau lần chạy 2026-10-29, nên không cần chạy lại. `neighbor_trace` thiếu 1/659 lần gọi, đã chạy nốt.
+
+**Kết quả.**
+
+| Biến | Normal | Fault |
+|---|---|---|
+| Độ dốc theo tỷ lệ bằng chứng gần (0 → 100%) | +0,094 [+0,050; +0,134] | +0,230 [+0,086; +0,370] |
+| `near_log` − `near_trace` | −0,326 [−0,389; −0,269] | −0,456 [−0,596; −0,333] |
+| `neighbor_trace` − `near_trace` | −0,331 [−0,375; −0,286] | −0,281 [−0,439; −0,123] |
+| `order_rev` − `ref_flat` | −0,012 [−0,037; +0,013] | +0,009 [−0,064; +0,073] |
+| `ref_flat` − `ref` | +0,020 [+0,001; +0,042], McNemar p = 0,0617 | −0,009 [−0,073; +0,055] |
+
+**Kết luận H1: giữ một phần.**
+- Giữ: TRUE_ALERT trên normal tăng theo độ gần thời gian và cao hơn rõ với trace so với log; thứ tự không
+  có tác dụng đo được.
+- Không đạt chặt: tiêu chí "đơn điệu" của `08` §5.1. Đường normal là 0,515 / 0,554 / 0,611 / 0,600, chững
+  lại từ 67%.
+- Chưa kiểm: vế "không phải do số lượng", vì `k` giữ cố định = 6.
+- Điểm phải viết rõ trong luận văn: tác động **không riêng cho normal**. Recall cũng tăng, độ dốc trên
+  fault không nhỏ hơn normal. Đây là độ nhạy chung của judge với bằng chứng, chưa phải thiên lệch chỉ tạo FP.
+- Nhánh `neighbor_trace` không trung tính nên không phải đối chứng âm đúng nghĩa, nhưng đi ngược giả
+  thuyết cũ của QĐ-011: trace lân cận làm giảm TRUE_ALERT.
+
+**Đặc trưng C2: chưa chọn được (V28).** Trên các điều kiện đã đo, ngưỡng confidence không tách nhãn nhất
+quán; θ = 0,95 loại gần hết alert (≤ 0,089 ở mọi điều kiện). Tỷ lệ bằng chứng gần được trích trên normal và
+fault có CI chồng nhau (`time_33` 0,485 và 0,638; `time_67` 0,840 và 0,854). Các số này đo trên prompt dựng
+và chưa có CI cho ngưỡng; verdict H0 đã cache chỉ được quét ở M6. Khuyến nghị: M6 quét θ trên cache, không
+tốn API, đặt trọng tâm vào C3 và báo GVHD. Chờ người dùng chốt.
+
+**Phương sai judge.** Tỷ lệ lật cờ TRUE_ALERT qua `repeat` 0/1/2: `ref` 0,007 (140 normal) và 0,000
+(109 fault); `near_trace` 0,000 (70 normal) và 0,035 (57 fault). Nhỏ so với hiệu ứng thời gian và loại
+bằng chứng; chỉ đo trên hai điều kiện.
+
+**Chi phí: ước tính theo token, chưa đối chiếu billing (V26).** Token ghi trong log × giá trong code
+(0,30 / 2,50 USD mỗi 1 triệu). M5: 6.988 lần gọi thành công, ≈ 9,48 USD, trong đó ngày 2026-11-01 là 753
+lần gọi, 1,0093 USD. Không tính request lỗi, retry và request bị ngắt. Số tiền thực bị tính chưa biết; hệ
+số 1,14 chỉ suy từ một lần đối chiếu và không được coi là số billing.
+
+**Đính chính QĐ-026.** Dòng "JSON hỏng: 0/5.677 ở mọi run" là sai: lỗi judge duy nhất ở
+`h0_val_c1_k0_v1` là JSON bị cắt (1/5.677; `invalid judge JSON: Unterminated string`, candidate
+`cand-46328c6dd473c922`, normal). V21 (a) vẫn đủ.
+
+**Sửa code.** `analyze` thêm `gate`, `cited_near_share`, `repeat_stability`. `h1_val.yaml` thêm `run_id`
+để `test_committed_configs_load` pass (không đổi prompt).

@@ -6,7 +6,7 @@
 
 ---
 
-## Trạng thái — 2026-10-29
+## Trạng thái — 2026-11-01
 
 | Mốc | Trạng thái | Báo cáo / quyết định |
 |---|---|---|
@@ -15,7 +15,7 @@
 | M2 | QUA | `docs/milestones/M2-harness-gport.md`; QĐ-018, QĐ-019 |
 | M3 | QUA (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
 | M4 | QUA (đóng 2026-10-29; GVHD đồng ý V24 (b)) | `docs/milestones/M4-h0.md`; QĐ-022..027 |
-| M5 | **ĐANG LÀM** (mở 2026-10-29) | Mục dưới; `04` M5 |
+| M5 | **CHỜ XEM + V28** (mở 2026-10-29) | `docs/milestones/M5-h1.md`; QĐ-028 |
 
 M4 tóm tắt: H0 trên `val` tái lập **hiện tượng** (C1-paper − BM25: ΔRecall +0,100 [+0,052; +0,155],
 ΔFPR +0,025 [+0,020; +0,031], McNemar có ý nghĩa; ΔF1 CI chứa 0) nhưng **không tái lập cơ chế**
@@ -31,10 +31,10 @@ CTAV (QĐ-027; GVHD đồng ý 2026-10-29).
 ### Việc (chi tiết ở báo cáo M4 §4 và `04` M5)
 
 1. - [x] Người dùng gửi mail GVHD; GVHD đồng ý V24 (b) (2026-10-29)
-2. - [ ] Mẫu cố định `eval/samples/h1_val.json` (seed 42): candidate normal có telemetry + 109 fault candidate của `val`; pool cục bộ từ `build_pool`
-3. - [ ] Prompt can thiệp, giữ k = 6: tỷ lệ event trong ±60 s quanh t₀ 0/33/67/100%; trace ↔ log; xáo thứ tự; đối chứng âm tỷ lệ lân cận 0/100%. Kiểm tra trước số candidate dựng được mọi điều kiện
-4. - [ ] Judge thật từng điều kiện (chạy một điều kiện thử trước); `repeat ∈ {0, 1, 2}` trên tập con
-5. - [ ] Phân tích + kết luận H1 + đặc trưng cho C2 ⇒ experiment-log, báo cáo `docs/milestones/M5-h1.md`
+2. - [x] Mẫu cố định `eval/samples/h1_val_v1.json.gz` (seed 42; `py scripts/h1.py collect`, 15 phút, 0 USD): 1.749 candidate có telemetry; dựng được `ref`/`ref_flat`/`order_rev` 1.177 normal + 109 fault, `time_*` 563 + 56, `near_trace` 602 + 57, `near_log` 432 + 57, `neighbor_trace` 602 + 57
+3. - [x] Prompt can thiệp (`eval/harness/h1.py`, `tests/test_h1.py`): điểm hiển thị cố định theo vị trí; `ref` tái tạo đúng prompt H0 (1.286/1.286 trúng cache)
+4. - [x] Judge thật: `ref`, `ref_flat` (`_v2`; `_v1` hỏng vì thiếu key — để nguyên), `order_rev`, `time_0/33/67`, `near_trace`, `near_log`, `neighbor_trace`; `repeat` 1, 2 trên `ref`, `near_trace` (752 lần gọi; 2026-11-01)
+5. - [ ] Phân tích và kết luận H1 **xong** (QĐ-028, `docs/milestones/M5-h1.md`). **Còn** đặc trưng cho C2 (V28) và người dùng xem báo cáo
 
 **DoD M5:** đường tỷ lệ TRUE_ALERT trên normal (và recall trên fault) theo từng biến can thiệp có
 CI; kết luận H1 (giữ / bác bỏ) và đặc trưng cho C2 ghi experiment-log. Hạn 2026-11-22.
@@ -44,7 +44,9 @@ CI; kết luận H1 (giữ / bác bỏ) và đặc trưng cho C2 ghi experiment-
 | # | Vấn đề | Khuyến nghị | Chặn gì |
 |---|---|---|---|
 | ~~V25~~ | Ý kiến GVHD về V24 (b) | GVHD đồng ý 2026-10-29 | |
-| V26 | Billing 5 USD / ≈ 8k request so với ≈ 4,4 USD / ≈ 4.830 request trong log (QĐ-026) | Người dùng cho biết khung thời gian của dashboard ⇒ đối chiếu; ước ngân sách M5 (≈ 16–23 USD) theo kết quả | Ngân sách M5 |
+| V26 | Billing 5 USD / ≈ 8k request so với ≈ 4,4 USD / ≈ 4.830 request trong log (QĐ-026) | Người dùng cho biết khung thời gian của dashboard ⇒ đối chiếu. Nếu billing thật cao hơn token > 1,3× thì tính lại bảng ngân sách dưới | Không (theo dõi) |
+| V28 | Chưa có đặc trưng C2 tách được normal và fault (QĐ-028, báo cáo M5 §3) | (b) M6 chỉ quét θ trên verdict đã cache, trọng tâm sang C3, báo GVHD | **M6** |
+| V27 | Phạm vi chấm ở M8 (`test`): toàn bộ candidate (như H0, ≈ 14 USD) hay chỉ cửa sổ có telemetry (số chính, ≈ 5 USD) | Quyết định khi mở M8, theo số credit còn lại lúc đó | M8 |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
@@ -52,13 +54,58 @@ Các vấn đề V16–V24 đã chốt: xem báo cáo M4 §3 và QĐ-022..027.
 
 ---
 
+## Ngân sách API (ghi 2026-10-29, theo yêu cầu người dùng)
+
+**Credit còn lại:** ≈ 1.250.000 đ ≈ **48 USD** (ước theo ≈ 26.000 đ/USD — đối chiếu đơn vị credit trên AI
+Studio). Đơn giá thực đo (QĐ-026, M5): ≈ 0,0014 USD / lần gọi theo token với prompt có 6 bằng chứng
+(≈ 2.000 token vào / 310 ra); ≈ 0,0006 USD với prompt không bằng chứng; billing ≈ 1,14 × số theo token
+(ngày 2026-10-28). Số dưới đây là **ước tính đã nhân 1,14, không phải số billing thật**: hệ số này chỉ
+suy từ một lần đối chiếu, giá trong code và số dư credit chưa được đối chiếu (V26).
+
+| Mốc | Phần tốn API | Ngân sách | Ngưỡng dừng |
+|---|---|---|---|
+| M5 (còn lại) | Xong: 753 lần gọi, 1,0093 USD **theo token** (billing thật chưa biết) | 1,5 USD | 3 USD |
+| M6 | C2/C3 áp lên verdict đã cache; định tuyến BM25 → C1 và quét ngân sách từ cache H0 | 2 USD | 4 USD — đổi prompt judge = lập lại ngân sách trước khi chạy |
+| M7 | Chỉ chấm các cửa sổ được Rescue Score "cứu" (quét tham số không gọi LLM) | 4 USD | 6 USD |
+| M8 | `test` một lần: BM25, C1, không-RAG (CTAV dùng lại cache) + `repeat` trên tập con; phạm vi theo V27 | 17 USD (toàn bộ) / 8 USD (chỉ telemetry) | 20 USD |
+| M9 | Tóm tắt incident bằng LLM (vài trăm) | 1 USD | 2 USD |
+| M10–M12 | Demo offline từ cache; đánh giá bằng người | 0 | 1 USD |
+| Dự phòng | Chạy lại do lỗi pipeline / đổi prompt | 8 USD | — |
+| **Tổng** | | **≈ 33 USD** (≈ 24 nếu V27 chọn "chỉ telemetry") | |
+
+**Đã tiêu (ước tính theo token, không phải billing; không gồm request lỗi, retry, request bị ngắt):**
+M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`ref_flat` 1,77, `order_rev` 1,77,
+`time_0/33/67` 0,80 / 0,75 / 0,76, `near_trace` 0,84, `near_log` 0,89, `neighbor_trace` 0,876 tính từ
+`usage` trong cache), 2026-11-01 1,0093 USD (`neighbor_trace` 0,0016, `repeat` 1 0,5022, `repeat` 2 0,5056).
+
+**Quy tắc (áp cho mọi mốc):**
+1. Trước mỗi lần chạy có gọi API: ước số lần gọi mới (trừ phần trúng cache) × đơn giá theo **token của
+   đúng loại prompt** — không dùng đơn giá của run khác loại (bài học QĐ-026).
+2. Điều kiện / config mới: chạy thử một điều kiện trước, đọc `runtime.json` (`estimated_usd_by_tokens`),
+   rồi mới chạy phần còn lại.
+3. Một mốc chạm **ngưỡng dừng** ⇒ dừng, báo người dùng, không tự chạy tiếp.
+4. Ghi chi phí thực của mỗi lần chạy vào experiment-log (QĐ của mốc) và cập nhật dòng "Đã tiêu" ở đây.
+5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
+
+---
+
+## Ghi chú bàn giao — phiên 2026-11-01
+
+**Trạng thái:** M5 xong run và phân tích (QĐ-028, `h1_val_analysis_v2`), H1 giữ một phần. Chưa đóng mốc:
+chờ người dùng xem `docs/milestones/M5-h1.md` và chốt V28. Không mở M6 trước khi có hai việc này.
+Test: 159 pass. Đính chính M4 (JSON bị cắt 1/5.677) đã ghi ở QĐ-028.
+**Việc đầu tiên phiên sau:** hỏi V28 và số billing cho V26.
+
 ## Ghi chú bàn giao — phiên 2026-10-29
 
-**Trạng thái:** V24 chốt (b), tạm (QĐ-027); M4 đóng có điều kiện; `08` (§2, §4, §5.1, §6), `04`
-(bảng §1, M4, M5, M6), `06` (dòng H1) và nháp chương (mục 5–6) đã sửa; mail GVHD soạn ở
-`docs/drafts/2026-10-29-mail-gvhd-h0.md` (chưa gửi). Chưa viết code cho M5.
-**Việc đầu tiên phiên sau:** hỏi người dùng đã gửi mail GVHD / có phản hồi chưa, và khung thời gian
-billing (V26); rồi mới mở M5.
+**Trạng thái:** V24 chốt (b), GVHD đồng ý ⇒ M4 QUA; M5 mở. Code H1 (`eval/harness/h1.py`,
+`scripts/h1.py`, `tests/test_h1.py`, `eval/configs/h1_val.yaml`), mẫu `eval/samples/h1_val_v1.json.gz`
+và 8 run `eval/results/h1_val_*` **chưa commit**. Người dùng bảo dừng giữa lúc chạy `neighbor_trace`.
+Sơ bộ: `ref_flat` − `ref` trên normal +0,020 [+0,001; +0,042], McNemar p = 0,06 (điểm hiển thị gần như
+không đổi hành vi judge). Cần sửa ghi chép M4: lỗi duy nhất ở `h0_val_c1_k0_v1` là **JSON bị cắt
+(1/5.677)**, không phải lỗi mạng; V21 (a) vẫn đủ.
+**Việc đầu tiên phiên sau:** hỏi người dùng có chạy tiếp không; nếu có: `neighbor_trace` →
+`repeat` 1, 2 (`--subset 200`) → `py scripts/h1.py analyze` → báo cáo M5, QĐ-028, commit.
 
 ## Ghi chú bàn giao — phiên 2026-10-28
 
