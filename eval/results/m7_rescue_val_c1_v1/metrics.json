@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 5,
+      "fp": 114,
+      "fn": 204,
+      "tn": 7313,
+      "precision": 0.04201680672268908,
+      "recall": 0.023923444976076555,
+      "f1": 0.030487804878048783,
+      "fpr": 0.015349400834791976,
+      "precision_ci95": [
+        0.008771929824561403,
+        0.07936507936507936
+      ],
+      "recall_ci95": [
+        0.004784119389382547,
+        0.047405339316325484
+      ],
+      "f1_ci95": [
+        0.006230045858245777,
+        0.05831330025744634
+      ],
+      "fpr_ci95": [
+        0.01289971480104478,
+        0.018238313969197513
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 1640,
+      "fn": 100,
+      "tn": 5787,
+      "precision": 0.062321326472269865,
+      "recall": 0.5215311004784688,
+      "f1": 0.11133810010214504,
+      "fpr": 0.22081594183384948,
+      "precision_ci95": [
+        0.05196681976496328,
+        0.07415954866803245
+      ],
+      "recall_ci95": [
+        0.4541272701741247,
+        0.5892134706579727
+      ],
+      "f1_ci95": [
+        0.09373037095841952,
+        0.1311142764538305
+      ],
+      "fpr_ci95": [
+        0.21112292259031257,
+        0.23002573067580231
+      ]
+    },
+    "operations": {
+      "windows": 7636,
+      "fault_windows": 209,
+      "candidates": 1749,
+      "retrieval_calls": 1459,
+      "llm_calls": 1459,
+      "api_calls": 1459,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 142,
+      "context_coverage": 0.10047846889952153,
+      "candidate_context_coverage": 0.0,
+      "avg_context_events": 2.0068540095956133,
+      "avg_context_tokens": 12.629883481836874,
+      "retrieval_latency_ms_avg": 134.22054694996572,
+      "retrieval_latency_ms_p95": 324.263,
+      "llm_latency_ms_avg": 2453.862454420836,
+      "llm_latency_ms_p95": 3686.601,
+      "prompt_tokens": 1528366,
+      "completion_tokens": 229047,
+      "estimated_cost_usd": 1.0311273,
+      "downgraded_by_evidence_rule": 7,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 5,
+      "fp": 114,
+      "fn": 204,
+      "tn": 28575,
+      "precision": 0.04201680672268908,
+      "recall": 0.023923444976076555,
+      "f1": 0.030487804878048783,
+      "fpr": 0.003973648436683049,
+      "precision_ci95": [
+        0.008924655388471177,
+        0.07937210282343024
+      ],
+      "recall_ci95": [
+        0.0051256281407035175,
+        0.045876844374920726
+      ],
+      "f1_ci95": [
+        0.006309148264984228,
+        0.05831330025744634
+      ],
+      "fpr_ci95": [
+        0.0032780911126465127,
+        0.0046729216446251085
+      ]
+    },
+    "detector_only": {
+      "tp": 109,
+      "fp": 5568,
+      "fn": 100,
+      "tn": 23121,
+      "precision": 0.01920028183899947,
+      "recall": 0.5215311004784688,
+      "f1": 0.037037037037037035,
+      "fpr": 0.1940813552232563,
+      "precision_ci95": [
+        0.015794434523196597,
+        0.02267187125142463
+      ],
+      "recall_ci95": [
+        0.4535864491973124,
+        0.5891114785752434
+      ],
+      "f1_ci95": [
+        0.030544818864644472,
+        0.04363679101288234
+      ],
+      "fpr_ci95": [
+        0.18941427627966642,
+        0.19867557719283999
+      ]
+    },
+    "operations": {
+      "windows": 28898,
+      "fault_windows": 209,
+      "candidates": 5677,
+      "retrieval_calls": 1459,
+      "llm_calls": 1459,
+      "api_calls": 1459,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 142,
+      "context_coverage": 0.10047846889952153,
+      "candidate_context_coverage": 0.0,
+      "avg_context_events": 2.0068540095956133,
+      "avg_context_tokens": 12.629883481836874,
+      "retrieval_latency_ms_avg": 134.22054694996572,
+      "retrieval_latency_ms_p95": 324.263,
+      "llm_latency_ms_avg": 2453.862454420836,
+      "llm_latency_ms_p95": 3686.601,
+      "prompt_tokens": 1528366,
+      "completion_tokens": 229047,
+      "estimated_cost_usd": 1.0311273,
+      "downgraded_by_evidence_rule": 7,
+      "judge_errors": 0
+    }
+  }
+}

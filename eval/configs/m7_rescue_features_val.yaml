@@ -1,0 +1,21 @@
+# M7 / QĐ-033: thành phần Rescue Score (C5) cho mọi cửa sổ `val`. 0 lần gọi LLM, không đọc nhãn.
+# Công thức và mặc định: 01 §6.2 (k_log 10, σ_rescue 300 s). A = cảnh báo của CTAV chốt
+# (ctav_final_val_v1, decision == alert) nổ trong [t_w − active_seconds, t_w]; active_seconds = cửa sổ
+# gom incident 300 s (01 §6.5). Log lỗi: ERROR / FATAL / CRITICAL, HTTP 5xx, exception (01 §6.2).
+# Chạy: py scripts/build_rescue_features.py --config eval/configs/m7_rescue_features_val.yaml
+kind: rescue_features
+run_id: m7_rescue_features_val_v1
+split: val
+windows_run: h0_val_c1_k0_v1  # cửa sổ, detector (is_candidate), anomaly_score
+alerts_run: ctav_final_val_v1  # tập A
+window_seconds: 60
+graph: data/graph/service_graph.json
+log:
+  k_log: 10
+  levels: [ERROR, FATAL, CRITICAL]
+  patterns:
+    - '\b(?:status|code)\D{0,5}5\d\d\b'
+    - 'exception|panic|traceback'
+time:
+  sigma_seconds: 300
+  active_seconds: 300

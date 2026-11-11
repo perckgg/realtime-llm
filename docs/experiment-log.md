@@ -1658,3 +1658,80 @@ Rescue của M7.
 
 **Mở M7.** Rescue Score (C5) + đăng ký giả thuyết H0–H5; danh sách config `test` phải gồm ablation C2/C3/C4 và
 C3-trượt (V31).
+
+## QĐ-033 — M7: Rescue Score (C5) trên `val`; công thức rút về 2 thành phần, đóng góp không có ý nghĩa (2026-11-11)
+
+**Thiết kế (cố định trong code trước khi chấm LLM).**
+- `services/detector/rescue.py`: hàm thuần `lambda_log`, `phi_topo`, `delta_time`, `active_alerts`,
+  `RescueParams` (η ≥ 0, tổng 1), `rescue_score`, `is_rescued`, `eta_grid` (21 điểm với bước 0,2) — đúng `01` §6.2.
+- **A = cảnh báo của chính CTAV chốt** (`ctav_final_val_v1`, 80 cảnh báo), không dùng nhãn; nhân quả:
+  0 ≤ t_w − t_a ≤ `active_seconds` = 300 s (cửa sổ gom incident `01` §6.5). Cửa sổ được cứu **không** quay lại
+  A (không lan truyền dây chuyền) ⇒ quét 147 tổ hợp không cần gọi LLM.
+- `N_err` = số dòng log của pod trong chính cửa sổ 60 s, khử trùng lặp (ts, pod, message); dòng lỗi = mức
+  ERROR/FATAL/CRITICAL hoặc mẫu `status/code 5xx`, `exception|panic|traceback`; `k_log` = 10, σ = 300 s.
+  Khoảng cách Φ_topo: đồ thị dịch vụ vô hướng (`graph.distances`). Mọi tham số ở
+  `eval/configs/m7_rescue_features_val.yaml`.
+- Lệch roadmap: đặc trưng ghi vào `eval/results/m7_rescue_features_val_v1/rescue_features.parquet`
+  (có snapshot config, không ghi đè) thay vì `data/rescue_features.parquet`.
+- Khả thi (`02` §6.3): số lần gọi thêm ≤ 50% số lần gọi của CTAV (5.677) ⇒ ≤ 2.838.
+- Đánh giá: hợp các cửa sổ được cứu của mọi tổ hợp khả thi chấm **một lần** bằng prompt C1 (cùng retrieval,
+  model, temperature với `h0_val_c1_k0_v1`; runner `rescue.windows`, `source = "rescue"`), rồi áp offline
+  chính sách CTAV (θ 0,80, C3 `dev` p90) qua `eval/harness/rescue.py`.
+- **Quy tắc chọn** (ghi trong code trước khi chấm): trong các tổ hợp khả thi **và "off"**, F1 cao nhất trên
+  `val` telemetry; hòa ⇒ ít lần gọi ⇒ FPR thấp ⇒ ít η khác 0. **Rút gọn công thức:** giữ thành phần có η > 0
+  ở tổ hợp chọn; mặt `without_<thành phần>` là tổ hợp tốt nhất khi η của thành phần đó = 0.
+
+**Bước 1 — đặc trưng** (`m7_rescue_features_val_v1`, 118 s, 0 LLM). 28.898 cửa sổ, 23.221 không là candidate.
+7.254 dòng log lỗi, nhưng 5.742 dòng thuộc pod không có cửa sổ `val` (chủ yếu `frontend` 5.484), chỉ 812 dòng
+rơi vào cửa sổ. Số cửa sổ không-candidate có thành phần > 0: **Λ_log 13**, Φ_topo 486, Δ_time 1.457.
+
+**Bước 2 — kế hoạch** (`m7_rescue_plan_val_v1`, 0 LLM). 147/147 tổ hợp khả thi (lớn nhất cứu 1.457 cửa sổ);
+hợp 1.459 cửa sổ, tất cả có telemetry, 21 fault (detector bỏ sót 100 fault có telemetry).
+
+**Bước 3 — chấm** (`m7_rescue_val_c1_v1`): 1.459 lần gọi API, 0 lỗi judge, 1.528.366 token vào / 229.047 ra =
+**1,03 USD theo token** (≈ 1,18 USD × 1,14). 974/1.459 cửa sổ C1 không lấy được event nào. Câu trả lời thô:
+5 TP / 114 FP; sau chính sách CTAV: 2 TP / 51 FP (`m7_anchor_features_rescue_val_v1` cho C3).
+
+**Bảng M7-1. Rescue Score trên CTAV** (`m7_rescue_val_v1`; `val`, 7.636 cửa sổ telemetry, 209 fault).
+
+| | η (Λ, Φ, Δ) | τ | +lần gọi | TP | FP | P | R | F1 [CI95] | FPR |
+|---|---|---:|---:|---:|---:|---:|---:|---|---:|
+| CTAV (off) | | | 0 | 29 | 51 | 0,363 | 0,139 | 0,201 [0,138; 0,264] | 0,0069 |
+| **chọn** | (0; 0,4; 0,6) | 0,8 | 52 | 31 | 67 | 0,316 | 0,148 | 0,202 [0,143; 0,261] | 0,0090 |
+| recall cao nhất lưới | (0,6; 0,4; 0) | 0,4 | | 31 | 73 | | 0,148 | | |
+
+CTAV+C5 − CTAV: ΔF1 +0,001 [−0,014; +0,022], ΔRecall +0,010 [0,000; +0,025], **ΔP −0,046 [−0,089; −0,010]**,
+**ΔFPR +0,0022 [+0,0011; +0,0034]**; McNemar (mọi cửa sổ): CTAV đúng / C5 sai 16, ngược lại 2, p = 0,0013.
+
+**Bảng M7-2. Đường τ tại η = (0; 0,4; 0,6).**
+
+| τ | 0,3 | 0,4 | 0,5 | 0,6 | 0,7 | 0,8 | 0,9 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Cửa sổ được cứu | 1.286 | 1.130 | 614 | 447 | 159 | 52 | 4 |
+| Lần gọi LLM | 6.963 | 6.807 | 6.291 | 6.124 | 5.836 | 5.729 | 5.681 |
+| Recall | 0,148 | 0,148 | 0,148 | 0,148 | 0,148 | 0,148 | 0,139 |
+| FPR | 0,0137 | 0,0133 | 0,0124 | 0,0116 | 0,0097 | 0,0090 | 0,0070 |
+| F1 | 0,181 | 0,183 | 0,187 | 0,190 | 0,199 | 0,202 | 0,200 |
+
+**Kết luận theo quy tắc ghi trước:** tổ hợp chọn khác "off" ⇒ `c5_kept = true`; **công thức rút về 2 thành
+phần** (Φ_topo, Δ_time; η1 = 0) — hai tham số tự do η2 : η3 và τ. Mặt `without_lambda_log` trùng tổ hợp chọn
+(Λ_log không đóng góp); bỏ Φ_topo hoặc Δ_time đều về F1 của "off".
+
+**Phát hiện 12 — C5 không thêm được recall trên `val`.** Cả lưới chỉ cứu thêm tối đa **2 TP** trên 100 fault
+detector bỏ sót. Nút thắt không ở cổng Rescue mà ở judge: trong 21 fault được đưa vào, C1 trả lời
+FALSE_POSITIVE 16 (đa số đủ 6 bằng chứng, confidence 0,80–0,90), TRUE_ALERT 5; C3 hạ tiếp 3 xuống
+UNCERTAIN. Λ_log gần như luôn 0 vì log lỗi của Nezha nằm ở pod không có cửa sổ (`frontend`). Lựa chọn của quy
+tắc dựa trên chênh F1 +0,0013 (đổi 2 TP lấy 16 FP); FPR tệ hơn có ý nghĩa. Khớp rủi ro số 2 của roadmap
+("Rescue rút về 2 tham số hoặc bỏ C5"). ⇒ **V34**: giữ C5 trong phương pháp chính hay chỉ làm ablation.
+
+**Chi phí M7:** 1.459 lần gọi, 1,03 USD theo token (ngân sách 4 USD, ngưỡng dừng 6 USD).
+
+**Tái lập.**
+```bash
+py scripts/build_rescue_features.py --config eval/configs/m7_rescue_features_val.yaml       # ~2 phút
+py -m eval rescue --config eval/configs/m7_rescue_plan_val.yaml                             # 0 LLM
+py -m eval run --config eval/configs/m7_rescue_val_c1.yaml                                  # 1.459 lần gọi (cache)
+py scripts/build_anchor_features.py --config eval/configs/m7_anchor_features_rescue_val.yaml
+py -m eval rescue --config eval/configs/m7_rescue_val.yaml                                  # 0 LLM
+```
+(Mỗi lệnh cần `run_id` mới nếu thư mục kết quả đã có.)

@@ -1,0 +1,13 @@
+# M7 / QĐ-033 bước 1: quét 147 tổ hợp Rescue Score (02 §6.1) trên CTAV chốt, KHÔNG gọi LLM.
+# Khả thi = số lần gọi thêm ≤ 50% số lần gọi của CTAV (02 §6.3). Ghi hợp các cửa sổ được cứu
+# (rescue_windows.csv) để m7_rescue_val_c1.yaml chấm một lần bằng prompt C1.
+# Chạy: py -m eval rescue --config eval/configs/m7_rescue_plan_val.yaml
+kind: rescue
+run_id: m7_rescue_plan_val_v1
+split: val
+features: m7_rescue_features_val_v1
+ctav: eval/configs/ctav_final.yaml
+grid:
+  eta_step: 0.2
+  tau: [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+max_call_increase: 0.5

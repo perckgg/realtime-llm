@@ -1,0 +1,13 @@
+# M7 / QĐ-033 bước 3: đặc trưng neo C3 cho các trace event mà run chấm Rescue đã retrieve, để
+# áp đúng chính sách CTAV chốt (C3, nền dev p90) lên câu trả lời của các cửa sổ được cứu.
+# Cùng tham số với m6_anchor_features_val.yaml. 0 lần gọi LLM, không dùng nhãn.
+# Chạy: py scripts/build_anchor_features.py --config eval/configs/m7_anchor_features_rescue_val.yaml
+kind: anchor_features
+run_id: m7_anchor_features_rescue_val_v1
+runs: [m7_rescue_val_c1_v1]
+rolling:
+  lookback_minutes: 60
+  guard_seconds: 60
+  min_spans: 30
+percentiles: [90, 95, 99]
+dev_baseline: data/span_baseline.parquet

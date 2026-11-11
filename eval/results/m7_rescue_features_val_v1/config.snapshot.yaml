@@ -1,0 +1,19 @@
+kind: rescue_features
+run_id: m7_rescue_features_val_v1
+split: val
+windows_run: h0_val_c1_k0_v1
+alerts_run: ctav_final_val_v1
+window_seconds: 60
+graph: data/graph/service_graph.json
+log:
+  k_log: 10
+  levels:
+  - ERROR
+  - FATAL
+  - CRITICAL
+  patterns:
+  - \b(?:status|code)\D{0,5}5\d\d\b
+  - exception|panic|traceback
+time:
+  sigma_seconds: 300
+  active_seconds: 300

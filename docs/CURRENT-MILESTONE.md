@@ -6,7 +6,7 @@
 
 ---
 
-## Trạng thái — 2026-11-01
+## Trạng thái — 2026-11-11
 
 | Mốc | Trạng thái | Báo cáo / quyết định |
 |---|---|---|
@@ -17,6 +17,12 @@
 | M4 | QUA (đóng 2026-10-29; GVHD đồng ý V24 (b)) | `docs/milestones/M4-h0.md`; QĐ-022..027 |
 | M5 | QUA (đóng 2026-11-01; H1 giữ một phần, V28 (b)) | `docs/milestones/M5-h1.md`; QĐ-028, QĐ-029 |
 | M6 | QUA CÓ ĐIỀU KIỆN (đóng 2026-11-11; H3 bỏ C2, C4; V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032 |
+| M7 | ĐANG LÀM — Rescue xong; đăng ký giả thuyết nháp, chờ V29, V33, V34 | `docs/milestones/M7-rescue-dang-ky.md`; QĐ-033 |
+
+M7 tóm tắt (QĐ-033): Rescue Score tính offline với A = cảnh báo CTAV; 147/147 tổ hợp khả thi, hợp 1.459 cửa
+sổ chấm một lần (1,03 USD theo token). Quy tắc chọn η = (0; 0,4; 0,6), τ = 0,8 ⇒ công thức rút về 2 thành phần
+(Λ_log không đóng góp); +2 TP / +16 FP, ΔF1 +0,001 [−0,014; +0,022], ΔFPR +0,0022 [+0,0011; +0,0034]
+(Phát hiện 12: nút thắt ở judge, không ở cổng Rescue). Bản nháp đăng ký H0–H5 ở cuối experiment-log.
 
 M6 tóm tắt (QĐ-031): CTAV đánh giá bằng replay verdict H0 đã cache (`py -m eval ctav`, 0 USD). H3 trên `val`
 bỏ C4 (chạy C1 cho mọi candidate rẻ hơn và F1 cao hơn) và C2 (ΔFPR CI chạm 0). Cấu hình chốt
@@ -36,21 +42,16 @@ chững lại từ 67% và tác động cả recall. Không chọn đặc trưng
 
 ---
 
-## Mốc hiện tại: M6 — CTAV: C2 + C3 + C4, chốt cấu hình (theo QĐ-029)
-## Mở 2026-11-01
+## Mốc hiện tại: M7 — Rescue Score (C5) + đăng ký giả thuyết
+## Mở 2026-11-11 (QĐ-032)
 
-### Việc (chi tiết ở `04` M6 và báo cáo M5 §4)
+### Việc (chi tiết ở `04` M7 và báo cáo M6 §4)
 
-1. - [x] Ngưỡng nền `duration_ms` theo service + operation (cho C3): baseline trượt + `dev`, quy tắc chọn `dev` p90 (V30 → QĐ-031)
-2. - [x] `services/judge/policy.py`: C3 (trọng tâm) + gating θ (C2); áp lên verdict **đã cache** từ M4; unit test
-3. - [x] Quét θ, chọn trên `val`, không gọi thêm LLM
-4. - [x] `services/judge/routing.py`: BM25 trước, topology khi UNCERTAIN / thiếu bằng chứng / FP yếu; unit test
-5. - [x] Quét ngân sách gọi LLM (H4)
-6. - [x] Ablation H3: CTAV đầy đủ, bỏ C2, bỏ C3, bỏ C4; C2 và C4 không đóng góp ⇒ bỏ (QĐ-031)
-7. - [x] Song song: `rca_agent/grouping.py` bản khởi động (timestamp + graph)
+1. - [x] Tính trước `Λ_log`, `Φ_topo`, `Δ_time` (`m7_rescue_features_val_v1`)
+2. - [x] Quét 147 tổ hợp, chấm cửa sổ được cứu, đường τ, rút về 2 thành phần (QĐ-033)
+3. - [ ] Đăng ký giả thuyết H0–H5 + danh sách config `test`, commit riêng — **nháp xong**, chờ V29, V33, V34
 
-**DoD M6:** `eval/configs/ctav_final.yaml` chốt; bảng H3 trên `val` có CI; θ chọn ghi experiment-log. **Đạt (QĐ-031).**
-Hạn 2026-12-06. Mở M7 sau khi người dùng xem báo cáo M6 và chốt V31, V32.
+**DoD M7:** giả thuyết đã commit **trước** khi chạy bất kỳ thứ gì trên `test`. **Chưa đạt.** Hạn 2026-12-13.
 
 ### Vấn đề cần chốt
 
@@ -62,7 +63,9 @@ Hạn 2026-12-06. Mở M7 sau khi người dùng xem báo cáo M6 và chốt V31
 | V30 | ~~Nguồn ngưỡng nền cho C3~~ | Agent tự quyết khi chạy tự động: dựng cả hai, quy tắc chọn `dev` p90 (QĐ-031) — **người dùng xác nhận** | Không |
 | ~~V31~~ | `dev` không phủ 15 service (Phát hiện 11) | Người dùng chốt (a) 2026-11-11 (QĐ-032): giữ `ctav_final.yaml`, C3-trượt là ablation bắt buộc ở M8 | |
 | ~~V32~~ | Recall CTAV < C1 (Phát hiện 10) | Người dùng chốt (a) 2026-11-11 (QĐ-032): giữ H2 nguyên văn, báo trung thực ở M8 | |
-| V29 | GVHD chưa được báo V28 (b), nay thêm việc H3 bỏ C2, C4 (QĐ-031); cần biết thêm loại báo cáo tháng 11 (tiến độ hay kết quả) | Người dùng báo GVHD trước khi đăng ký giả thuyết M7 | **Đăng ký giả thuyết M7** |
+| V29 | GVHD chưa được báo V28 (b), nay thêm việc H3 bỏ C2, C4 (QĐ-031) và kết quả C5 (QĐ-033); cần biết thêm loại báo cáo tháng 11 (tiến độ hay kết quả) | Người dùng báo GVHD trước khi đăng ký giả thuyết M7 | **Đăng ký giả thuyết M7** |
+| V33 | δ trong vế "recall ≥ C1 − δ" của H2 | (a) δ = 0,05 cố định (báo cáo M7 §3) | **Đăng ký giả thuyết M7** |
+| V34 | Vai trò C5 ở M8: chính (theo quy tắc chọn) / chỉ ablation / bỏ | (b) chỉ ablation H3 một điểm (≈ 1 USD trên `test`) | **Đăng ký giả thuyết M7** |
 | V27 | Phạm vi chấm ở M8 (`test`): toàn bộ candidate (như H0, ≈ 14 USD) hay chỉ cửa sổ có telemetry (số chính, ≈ 5 USD) | Quyết định khi mở M8, theo số credit còn lại lúc đó | M8 |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
@@ -83,7 +86,7 @@ suy từ một lần đối chiếu, giá trong code và số dư credit chưa �
 |---|---|---|---|
 | M5 (còn lại) | Xong: 753 lần gọi, 1,0093 USD **theo token** (billing thật chưa biết) | 1,5 USD | 3 USD |
 | M6 | Xong: 0 lần gọi (replay cache H0, QĐ-031) | 2 USD | 4 USD — đổi prompt judge = lập lại ngân sách trước khi chạy |
-| M7 | Chỉ chấm các cửa sổ được Rescue Score "cứu" (quét tham số không gọi LLM) | 4 USD | 6 USD |
+| M7 | Xong phần Rescue: 1.459 lần gọi, 1,03 USD **theo token** (`m7_rescue_val_c1_v1`) | 4 USD | 6 USD |
 | M8 | `test` một lần: BM25, C1, không-RAG (CTAV dùng lại cache) + `repeat` trên tập con; phạm vi theo V27 | 17 USD (toàn bộ) / 8 USD (chỉ telemetry) | 20 USD |
 | M9 | Tóm tắt incident bằng LLM (vài trăm) | 1 USD | 2 USD |
 | M10–M12 | Demo offline từ cache; đánh giá bằng người | 0 | 1 USD |
@@ -105,6 +108,13 @@ M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`r
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — phiên 2026-11-11 (tiếp, M7)
+
+**Trạng thái:** M7 việc 1–2 xong (QĐ-033, báo cáo `docs/milestones/M7-rescue-dang-ky.md`); bản nháp đăng ký
+H0–H5 cuối experiment-log, commit riêng. 1,03 USD theo token. Test, mypy sạch; ruff chỉ còn E402 cũ ở `scripts/`.
+**Việc đầu tiên phiên sau:** người dùng báo GVHD (V29), chốt V33, V34 ⇒ sửa bản nháp thành "ĐÃ ĐĂNG KÝ",
+commit riêng, đóng M7, mở M8. Không chạm `test` trước đó.
 
 ## Ghi chú bàn giao — phiên 2026-11-11
 

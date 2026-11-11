@@ -1,0 +1,31 @@
+{
+  "config": {
+    "kind": "anchor_features",
+    "run_id": "m7_anchor_features_rescue_val_v1",
+    "runs": [
+      "m7_rescue_val_c1_v1"
+    ],
+    "rolling": {
+      "lookback_minutes": 60,
+      "guard_seconds": 60,
+      "min_spans": 30
+    },
+    "percentiles": [
+      90,
+      95,
+      99
+    ],
+    "dev_baseline": "data/span_baseline.parquet"
+  },
+  "index_seconds": 55.2,
+  "runs": {
+    "m7_rescue_val_c1_v1": {
+      "trace": 2915,
+      "trace_rolling_covered": 2395,
+      "trace_dev_covered": 1298,
+      "log": 13
+    }
+  },
+  "wall_seconds": 55.9,
+  "git_commit": "279761c3fe3f166cc985f18dfd0c99c205b30460\nmodified tracked files at run time:\n  docs/Final_Thesis_Phase2/01-architecture-design.md\n  docs/Final_Thesis_Phase2/02-data-and-experiment-protocol.md\n  docs/Final_Thesis_Phase2/07-setup-guide.md\n  docs/graph-coverage.md\n  docs/label-audit.md\n  docs/milestones/M1-detector-bm25-judge.md\n  docs/milestones/M2-harness-gport.md\n  eval/__main__.py\n  eval/harness/runner.py\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py\n  services/detector/candidates.py\n  tests/test_harness.py"
+}

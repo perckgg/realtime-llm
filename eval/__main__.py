@@ -1,6 +1,7 @@
 """`py -m eval run --config eval/configs/<name>.yaml` (02 SS3);
 `py -m eval compare --runs a=run_a,b=run_b [--detector-only run] --out name` (eval/harness/compare.py);
-`py -m eval ctav --config eval/configs/ctav_final.yaml` (eval/harness/ctav.py)."""
+`py -m eval ctav --config eval/configs/ctav_final.yaml` (eval/harness/ctav.py);
+`py -m eval rescue --config eval/configs/m7_rescue_*.yaml` (eval/harness/rescue.py)."""
 
 from __future__ import annotations
 
@@ -40,6 +41,27 @@ def _ctav(args: argparse.Namespace) -> int:
     return 0
 
 
+def _rescue(args: argparse.Namespace) -> int:
+    from eval.harness import rescue
+
+    config = rescue.load_rescue_config(args.config)
+    out_dir = RESULTS / config["run_id"]
+    if out_dir.exists():
+        raise SystemExit(f"{out_dir} already exists: results are never overwritten, use a new run_id")
+    base = rescue.load_base(config, RESULTS, REPO)
+    frame = rescue.load_features(RESULTS, config["features"], base.replay.ids)
+    union = None
+    if "judged_run" in config:
+        report = rescue.evaluate(config, base, frame, RESULTS)
+    else:
+        report, union = rescue.plan(config, base, frame)
+    report["git_commit"] = _git_commit()
+    rescue.write(report, out_dir, args.config.read_text(encoding="utf-8"), union)
+    print(rescue.table(report))
+    print(f"wrote {out_dir}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="py -m eval")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -53,11 +75,15 @@ def main() -> int:
     compare_parser.add_argument("--seed", type=int, default=42)
     ctav_parser = sub.add_parser("ctav", help="CTAV replay on cached tier runs (C2+C3+C4, M6)")
     ctav_parser.add_argument("--config", type=Path, required=True)
+    rescue_parser = sub.add_parser("rescue", help="Rescue Score (C5) plan / ablation on top of CTAV (M7)")
+    rescue_parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "compare":
         return _compare(args)
     if args.command == "ctav":
         return _ctav(args)
+    if args.command == "rescue":
+        return _rescue(args)
     load_dotenv(REPO / ".env")
     out_dir = run(load_config(args.config))
     metrics = json.loads((out_dir / "metrics.json").read_text(encoding="utf-8"))

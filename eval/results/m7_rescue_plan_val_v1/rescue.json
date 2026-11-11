@@ -1,0 +1,1774 @@
+{
+  "ctav_llm_calls": 5677,
+  "max_added_calls": 2838.5,
+  "points": [
+    {
+      "name": "eta=(0,0,1)|tau=0.3",
+      "eta": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tau": 0.3,
+      "rescued": 1457,
+      "rescued_in_subset": 1457,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0,1)|tau=0.4",
+      "eta": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tau": 0.4,
+      "rescued": 1344,
+      "rescued_in_subset": 1344,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0,1)|tau=0.5",
+      "eta": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tau": 0.5,
+      "rescued": 1196,
+      "rescued_in_subset": 1196,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0,1)|tau=0.6",
+      "eta": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tau": 0.6,
+      "rescued": 1020,
+      "rescued_in_subset": 1020,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0,1)|tau=0.7",
+      "eta": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tau": 0.7,
+      "rescued": 819,
+      "rescued_in_subset": 819,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0,1)|tau=0.8",
+      "eta": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tau": 0.8,
+      "rescued": 819,
+      "rescued_in_subset": 819,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0,1)|tau=0.9",
+      "eta": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tau": 0.9,
+      "rescued": 360,
+      "rescued_in_subset": 360,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.2,0.8)|tau=0.3",
+      "eta": [
+        0.0,
+        0.2,
+        0.8
+      ],
+      "tau": 0.3,
+      "rescued": 1386,
+      "rescued_in_subset": 1386,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.2,0.8)|tau=0.4",
+      "eta": [
+        0.0,
+        0.2,
+        0.8
+      ],
+      "tau": 0.4,
+      "rescued": 1250,
+      "rescued_in_subset": 1250,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.2,0.8)|tau=0.5",
+      "eta": [
+        0.0,
+        0.2,
+        0.8
+      ],
+      "tau": 0.5,
+      "rescued": 1079,
+      "rescued_in_subset": 1079,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.2,0.8)|tau=0.6",
+      "eta": [
+        0.0,
+        0.2,
+        0.8
+      ],
+      "tau": 0.6,
+      "rescued": 893,
+      "rescued_in_subset": 893,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.2,0.8)|tau=0.7",
+      "eta": [
+        0.0,
+        0.2,
+        0.8
+      ],
+      "tau": 0.7,
+      "rescued": 525,
+      "rescued_in_subset": 525,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.2,0.8)|tau=0.8",
+      "eta": [
+        0.0,
+        0.2,
+        0.8
+      ],
+      "tau": 0.8,
+      "rescued": 302,
+      "rescued_in_subset": 302,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.2,0.8)|tau=0.9",
+      "eta": [
+        0.0,
+        0.2,
+        0.8
+      ],
+      "tau": 0.9,
+      "rescued": 12,
+      "rescued_in_subset": 12,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.3",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.3,
+      "rescued": 1286,
+      "rescued_in_subset": 1286,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.4",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.4,
+      "rescued": 1130,
+      "rescued_in_subset": 1130,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.5",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.5,
+      "rescued": 614,
+      "rescued_in_subset": 614,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.6",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.6,
+      "rescued": 447,
+      "rescued_in_subset": 447,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.7",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.7,
+      "rescued": 159,
+      "rescued_in_subset": 159,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.8",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.8,
+      "rescued": 52,
+      "rescued_in_subset": 52,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.9",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.9,
+      "rescued": 4,
+      "rescued_in_subset": 4,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.6,0.4)|tau=0.3",
+      "eta": [
+        0.0,
+        0.6,
+        0.4
+      ],
+      "tau": 0.3,
+      "rescued": 1038,
+      "rescued_in_subset": 1038,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.6,0.4)|tau=0.4",
+      "eta": [
+        0.0,
+        0.6,
+        0.4
+      ],
+      "tau": 0.4,
+      "rescued": 572,
+      "rescued_in_subset": 572,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.6,0.4)|tau=0.5",
+      "eta": [
+        0.0,
+        0.6,
+        0.4
+      ],
+      "tau": 0.5,
+      "rescued": 283,
+      "rescued_in_subset": 283,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.6,0.4)|tau=0.6",
+      "eta": [
+        0.0,
+        0.6,
+        0.4
+      ],
+      "tau": 0.6,
+      "rescued": 135,
+      "rescued_in_subset": 135,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.6,0.4)|tau=0.7",
+      "eta": [
+        0.0,
+        0.6,
+        0.4
+      ],
+      "tau": 0.7,
+      "rescued": 81,
+      "rescued_in_subset": 81,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.6,0.4)|tau=0.8",
+      "eta": [
+        0.0,
+        0.6,
+        0.4
+      ],
+      "tau": 0.8,
+      "rescued": 58,
+      "rescued_in_subset": 58,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.6,0.4)|tau=0.9",
+      "eta": [
+        0.0,
+        0.6,
+        0.4
+      ],
+      "tau": 0.9,
+      "rescued": 27,
+      "rescued_in_subset": 27,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.8,0.2)|tau=0.3",
+      "eta": [
+        0.0,
+        0.8,
+        0.2
+      ],
+      "tau": 0.3,
+      "rescued": 472,
+      "rescued_in_subset": 472,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.8,0.2)|tau=0.4",
+      "eta": [
+        0.0,
+        0.8,
+        0.2
+      ],
+      "tau": 0.4,
+      "rescued": 320,
+      "rescued_in_subset": 320,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.8,0.2)|tau=0.5",
+      "eta": [
+        0.0,
+        0.8,
+        0.2
+      ],
+      "tau": 0.5,
+      "rescued": 100,
+      "rescued_in_subset": 100,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.8,0.2)|tau=0.6",
+      "eta": [
+        0.0,
+        0.8,
+        0.2
+      ],
+      "tau": 0.6,
+      "rescued": 81,
+      "rescued_in_subset": 81,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.8,0.2)|tau=0.7",
+      "eta": [
+        0.0,
+        0.8,
+        0.2
+      ],
+      "tau": 0.7,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.8,0.2)|tau=0.8",
+      "eta": [
+        0.0,
+        0.8,
+        0.2
+      ],
+      "tau": 0.8,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,0.8,0.2)|tau=0.9",
+      "eta": [
+        0.0,
+        0.8,
+        0.2
+      ],
+      "tau": 0.9,
+      "rescued": 58,
+      "rescued_in_subset": 58,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,1,0)|tau=0.3",
+      "eta": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "tau": 0.3,
+      "rescued": 377,
+      "rescued_in_subset": 377,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,1,0)|tau=0.4",
+      "eta": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "tau": 0.4,
+      "rescued": 106,
+      "rescued_in_subset": 106,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,1,0)|tau=0.5",
+      "eta": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "tau": 0.5,
+      "rescued": 106,
+      "rescued_in_subset": 106,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,1,0)|tau=0.6",
+      "eta": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "tau": 0.6,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,1,0)|tau=0.7",
+      "eta": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "tau": 0.7,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,1,0)|tau=0.8",
+      "eta": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "tau": 0.8,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0,1,0)|tau=0.9",
+      "eta": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "tau": 0.9,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0,0.8)|tau=0.3",
+      "eta": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "tau": 0.3,
+      "rescued": 1345,
+      "rescued_in_subset": 1345,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0,0.8)|tau=0.4",
+      "eta": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "tau": 0.4,
+      "rescued": 1197,
+      "rescued_in_subset": 1197,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0,0.8)|tau=0.5",
+      "eta": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "tau": 0.5,
+      "rescued": 1020,
+      "rescued_in_subset": 1020,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0,0.8)|tau=0.6",
+      "eta": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "tau": 0.6,
+      "rescued": 819,
+      "rescued_in_subset": 819,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0,0.8)|tau=0.7",
+      "eta": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "tau": 0.7,
+      "rescued": 362,
+      "rescued_in_subset": 362,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0,0.8)|tau=0.8",
+      "eta": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "tau": 0.8,
+      "rescued": 254,
+      "rescued_in_subset": 254,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0,0.8)|tau=0.9",
+      "eta": [
+        0.2,
+        0.0,
+        0.8
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.2,0.6)|tau=0.3",
+      "eta": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "tau": 0.3,
+      "rescued": 1254,
+      "rescued_in_subset": 1254,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.2,0.6)|tau=0.4",
+      "eta": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "tau": 0.4,
+      "rescued": 1051,
+      "rescued_in_subset": 1051,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.2,0.6)|tau=0.5",
+      "eta": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "tau": 0.5,
+      "rescued": 546,
+      "rescued_in_subset": 546,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.2,0.6)|tau=0.6",
+      "eta": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "tau": 0.6,
+      "rescued": 321,
+      "rescued_in_subset": 321,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.2,0.6)|tau=0.7",
+      "eta": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "tau": 0.7,
+      "rescued": 12,
+      "rescued_in_subset": 12,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.2,0.6)|tau=0.8",
+      "eta": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "tau": 0.8,
+      "rescued": 4,
+      "rescued_in_subset": 4,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.2,0.6)|tau=0.9",
+      "eta": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.4,0.4)|tau=0.3",
+      "eta": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "tau": 0.3,
+      "rescued": 1006,
+      "rescued_in_subset": 1006,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.4,0.4)|tau=0.4",
+      "eta": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "tau": 0.4,
+      "rescued": 520,
+      "rescued_in_subset": 520,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.4,0.4)|tau=0.5",
+      "eta": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "tau": 0.5,
+      "rescued": 186,
+      "rescued_in_subset": 186,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.4,0.4)|tau=0.6",
+      "eta": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "tau": 0.6,
+      "rescued": 67,
+      "rescued_in_subset": 67,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.4,0.4)|tau=0.7",
+      "eta": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "tau": 0.7,
+      "rescued": 27,
+      "rescued_in_subset": 27,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.4,0.4)|tau=0.8",
+      "eta": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "tau": 0.8,
+      "rescued": 4,
+      "rescued_in_subset": 4,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.4,0.4)|tau=0.9",
+      "eta": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.6,0.2)|tau=0.3",
+      "eta": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "tau": 0.3,
+      "rescued": 392,
+      "rescued_in_subset": 392,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.6,0.2)|tau=0.4",
+      "eta": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "tau": 0.4,
+      "rescued": 146,
+      "rescued_in_subset": 146,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.6,0.2)|tau=0.5",
+      "eta": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "tau": 0.5,
+      "rescued": 81,
+      "rescued_in_subset": 81,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.6,0.2)|tau=0.6",
+      "eta": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "tau": 0.6,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.6,0.2)|tau=0.7",
+      "eta": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "tau": 0.7,
+      "rescued": 59,
+      "rescued_in_subset": 59,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.6,0.2)|tau=0.8",
+      "eta": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "tau": 0.8,
+      "rescued": 4,
+      "rescued_in_subset": 4,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.6,0.2)|tau=0.9",
+      "eta": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.8,0)|tau=0.3",
+      "eta": [
+        0.2,
+        0.8,
+        0.0
+      ],
+      "tau": 0.3,
+      "rescued": 111,
+      "rescued_in_subset": 111,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.8,0)|tau=0.4",
+      "eta": [
+        0.2,
+        0.8,
+        0.0
+      ],
+      "tau": 0.4,
+      "rescued": 106,
+      "rescued_in_subset": 106,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.8,0)|tau=0.5",
+      "eta": [
+        0.2,
+        0.8,
+        0.0
+      ],
+      "tau": 0.5,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.8,0)|tau=0.6",
+      "eta": [
+        0.2,
+        0.8,
+        0.0
+      ],
+      "tau": 0.6,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.8,0)|tau=0.7",
+      "eta": [
+        0.2,
+        0.8,
+        0.0
+      ],
+      "tau": 0.7,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.8,0)|tau=0.8",
+      "eta": [
+        0.2,
+        0.8,
+        0.0
+      ],
+      "tau": 0.8,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.2,0.8,0)|tau=0.9",
+      "eta": [
+        0.2,
+        0.8,
+        0.0
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0,0.6)|tau=0.3",
+      "eta": [
+        0.4,
+        0.0,
+        0.6
+      ],
+      "tau": 0.3,
+      "rescued": 1198,
+      "rescued_in_subset": 1198,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0,0.6)|tau=0.4",
+      "eta": [
+        0.4,
+        0.0,
+        0.6
+      ],
+      "tau": 0.4,
+      "rescued": 1020,
+      "rescued_in_subset": 1020,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0,0.6)|tau=0.5",
+      "eta": [
+        0.4,
+        0.0,
+        0.6
+      ],
+      "tau": 0.5,
+      "rescued": 363,
+      "rescued_in_subset": 363,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0,0.6)|tau=0.6",
+      "eta": [
+        0.4,
+        0.0,
+        0.6
+      ],
+      "tau": 0.6,
+      "rescued": 256,
+      "rescued_in_subset": 256,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0,0.6)|tau=0.7",
+      "eta": [
+        0.4,
+        0.0,
+        0.6
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0,0.6)|tau=0.8",
+      "eta": [
+        0.4,
+        0.0,
+        0.6
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0,0.6)|tau=0.9",
+      "eta": [
+        0.4,
+        0.0,
+        0.6
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.2,0.4)|tau=0.3",
+      "eta": [
+        0.4,
+        0.2,
+        0.4
+      ],
+      "tau": 0.3,
+      "rescued": 927,
+      "rescued_in_subset": 927,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.2,0.4)|tau=0.4",
+      "eta": [
+        0.4,
+        0.2,
+        0.4
+      ],
+      "tau": 0.4,
+      "rescued": 349,
+      "rescued_in_subset": 349,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.2,0.4)|tau=0.5",
+      "eta": [
+        0.4,
+        0.2,
+        0.4
+      ],
+      "tau": 0.5,
+      "rescued": 38,
+      "rescued_in_subset": 38,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.2,0.4)|tau=0.6",
+      "eta": [
+        0.4,
+        0.2,
+        0.4
+      ],
+      "tau": 0.6,
+      "rescued": 4,
+      "rescued_in_subset": 4,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.2,0.4)|tau=0.7",
+      "eta": [
+        0.4,
+        0.2,
+        0.4
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.2,0.4)|tau=0.8",
+      "eta": [
+        0.4,
+        0.2,
+        0.4
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.2,0.4)|tau=0.9",
+      "eta": [
+        0.4,
+        0.2,
+        0.4
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.4,0.2)|tau=0.3",
+      "eta": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "tau": 0.3,
+      "rescued": 198,
+      "rescued_in_subset": 198,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.4,0.2)|tau=0.4",
+      "eta": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "tau": 0.4,
+      "rescued": 84,
+      "rescued_in_subset": 84,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.4,0.2)|tau=0.5",
+      "eta": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "tau": 0.5,
+      "rescued": 59,
+      "rescued_in_subset": 59,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.4,0.2)|tau=0.6",
+      "eta": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "tau": 0.6,
+      "rescued": 4,
+      "rescued_in_subset": 4,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.4,0.2)|tau=0.7",
+      "eta": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.4,0.2)|tau=0.8",
+      "eta": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.4,0.2)|tau=0.9",
+      "eta": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.6,0)|tau=0.3",
+      "eta": [
+        0.4,
+        0.6,
+        0.0
+      ],
+      "tau": 0.3,
+      "rescued": 110,
+      "rescued_in_subset": 110,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.6,0)|tau=0.4",
+      "eta": [
+        0.4,
+        0.6,
+        0.0
+      ],
+      "tau": 0.4,
+      "rescued": 74,
+      "rescued_in_subset": 74,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.6,0)|tau=0.5",
+      "eta": [
+        0.4,
+        0.6,
+        0.0
+      ],
+      "tau": 0.5,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.6,0)|tau=0.6",
+      "eta": [
+        0.4,
+        0.6,
+        0.0
+      ],
+      "tau": 0.6,
+      "rescued": 73,
+      "rescued_in_subset": 73,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.6,0)|tau=0.7",
+      "eta": [
+        0.4,
+        0.6,
+        0.0
+      ],
+      "tau": 0.7,
+      "rescued": 1,
+      "rescued_in_subset": 1,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.6,0)|tau=0.8",
+      "eta": [
+        0.4,
+        0.6,
+        0.0
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.4,0.6,0)|tau=0.9",
+      "eta": [
+        0.4,
+        0.6,
+        0.0
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0,0.4)|tau=0.3",
+      "eta": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "tau": 0.3,
+      "rescued": 825,
+      "rescued_in_subset": 825,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0,0.4)|tau=0.4",
+      "eta": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "tau": 0.4,
+      "rescued": 257,
+      "rescued_in_subset": 257,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0,0.4)|tau=0.5",
+      "eta": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "tau": 0.5,
+      "rescued": 2,
+      "rescued_in_subset": 2,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0,0.4)|tau=0.6",
+      "eta": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "tau": 0.6,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0,0.4)|tau=0.7",
+      "eta": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0,0.4)|tau=0.8",
+      "eta": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0,0.4)|tau=0.9",
+      "eta": [
+        0.6,
+        0.0,
+        0.4
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.2,0.2)|tau=0.3",
+      "eta": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "tau": 0.3,
+      "rescued": 75,
+      "rescued_in_subset": 75,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.2,0.2)|tau=0.4",
+      "eta": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "tau": 0.4,
+      "rescued": 8,
+      "rescued_in_subset": 8,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.2,0.2)|tau=0.5",
+      "eta": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "tau": 0.5,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.2,0.2)|tau=0.6",
+      "eta": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "tau": 0.6,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.2,0.2)|tau=0.7",
+      "eta": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.2,0.2)|tau=0.8",
+      "eta": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.2,0.2)|tau=0.9",
+      "eta": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.4,0)|tau=0.3",
+      "eta": [
+        0.6,
+        0.4,
+        0.0
+      ],
+      "tau": 0.3,
+      "rescued": 78,
+      "rescued_in_subset": 78,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.4,0)|tau=0.4",
+      "eta": [
+        0.6,
+        0.4,
+        0.0
+      ],
+      "tau": 0.4,
+      "rescued": 74,
+      "rescued_in_subset": 74,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.4,0)|tau=0.5",
+      "eta": [
+        0.6,
+        0.4,
+        0.0
+      ],
+      "tau": 0.5,
+      "rescued": 1,
+      "rescued_in_subset": 1,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.4,0)|tau=0.6",
+      "eta": [
+        0.6,
+        0.4,
+        0.0
+      ],
+      "tau": 0.6,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.4,0)|tau=0.7",
+      "eta": [
+        0.6,
+        0.4,
+        0.0
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.4,0)|tau=0.8",
+      "eta": [
+        0.6,
+        0.4,
+        0.0
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.6,0.4,0)|tau=0.9",
+      "eta": [
+        0.6,
+        0.4,
+        0.0
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0,0.2)|tau=0.3",
+      "eta": [
+        0.8,
+        0.0,
+        0.2
+      ],
+      "tau": 0.3,
+      "rescued": 6,
+      "rescued_in_subset": 6,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0,0.2)|tau=0.4",
+      "eta": [
+        0.8,
+        0.0,
+        0.2
+      ],
+      "tau": 0.4,
+      "rescued": 5,
+      "rescued_in_subset": 5,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0,0.2)|tau=0.5",
+      "eta": [
+        0.8,
+        0.0,
+        0.2
+      ],
+      "tau": 0.5,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0,0.2)|tau=0.6",
+      "eta": [
+        0.8,
+        0.0,
+        0.2
+      ],
+      "tau": 0.6,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0,0.2)|tau=0.7",
+      "eta": [
+        0.8,
+        0.0,
+        0.2
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0,0.2)|tau=0.8",
+      "eta": [
+        0.8,
+        0.0,
+        0.2
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0,0.2)|tau=0.9",
+      "eta": [
+        0.8,
+        0.0,
+        0.2
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0.2,0)|tau=0.3",
+      "eta": [
+        0.8,
+        0.2,
+        0.0
+      ],
+      "tau": 0.3,
+      "rescued": 6,
+      "rescued_in_subset": 6,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0.2,0)|tau=0.4",
+      "eta": [
+        0.8,
+        0.2,
+        0.0
+      ],
+      "tau": 0.4,
+      "rescued": 4,
+      "rescued_in_subset": 4,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0.2,0)|tau=0.5",
+      "eta": [
+        0.8,
+        0.2,
+        0.0
+      ],
+      "tau": 0.5,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0.2,0)|tau=0.6",
+      "eta": [
+        0.8,
+        0.2,
+        0.0
+      ],
+      "tau": 0.6,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0.2,0)|tau=0.7",
+      "eta": [
+        0.8,
+        0.2,
+        0.0
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0.2,0)|tau=0.8",
+      "eta": [
+        0.8,
+        0.2,
+        0.0
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(0.8,0.2,0)|tau=0.9",
+      "eta": [
+        0.8,
+        0.2,
+        0.0
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(1,0,0)|tau=0.3",
+      "eta": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "tau": 0.3,
+      "rescued": 5,
+      "rescued_in_subset": 5,
+      "feasible": true
+    },
+    {
+      "name": "eta=(1,0,0)|tau=0.4",
+      "eta": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "tau": 0.4,
+      "rescued": 3,
+      "rescued_in_subset": 3,
+      "feasible": true
+    },
+    {
+      "name": "eta=(1,0,0)|tau=0.5",
+      "eta": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "tau": 0.5,
+      "rescued": 3,
+      "rescued_in_subset": 3,
+      "feasible": true
+    },
+    {
+      "name": "eta=(1,0,0)|tau=0.6",
+      "eta": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "tau": 0.6,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(1,0,0)|tau=0.7",
+      "eta": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "tau": 0.7,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(1,0,0)|tau=0.8",
+      "eta": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "tau": 0.8,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    },
+    {
+      "name": "eta=(1,0,0)|tau=0.9",
+      "eta": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "tau": 0.9,
+      "rescued": 0,
+      "rescued_in_subset": 0,
+      "feasible": true
+    }
+  ],
+  "feasible_points": 147,
+  "union_windows": 1459,
+  "union_in_subset": 1459,
+  "git_commit": "279761c3fe3f166cc985f18dfd0c99c205b30460\nmodified tracked files at run time:\n  docs/Final_Thesis_Phase2/01-architecture-design.md\n  docs/Final_Thesis_Phase2/02-data-and-experiment-protocol.md\n  docs/Final_Thesis_Phase2/07-setup-guide.md\n  docs/graph-coverage.md\n  docs/label-audit.md\n  docs/milestones/M1-detector-bm25-judge.md\n  docs/milestones/M2-harness-gport.md\n  eval/__main__.py\n  eval/harness/runner.py\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py\n  services/detector/candidates.py"
+}

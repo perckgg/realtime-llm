@@ -24,7 +24,7 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Xong** (2026-10-29; V24 (b), GVHD đồng ý, QĐ-027) — `docs/milestones/M4-h0.md` |
 | M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Xong** (2026-11-01; H1 giữ một phần, V28 (b), QĐ-028, QĐ-029) — `docs/milestones/M5-h1.md` |
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | **Xong** (2026-11-11; H3 bỏ C2, C4; V31 (a), V32 (a) — QĐ-031, QĐ-032) — `docs/milestones/M6-ctav.md` |
-| M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | **Đang làm** (mở 2026-11-11, QĐ-032) |
+| M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | **Đang làm** (mở 2026-11-11) — Rescue xong (QĐ-033); đăng ký giả thuyết **nháp**, chờ V29, V33, V34 — `docs/milestones/M7-rescue-dang-ky.md` |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | |
 | M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | |
 | M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | |
@@ -204,6 +204,12 @@ gọi LLM). H3 bỏ C2 và C4; cấu hình chốt = C1 cho mọi candidate + θ 
 | **Đăng ký giả thuyết H0–H5** với ngưỡng định lượng + danh sách config sẽ chạy trên `test` | Mục "Đăng ký giả thuyết" trong experiment-log, commit riêng |
 
 **DoD M7:** giả thuyết đã commit **trước** khi chạy bất kỳ thứ gì trên `test`.
+
+> **Kết quả Rescue (QĐ-033, `val`):** đặc trưng ở `eval/results/m7_rescue_features_val_v1/` (thay cho
+> `data/rescue_features.parquet`), quét + đường τ ở `eval/results/m7_rescue_val_v1/` (thay cho
+> `rescue_ablation/`). Công thức rút về 2 thành phần (Φ_topo, Δ_time; Λ_log không đóng góp); C5 thêm 2 TP /
+> 16 FP, ΔF1 CI chứa 0, ΔFPR > 0 có ý nghĩa — rủi ro số 2 bên dưới đã xảy ra (V34). Đăng ký giả thuyết: nháp
+> cuối `docs/experiment-log.md`, chờ V29, V33, V34.
 
 ---
 

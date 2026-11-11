@@ -159,8 +159,14 @@ def test_committed_configs_load():
     import yaml
 
     from eval.harness.ctav import load_anchor_config, load_ctav_config
+    from eval.harness.rescue import load_features_config, load_rescue_config
 
-    loaders = {"anchor_features": load_anchor_config, "ctav": load_ctav_config}
+    loaders = {
+        "anchor_features": load_anchor_config,
+        "ctav": load_ctav_config,
+        "rescue": load_rescue_config,
+        "rescue_features": load_features_config,
+    }
     for path in (Path(__file__).parents[1] / "eval" / "configs").glob("*.yaml"):
         if path.name == "bm25_baseline.yaml":
             continue  # M0 draft, superseded in M4

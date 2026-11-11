@@ -29,6 +29,9 @@ Config sections (see eval/configs/*.yaml for full examples):
   reads the label and exists **only** to reproduce GD1 (QD-016)
 - `judge`: services/judge/registry.py block
 - `storage`: {clickhouse: false}
+- `rescue` (optional, M7): {windows: <csv of window_id + Rescue components>} -- judge
+  *only* those windows (detector-rejected, promoted as source=rescue); metric
+  candidates are then not judged (they are cached in the run without `rescue`)
 - `stages`: `full` (default) | `detector` -- detector only, no retrieval or
   judge (counting candidates / cost estimates); `retrieval` and `judge` may
   then be omitted
@@ -145,6 +148,18 @@ def _evidence(config: dict[str, Any], nezha: NezhaEvidenceStore) -> NezhaEvidenc
     if spec["store"] == "gd1_corpus":
         return load_gd1_corpus(REPO / spec["path"])
     raise ValueError(f"unknown evidence.store {spec['store']!r}")
+
+
+def _rescue_windows(config: dict[str, Any]) -> dict[str, dict[str, float]] | None:
+    """`rescue: {windows: <csv>}` -> window_id -> Rescue components (eval/harness/rescue.py plan)."""
+    spec = config.get("rescue") or {}
+    if not spec.get("windows"):
+        return None
+    with (REPO / spec["windows"]).open(encoding="utf-8", newline="") as handle:
+        return {
+            r["window_id"]: {k: float(r[k]) for k in ("lambda_log", "phi_topo", "delta_time")}
+            for r in csv.DictReader(handle)
+        }
 
 
 def _git_commit() -> str:
@@ -285,6 +300,7 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
         judge = build_judge(config["judge"])
     gate = Gate(config.get("gate"))
     threshold = detector.threshold
+    rescue = _rescue_windows(config)
 
     rows: list[dict[str, Any]] = []
     jobs: list[tuple[AlertCandidate, RetrievalResult]] = []
@@ -302,8 +318,18 @@ def run(config: dict[str, Any], results_root: Path = RESULTS) -> Path:
         label = label_override.get(window.window_id) or _dataset_label(window)
         score = detector.score(window)
         promoted = detector.is_candidate(window, score)
-        candidate = build_alert_candidate(window, score, promoted, detector.top_features(window))
+        top_features = detector.top_features(window)
+        candidate = build_alert_candidate(window, score, promoted, top_features)
         row = _row(window, label, score, candidate, nezha)
+        if rescue is not None:
+            # M7 (QD-033): judge only the listed Rescue windows; metric candidates are not judged here.
+            candidate = None
+            if window.window_id in rescue:
+                if promoted:
+                    raise ValueError(f"{window.window_id} is a metric candidate; rescue lists y_IF == 0 windows only")
+                candidate = build_alert_candidate(
+                    window, score, True, top_features, source="rescue", rescue_components=rescue[window.window_id]
+                )
         gate_action = "not_candidate"
         if candidate is not None and not full:
             gate_action = "detector_only"

@@ -1,0 +1,17 @@
+279761c3fe3f166cc985f18dfd0c99c205b30460
+modified tracked files at run time:
+  docs/Final_Thesis_Phase2/01-architecture-design.md
+  docs/Final_Thesis_Phase2/02-data-and-experiment-protocol.md
+  docs/Final_Thesis_Phase2/07-setup-guide.md
+  docs/graph-coverage.md
+  docs/label-audit.md
+  docs/milestones/M1-detector-bm25-judge.md
+  docs/milestones/M2-harness-gport.md
+  eval/__main__.py
+  eval/harness/runner.py
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  services/detector/candidates.py
+  tests/test_harness.py

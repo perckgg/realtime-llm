@@ -1,0 +1,23 @@
+# M7 / QĐ-033 bước 4: đánh giá 147 tổ hợp Rescue Score trên CTAV chốt (`val`), 0 lần gọi LLM mới.
+# Cửa sổ được cứu dùng câu trả lời C1 của m7_rescue_val_c1_v1 + chính sách CTAV (θ 0.80, C3 nền dev p90).
+# Chọn tổ hợp (kể cả "off") theo F1 → ít lần gọi → FPR thấp → ít η khác 0, chỉ trong tổ hợp khả thi
+# (thêm ≤ 50% số lần gọi của CTAV). Rút gọn công thức: giữ thành phần có η > 0 ở tổ hợp chọn;
+# mặt `without_<thành phần>` báo cáo F1 tốt nhất khi bỏ thành phần đó, kèm CI ghép cặp.
+# Chạy: py -m eval rescue --config eval/configs/m7_rescue_val.yaml
+kind: rescue
+run_id: m7_rescue_val_v1
+split: val
+features: m7_rescue_features_val_v1
+ctav: eval/configs/ctav_final.yaml
+judged_run: m7_rescue_val_c1_v1
+anchor_features: m7_anchor_features_rescue_val_v1
+grid:
+  eta_step: 0.2
+  tau: [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+max_call_increase: 0.5
+model: gemini-2.5-flash
+baselines:
+  bm25: h0_val_bm25_v3
+  c1: h0_val_c1_k0_v1
+n_boot: 1000
+seed: 42
