@@ -156,10 +156,16 @@ def test_load_config_requires_exactly_one_window_source(tmp_path: Path):
 
 
 def test_committed_configs_load():
+    import yaml
+
+    from eval.harness.ctav import load_anchor_config, load_ctav_config
+
+    loaders = {"anchor_features": load_anchor_config, "ctav": load_ctav_config}
     for path in (Path(__file__).parents[1] / "eval" / "configs").glob("*.yaml"):
         if path.name == "bm25_baseline.yaml":
             continue  # M0 draft, superseded in M4
-        load_config(path)
+        kind = yaml.safe_load(path.read_text(encoding="utf-8")).get("kind")
+        loaders.get(kind, load_config)(path)
 
 
 # --- parallel judging (QD-019) ------------------------------------------------------------

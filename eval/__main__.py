@@ -1,5 +1,6 @@
 """`py -m eval run --config eval/configs/<name>.yaml` (02 SS3);
-`py -m eval compare --runs a=run_a,b=run_b [--detector-only run] --out name` (eval/harness/compare.py)."""
+`py -m eval compare --runs a=run_a,b=run_b [--detector-only run] --out name` (eval/harness/compare.py);
+`py -m eval ctav --config eval/configs/ctav_final.yaml` (eval/harness/ctav.py)."""
 
 from __future__ import annotations
 
@@ -24,6 +25,21 @@ def _compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _ctav(args: argparse.Namespace) -> int:
+    from eval.harness import ctav
+
+    config = ctav.load_ctav_config(args.config)
+    out_dir = RESULTS / config["run_id"]
+    if out_dir.exists():
+        raise SystemExit(f"{out_dir} already exists: results are never overwritten, use a new run_id")
+    report, replay, outcome, _ = ctav.evaluate(config, RESULTS)
+    report["git_commit"] = _git_commit()
+    ctav.write(report, replay, outcome, out_dir, args.config.read_text(encoding="utf-8"))
+    print(ctav.table(report))
+    print(f"wrote {out_dir}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="py -m eval")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -35,9 +51,13 @@ def main() -> int:
     compare_parser.add_argument("--out", required=True, help="new directory name under eval/results/")
     compare_parser.add_argument("--n-boot", type=int, default=1000)
     compare_parser.add_argument("--seed", type=int, default=42)
+    ctav_parser = sub.add_parser("ctav", help="CTAV replay on cached tier runs (C2+C3+C4, M6)")
+    ctav_parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "compare":
         return _compare(args)
+    if args.command == "ctav":
+        return _ctav(args)
     load_dotenv(REPO / ".env")
     out_dir = run(load_config(args.config))
     metrics = json.loads((out_dir / "metrics.json").read_text(encoding="utf-8"))

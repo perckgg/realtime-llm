@@ -1,0 +1,6529 @@
+{
+  "created_at": "2026-11-11T06:28:05.658472+00:00",
+  "config": {
+    "kind": "ctav",
+    "run_id": "m6_ctav_select_val_v1",
+    "split": "val",
+    "subset": "telemetry",
+    "model": "gemini-2.5-flash",
+    "tiers": {
+      "local": "h0_val_bm25_v3",
+      "topology": "h0_val_c1_k0_v1"
+    },
+    "anchor_features": "m6_anchor_features_val_v1",
+    "policy": {
+      "theta_local": 0.8,
+      "theta_topo": 0.8,
+      "gating": true,
+      "anchoring": true,
+      "require_evidence": true,
+      "anchor": {
+        "baseline": "rolling",
+        "percentile": 95,
+        "log_levels": [
+          "ERROR",
+          "WARN"
+        ]
+      }
+    },
+    "routing": {
+      "enabled": true,
+      "escalate_on": [
+        "no_context",
+        "uncertain",
+        "weak_fp"
+      ],
+      "fp_confidence": 0.8
+    },
+    "sweep": {
+      "metric": "f1",
+      "apply_selection": true,
+      "grid": {
+        "mode": [
+          "two_tier",
+          "topology_only"
+        ],
+        "theta_topo": [
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ],
+        "fp_confidence": [
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ],
+        "percentile": [
+          90,
+          95,
+          99
+        ]
+      }
+    },
+    "baselines": {
+      "bm25": "h0_val_bm25_v3",
+      "c1": "h0_val_c1_k0_v1",
+      "norag": "h0_val_norag_v1"
+    },
+    "budgets": [
+      120,
+      250,
+      500,
+      1000,
+      2000,
+      4000
+    ],
+    "n_boot": 1000,
+    "seed": 42
+  },
+  "subset": "telemetry",
+  "windows": 7636,
+  "fault_windows": 209,
+  "candidates": 1749,
+  "price_per_1m": [
+    0.3,
+    2.5
+  ],
+  "sweep": {
+    "grid": {
+      "mode": [
+        "two_tier",
+        "topology_only"
+      ],
+      "theta_topo": [
+        0.8,
+        0.85,
+        0.9,
+        0.95
+      ],
+      "fp_confidence": [
+        0.8,
+        0.85,
+        0.9,
+        0.95
+      ],
+      "percentile": [
+        90,
+        95,
+        99
+      ]
+    },
+    "metric": "f1",
+    "points": [
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 19,
+          "fp": 294,
+          "fn": 190,
+          "tn": 7133,
+          "precision": 0.06070287539936102,
+          "recall": 0.09090909090909091,
+          "f1": 0.0727969348659004,
+          "fpr": 0.03958529688972667,
+          "precision_ci95": [
+            0.03741417127598703,
+            0.08667391304347825
+          ],
+          "recall_ci95": [
+            0.05701754385964912,
+            0.130439678809244
+          ],
+          "f1_ci95": [
+            0.04519561615904167,
+            0.10297540468332547
+          ],
+          "fpr_ci95": [
+            0.035467927714747285,
+            0.04410963418796081
+          ]
+        },
+        "cost": {
+          "llm_calls": 5862,
+          "tier2_calls": 185,
+          "prompt_tokens": 5681481,
+          "completion_tokens": 791673,
+          "estimated_cost_usd": 3.6836268
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 16,
+          "fp": 253,
+          "fn": 193,
+          "tn": 7174,
+          "precision": 0.05947955390334572,
+          "recall": 0.07655502392344497,
+          "f1": 0.06694560669456068,
+          "fpr": 0.034064898343880434,
+          "precision_ci95": [
+            0.03383331639910587,
+            0.08713616427432216
+          ],
+          "recall_ci95": [
+            0.04305199664391483,
+            0.1144395046046364
+          ],
+          "f1_ci95": [
+            0.038872709538075666,
+            0.0977795172863666
+          ],
+          "fpr_ci95": [
+            0.030159293625135798,
+            0.038415557649782384
+          ]
+        },
+        "cost": {
+          "llm_calls": 5904,
+          "tier2_calls": 227,
+          "prompt_tokens": 5762690,
+          "completion_tokens": 803191,
+          "estimated_cost_usd": 3.7367844999999997
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 12,
+          "fp": 100,
+          "fn": 197,
+          "tn": 7327,
+          "precision": 0.10714285714285714,
+          "recall": 0.05741626794258373,
+          "f1": 0.07476635514018691,
+          "fpr": 0.013464386697185943,
+          "precision_ci95": [
+            0.05503336113427857,
+            0.16396227916600348
+          ],
+          "recall_ci95": [
+            0.028568043331076504,
+            0.09050802139037432
+          ],
+          "f1_ci95": [
+            0.03821352744919624,
+            0.11502519046448757
+          ],
+          "fpr_ci95": [
+            0.011018653814319868,
+            0.016019062726151917
+          ]
+        },
+        "cost": {
+          "llm_calls": 6045,
+          "tier2_calls": 368,
+          "prompt_tokens": 6034303,
+          "completion_tokens": 843622,
+          "estimated_cost_usd": 3.9193459
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 24,
+          "fp": 326,
+          "fn": 185,
+          "tn": 7101,
+          "precision": 0.06857142857142857,
+          "recall": 0.11483253588516747,
+          "f1": 0.08586762075134169,
+          "fpr": 0.04389390063282617,
+          "precision_ci95": [
+            0.04493754315485531,
+            0.09440226213541393
+          ],
+          "recall_ci95": [
+            0.0761904761904762,
+            0.15791732550259766
+          ],
+          "f1_ci95": [
+            0.057239978443808806,
+            0.1161577297475664
+          ],
+          "fpr_ci95": [
+            0.03960233113314899,
+            0.048478544036801505
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 21,
+          "fp": 279,
+          "fn": 188,
+          "tn": 7148,
+          "precision": 0.07,
+          "recall": 0.10047846889952153,
+          "f1": 0.0825147347740668,
+          "fpr": 0.03756563888514878,
+          "precision_ci95": [
+            0.043986536022826345,
+            0.09831344402167647
+          ],
+          "recall_ci95": [
+            0.06416783014146098,
+            0.1435919540229885
+          ],
+          "f1_ci95": [
+            0.052735667769830255,
+            0.11607678125035345
+          ],
+          "fpr_ci95": [
+            0.03339100515568449,
+            0.042272531592319224
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 14,
+          "fp": 107,
+          "fn": 195,
+          "tn": 7320,
+          "precision": 0.11570247933884298,
+          "recall": 0.06698564593301436,
+          "f1": 0.08484848484848484,
+          "fpr": 0.014406893765988959,
+          "precision_ci95": [
+            0.06348926894701543,
+            0.17392127799736495
+          ],
+          "recall_ci95": [
+            0.03607784826856991,
+            0.10222764227642277
+          ],
+          "f1_ci95": [
+            0.04516129032258065,
+            0.12540883478859302
+          ],
+          "fpr_ci95": [
+            0.011849341117950208,
+            0.01712767547793265
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 24,
+          "fp": 326,
+          "fn": 185,
+          "tn": 7101,
+          "precision": 0.06857142857142857,
+          "recall": 0.11483253588516747,
+          "f1": 0.08586762075134169,
+          "fpr": 0.04389390063282617,
+          "precision_ci95": [
+            0.04493754315485531,
+            0.09440226213541393
+          ],
+          "recall_ci95": [
+            0.0761904761904762,
+            0.15791732550259766
+          ],
+          "f1_ci95": [
+            0.057239978443808806,
+            0.1161577297475664
+          ],
+          "fpr_ci95": [
+            0.03960233113314899,
+            0.048478544036801505
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 21,
+          "fp": 279,
+          "fn": 188,
+          "tn": 7148,
+          "precision": 0.07,
+          "recall": 0.10047846889952153,
+          "f1": 0.0825147347740668,
+          "fpr": 0.03756563888514878,
+          "precision_ci95": [
+            0.043986536022826345,
+            0.09831344402167647
+          ],
+          "recall_ci95": [
+            0.06416783014146098,
+            0.1435919540229885
+          ],
+          "f1_ci95": [
+            0.052735667769830255,
+            0.11607678125035345
+          ],
+          "fpr_ci95": [
+            0.03339100515568449,
+            0.042272531592319224
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 14,
+          "fp": 107,
+          "fn": 195,
+          "tn": 7320,
+          "precision": 0.11570247933884298,
+          "recall": 0.06698564593301436,
+          "f1": 0.08484848484848484,
+          "fpr": 0.014406893765988959,
+          "precision_ci95": [
+            0.06348926894701543,
+            0.17392127799736495
+          ],
+          "recall_ci95": [
+            0.03607784826856991,
+            0.10222764227642277
+          ],
+          "f1_ci95": [
+            0.04516129032258065,
+            0.12540883478859302
+          ],
+          "fpr_ci95": [
+            0.011849341117950208,
+            0.01712767547793265
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 35,
+          "fp": 414,
+          "fn": 174,
+          "tn": 7013,
+          "precision": 0.0779510022271715,
+          "recall": 0.1674641148325359,
+          "f1": 0.10638297872340426,
+          "fpr": 0.055742560926349806,
+          "precision_ci95": [
+            0.05431995669991495,
+            0.10145633352155091
+          ],
+          "recall_ci95": [
+            0.11961592469315581,
+            0.21875
+          ],
+          "f1_ci95": [
+            0.07511151150271361,
+            0.1369691733314691
+          ],
+          "fpr_ci95": [
+            0.05078027475539811,
+            0.06102983462476756
+          ]
+        },
+        "cost": {
+          "llm_calls": 6687,
+          "tier2_calls": 1010,
+          "prompt_tokens": 7293671,
+          "completion_tokens": 1076730,
+          "estimated_cost_usd": 4.879926299999999
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 29,
+          "fp": 330,
+          "fn": 180,
+          "tn": 7097,
+          "precision": 0.0807799442896936,
+          "recall": 0.13875598086124402,
+          "f1": 0.10211267605633803,
+          "fpr": 0.04443247610071361,
+          "precision_ci95": [
+            0.05497023361994724,
+            0.10734643894403745
+          ],
+          "recall_ci95": [
+            0.09501672706997491,
+            0.18848661463992888
+          ],
+          "f1_ci95": [
+            0.07088991878065502,
+            0.13448686371100163
+          ],
+          "fpr_ci95": [
+            0.0400966159404361,
+            0.04898808722573698
+          ]
+        },
+        "cost": {
+          "llm_calls": 6729,
+          "tier2_calls": 1052,
+          "prompt_tokens": 7374880,
+          "completion_tokens": 1088248,
+          "estimated_cost_usd": 4.933084
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.8|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 18,
+          "fp": 121,
+          "fn": 191,
+          "tn": 7306,
+          "precision": 0.12949640287769784,
+          "recall": 0.0861244019138756,
+          "f1": 0.10344827586206898,
+          "fpr": 0.016291907903594992,
+          "precision_ci95": [
+            0.07499574829931972,
+            0.18545888109123257
+          ],
+          "recall_ci95": [
+            0.05126050420168067,
+            0.1250140134529148
+          ],
+          "f1_ci95": [
+            0.061714237172952775,
+            0.1466303550937141
+          ],
+          "fpr_ci95": [
+            0.013611539106422004,
+            0.019241248965949868
+          ]
+        },
+        "cost": {
+          "llm_calls": 6870,
+          "tier2_calls": 1193,
+          "prompt_tokens": 7646493,
+          "completion_tokens": 1128679,
+          "estimated_cost_usd": 5.1156454
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 19,
+          "fp": 293,
+          "fn": 190,
+          "tn": 7134,
+          "precision": 0.060897435897435896,
+          "recall": 0.09090909090909091,
+          "f1": 0.07293666026871401,
+          "fpr": 0.039450653022754814,
+          "precision_ci95": [
+            0.03761568254036184,
+            0.08696329405390761
+          ],
+          "recall_ci95": [
+            0.05701390621102519,
+            0.1306371161737654
+          ],
+          "f1_ci95": [
+            0.045283018867924525,
+            0.10317973113698757
+          ],
+          "fpr_ci95": [
+            0.035333068674006804,
+            0.043975174076782114
+          ]
+        },
+        "cost": {
+          "llm_calls": 5862,
+          "tier2_calls": 185,
+          "prompt_tokens": 5681481,
+          "completion_tokens": 791673,
+          "estimated_cost_usd": 3.6836268
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 16,
+          "fp": 252,
+          "fn": 193,
+          "tn": 7175,
+          "precision": 0.05970149253731343,
+          "recall": 0.07655502392344497,
+          "f1": 0.06708595387840671,
+          "fpr": 0.033930254476908575,
+          "precision_ci95": [
+            0.03408769296740995,
+            0.08803834914247388
+          ],
+          "recall_ci95": [
+            0.04385605406960023,
+            0.11489483981413548
+          ],
+          "f1_ci95": [
+            0.039294916121209826,
+            0.09842863263755273
+          ],
+          "fpr_ci95": [
+            0.02994842184298532,
+            0.03828122572952381
+          ]
+        },
+        "cost": {
+          "llm_calls": 5904,
+          "tier2_calls": 227,
+          "prompt_tokens": 5762690,
+          "completion_tokens": 803191,
+          "estimated_cost_usd": 3.7367844999999997
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 12,
+          "fp": 100,
+          "fn": 197,
+          "tn": 7327,
+          "precision": 0.10714285714285714,
+          "recall": 0.05741626794258373,
+          "f1": 0.07476635514018691,
+          "fpr": 0.013464386697185943,
+          "precision_ci95": [
+            0.05503336113427857,
+            0.16396227916600348
+          ],
+          "recall_ci95": [
+            0.028568043331076504,
+            0.09050802139037432
+          ],
+          "f1_ci95": [
+            0.03821352744919624,
+            0.11502519046448757
+          ],
+          "fpr_ci95": [
+            0.011018653814319868,
+            0.016019062726151917
+          ]
+        },
+        "cost": {
+          "llm_calls": 6045,
+          "tier2_calls": 368,
+          "prompt_tokens": 6034303,
+          "completion_tokens": 843622,
+          "estimated_cost_usd": 3.9193459
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 24,
+          "fp": 325,
+          "fn": 185,
+          "tn": 7102,
+          "precision": 0.06876790830945559,
+          "recall": 0.11483253588516747,
+          "f1": 0.08602150537634408,
+          "fpr": 0.043759256765854314,
+          "precision_ci95": [
+            0.0450641101511027,
+            0.0949559040498649
+          ],
+          "recall_ci95": [
+            0.0761904761904762,
+            0.15791732550259766
+          ],
+          "f1_ci95": [
+            0.05734254992319508,
+            0.11658155616809322
+          ],
+          "fpr_ci95": [
+            0.03946807453083337,
+            0.04834387203516257
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 21,
+          "fp": 278,
+          "fn": 188,
+          "tn": 7149,
+          "precision": 0.07023411371237458,
+          "recall": 0.10047846889952153,
+          "f1": 0.08267716535433071,
+          "fpr": 0.03743099501817692,
+          "precision_ci95": [
+            0.044064074667888226,
+            0.09900979709952834
+          ],
+          "recall_ci95": [
+            0.06403156090022216,
+            0.1435919540229885
+          ],
+          "f1_ci95": [
+            0.05284284866175234,
+            0.1163017805232558
+          ],
+          "fpr_ci95": [
+            0.03323007794389995,
+            0.0421307231062403
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 14,
+          "fp": 107,
+          "fn": 195,
+          "tn": 7320,
+          "precision": 0.11570247933884298,
+          "recall": 0.06698564593301436,
+          "f1": 0.08484848484848484,
+          "fpr": 0.014406893765988959,
+          "precision_ci95": [
+            0.06348926894701543,
+            0.17392127799736495
+          ],
+          "recall_ci95": [
+            0.03607784826856991,
+            0.10222764227642277
+          ],
+          "f1_ci95": [
+            0.04516129032258065,
+            0.12540883478859302
+          ],
+          "fpr_ci95": [
+            0.011849341117950208,
+            0.01712767547793265
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 24,
+          "fp": 325,
+          "fn": 185,
+          "tn": 7102,
+          "precision": 0.06876790830945559,
+          "recall": 0.11483253588516747,
+          "f1": 0.08602150537634408,
+          "fpr": 0.043759256765854314,
+          "precision_ci95": [
+            0.0450641101511027,
+            0.0949559040498649
+          ],
+          "recall_ci95": [
+            0.0761904761904762,
+            0.15791732550259766
+          ],
+          "f1_ci95": [
+            0.05734254992319508,
+            0.11658155616809322
+          ],
+          "fpr_ci95": [
+            0.03946807453083337,
+            0.04834387203516257
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 21,
+          "fp": 278,
+          "fn": 188,
+          "tn": 7149,
+          "precision": 0.07023411371237458,
+          "recall": 0.10047846889952153,
+          "f1": 0.08267716535433071,
+          "fpr": 0.03743099501817692,
+          "precision_ci95": [
+            0.044064074667888226,
+            0.09900979709952834
+          ],
+          "recall_ci95": [
+            0.06403156090022216,
+            0.1435919540229885
+          ],
+          "f1_ci95": [
+            0.05284284866175234,
+            0.1163017805232558
+          ],
+          "fpr_ci95": [
+            0.03323007794389995,
+            0.0421307231062403
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 14,
+          "fp": 107,
+          "fn": 195,
+          "tn": 7320,
+          "precision": 0.11570247933884298,
+          "recall": 0.06698564593301436,
+          "f1": 0.08484848484848484,
+          "fpr": 0.014406893765988959,
+          "precision_ci95": [
+            0.06348926894701543,
+            0.17392127799736495
+          ],
+          "recall_ci95": [
+            0.03607784826856991,
+            0.10222764227642277
+          ],
+          "f1_ci95": [
+            0.04516129032258065,
+            0.12540883478859302
+          ],
+          "fpr_ci95": [
+            0.011849341117950208,
+            0.01712767547793265
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 35,
+          "fp": 404,
+          "fn": 174,
+          "tn": 7023,
+          "precision": 0.07972665148063782,
+          "recall": 0.1674641148325359,
+          "f1": 0.1080246913580247,
+          "fpr": 0.05439612225663121,
+          "precision_ci95": [
+            0.05555270362765229,
+            0.10459941843870416
+          ],
+          "recall_ci95": [
+            0.11961592469315581,
+            0.21940545356898739
+          ],
+          "f1_ci95": [
+            0.07632922418068981,
+            0.1398831509664519
+          ],
+          "fpr_ci95": [
+            0.04950565987890694,
+            0.05948620701299725
+          ]
+        },
+        "cost": {
+          "llm_calls": 6687,
+          "tier2_calls": 1010,
+          "prompt_tokens": 7293671,
+          "completion_tokens": 1076730,
+          "estimated_cost_usd": 4.879926299999999
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 29,
+          "fp": 323,
+          "fn": 180,
+          "tn": 7104,
+          "precision": 0.08238636363636363,
+          "recall": 0.13875598086124402,
+          "f1": 0.1033868092691622,
+          "fpr": 0.043489969031910596,
+          "precision_ci95": [
+            0.056021848739495804,
+            0.10968149099144583
+          ],
+          "recall_ci95": [
+            0.09325565133660416,
+            0.18304097326103214
+          ],
+          "f1_ci95": [
+            0.07130714919090032,
+            0.13612782870362317
+          ],
+          "fpr_ci95": [
+            0.03881820252234296,
+            0.04794047892491638
+          ]
+        },
+        "cost": {
+          "llm_calls": 6729,
+          "tier2_calls": 1052,
+          "prompt_tokens": 7374880,
+          "completion_tokens": 1088248,
+          "estimated_cost_usd": 4.933084
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.85|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 18,
+          "fp": 120,
+          "fn": 191,
+          "tn": 7307,
+          "precision": 0.13043478260869565,
+          "recall": 0.0861244019138756,
+          "f1": 0.1037463976945245,
+          "fpr": 0.016157264036623133,
+          "precision_ci95": [
+            0.07546460490849766,
+            0.19087639459776862
+          ],
+          "recall_ci95": [
+            0.04954399466731305,
+            0.1271269524759056
+          ],
+          "f1_ci95": [
+            0.0609709763511009,
+            0.15086985600755368
+          ],
+          "fpr_ci95": [
+            0.013513376607730249,
+            0.01902439152109254
+          ]
+        },
+        "cost": {
+          "llm_calls": 6870,
+          "tier2_calls": 1193,
+          "prompt_tokens": 7646493,
+          "completion_tokens": 1128679,
+          "estimated_cost_usd": 5.1156454
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 19,
+          "fp": 292,
+          "fn": 190,
+          "tn": 7135,
+          "precision": 0.06109324758842444,
+          "recall": 0.09090909090909091,
+          "f1": 0.07307692307692307,
+          "fpr": 0.039316009155782955,
+          "precision_ci95": [
+            0.03761568254036184,
+            0.08638645176552873
+          ],
+          "recall_ci95": [
+            0.05659893565553943,
+            0.12931034482758622
+          ],
+          "f1_ci95": [
+            0.044989775051124746,
+            0.10247576334148772
+          ],
+          "fpr_ci95": [
+            0.0351369636194182,
+            0.043627833387532663
+          ]
+        },
+        "cost": {
+          "llm_calls": 5862,
+          "tier2_calls": 185,
+          "prompt_tokens": 5681481,
+          "completion_tokens": 791673,
+          "estimated_cost_usd": 3.6836268
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 16,
+          "fp": 250,
+          "fn": 193,
+          "tn": 7177,
+          "precision": 0.06015037593984962,
+          "recall": 0.07655502392344497,
+          "f1": 0.06736842105263158,
+          "fpr": 0.03366096674296486,
+          "precision_ci95": [
+            0.03434787972019853,
+            0.08866219761002622
+          ],
+          "recall_ci95": [
+            0.04385605406960023,
+            0.11489483981413548
+          ],
+          "f1_ci95": [
+            0.0394672342621259,
+            0.09881810032191025
+          ],
+          "fpr_ci95": [
+            0.029648212671890165,
+            0.03809411593511862
+          ]
+        },
+        "cost": {
+          "llm_calls": 5904,
+          "tier2_calls": 227,
+          "prompt_tokens": 5762690,
+          "completion_tokens": 803191,
+          "estimated_cost_usd": 3.7367844999999997
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 12,
+          "fp": 100,
+          "fn": 197,
+          "tn": 7327,
+          "precision": 0.10714285714285714,
+          "recall": 0.05741626794258373,
+          "f1": 0.07476635514018691,
+          "fpr": 0.013464386697185943,
+          "precision_ci95": [
+            0.05503336113427857,
+            0.16396227916600348
+          ],
+          "recall_ci95": [
+            0.028568043331076504,
+            0.09050802139037432
+          ],
+          "f1_ci95": [
+            0.03821352744919624,
+            0.11502519046448757
+          ],
+          "fpr_ci95": [
+            0.011018653814319868,
+            0.016019062726151917
+          ]
+        },
+        "cost": {
+          "llm_calls": 6045,
+          "tier2_calls": 368,
+          "prompt_tokens": 6034303,
+          "completion_tokens": 843622,
+          "estimated_cost_usd": 3.9193459
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 24,
+          "fp": 323,
+          "fn": 185,
+          "tn": 7104,
+          "precision": 0.069164265129683,
+          "recall": 0.11483253588516747,
+          "f1": 0.08633093525179857,
+          "fpr": 0.043489969031910596,
+          "precision_ci95": [
+            0.0453193951242868,
+            0.09358935656373986
+          ],
+          "recall_ci95": [
+            0.07618926758520668,
+            0.15737376436013892
+          ],
+          "f1_ci95": [
+            0.05754879966994146,
+            0.11620744786741649
+          ],
+          "fpr_ci95": [
+            0.03919956132620212,
+            0.04805028592364627
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 21,
+          "fp": 275,
+          "fn": 188,
+          "tn": 7152,
+          "precision": 0.07094594594594594,
+          "recall": 0.10047846889952153,
+          "f1": 0.08316831683168316,
+          "fpr": 0.03702706341726134,
+          "precision_ci95": [
+            0.04391891891891892,
+            0.09873236451381491
+          ],
+          "recall_ci95": [
+            0.06190353460972018,
+            0.14151247064539638
+          ],
+          "f1_ci95": [
+            0.05273566776983026,
+            0.11577560546218973
+          ],
+          "fpr_ci95": [
+            0.03285244055639925,
+            0.04167916307538753
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 14,
+          "fp": 107,
+          "fn": 195,
+          "tn": 7320,
+          "precision": 0.11570247933884298,
+          "recall": 0.06698564593301436,
+          "f1": 0.08484848484848484,
+          "fpr": 0.014406893765988959,
+          "precision_ci95": [
+            0.06348926894701543,
+            0.17392127799736495
+          ],
+          "recall_ci95": [
+            0.03607784826856991,
+            0.10222764227642277
+          ],
+          "f1_ci95": [
+            0.04516129032258065,
+            0.12540883478859302
+          ],
+          "fpr_ci95": [
+            0.011849341117950208,
+            0.01712767547793265
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 24,
+          "fp": 323,
+          "fn": 185,
+          "tn": 7104,
+          "precision": 0.069164265129683,
+          "recall": 0.11483253588516747,
+          "f1": 0.08633093525179857,
+          "fpr": 0.043489969031910596,
+          "precision_ci95": [
+            0.0453193951242868,
+            0.09358935656373986
+          ],
+          "recall_ci95": [
+            0.07618926758520668,
+            0.15737376436013892
+          ],
+          "f1_ci95": [
+            0.05754879966994146,
+            0.11620744786741649
+          ],
+          "fpr_ci95": [
+            0.03919956132620212,
+            0.04805028592364627
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 21,
+          "fp": 275,
+          "fn": 188,
+          "tn": 7152,
+          "precision": 0.07094594594594594,
+          "recall": 0.10047846889952153,
+          "f1": 0.08316831683168316,
+          "fpr": 0.03702706341726134,
+          "precision_ci95": [
+            0.04391891891891892,
+            0.09873236451381491
+          ],
+          "recall_ci95": [
+            0.06190353460972018,
+            0.14151247064539638
+          ],
+          "f1_ci95": [
+            0.05273566776983026,
+            0.11577560546218973
+          ],
+          "fpr_ci95": [
+            0.03285244055639925,
+            0.04167916307538753
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 14,
+          "fp": 107,
+          "fn": 195,
+          "tn": 7320,
+          "precision": 0.11570247933884298,
+          "recall": 0.06698564593301436,
+          "f1": 0.08484848484848484,
+          "fpr": 0.014406893765988959,
+          "precision_ci95": [
+            0.06348926894701543,
+            0.17392127799736495
+          ],
+          "recall_ci95": [
+            0.03607784826856991,
+            0.10222764227642277
+          ],
+          "f1_ci95": [
+            0.04516129032258065,
+            0.12540883478859302
+          ],
+          "fpr_ci95": [
+            0.011849341117950208,
+            0.01712767547793265
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 35,
+          "fp": 381,
+          "fn": 174,
+          "tn": 7046,
+          "precision": 0.08413461538461539,
+          "recall": 0.1674641148325359,
+          "f1": 0.112,
+          "fpr": 0.05129931331627844,
+          "precision_ci95": [
+            0.058555633555633556,
+            0.11058850637029005
+          ],
+          "recall_ci95": [
+            0.11890803125400283,
+            0.2194194931493724
+          ],
+          "f1_ci95": [
+            0.07894501037540086,
+            0.14492860818111655
+          ],
+          "fpr_ci95": [
+            0.04642086946732706,
+            0.056109834466340526
+          ]
+        },
+        "cost": {
+          "llm_calls": 6687,
+          "tier2_calls": 1010,
+          "prompt_tokens": 7293671,
+          "completion_tokens": 1076730,
+          "estimated_cost_usd": 4.879926299999999
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 29,
+          "fp": 311,
+          "fn": 180,
+          "tn": 7116,
+          "precision": 0.08529411764705883,
+          "recall": 0.13875598086124402,
+          "f1": 0.10564663023679417,
+          "fpr": 0.041874242628248286,
+          "precision_ci95": [
+            0.057971014492753624,
+            0.11280627840727227
+          ],
+          "recall_ci95": [
+            0.0950102429031314,
+            0.18848167539267016
+          ],
+          "f1_ci95": [
+            0.07312280654932679,
+            0.13883677298311445
+          ],
+          "fpr_ci95": [
+            0.03766185995915306,
+            0.04633312714812787
+          ]
+        },
+        "cost": {
+          "llm_calls": 6729,
+          "tier2_calls": 1052,
+          "prompt_tokens": 7374880,
+          "completion_tokens": 1088248,
+          "estimated_cost_usd": 4.933084
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.9|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 18,
+          "fp": 116,
+          "fn": 191,
+          "tn": 7311,
+          "precision": 0.13432835820895522,
+          "recall": 0.0861244019138756,
+          "f1": 0.10495626822157435,
+          "fpr": 0.015618688568735694,
+          "precision_ci95": [
+            0.07640199224175087,
+            0.19549280810722458
+          ],
+          "recall_ci95": [
+            0.051637159405028304,
+            0.12745619524405505
+          ],
+          "f1_ci95": [
+            0.06172364672364671,
+            0.1508571265697021
+          ],
+          "fpr_ci95": [
+            0.012804873962062067,
+            0.018603188507967813
+          ]
+        },
+        "cost": {
+          "llm_calls": 6870,
+          "tier2_calls": 1193,
+          "prompt_tokens": 7646493,
+          "completion_tokens": 1128679,
+          "estimated_cost_usd": 5.1156454
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 15,
+          "fp": 264,
+          "fn": 194,
+          "tn": 7163,
+          "precision": 0.053763440860215055,
+          "recall": 0.07177033492822966,
+          "f1": 0.06147540983606557,
+          "fpr": 0.03554598088057089,
+          "precision_ci95": [
+            0.030712164239376807,
+            0.07885540464063384
+          ],
+          "recall_ci95": [
+            0.04018282200476065,
+            0.10822566608649083
+          ],
+          "f1_ci95": [
+            0.03463203463203463,
+            0.09109539073308281
+          ],
+          "fpr_ci95": [
+            0.0315608181612678,
+            0.040055278852254905
+          ]
+        },
+        "cost": {
+          "llm_calls": 5862,
+          "tier2_calls": 185,
+          "prompt_tokens": 5681481,
+          "completion_tokens": 791673,
+          "estimated_cost_usd": 3.6836268
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 10,
+          "fp": 228,
+          "fn": 199,
+          "tn": 7199,
+          "precision": 0.04201680672268908,
+          "recall": 0.04784688995215311,
+          "f1": 0.0447427293064877,
+          "fpr": 0.030698801669583952,
+          "precision_ci95": [
+            0.02048971227835396,
+            0.06819792050055205
+          ],
+          "recall_ci95": [
+            0.023253122308354867,
+            0.07793909147620937
+          ],
+          "f1_ci95": [
+            0.022025221474560683,
+            0.07128256963162624
+          ],
+          "fpr_ci95": [
+            0.02664304411671984,
+            0.03424381983104505
+          ]
+        },
+        "cost": {
+          "llm_calls": 5904,
+          "tier2_calls": 227,
+          "prompt_tokens": 5762690,
+          "completion_tokens": 803191,
+          "estimated_cost_usd": 3.7367844999999997
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 7,
+          "fp": 88,
+          "fn": 202,
+          "tn": 7339,
+          "precision": 0.07368421052631578,
+          "recall": 0.03349282296650718,
+          "f1": 0.046052631578947366,
+          "fpr": 0.01184866029352363,
+          "precision_ci95": [
+            0.028846153846153848,
+            0.1348314606741573
+          ],
+          "recall_ci95": [
+            0.013633292383292382,
+            0.0625
+          ],
+          "f1_ci95": [
+            0.0189873417721519,
+            0.08497428479588556
+          ],
+          "fpr_ci95": [
+            0.009430054294019734,
+            0.01423468589055206
+          ]
+        },
+        "cost": {
+          "llm_calls": 6045,
+          "tier2_calls": 368,
+          "prompt_tokens": 6034303,
+          "completion_tokens": 843622,
+          "estimated_cost_usd": 3.9193459
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 15,
+          "fp": 264,
+          "fn": 194,
+          "tn": 7163,
+          "precision": 0.053763440860215055,
+          "recall": 0.07177033492822966,
+          "f1": 0.06147540983606557,
+          "fpr": 0.03554598088057089,
+          "precision_ci95": [
+            0.030712164239376807,
+            0.07885540464063384
+          ],
+          "recall_ci95": [
+            0.04018282200476065,
+            0.10822566608649083
+          ],
+          "f1_ci95": [
+            0.03463203463203463,
+            0.09109539073308281
+          ],
+          "fpr_ci95": [
+            0.0315608181612678,
+            0.040055278852254905
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 10,
+          "fp": 228,
+          "fn": 199,
+          "tn": 7199,
+          "precision": 0.04201680672268908,
+          "recall": 0.04784688995215311,
+          "f1": 0.0447427293064877,
+          "fpr": 0.030698801669583952,
+          "precision_ci95": [
+            0.02048971227835396,
+            0.06819792050055205
+          ],
+          "recall_ci95": [
+            0.023253122308354867,
+            0.07793909147620937
+          ],
+          "f1_ci95": [
+            0.022025221474560683,
+            0.07128256963162624
+          ],
+          "fpr_ci95": [
+            0.02664304411671984,
+            0.03424381983104505
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 7,
+          "fp": 88,
+          "fn": 202,
+          "tn": 7339,
+          "precision": 0.07368421052631578,
+          "recall": 0.03349282296650718,
+          "f1": 0.046052631578947366,
+          "fpr": 0.01184866029352363,
+          "precision_ci95": [
+            0.028846153846153848,
+            0.1348314606741573
+          ],
+          "recall_ci95": [
+            0.013633292383292382,
+            0.0625
+          ],
+          "f1_ci95": [
+            0.0189873417721519,
+            0.08497428479588556
+          ],
+          "fpr_ci95": [
+            0.009430054294019734,
+            0.01423468589055206
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 15,
+          "fp": 264,
+          "fn": 194,
+          "tn": 7163,
+          "precision": 0.053763440860215055,
+          "recall": 0.07177033492822966,
+          "f1": 0.06147540983606557,
+          "fpr": 0.03554598088057089,
+          "precision_ci95": [
+            0.030712164239376807,
+            0.07885540464063384
+          ],
+          "recall_ci95": [
+            0.04018282200476065,
+            0.10822566608649083
+          ],
+          "f1_ci95": [
+            0.03463203463203463,
+            0.09109539073308281
+          ],
+          "fpr_ci95": [
+            0.0315608181612678,
+            0.040055278852254905
+          ]
+        },
+        "cost": {
+          "llm_calls": 6077,
+          "tier2_calls": 400,
+          "prompt_tokens": 6101116,
+          "completion_tokens": 864244,
+          "estimated_cost_usd": 3.9909448000000003
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 10,
+          "fp": 228,
+          "fn": 199,
+          "tn": 7199,
+          "precision": 0.04201680672268908,
+          "recall": 0.04784688995215311,
+          "f1": 0.0447427293064877,
+          "fpr": 0.030698801669583952,
+          "precision_ci95": [
+            0.02048971227835396,
+            0.06819792050055205
+          ],
+          "recall_ci95": [
+            0.023253122308354867,
+            0.07793909147620937
+          ],
+          "f1_ci95": [
+            0.022025221474560683,
+            0.07128256963162624
+          ],
+          "fpr_ci95": [
+            0.02664304411671984,
+            0.03424381983104505
+          ]
+        },
+        "cost": {
+          "llm_calls": 6119,
+          "tier2_calls": 442,
+          "prompt_tokens": 6182325,
+          "completion_tokens": 875762,
+          "estimated_cost_usd": 4.0441025
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 7,
+          "fp": 88,
+          "fn": 202,
+          "tn": 7339,
+          "precision": 0.07368421052631578,
+          "recall": 0.03349282296650718,
+          "f1": 0.046052631578947366,
+          "fpr": 0.01184866029352363,
+          "precision_ci95": [
+            0.028846153846153848,
+            0.1348314606741573
+          ],
+          "recall_ci95": [
+            0.013633292383292382,
+            0.0625
+          ],
+          "f1_ci95": [
+            0.0189873417721519,
+            0.08497428479588556
+          ],
+          "fpr_ci95": [
+            0.009430054294019734,
+            0.01423468589055206
+          ]
+        },
+        "cost": {
+          "llm_calls": 6260,
+          "tier2_calls": 583,
+          "prompt_tokens": 6453938,
+          "completion_tokens": 916193,
+          "estimated_cost_usd": 4.2266639
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 15,
+          "fp": 265,
+          "fn": 194,
+          "tn": 7162,
+          "precision": 0.05357142857142857,
+          "recall": 0.07177033492822966,
+          "f1": 0.06134969325153374,
+          "fpr": 0.03568062474754275,
+          "precision_ci95": [
+            0.03041537043438184,
+            0.07857142857142857
+          ],
+          "recall_ci95": [
+            0.03946937485635486,
+            0.1077027027027027
+          ],
+          "f1_ci95": [
+            0.0345572354211663,
+            0.09018256333830102
+          ],
+          "fpr_ci95": [
+            0.03168317904118887,
+            0.040247698926026095
+          ]
+        },
+        "cost": {
+          "llm_calls": 6687,
+          "tier2_calls": 1010,
+          "prompt_tokens": 7293671,
+          "completion_tokens": 1076730,
+          "estimated_cost_usd": 4.879926299999999
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 10,
+          "fp": 229,
+          "fn": 199,
+          "tn": 7198,
+          "precision": 0.04184100418410042,
+          "recall": 0.04784688995215311,
+          "f1": 0.04464285714285714,
+          "fpr": 0.03083344553655581,
+          "precision_ci95": [
+            0.020323146045225633,
+            0.06794012477175897
+          ],
+          "recall_ci95": [
+            0.023253122308354867,
+            0.07793909147620937
+          ],
+          "f1_ci95": [
+            0.021976817042606515,
+            0.07113343508504161
+          ],
+          "fpr_ci95": [
+            0.026778287995484915,
+            0.03445166666522122
+          ]
+        },
+        "cost": {
+          "llm_calls": 6729,
+          "tier2_calls": 1052,
+          "prompt_tokens": 7374880,
+          "completion_tokens": 1088248,
+          "estimated_cost_usd": 4.933084
+        }
+      },
+      {
+        "name": "mode=two_tier|theta_topo=0.95|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "two_tier",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 7,
+          "fp": 88,
+          "fn": 202,
+          "tn": 7339,
+          "precision": 0.07368421052631578,
+          "recall": 0.03349282296650718,
+          "f1": 0.046052631578947366,
+          "fpr": 0.01184866029352363,
+          "precision_ci95": [
+            0.028846153846153848,
+            0.1348314606741573
+          ],
+          "recall_ci95": [
+            0.013633292383292382,
+            0.0625
+          ],
+          "f1_ci95": [
+            0.0189873417721519,
+            0.08497428479588556
+          ],
+          "fpr_ci95": [
+            0.009430054294019734,
+            0.01423468589055206
+          ]
+        },
+        "cost": {
+          "llm_calls": 6870,
+          "tier2_calls": 1193,
+          "prompt_tokens": 7646493,
+          "completion_tokens": 1128679,
+          "estimated_cost_usd": 5.1156454
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 255,
+          "fn": 175,
+          "tn": 7172,
+          "precision": 0.11764705882352941,
+          "recall": 0.16267942583732056,
+          "f1": 0.13654618473895583,
+          "fpr": 0.03433418607782415,
+          "precision_ci95": [
+            0.08190974457386467,
+            0.15437659514131769
+          ],
+          "recall_ci95": [
+            0.11373831177148712,
+            0.21428571428571427
+          ],
+          "f1_ci95": [
+            0.0959908523908524,
+            0.17671223354958296
+          ],
+          "fpr_ci95": [
+            0.030396057238519916,
+            0.03840060260097248
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 161,
+          "fn": 181,
+          "tn": 7266,
+          "precision": 0.14814814814814814,
+          "recall": 0.1339712918660287,
+          "f1": 0.14070351758793967,
+          "fpr": 0.021677662582469368,
+          "precision_ci95": [
+            0.10212202671880093,
+            0.19697156291983878
+          ],
+          "recall_ci95": [
+            0.09007840387557368,
+            0.17982894736842106
+          ],
+          "f1_ci95": [
+            0.09823596445580361,
+            0.18500224935732648
+          ],
+          "fpr_ci95": [
+            0.018428530796781268,
+            0.02518247263536762
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 43,
+          "fn": 192,
+          "tn": 7384,
+          "precision": 0.2833333333333333,
+          "recall": 0.08133971291866028,
+          "f1": 0.12639405204460966,
+          "fpr": 0.005789686279789956,
+          "precision_ci95": [
+            0.17139817629179332,
+            0.40679535467671063
+          ],
+          "recall_ci95": [
+            0.04672655077235969,
+            0.11947709255162242
+          ],
+          "f1_ci95": [
+            0.07374809185637486,
+            0.18114922813036022
+          ],
+          "fpr_ci95": [
+            0.004161031952360069,
+            0.007532982021691327
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 255,
+          "fn": 175,
+          "tn": 7172,
+          "precision": 0.11764705882352941,
+          "recall": 0.16267942583732056,
+          "f1": 0.13654618473895583,
+          "fpr": 0.03433418607782415,
+          "precision_ci95": [
+            0.08190974457386467,
+            0.15437659514131769
+          ],
+          "recall_ci95": [
+            0.11373831177148712,
+            0.21428571428571427
+          ],
+          "f1_ci95": [
+            0.0959908523908524,
+            0.17671223354958296
+          ],
+          "fpr_ci95": [
+            0.030396057238519916,
+            0.03840060260097248
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 161,
+          "fn": 181,
+          "tn": 7266,
+          "precision": 0.14814814814814814,
+          "recall": 0.1339712918660287,
+          "f1": 0.14070351758793967,
+          "fpr": 0.021677662582469368,
+          "precision_ci95": [
+            0.10212202671880093,
+            0.19697156291983878
+          ],
+          "recall_ci95": [
+            0.09007840387557368,
+            0.17982894736842106
+          ],
+          "f1_ci95": [
+            0.09823596445580361,
+            0.18500224935732648
+          ],
+          "fpr_ci95": [
+            0.018428530796781268,
+            0.02518247263536762
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 43,
+          "fn": 192,
+          "tn": 7384,
+          "precision": 0.2833333333333333,
+          "recall": 0.08133971291866028,
+          "f1": 0.12639405204460966,
+          "fpr": 0.005789686279789956,
+          "precision_ci95": [
+            0.17139817629179332,
+            0.40679535467671063
+          ],
+          "recall_ci95": [
+            0.04672655077235969,
+            0.11947709255162242
+          ],
+          "f1_ci95": [
+            0.07374809185637486,
+            0.18114922813036022
+          ],
+          "fpr_ci95": [
+            0.004161031952360069,
+            0.007532982021691327
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 255,
+          "fn": 175,
+          "tn": 7172,
+          "precision": 0.11764705882352941,
+          "recall": 0.16267942583732056,
+          "f1": 0.13654618473895583,
+          "fpr": 0.03433418607782415,
+          "precision_ci95": [
+            0.08190974457386467,
+            0.15437659514131769
+          ],
+          "recall_ci95": [
+            0.11373831177148712,
+            0.21428571428571427
+          ],
+          "f1_ci95": [
+            0.0959908523908524,
+            0.17671223354958296
+          ],
+          "fpr_ci95": [
+            0.030396057238519916,
+            0.03840060260097248
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 161,
+          "fn": 181,
+          "tn": 7266,
+          "precision": 0.14814814814814814,
+          "recall": 0.1339712918660287,
+          "f1": 0.14070351758793967,
+          "fpr": 0.021677662582469368,
+          "precision_ci95": [
+            0.10212202671880093,
+            0.19697156291983878
+          ],
+          "recall_ci95": [
+            0.09007840387557368,
+            0.17982894736842106
+          ],
+          "f1_ci95": [
+            0.09823596445580361,
+            0.18500224935732648
+          ],
+          "fpr_ci95": [
+            0.018428530796781268,
+            0.02518247263536762
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 43,
+          "fn": 192,
+          "tn": 7384,
+          "precision": 0.2833333333333333,
+          "recall": 0.08133971291866028,
+          "f1": 0.12639405204460966,
+          "fpr": 0.005789686279789956,
+          "precision_ci95": [
+            0.17139817629179332,
+            0.40679535467671063
+          ],
+          "recall_ci95": [
+            0.04672655077235969,
+            0.11947709255162242
+          ],
+          "f1_ci95": [
+            0.07374809185637486,
+            0.18114922813036022
+          ],
+          "fpr_ci95": [
+            0.004161031952360069,
+            0.007532982021691327
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 255,
+          "fn": 175,
+          "tn": 7172,
+          "precision": 0.11764705882352941,
+          "recall": 0.16267942583732056,
+          "f1": 0.13654618473895583,
+          "fpr": 0.03433418607782415,
+          "precision_ci95": [
+            0.08190974457386467,
+            0.15437659514131769
+          ],
+          "recall_ci95": [
+            0.11373831177148712,
+            0.21428571428571427
+          ],
+          "f1_ci95": [
+            0.0959908523908524,
+            0.17671223354958296
+          ],
+          "fpr_ci95": [
+            0.030396057238519916,
+            0.03840060260097248
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 161,
+          "fn": 181,
+          "tn": 7266,
+          "precision": 0.14814814814814814,
+          "recall": 0.1339712918660287,
+          "f1": 0.14070351758793967,
+          "fpr": 0.021677662582469368,
+          "precision_ci95": [
+            0.10212202671880093,
+            0.19697156291983878
+          ],
+          "recall_ci95": [
+            0.09007840387557368,
+            0.17982894736842106
+          ],
+          "f1_ci95": [
+            0.09823596445580361,
+            0.18500224935732648
+          ],
+          "fpr_ci95": [
+            0.018428530796781268,
+            0.02518247263536762
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.8|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.8,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 43,
+          "fn": 192,
+          "tn": 7384,
+          "precision": 0.2833333333333333,
+          "recall": 0.08133971291866028,
+          "f1": 0.12639405204460966,
+          "fpr": 0.005789686279789956,
+          "precision_ci95": [
+            0.17139817629179332,
+            0.40679535467671063
+          ],
+          "recall_ci95": [
+            0.04672655077235969,
+            0.11947709255162242
+          ],
+          "f1_ci95": [
+            0.07374809185637486,
+            0.18114922813036022
+          ],
+          "fpr_ci95": [
+            0.004161031952360069,
+            0.007532982021691327
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 244,
+          "fn": 175,
+          "tn": 7183,
+          "precision": 0.1223021582733813,
+          "recall": 0.16267942583732056,
+          "f1": 0.13963039014373715,
+          "fpr": 0.0328531035411337,
+          "precision_ci95": [
+            0.08479077552538591,
+            0.16027941059127057
+          ],
+          "recall_ci95": [
+            0.11374138302455837,
+            0.21431318681318678
+          ],
+          "f1_ci95": [
+            0.09812654968529468,
+            0.18069936219910201
+          ],
+          "fpr_ci95": [
+            0.029156543071831936,
+            0.036943286470248325
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 153,
+          "fn": 181,
+          "tn": 7274,
+          "precision": 0.15469613259668508,
+          "recall": 0.1339712918660287,
+          "f1": 0.1435897435897436,
+          "fpr": 0.02060051164669449,
+          "precision_ci95": [
+            0.10981529985549134,
+            0.21229933217748667
+          ],
+          "recall_ci95": [
+            0.0921564371424119,
+            0.18334183673469387
+          ],
+          "f1_ci95": [
+            0.10187428797522323,
+            0.19184833951021
+          ],
+          "fpr_ci95": [
+            0.017370289475364453,
+            0.02397158364173933
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 42,
+          "fn": 192,
+          "tn": 7385,
+          "precision": 0.288135593220339,
+          "recall": 0.08133971291866028,
+          "f1": 0.12686567164179105,
+          "fpr": 0.005655042412818096,
+          "precision_ci95": [
+            0.17540045766590387,
+            0.40985802107728336
+          ],
+          "recall_ci95": [
+            0.04586690262189727,
+            0.12077781673679289
+          ],
+          "f1_ci95": [
+            0.07406724067240672,
+            0.1825219314595293
+          ],
+          "fpr_ci95": [
+            0.003910345363015266,
+            0.007390635510273531
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 244,
+          "fn": 175,
+          "tn": 7183,
+          "precision": 0.1223021582733813,
+          "recall": 0.16267942583732056,
+          "f1": 0.13963039014373715,
+          "fpr": 0.0328531035411337,
+          "precision_ci95": [
+            0.08479077552538591,
+            0.16027941059127057
+          ],
+          "recall_ci95": [
+            0.11374138302455837,
+            0.21431318681318678
+          ],
+          "f1_ci95": [
+            0.09812654968529468,
+            0.18069936219910201
+          ],
+          "fpr_ci95": [
+            0.029156543071831936,
+            0.036943286470248325
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 153,
+          "fn": 181,
+          "tn": 7274,
+          "precision": 0.15469613259668508,
+          "recall": 0.1339712918660287,
+          "f1": 0.1435897435897436,
+          "fpr": 0.02060051164669449,
+          "precision_ci95": [
+            0.10981529985549134,
+            0.21229933217748667
+          ],
+          "recall_ci95": [
+            0.0921564371424119,
+            0.18334183673469387
+          ],
+          "f1_ci95": [
+            0.10187428797522323,
+            0.19184833951021
+          ],
+          "fpr_ci95": [
+            0.017370289475364453,
+            0.02397158364173933
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 42,
+          "fn": 192,
+          "tn": 7385,
+          "precision": 0.288135593220339,
+          "recall": 0.08133971291866028,
+          "f1": 0.12686567164179105,
+          "fpr": 0.005655042412818096,
+          "precision_ci95": [
+            0.17540045766590387,
+            0.40985802107728336
+          ],
+          "recall_ci95": [
+            0.04586690262189727,
+            0.12077781673679289
+          ],
+          "f1_ci95": [
+            0.07406724067240672,
+            0.1825219314595293
+          ],
+          "fpr_ci95": [
+            0.003910345363015266,
+            0.007390635510273531
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 244,
+          "fn": 175,
+          "tn": 7183,
+          "precision": 0.1223021582733813,
+          "recall": 0.16267942583732056,
+          "f1": 0.13963039014373715,
+          "fpr": 0.0328531035411337,
+          "precision_ci95": [
+            0.08479077552538591,
+            0.16027941059127057
+          ],
+          "recall_ci95": [
+            0.11374138302455837,
+            0.21431318681318678
+          ],
+          "f1_ci95": [
+            0.09812654968529468,
+            0.18069936219910201
+          ],
+          "fpr_ci95": [
+            0.029156543071831936,
+            0.036943286470248325
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 153,
+          "fn": 181,
+          "tn": 7274,
+          "precision": 0.15469613259668508,
+          "recall": 0.1339712918660287,
+          "f1": 0.1435897435897436,
+          "fpr": 0.02060051164669449,
+          "precision_ci95": [
+            0.10981529985549134,
+            0.21229933217748667
+          ],
+          "recall_ci95": [
+            0.0921564371424119,
+            0.18334183673469387
+          ],
+          "f1_ci95": [
+            0.10187428797522323,
+            0.19184833951021
+          ],
+          "fpr_ci95": [
+            0.017370289475364453,
+            0.02397158364173933
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 42,
+          "fn": 192,
+          "tn": 7385,
+          "precision": 0.288135593220339,
+          "recall": 0.08133971291866028,
+          "f1": 0.12686567164179105,
+          "fpr": 0.005655042412818096,
+          "precision_ci95": [
+            0.17540045766590387,
+            0.40985802107728336
+          ],
+          "recall_ci95": [
+            0.04586690262189727,
+            0.12077781673679289
+          ],
+          "f1_ci95": [
+            0.07406724067240672,
+            0.1825219314595293
+          ],
+          "fpr_ci95": [
+            0.003910345363015266,
+            0.007390635510273531
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 244,
+          "fn": 175,
+          "tn": 7183,
+          "precision": 0.1223021582733813,
+          "recall": 0.16267942583732056,
+          "f1": 0.13963039014373715,
+          "fpr": 0.0328531035411337,
+          "precision_ci95": [
+            0.08479077552538591,
+            0.16027941059127057
+          ],
+          "recall_ci95": [
+            0.11374138302455837,
+            0.21431318681318678
+          ],
+          "f1_ci95": [
+            0.09812654968529468,
+            0.18069936219910201
+          ],
+          "fpr_ci95": [
+            0.029156543071831936,
+            0.036943286470248325
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 153,
+          "fn": 181,
+          "tn": 7274,
+          "precision": 0.15469613259668508,
+          "recall": 0.1339712918660287,
+          "f1": 0.1435897435897436,
+          "fpr": 0.02060051164669449,
+          "precision_ci95": [
+            0.10981529985549134,
+            0.21229933217748667
+          ],
+          "recall_ci95": [
+            0.0921564371424119,
+            0.18334183673469387
+          ],
+          "f1_ci95": [
+            0.10187428797522323,
+            0.19184833951021
+          ],
+          "fpr_ci95": [
+            0.017370289475364453,
+            0.02397158364173933
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.85|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.85,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 42,
+          "fn": 192,
+          "tn": 7385,
+          "precision": 0.288135593220339,
+          "recall": 0.08133971291866028,
+          "f1": 0.12686567164179105,
+          "fpr": 0.005655042412818096,
+          "precision_ci95": [
+            0.17540045766590387,
+            0.40985802107728336
+          ],
+          "recall_ci95": [
+            0.04586690262189727,
+            0.12077781673679289
+          ],
+          "f1_ci95": [
+            0.07406724067240672,
+            0.1825219314595293
+          ],
+          "fpr_ci95": [
+            0.003910345363015266,
+            0.007390635510273531
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 217,
+          "fn": 175,
+          "tn": 7210,
+          "precision": 0.13545816733067728,
+          "recall": 0.16267942583732056,
+          "f1": 0.14782608695652175,
+          "fpr": 0.029217719132893498,
+          "precision_ci95": [
+            0.0944697342519685,
+            0.1783048899106906
+          ],
+          "recall_ci95": [
+            0.11350586435492097,
+            0.21393092676154113
+          ],
+          "f1_ci95": [
+            0.10395878873601645,
+            0.1912350597609562
+          ],
+          "fpr_ci95": [
+            0.0256752352620267,
+            0.03303358648532666
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 140,
+          "fn": 181,
+          "tn": 7287,
+          "precision": 0.16666666666666666,
+          "recall": 0.1339712918660287,
+          "f1": 0.14854111405835543,
+          "fpr": 0.01885014137606032,
+          "precision_ci95": [
+            0.11515151515151516,
+            0.22560975609756098
+          ],
+          "recall_ci95": [
+            0.09009009009009009,
+            0.17925976497848392
+          ],
+          "f1_ci95": [
+            0.10255376344086022,
+            0.19514080965551925
+          ],
+          "fpr_ci95": [
+            0.01598984231693287,
+            0.022029318637256434
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 38,
+          "fn": 192,
+          "tn": 7389,
+          "precision": 0.3090909090909091,
+          "recall": 0.08133971291866028,
+          "f1": 0.12878787878787878,
+          "fpr": 0.005116466944930658,
+          "precision_ci95": [
+            0.18963077423552374,
+            0.44005769230769226
+          ],
+          "recall_ci95": [
+            0.04564554794520548,
+            0.12106029637199794
+          ],
+          "f1_ci95": [
+            0.07468108089571689,
+            0.18659048507462686
+          ],
+          "fpr_ci95": [
+            0.0036200795085816547,
+            0.006747138499453627
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 217,
+          "fn": 175,
+          "tn": 7210,
+          "precision": 0.13545816733067728,
+          "recall": 0.16267942583732056,
+          "f1": 0.14782608695652175,
+          "fpr": 0.029217719132893498,
+          "precision_ci95": [
+            0.0944697342519685,
+            0.1783048899106906
+          ],
+          "recall_ci95": [
+            0.11350586435492097,
+            0.21393092676154113
+          ],
+          "f1_ci95": [
+            0.10395878873601645,
+            0.1912350597609562
+          ],
+          "fpr_ci95": [
+            0.0256752352620267,
+            0.03303358648532666
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 140,
+          "fn": 181,
+          "tn": 7287,
+          "precision": 0.16666666666666666,
+          "recall": 0.1339712918660287,
+          "f1": 0.14854111405835543,
+          "fpr": 0.01885014137606032,
+          "precision_ci95": [
+            0.11515151515151516,
+            0.22560975609756098
+          ],
+          "recall_ci95": [
+            0.09009009009009009,
+            0.17925976497848392
+          ],
+          "f1_ci95": [
+            0.10255376344086022,
+            0.19514080965551925
+          ],
+          "fpr_ci95": [
+            0.01598984231693287,
+            0.022029318637256434
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 38,
+          "fn": 192,
+          "tn": 7389,
+          "precision": 0.3090909090909091,
+          "recall": 0.08133971291866028,
+          "f1": 0.12878787878787878,
+          "fpr": 0.005116466944930658,
+          "precision_ci95": [
+            0.18963077423552374,
+            0.44005769230769226
+          ],
+          "recall_ci95": [
+            0.04564554794520548,
+            0.12106029637199794
+          ],
+          "f1_ci95": [
+            0.07468108089571689,
+            0.18659048507462686
+          ],
+          "fpr_ci95": [
+            0.0036200795085816547,
+            0.006747138499453627
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 217,
+          "fn": 175,
+          "tn": 7210,
+          "precision": 0.13545816733067728,
+          "recall": 0.16267942583732056,
+          "f1": 0.14782608695652175,
+          "fpr": 0.029217719132893498,
+          "precision_ci95": [
+            0.0944697342519685,
+            0.1783048899106906
+          ],
+          "recall_ci95": [
+            0.11350586435492097,
+            0.21393092676154113
+          ],
+          "f1_ci95": [
+            0.10395878873601645,
+            0.1912350597609562
+          ],
+          "fpr_ci95": [
+            0.0256752352620267,
+            0.03303358648532666
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 140,
+          "fn": 181,
+          "tn": 7287,
+          "precision": 0.16666666666666666,
+          "recall": 0.1339712918660287,
+          "f1": 0.14854111405835543,
+          "fpr": 0.01885014137606032,
+          "precision_ci95": [
+            0.11515151515151516,
+            0.22560975609756098
+          ],
+          "recall_ci95": [
+            0.09009009009009009,
+            0.17925976497848392
+          ],
+          "f1_ci95": [
+            0.10255376344086022,
+            0.19514080965551925
+          ],
+          "fpr_ci95": [
+            0.01598984231693287,
+            0.022029318637256434
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 38,
+          "fn": 192,
+          "tn": 7389,
+          "precision": 0.3090909090909091,
+          "recall": 0.08133971291866028,
+          "f1": 0.12878787878787878,
+          "fpr": 0.005116466944930658,
+          "precision_ci95": [
+            0.18963077423552374,
+            0.44005769230769226
+          ],
+          "recall_ci95": [
+            0.04564554794520548,
+            0.12106029637199794
+          ],
+          "f1_ci95": [
+            0.07468108089571689,
+            0.18659048507462686
+          ],
+          "fpr_ci95": [
+            0.0036200795085816547,
+            0.006747138499453627
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 34,
+          "fp": 217,
+          "fn": 175,
+          "tn": 7210,
+          "precision": 0.13545816733067728,
+          "recall": 0.16267942583732056,
+          "f1": 0.14782608695652175,
+          "fpr": 0.029217719132893498,
+          "precision_ci95": [
+            0.0944697342519685,
+            0.1783048899106906
+          ],
+          "recall_ci95": [
+            0.11350586435492097,
+            0.21393092676154113
+          ],
+          "f1_ci95": [
+            0.10395878873601645,
+            0.1912350597609562
+          ],
+          "fpr_ci95": [
+            0.0256752352620267,
+            0.03303358648532666
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 28,
+          "fp": 140,
+          "fn": 181,
+          "tn": 7287,
+          "precision": 0.16666666666666666,
+          "recall": 0.1339712918660287,
+          "f1": 0.14854111405835543,
+          "fpr": 0.01885014137606032,
+          "precision_ci95": [
+            0.11515151515151516,
+            0.22560975609756098
+          ],
+          "recall_ci95": [
+            0.09009009009009009,
+            0.17925976497848392
+          ],
+          "f1_ci95": [
+            0.10255376344086022,
+            0.19514080965551925
+          ],
+          "fpr_ci95": [
+            0.01598984231693287,
+            0.022029318637256434
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.9|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.9,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 17,
+          "fp": 38,
+          "fn": 192,
+          "tn": 7389,
+          "precision": 0.3090909090909091,
+          "recall": 0.08133971291866028,
+          "f1": 0.12878787878787878,
+          "fpr": 0.005116466944930658,
+          "precision_ci95": [
+            0.18963077423552374,
+            0.44005769230769226
+          ],
+          "recall_ci95": [
+            0.04564554794520548,
+            0.12106029637199794
+          ],
+          "f1_ci95": [
+            0.07468108089571689,
+            0.18659048507462686
+          ],
+          "fpr_ci95": [
+            0.0036200795085816547,
+            0.006747138499453627
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.8|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 8,
+          "fn": 208,
+          "tn": 7419,
+          "precision": 0.1111111111111111,
+          "recall": 0.004784688995215311,
+          "f1": 0.009174311926605503,
+          "fpr": 0.0010771509357748754,
+          "precision_ci95": [
+            0.0,
+            0.375
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.02885670731707316
+          ],
+          "fpr_ci95": [
+            0.0004044203142114944,
+            0.0018842847496952477
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.8|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 6,
+          "fn": 208,
+          "tn": 7421,
+          "precision": 0.14285714285714285,
+          "recall": 0.004784688995215311,
+          "f1": 0.009259259259259259,
+          "fpr": 0.0008078632018311566,
+          "precision_ci95": [
+            0.0,
+            0.5
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029136974508584813
+          ],
+          "fpr_ci95": [
+            0.0002690341673392521,
+            0.0014822850103752337
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.8|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.8,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 208,
+          "tn": 7425,
+          "precision": 0.3333333333333333,
+          "recall": 0.004784688995215311,
+          "f1": 0.009433962264150941,
+          "fpr": 0.00026928773394371884,
+          "precision_ci95": [
+            0.0,
+            1.0
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015308084772370485
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029858246456161402
+          ],
+          "fpr_ci95": [
+            0.0,
+            0.0006737636437137853
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.85|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 8,
+          "fn": 208,
+          "tn": 7419,
+          "precision": 0.1111111111111111,
+          "recall": 0.004784688995215311,
+          "f1": 0.009174311926605503,
+          "fpr": 0.0010771509357748754,
+          "precision_ci95": [
+            0.0,
+            0.375
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.02885670731707316
+          ],
+          "fpr_ci95": [
+            0.0004044203142114944,
+            0.0018842847496952477
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.85|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 6,
+          "fn": 208,
+          "tn": 7421,
+          "precision": 0.14285714285714285,
+          "recall": 0.004784688995215311,
+          "f1": 0.009259259259259259,
+          "fpr": 0.0008078632018311566,
+          "precision_ci95": [
+            0.0,
+            0.5
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029136974508584813
+          ],
+          "fpr_ci95": [
+            0.0002690341673392521,
+            0.0014822850103752337
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.85|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.85,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 208,
+          "tn": 7425,
+          "precision": 0.3333333333333333,
+          "recall": 0.004784688995215311,
+          "f1": 0.009433962264150941,
+          "fpr": 0.00026928773394371884,
+          "precision_ci95": [
+            0.0,
+            1.0
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015308084772370485
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029858246456161402
+          ],
+          "fpr_ci95": [
+            0.0,
+            0.0006737636437137853
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.9|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 8,
+          "fn": 208,
+          "tn": 7419,
+          "precision": 0.1111111111111111,
+          "recall": 0.004784688995215311,
+          "f1": 0.009174311926605503,
+          "fpr": 0.0010771509357748754,
+          "precision_ci95": [
+            0.0,
+            0.375
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.02885670731707316
+          ],
+          "fpr_ci95": [
+            0.0004044203142114944,
+            0.0018842847496952477
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.9|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 6,
+          "fn": 208,
+          "tn": 7421,
+          "precision": 0.14285714285714285,
+          "recall": 0.004784688995215311,
+          "f1": 0.009259259259259259,
+          "fpr": 0.0008078632018311566,
+          "precision_ci95": [
+            0.0,
+            0.5
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029136974508584813
+          ],
+          "fpr_ci95": [
+            0.0002690341673392521,
+            0.0014822850103752337
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.9|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.9,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 208,
+          "tn": 7425,
+          "precision": 0.3333333333333333,
+          "recall": 0.004784688995215311,
+          "f1": 0.009433962264150941,
+          "fpr": 0.00026928773394371884,
+          "precision_ci95": [
+            0.0,
+            1.0
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015308084772370485
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029858246456161402
+          ],
+          "fpr_ci95": [
+            0.0,
+            0.0006737636437137853
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.95|percentile=90",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 90
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 8,
+          "fn": 208,
+          "tn": 7419,
+          "precision": 0.1111111111111111,
+          "recall": 0.004784688995215311,
+          "f1": 0.009174311926605503,
+          "fpr": 0.0010771509357748754,
+          "precision_ci95": [
+            0.0,
+            0.375
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.02885670731707316
+          ],
+          "fpr_ci95": [
+            0.0004044203142114944,
+            0.0018842847496952477
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.95|percentile=95",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 95
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 6,
+          "fn": 208,
+          "tn": 7421,
+          "precision": 0.14285714285714285,
+          "recall": 0.004784688995215311,
+          "f1": 0.009259259259259259,
+          "fpr": 0.0008078632018311566,
+          "precision_ci95": [
+            0.0,
+            0.5
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015230368797265097
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029136974508584813
+          ],
+          "fpr_ci95": [
+            0.0002690341673392521,
+            0.0014822850103752337
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      },
+      {
+        "name": "mode=topology_only|theta_topo=0.95|fp_confidence=0.95|percentile=99",
+        "variant": {
+          "mode": "topology_only",
+          "theta_local": 0.8,
+          "theta_topo": 0.95,
+          "gating": true,
+          "anchoring": true,
+          "fp_confidence": 0.95,
+          "escalate_on": [
+            "no_context",
+            "uncertain",
+            "weak_fp"
+          ],
+          "baseline": "rolling",
+          "percentile": 99
+        },
+        "metrics": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 208,
+          "tn": 7425,
+          "precision": 0.3333333333333333,
+          "recall": 0.004784688995215311,
+          "f1": 0.009433962264150941,
+          "fpr": 0.00026928773394371884,
+          "precision_ci95": [
+            0.0,
+            1.0
+          ],
+          "recall_ci95": [
+            0.0,
+            0.015308084772370485
+          ],
+          "f1_ci95": [
+            0.0,
+            0.029858246456161402
+          ],
+          "fpr_ci95": [
+            0.0,
+            0.0006737636437137853
+          ]
+        },
+        "cost": {
+          "llm_calls": 5677,
+          "tier2_calls": 5677,
+          "prompt_tokens": 5173670,
+          "completion_tokens": 691941,
+          "estimated_cost_usd": 3.2819535
+        }
+      }
+    ],
+    "selected": "mode=two_tier|theta_topo=0.9|fp_confidence=0.95|percentile=90",
+    "selected_variant": {
+      "mode": "two_tier",
+      "theta_local": 0.8,
+      "theta_topo": 0.9,
+      "gating": true,
+      "anchoring": true,
+      "fp_confidence": 0.95,
+      "escalate_on": [
+        "no_context",
+        "uncertain",
+        "weak_fp"
+      ],
+      "baseline": "rolling",
+      "percentile": 90
+    }
+  },
+  "main": {
+    "variant": {
+      "mode": "two_tier",
+      "theta_local": 0.8,
+      "theta_topo": 0.9,
+      "gating": true,
+      "anchoring": true,
+      "fp_confidence": 0.95,
+      "escalate_on": [
+        "no_context",
+        "uncertain",
+        "weak_fp"
+      ],
+      "baseline": "rolling",
+      "percentile": 90
+    },
+    "cost": {
+      "llm_calls": 6687,
+      "tier2_calls": 1010,
+      "prompt_tokens": 7293671,
+      "completion_tokens": 1076730,
+      "estimated_cost_usd": 4.879926299999999
+    },
+    "counts": {
+      "escalation_uncertain": 175,
+      "downgraded_by_evidence_rule": 548,
+      "downgraded_by_gating": 102,
+      "downgraded_by_anchoring": 191,
+      "downgraded_by_threshold": 0,
+      "final_tier2": 1010,
+      "final_tier1": 4667,
+      "escalation_weak_fp": 832,
+      "escalation_no_context": 4394,
+      "tier2_skipped_empty_context": 4391
+    }
+  },
+  "ablation": {
+    "windows": 7636,
+    "fault_windows": 209,
+    "reference": "ctav",
+    "methods": {
+      "ctav": {
+        "tp": 35,
+        "fp": 381,
+        "fn": 174,
+        "tn": 7046,
+        "precision": 0.08413461538461539,
+        "recall": 0.1674641148325359,
+        "f1": 0.112,
+        "fpr": 0.05129931331627844,
+        "precision_ci95": [
+          0.058555633555633556,
+          0.11058850637029005
+        ],
+        "recall_ci95": [
+          0.11890803125400283,
+          0.2194194931493724
+        ],
+        "f1_ci95": [
+          0.07894501037540086,
+          0.14492860818111655
+        ],
+        "fpr_ci95": [
+          0.04642086946732706,
+          0.056109834466340526
+        ]
+      },
+      "no_c2": {
+        "tp": 35,
+        "fp": 414,
+        "fn": 174,
+        "tn": 7013,
+        "precision": 0.0779510022271715,
+        "recall": 0.1674641148325359,
+        "f1": 0.10638297872340426,
+        "fpr": 0.055742560926349806,
+        "precision_ci95": [
+          0.05431995669991495,
+          0.10145633352155091
+        ],
+        "recall_ci95": [
+          0.11961592469315581,
+          0.21875
+        ],
+        "f1_ci95": [
+          0.07511151150271361,
+          0.1369691733314691
+        ],
+        "fpr_ci95": [
+          0.05078027475539811,
+          0.06102983462476756
+        ]
+      },
+      "no_c3": {
+        "tp": 59,
+        "fp": 614,
+        "fn": 150,
+        "tn": 6813,
+        "precision": 0.08766716196136701,
+        "recall": 0.2822966507177033,
+        "f1": 0.13378684807256236,
+        "fpr": 0.08267133432072168,
+        "precision_ci95": [
+          0.06666204986149585,
+          0.10928805534470963
+        ],
+        "recall_ci95": [
+          0.22610238693467338,
+          0.34635639621702335
+        ],
+        "f1_ci95": [
+          0.10377052914638754,
+          0.16470650350953475
+        ],
+        "fpr_ci95": [
+          0.07640456294307209,
+          0.08916903366239737
+        ]
+      },
+      "no_c4": {
+        "tp": 34,
+        "fp": 217,
+        "fn": 175,
+        "tn": 7210,
+        "precision": 0.13545816733067728,
+        "recall": 0.16267942583732056,
+        "f1": 0.14782608695652175,
+        "fpr": 0.029217719132893498,
+        "precision_ci95": [
+          0.0944697342519685,
+          0.1783048899106906
+        ],
+        "recall_ci95": [
+          0.11350586435492097,
+          0.21393092676154113
+        ],
+        "f1_ci95": [
+          0.10395878873601645,
+          0.1912350597609562
+        ],
+        "fpr_ci95": [
+          0.0256752352620267,
+          0.03303358648532666
+        ]
+      },
+      "c3_dev_baseline": {
+        "tp": 29,
+        "fp": 86,
+        "fn": 180,
+        "tn": 7341,
+        "precision": 0.25217391304347825,
+        "recall": 0.13875598086124402,
+        "f1": 0.17901234567901234,
+        "fpr": 0.011579372559579911,
+        "precision_ci95": [
+          0.17202121476315027,
+          0.33643668831168827
+        ],
+        "recall_ci95": [
+          0.09298028311425682,
+          0.18867924528301888
+        ],
+        "f1_ci95": [
+          0.12269641796952305,
+          0.23729065030428004
+        ],
+        "fpr_ci95": [
+          0.009170507415124625,
+          0.014018487383035023
+        ]
+      }
+    },
+    "pairs": {
+      "no_c2 - ctav": {
+        "d_precision": -0.006183613157443896,
+        "d_recall": 0.0,
+        "d_f1": -0.005617021276595746,
+        "d_fpr": 0.004443247610071366,
+        "d_precision_ci95": [
+          -0.00918993042938358,
+          -0.00369808780576853
+        ],
+        "d_recall_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_f1_ci95": [
+          -0.00826522091974269,
+          -0.00338937768786169
+        ],
+        "d_fpr_ci95": [
+          0.002961367613406922,
+          0.005926065726011801
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 33,
+          "a_wrong_b_right": 0,
+          "p_value": 2.3283064365386963e-10
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 33,
+          "a_wrong_b_right": 0,
+          "p_value": 2.3283064365386963e-10
+        }
+      },
+      "no_c3 - ctav": {
+        "d_precision": 0.003532546576751616,
+        "d_recall": 0.11483253588516742,
+        "d_f1": 0.021786848072562356,
+        "d_fpr": 0.031372021004443244,
+        "d_precision_ci95": [
+          -0.014273265615832281,
+          0.02016437255205495
+        ],
+        "d_recall_ci95": [
+          0.07291193181818183,
+          0.15567882053116336
+        ],
+        "d_f1_ci95": [
+          -0.0010573046347558384,
+          0.044547600650525744
+        ],
+        "d_fpr_ci95": [
+          0.027478170790521995,
+          0.03543089653134176
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 233,
+          "a_wrong_b_right": 24,
+          "p_value": 3.527324528424517e-44
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 24,
+          "p_value": 1.1920928955078125e-07
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 233,
+          "a_wrong_b_right": 0,
+          "p_value": 1.448908652612274e-70
+        }
+      },
+      "no_c4 - ctav": {
+        "d_precision": 0.05132355194606189,
+        "d_recall": -0.004784688995215336,
+        "d_f1": 0.035826086956521744,
+        "d_fpr": -0.022081594183384942,
+        "d_precision_ci95": [
+          0.0346946358460525,
+          0.06961801061195169
+        ],
+        "d_recall_ci95": [
+          -0.015625,
+          0.0
+        ],
+        "d_f1_ci95": [
+          0.022335062418553427,
+          0.04895367747601256
+        ],
+        "d_fpr_ci95": [
+          -0.025554894277894744,
+          -0.01886538202398599
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 1,
+          "a_wrong_b_right": 164,
+          "p_value": 7.098863070004872e-48
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 1,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 164,
+          "p_value": 8.552847072295026e-50
+        }
+      },
+      "c3_dev_baseline - ctav": {
+        "d_precision": 0.16803929765886286,
+        "d_recall": -0.028708133971291877,
+        "d_f1": 0.06701234567901233,
+        "d_fpr": -0.03971994075669853,
+        "d_precision_ci95": [
+          0.10815877933284228,
+          0.22891351910625374
+        ],
+        "d_recall_ci95": [
+          -0.06452822580645161,
+          0.004854368932038833
+        ],
+        "d_f1_ci95": [
+          0.030595911875220882,
+          0.10395881297159716
+        ],
+        "d_fpr_ci95": [
+          -0.044046588144235885,
+          -0.035406950228268695
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 25,
+          "a_wrong_b_right": 314,
+          "p_value": 9.079110618267449e-65
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 10,
+          "a_wrong_b_right": 4,
+          "p_value": 0.1795654296875
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 15,
+          "a_wrong_b_right": 310,
+          "p_value": 8.071956800969626e-73
+        }
+      }
+    },
+    "costs": {
+      "ctav": {
+        "llm_calls": 6687,
+        "tier2_calls": 1010,
+        "prompt_tokens": 7293671,
+        "completion_tokens": 1076730,
+        "estimated_cost_usd": 4.879926299999999
+      },
+      "no_c2": {
+        "llm_calls": 6687,
+        "tier2_calls": 1010,
+        "prompt_tokens": 7293671,
+        "completion_tokens": 1076730,
+        "estimated_cost_usd": 4.879926299999999
+      },
+      "no_c3": {
+        "llm_calls": 6512,
+        "tier2_calls": 835,
+        "prompt_tokens": 6950712,
+        "completion_tokens": 1024459,
+        "estimated_cost_usd": 4.6463611
+      },
+      "no_c4": {
+        "llm_calls": 5677,
+        "tier2_calls": 5677,
+        "prompt_tokens": 5173670,
+        "completion_tokens": 691941,
+        "estimated_cost_usd": 3.2819535
+      },
+      "c3_dev_baseline": {
+        "llm_calls": 6888,
+        "tier2_calls": 1211,
+        "prompt_tokens": 7679945,
+        "completion_tokens": 1135809,
+        "estimated_cost_usd": 5.143506
+      }
+    },
+    "variants": {
+      "ctav": {
+        "mode": "two_tier",
+        "theta_local": 0.8,
+        "theta_topo": 0.9,
+        "gating": true,
+        "anchoring": true,
+        "fp_confidence": 0.95,
+        "escalate_on": [
+          "no_context",
+          "uncertain",
+          "weak_fp"
+        ],
+        "baseline": "rolling",
+        "percentile": 90
+      },
+      "no_c2": {
+        "mode": "two_tier",
+        "theta_local": 0.8,
+        "theta_topo": 0.9,
+        "gating": false,
+        "anchoring": true,
+        "fp_confidence": 0.95,
+        "escalate_on": [
+          "no_context",
+          "uncertain",
+          "weak_fp"
+        ],
+        "baseline": "rolling",
+        "percentile": 90
+      },
+      "no_c3": {
+        "mode": "two_tier",
+        "theta_local": 0.8,
+        "theta_topo": 0.9,
+        "gating": true,
+        "anchoring": false,
+        "fp_confidence": 0.95,
+        "escalate_on": [
+          "no_context",
+          "uncertain",
+          "weak_fp"
+        ],
+        "baseline": "rolling",
+        "percentile": 90
+      },
+      "no_c4": {
+        "mode": "topology_only",
+        "theta_local": 0.8,
+        "theta_topo": 0.9,
+        "gating": true,
+        "anchoring": true,
+        "fp_confidence": 0.95,
+        "escalate_on": [
+          "no_context",
+          "uncertain",
+          "weak_fp"
+        ],
+        "baseline": "rolling",
+        "percentile": 90
+      },
+      "c3_dev_baseline": {
+        "mode": "two_tier",
+        "theta_local": 0.8,
+        "theta_topo": 0.9,
+        "gating": true,
+        "anchoring": true,
+        "fp_confidence": 0.95,
+        "escalate_on": [
+          "no_context",
+          "uncertain",
+          "weak_fp"
+        ],
+        "baseline": "dev",
+        "percentile": 90
+      }
+    },
+    "counts": {
+      "ctav": {
+        "escalation_uncertain": 175,
+        "downgraded_by_evidence_rule": 548,
+        "downgraded_by_gating": 102,
+        "downgraded_by_anchoring": 191,
+        "downgraded_by_threshold": 0,
+        "final_tier2": 1010,
+        "final_tier1": 4667,
+        "escalation_weak_fp": 832,
+        "escalation_no_context": 4394,
+        "tier2_skipped_empty_context": 4391
+      },
+      "no_c2": {
+        "escalation_uncertain": 175,
+        "downgraded_by_evidence_rule": 548,
+        "downgraded_by_gating": 0,
+        "downgraded_by_anchoring": 260,
+        "downgraded_by_threshold": 0,
+        "final_tier2": 1010,
+        "final_tier1": 4667,
+        "escalation_weak_fp": 832,
+        "escalation_no_context": 4394,
+        "tier2_skipped_empty_context": 4391
+      },
+      "no_c3": {
+        "downgraded_by_evidence_rule": 548,
+        "downgraded_by_gating": 82,
+        "downgraded_by_anchoring": 0,
+        "downgraded_by_threshold": 0,
+        "final_tier1": 4842,
+        "escalation_weak_fp": 832,
+        "final_tier2": 835,
+        "escalation_no_context": 4394,
+        "tier2_skipped_empty_context": 4391
+      },
+      "no_c4": {
+        "downgraded_by_evidence_rule": 548,
+        "downgraded_by_gating": 109,
+        "downgraded_by_anchoring": 301,
+        "downgraded_by_threshold": 0,
+        "final_tier2": 5677
+      },
+      "c3_dev_baseline": {
+        "escalation_uncertain": 376,
+        "downgraded_by_evidence_rule": 548,
+        "downgraded_by_gating": 107,
+        "downgraded_by_anchoring": 450,
+        "downgraded_by_threshold": 0,
+        "final_tier2": 1211,
+        "escalation_weak_fp": 832,
+        "final_tier1": 4466,
+        "escalation_no_context": 4394,
+        "tier2_skipped_empty_context": 4391
+      }
+    }
+  },
+  "components": {
+    "C2": {
+      "rule": "removing C2 raises FPR: d_fpr CI95 lower bound > 0 (no-op if theta_topo == theta_local)",
+      "theta_topo_above_local": true,
+      "d_fpr_ci95": [
+        0.002961367613406922,
+        0.005926065726011801
+      ],
+      "contributes": true
+    },
+    "C3": {
+      "rule": "removing C3 lowers precision: d_precision CI95 upper bound < 0",
+      "d_precision_ci95": [
+        -0.014273265615832281,
+        0.02016437255205495
+      ],
+      "contributes": false
+    },
+    "C4": {
+      "rule": "removing C4 costs more (USD) and does not raise F1: cost(no_c4) > cost(ctav) and d_f1 CI95 lower bound <= 0",
+      "cost_usd": {
+        "ctav": 4.879926299999999,
+        "no_c4": 3.2819535
+      },
+      "d_f1_ci95": [
+        0.022335062418553427,
+        0.04895367747601256
+      ],
+      "contributes": false
+    }
+  },
+  "baselines": {
+    "windows": 7636,
+    "fault_windows": 209,
+    "reference": "bm25",
+    "methods": {
+      "bm25": {
+        "tp": 34,
+        "fp": 417,
+        "fn": 175,
+        "tn": 7010,
+        "precision": 0.07538802660753881,
+        "recall": 0.16267942583732056,
+        "f1": 0.10303030303030303,
+        "fpr": 0.05614649252726538,
+        "precision_ci95": [
+          0.05197437697437698,
+          0.09829396325459316
+        ],
+        "recall_ci95": [
+          0.11467650993883792,
+          0.2135519622093023
+        ],
+        "f1_ci95": [
+          0.07176007601051707,
+          0.13333333333333333
+        ],
+        "fpr_ci95": [
+          0.05114513117223916,
+          0.06124811717570542
+        ]
+      },
+      "c1": {
+        "tp": 55,
+        "fp": 606,
+        "fn": 154,
+        "tn": 6821,
+        "precision": 0.0832072617246596,
+        "recall": 0.2631578947368421,
+        "f1": 0.1264367816091954,
+        "fpr": 0.08159418338494681,
+        "precision_ci95": [
+          0.0611200703185296,
+          0.10454766272591384
+        ],
+        "recall_ci95": [
+          0.2047591362126246,
+          0.3256906679397235
+        ],
+        "f1_ci95": [
+          0.09534104107274839,
+          0.1562698469976905
+        ],
+        "fpr_ci95": [
+          0.07499654945579651,
+          0.08747384538800708
+        ]
+      },
+      "norag": {
+        "tp": 18,
+        "fp": 166,
+        "fn": 191,
+        "tn": 7261,
+        "precision": 0.09782608695652174,
+        "recall": 0.0861244019138756,
+        "f1": 0.09160305343511452,
+        "fpr": 0.022350881917328664,
+        "precision_ci95": [
+          0.058807967631497045,
+          0.14136496097994666
+        ],
+        "recall_ci95": [
+          0.052374746106973596,
+          0.12834028454079688
+        ],
+        "f1_ci95": [
+          0.05641025641025641,
+          0.13372259358288766
+        ],
+        "fpr_ci95": [
+          0.019119043274625797,
+          0.025976036200534916
+        ]
+      },
+      "ctav": {
+        "tp": 35,
+        "fp": 381,
+        "fn": 174,
+        "tn": 7046,
+        "precision": 0.08413461538461539,
+        "recall": 0.1674641148325359,
+        "f1": 0.112,
+        "fpr": 0.05129931331627844,
+        "precision_ci95": [
+          0.058555633555633556,
+          0.11058850637029005
+        ],
+        "recall_ci95": [
+          0.11890803125400283,
+          0.2194194931493724
+        ],
+        "f1_ci95": [
+          0.07894501037540086,
+          0.14492860818111655
+        ],
+        "fpr_ci95": [
+          0.04642086946732706,
+          0.056109834466340526
+        ]
+      },
+      "detector_only": {
+        "tp": 109,
+        "fp": 1640,
+        "fn": 100,
+        "tn": 5787,
+        "precision": 0.062321326472269865,
+        "recall": 0.5215311004784688,
+        "f1": 0.11133810010214504,
+        "fpr": 0.22081594183384948,
+        "precision_ci95": [
+          0.05196681976496328,
+          0.07415954866803245
+        ],
+        "recall_ci95": [
+          0.4541272701741247,
+          0.5892134706579727
+        ],
+        "f1_ci95": [
+          0.09373037095841952,
+          0.1311142764538305
+        ],
+        "fpr_ci95": [
+          0.21112292259031257,
+          0.23002573067580231
+        ]
+      }
+    },
+    "pairs": {
+      "c1 - bm25": {
+        "d_precision": 0.007819235117120793,
+        "d_recall": 0.10047846889952153,
+        "d_f1": 0.02340647857889236,
+        "d_fpr": 0.025447690857681428,
+        "d_precision_ci95": [
+          -0.010780480229071928,
+          0.027430700581763463
+        ],
+        "d_recall_ci95": [
+          0.051639666324125005,
+          0.1550228494623656
+        ],
+        "d_f1_ci95": [
+          -0.003959388884952354,
+          0.05207437963717572
+        ],
+        "d_fpr_ci95": [
+          0.020443640528571276,
+          0.030602235292578783
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 283,
+          "a_wrong_b_right": 115,
+          "p_value": 1.888270877511171e-17
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 7,
+          "a_wrong_b_right": 28,
+          "p_value": 0.0005082604475319386
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 276,
+          "a_wrong_b_right": 87,
+          "p_value": 4.9745646340824824e-24
+        }
+      },
+      "norag - bm25": {
+        "d_precision": 0.022438060348982936,
+        "d_recall": -0.07655502392344496,
+        "d_f1": -0.01142724959518851,
+        "d_fpr": -0.033795610609936716,
+        "d_precision_ci95": [
+          -0.016152468296061595,
+          0.05609318085637738
+        ],
+        "d_recall_ci95": [
+          -0.12435297605238056,
+          -0.033816425120772944
+        ],
+        "d_f1_ci95": [
+          -0.05011779619646518,
+          0.02223077234031055
+        ],
+        "d_fpr_ci95": [
+          -0.039500599719155906,
+          -0.028012266681950553
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 139,
+          "a_wrong_b_right": 374,
+          "p_value": 6.717747108336363e-26
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 21,
+          "a_wrong_b_right": 5,
+          "p_value": 0.002493917942047119
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 118,
+          "a_wrong_b_right": 369,
+          "p_value": 3.9982449169154495e-31
+        }
+      },
+      "ctav - bm25": {
+        "d_precision": 0.008746588777076583,
+        "d_recall": 0.004784688995215336,
+        "d_f1": 0.008969696969696975,
+        "d_fpr": -0.004847179210986943,
+        "d_precision_ci95": [
+          -0.015276307103896459,
+          0.03379642142160272
+        ],
+        "d_recall_ci95": [
+          -0.0476304945054945,
+          0.061142074618861564
+        ],
+        "d_f1_ci95": [
+          -0.024443914899696603,
+          0.04352470471517382
+        ],
+        "d_fpr_ci95": [
+          -0.008494993027908085,
+          -0.0009375271349802464
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 105,
+          "a_wrong_b_right": 142,
+          "p_value": 0.021794517238479885
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 15,
+          "a_wrong_b_right": 16,
+          "p_value": 1.0
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 90,
+          "a_wrong_b_right": 126,
+          "p_value": 0.017043037212875395
+        }
+      },
+      "detector_only - bm25": {
+        "d_precision": -0.013066700135268942,
+        "d_recall": 0.3588516746411483,
+        "d_f1": 0.00830779707184201,
+        "d_fpr": 0.1646694493065841,
+        "d_precision_ci95": [
+          -0.034506012263598645,
+          0.006759969704844127
+        ],
+        "d_recall_ci95": [
+          0.2955457609541094,
+          0.4264011782238159
+        ],
+        "d_f1_ci95": [
+          -0.01973824361181183,
+          0.03563494878727805
+        ],
+        "d_fpr_ci95": [
+          0.1563677218051261,
+          0.1731643132366325
+        ],
+        "mcnemar_all": {
+          "n": 7636,
+          "a_right_b_wrong": 1223,
+          "a_wrong_b_right": 75,
+          "p_value": 5.568642141397597e-268
+        },
+        "mcnemar_fault": {
+          "n": 209,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 75,
+          "p_value": 5.293955920339377e-23
+        },
+        "mcnemar_normal": {
+          "n": 7427,
+          "a_right_b_wrong": 1223,
+          "a_wrong_b_right": 0,
+          "p_value": 0.0
+        }
+      }
+    }
+  },
+  "budget_curve": {
+    "ctav": [
+      {
+        "budget": 120,
+        "llm_calls": 120,
+        "tp": 4,
+        "fp": 34,
+        "fn": 205,
+        "tn": 7393,
+        "precision": 0.10526315789473684,
+        "recall": 0.019138755980861243,
+        "f1": 0.032388663967611336,
+        "fpr": 0.004577891477043221,
+        "precision_ci95": [
+          0.023255813953488372,
+          0.21875
+        ],
+        "recall_ci95": [
+          0.004443952802359882,
+          0.04000502512562814
+        ],
+        "f1_ci95": [
+          0.00760312791448454,
+          0.06695107100480858
+        ],
+        "fpr_ci95": [
+          0.003097643097643098,
+          0.00605493848578842
+        ]
+      },
+      {
+        "budget": 250,
+        "llm_calls": 250,
+        "tp": 5,
+        "fp": 48,
+        "fn": 204,
+        "tn": 7379,
+        "precision": 0.09433962264150944,
+        "recall": 0.023923444976076555,
+        "f1": 0.03816793893129771,
+        "fpr": 0.006462905614649253,
+        "precision_ci95": [
+          0.01959841628959276,
+          0.18
+        ],
+        "recall_ci95": [
+          0.0048297621524166145,
+          0.046159793814432984
+        ],
+        "f1_ci95": [
+          0.007751189727933914,
+          0.07231119600352627
+        ],
+        "fpr_ci95": [
+          0.004716297859725895,
+          0.008459839277931184
+        ]
+      },
+      {
+        "budget": 500,
+        "llm_calls": 500,
+        "tp": 11,
+        "fp": 58,
+        "fn": 198,
+        "tn": 7369,
+        "precision": 0.15942028985507245,
+        "recall": 0.05263157894736842,
+        "f1": 0.07913669064748201,
+        "fpr": 0.007809344284367847,
+        "precision_ci95": [
+          0.07573863636363637,
+          0.2465753424657534
+        ],
+        "recall_ci95": [
+          0.025377506024714145,
+          0.0849106784423926
+        ],
+        "f1_ci95": [
+          0.03830689218128579,
+          0.12413905792201937
+        ],
+        "fpr_ci95": [
+          0.005914733746580777,
+          0.009966363527516545
+        ]
+      },
+      {
+        "budget": 1000,
+        "llm_calls": 1000,
+        "tp": 11,
+        "fp": 58,
+        "fn": 198,
+        "tn": 7369,
+        "precision": 0.15942028985507245,
+        "recall": 0.05263157894736842,
+        "f1": 0.07913669064748201,
+        "fpr": 0.007809344284367847,
+        "precision_ci95": [
+          0.07573863636363637,
+          0.2465753424657534
+        ],
+        "recall_ci95": [
+          0.025377506024714145,
+          0.0849106784423926
+        ],
+        "f1_ci95": [
+          0.03830689218128579,
+          0.12413905792201937
+        ],
+        "fpr_ci95": [
+          0.005914733746580777,
+          0.009966363527516545
+        ]
+      },
+      {
+        "budget": 2000,
+        "llm_calls": 2000,
+        "tp": 30,
+        "fp": 68,
+        "fn": 179,
+        "tn": 7359,
+        "precision": 0.30612244897959184,
+        "recall": 0.14354066985645933,
+        "f1": 0.19543973941368079,
+        "fpr": 0.009155782954086441,
+        "precision_ci95": [
+          0.21426837725381415,
+          0.4086143695014663
+        ],
+        "recall_ci95": [
+          0.0967741935483871,
+          0.19502618059672
+        ],
+        "f1_ci95": [
+          0.13635956337569244,
+          0.25705553067622033
+        ],
+        "fpr_ci95": [
+          0.007113779864719714,
+          0.011468238452796846
+        ]
+      },
+      {
+        "budget": 4000,
+        "llm_calls": 4000,
+        "tp": 30,
+        "fp": 316,
+        "fn": 179,
+        "tn": 7111,
+        "precision": 0.08670520231213873,
+        "recall": 0.14354066985645933,
+        "f1": 0.10810810810810811,
+        "fpr": 0.04254746196310758,
+        "precision_ci95": [
+          0.059878960028660624,
+          0.11378099656542769
+        ],
+        "recall_ci95": [
+          0.1,
+          0.19340425269188977
+        ],
+        "f1_ci95": [
+          0.07618444846292947,
+          0.1414538573184168
+        ],
+        "fpr_ci95": [
+          0.03809331558193097,
+          0.046921616606467605
+        ]
+      }
+    ],
+    "bm25": [
+      {
+        "budget": 120,
+        "tp": 2,
+        "fp": 44,
+        "fn": 207,
+        "tn": 7383,
+        "precision": 0.043478260869565216,
+        "recall": 0.009569377990430622,
+        "f1": 0.01568627450980392,
+        "fpr": 0.005924330146761815,
+        "precision_ci95": [
+          0.0,
+          0.11540697674418603
+        ],
+        "recall_ci95": [
+          0.0,
+          0.024755553913600313
+        ],
+        "f1_ci95": [
+          0.0,
+          0.04066295292582555
+        ],
+        "fpr_ci95": [
+          0.004173355832191433,
+          0.007673770568143836
+        ]
+      },
+      {
+        "budget": 250,
+        "tp": 12,
+        "fp": 75,
+        "fn": 197,
+        "tn": 7352,
+        "precision": 0.13793103448275862,
+        "recall": 0.05741626794258373,
+        "f1": 0.08108108108108109,
+        "fpr": 0.010098290022889457,
+        "precision_ci95": [
+          0.06976744186046512,
+          0.21686746987951808
+        ],
+        "recall_ci95": [
+          0.029265752032520326,
+          0.09179857886590685
+        ],
+        "f1_ci95": [
+          0.04180461280638511,
+          0.1268758480325644
+        ],
+        "fpr_ci95": [
+          0.00795553022130692,
+          0.012279385488183355
+        ]
+      },
+      {
+        "budget": 500,
+        "tp": 12,
+        "fp": 75,
+        "fn": 197,
+        "tn": 7352,
+        "precision": 0.13793103448275862,
+        "recall": 0.05741626794258373,
+        "f1": 0.08108108108108109,
+        "fpr": 0.010098290022889457,
+        "precision_ci95": [
+          0.06976744186046512,
+          0.21686746987951808
+        ],
+        "recall_ci95": [
+          0.029265752032520326,
+          0.09179857886590685
+        ],
+        "f1_ci95": [
+          0.04180461280638511,
+          0.1268758480325644
+        ],
+        "fpr_ci95": [
+          0.00795553022130692,
+          0.012279385488183355
+        ]
+      },
+      {
+        "budget": 1000,
+        "tp": 12,
+        "fp": 75,
+        "fn": 197,
+        "tn": 7352,
+        "precision": 0.13793103448275862,
+        "recall": 0.05741626794258373,
+        "f1": 0.08108108108108109,
+        "fpr": 0.010098290022889457,
+        "precision_ci95": [
+          0.06976744186046512,
+          0.21686746987951808
+        ],
+        "recall_ci95": [
+          0.029265752032520326,
+          0.09179857886590685
+        ],
+        "f1_ci95": [
+          0.04180461280638511,
+          0.1268758480325644
+        ],
+        "fpr_ci95": [
+          0.00795553022130692,
+          0.012279385488183355
+        ]
+      },
+      {
+        "budget": 2000,
+        "tp": 26,
+        "fp": 175,
+        "fn": 183,
+        "tn": 7252,
+        "precision": 0.12935323383084577,
+        "recall": 0.12440191387559808,
+        "f1": 0.1268292682926829,
+        "fpr": 0.0235626767200754,
+        "precision_ci95": [
+          0.08848525837956807,
+          0.17525773195876287
+        ],
+        "recall_ci95": [
+          0.08596256684491979,
+          0.17010309278350516
+        ],
+        "f1_ci95": [
+          0.08853942721130222,
+          0.17000257731958765
+        ],
+        "fpr_ci95": [
+          0.020053027395709414,
+          0.027194582671807174
+        ]
+      },
+      {
+        "budget": 4000,
+        "tp": 28,
+        "fp": 345,
+        "fn": 181,
+        "tn": 7082,
+        "precision": 0.07506702412868632,
+        "recall": 0.1339712918660287,
+        "f1": 0.09621993127147767,
+        "fpr": 0.046452134105291504,
+        "precision_ci95": [
+          0.050798752228164,
+          0.09977623770032282
+        ],
+        "recall_ci95": [
+          0.0908982683982684,
+          0.17857142857142858
+        ],
+        "f1_ci95": [
+          0.06618638258982121,
+          0.1276667383050362
+        ],
+        "fpr_ci95": [
+          0.041738900368918384,
+          0.05112405692042433
+        ]
+      }
+    ],
+    "c1": [
+      {
+        "budget": 120,
+        "tp": 3,
+        "fp": 52,
+        "fn": 206,
+        "tn": 7375,
+        "precision": 0.05454545454545454,
+        "recall": 0.014354066985645933,
+        "f1": 0.022727272727272728,
+        "fpr": 0.0070014810825366905,
+        "precision_ci95": [
+          0.0,
+          0.12073363828289933
+        ],
+        "recall_ci95": [
+          0.0,
+          0.031403253506344805
+        ],
+        "f1_ci95": [
+          0.0,
+          0.050004480286738345
+        ],
+        "fpr_ci95": [
+          0.005231598887448943,
+          0.0090661815754448
+        ]
+      },
+      {
+        "budget": 250,
+        "tp": 12,
+        "fp": 95,
+        "fn": 197,
+        "tn": 7332,
+        "precision": 0.11214953271028037,
+        "recall": 0.05741626794258373,
+        "f1": 0.0759493670886076,
+        "fpr": 0.012791167362326645,
+        "precision_ci95": [
+          0.05644219173952367,
+          0.17274582560296844
+        ],
+        "recall_ci95": [
+          0.028165723311833618,
+          0.09050802139037432
+        ],
+        "f1_ci95": [
+          0.03773584905660377,
+          0.11657238467054418
+        ],
+        "fpr_ci95": [
+          0.01039161344151373,
+          0.015339332437446764
+        ]
+      },
+      {
+        "budget": 500,
+        "tp": 12,
+        "fp": 95,
+        "fn": 197,
+        "tn": 7332,
+        "precision": 0.11214953271028037,
+        "recall": 0.05741626794258373,
+        "f1": 0.0759493670886076,
+        "fpr": 0.012791167362326645,
+        "precision_ci95": [
+          0.05644219173952367,
+          0.17274582560296844
+        ],
+        "recall_ci95": [
+          0.028165723311833618,
+          0.09050802139037432
+        ],
+        "f1_ci95": [
+          0.03773584905660377,
+          0.11657238467054418
+        ],
+        "fpr_ci95": [
+          0.01039161344151373,
+          0.015339332437446764
+        ]
+      },
+      {
+        "budget": 1000,
+        "tp": 12,
+        "fp": 95,
+        "fn": 197,
+        "tn": 7332,
+        "precision": 0.11214953271028037,
+        "recall": 0.05741626794258373,
+        "f1": 0.0759493670886076,
+        "fpr": 0.012791167362326645,
+        "precision_ci95": [
+          0.05644219173952367,
+          0.17274582560296844
+        ],
+        "recall_ci95": [
+          0.028165723311833618,
+          0.09050802139037432
+        ],
+        "f1_ci95": [
+          0.03773584905660377,
+          0.11657238467054418
+        ],
+        "fpr_ci95": [
+          0.01039161344151373,
+          0.015339332437446764
+        ]
+      },
+      {
+        "budget": 2000,
+        "tp": 38,
+        "fp": 292,
+        "fn": 171,
+        "tn": 7135,
+        "precision": 0.11515151515151516,
+        "recall": 0.18181818181818182,
+        "f1": 0.1410018552875696,
+        "fpr": 0.039316009155782955,
+        "precision_ci95": [
+          0.0815693396092396,
+          0.1488142140810479
+        ],
+        "recall_ci95": [
+          0.1304206662902315,
+          0.2375715382900181
+        ],
+        "f1_ci95": [
+          0.10303391741845941,
+          0.1805855316055217
+        ],
+        "fpr_ci95": [
+          0.035192162444047076,
+          0.04353316750931238
+        ]
+      },
+      {
+        "budget": 4000,
+        "tp": 42,
+        "fp": 479,
+        "fn": 167,
+        "tn": 6948,
+        "precision": 0.08061420345489444,
+        "recall": 0.20095693779904306,
+        "f1": 0.11506849315068493,
+        "fpr": 0.06449441227952067,
+        "precision_ci95": [
+          0.057376657367645675,
+          0.10392277326809742
+        ],
+        "recall_ci95": [
+          0.14705083120204604,
+          0.25473672180201146
+        ],
+        "f1_ci95": [
+          0.08287007048961709,
+          0.14634642750769433
+        ],
+        "fpr_ci95": [
+          0.05921123425194868,
+          0.06991157231277689
+        ]
+      }
+    ],
+    "norag": [
+      {
+        "budget": 120,
+        "tp": 0,
+        "fp": 8,
+        "fn": 209,
+        "tn": 7419,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0010771509357748754,
+        "precision_ci95": [
+          0.0,
+          0.0
+        ],
+        "recall_ci95": [
+          0.0,
+          0.0
+        ],
+        "f1_ci95": [
+          0.0,
+          0.0
+        ],
+        "fpr_ci95": [
+          0.00040376714766429895,
+          0.0018847667104676144
+        ]
+      },
+      {
+        "budget": 250,
+        "tp": 6,
+        "fp": 11,
+        "fn": 203,
+        "tn": 7416,
+        "precision": 0.35294117647058826,
+        "recall": 0.028708133971291867,
+        "f1": 0.05309734513274337,
+        "fpr": 0.0014810825366904537,
+        "precision_ci95": [
+          0.125,
+          0.6
+        ],
+        "recall_ci95": [
+          0.009168168414154654,
+          0.052138907695779724
+        ],
+        "f1_ci95": [
+          0.017092198581560285,
+          0.09487107095802746
+        ],
+        "fpr_ci95": [
+          0.0006740247778695461,
+          0.0022932995346915024
+        ]
+      },
+      {
+        "budget": 500,
+        "tp": 6,
+        "fp": 11,
+        "fn": 203,
+        "tn": 7416,
+        "precision": 0.35294117647058826,
+        "recall": 0.028708133971291867,
+        "f1": 0.05309734513274337,
+        "fpr": 0.0014810825366904537,
+        "precision_ci95": [
+          0.125,
+          0.6
+        ],
+        "recall_ci95": [
+          0.009168168414154654,
+          0.052138907695779724
+        ],
+        "f1_ci95": [
+          0.017092198581560285,
+          0.09487107095802746
+        ],
+        "fpr_ci95": [
+          0.0006740247778695461,
+          0.0022932995346915024
+        ]
+      },
+      {
+        "budget": 1000,
+        "tp": 6,
+        "fp": 11,
+        "fn": 203,
+        "tn": 7416,
+        "precision": 0.35294117647058826,
+        "recall": 0.028708133971291867,
+        "f1": 0.05309734513274337,
+        "fpr": 0.0014810825366904537,
+        "precision_ci95": [
+          0.125,
+          0.6
+        ],
+        "recall_ci95": [
+          0.009168168414154654,
+          0.052138907695779724
+        ],
+        "f1_ci95": [
+          0.017092198581560285,
+          0.09487107095802746
+        ],
+        "fpr_ci95": [
+          0.0006740247778695461,
+          0.0022932995346915024
+        ]
+      },
+      {
+        "budget": 2000,
+        "tp": 12,
+        "fp": 39,
+        "fn": 197,
+        "tn": 7388,
+        "precision": 0.23529411764705882,
+        "recall": 0.05741626794258373,
+        "f1": 0.0923076923076923,
+        "fpr": 0.005251110811902518,
+        "precision_ci95": [
+          0.11665697674418606,
+          0.36
+        ],
+        "recall_ci95": [
+          0.0273972602739726,
+          0.09090909090909091
+        ],
+        "f1_ci95": [
+          0.044276372910787926,
+          0.14285714285714285
+        ],
+        "fpr_ci95": [
+          0.0036353232641267723,
+          0.006871486366172076
+        ]
+      },
+      {
+        "budget": 4000,
+        "tp": 12,
+        "fp": 97,
+        "fn": 197,
+        "tn": 7330,
+        "precision": 0.11009174311926606,
+        "recall": 0.05741626794258373,
+        "f1": 0.07547169811320756,
+        "fpr": 0.013060455096270365,
+        "precision_ci95": [
+          0.05767857142857143,
+          0.17002927927927927
+        ],
+        "recall_ci95": [
+          0.0291123439667129,
+          0.09090909090909091
+        ],
+        "f1_ci95": [
+          0.03896103896103896,
+          0.1151666179479684
+        ],
+        "fpr_ci95": [
+          0.01060911914302339,
+          0.015746971736204575
+        ]
+      }
+    ]
+  },
+  "git_commit": "87389382cce40f4020363922817e01ceb7ef9983\nmodified tracked files at run time:\n  docs/Final_Thesis_Phase2/01-architecture-design.md\n  docs/Final_Thesis_Phase2/02-data-and-experiment-protocol.md\n  docs/Final_Thesis_Phase2/07-setup-guide.md\n  docs/graph-coverage.md\n  docs/label-audit.md\n  docs/milestones/M1-detector-bm25-judge.md\n  docs/milestones/M2-harness-gport.md\n  eval/__main__.py\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py\n  services/judge/span_baseline.py\n  tests/test_harness.py"
+}

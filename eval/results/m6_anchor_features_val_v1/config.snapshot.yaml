@@ -1,0 +1,14 @@
+kind: anchor_features
+run_id: m6_anchor_features_val_v1
+runs:
+- h0_val_bm25_v3
+- h0_val_c1_k0_v1
+rolling:
+  lookback_minutes: 60
+  guard_seconds: 60
+  min_spans: 30
+percentiles:
+- 90
+- 95
+- 99
+dev_baseline: data/span_baseline.parquet

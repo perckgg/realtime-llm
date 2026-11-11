@@ -23,7 +23,7 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M3 | Service graph + C1 + tái lập paper | **Cổng chặn G-paper** | 2026-11-08 | **Xong** (2026-10-19) — `docs/milestones/M3-graph-c1-gpaper.md` |
 | M4 | H0 — tái lập vấn đề trên split GĐ2 | Cổng chặn (hướng nghiên cứu) | 2026-11-15 | **Xong** (2026-10-29; V24 (b), GVHD đồng ý, QĐ-027) — `docs/milestones/M4-h0.md` |
 | M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Xong** (2026-11-01; H1 giữ một phần, V28 (b), QĐ-028, QĐ-029) — `docs/milestones/M5-h1.md` |
-| M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | **Đang làm** (mở 2026-11-01) |
+| M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | **Xong, chờ người dùng xem** (2026-11-01; H3 bỏ C2, C4 — QĐ-031) — `docs/milestones/M6-ctav.md` |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | |
 | M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | |
@@ -187,6 +187,11 @@ CI; kết luận H1 (giữ / bác bỏ) và đặc trưng chọn cho C2 ghi expe
 | **Song song:** `rca_agent/grouping.py` bản khởi động (chỉ cần timestamp + graph) | Module chạy độc lập |
 
 **DoD M6:** `eval/configs/ctav_final.yaml` chốt; bảng H3 trên `val` có CI; θ chọn ghi experiment-log.
+
+**Kết quả (QĐ-031):** đạt. CTAV được đánh giá bằng replay verdict H0 đã cache (`py -m eval ctav`, 0 lần
+gọi LLM). H3 bỏ C2 và C4; cấu hình chốt = C1 cho mọi candidate + θ 0,80 + C3 (`dev` p90). Trên `val`
+(telemetry): F1 0,201 vs BM25 0,103 (ΔF1 +0,098 [+0,046; +0,149]), FPR 0,007 vs 0,056, nhưng recall
+0,139 < C1 0,263. Báo cáo `docs/milestones/M6-ctav.md`.
 
 ---
 

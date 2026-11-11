@@ -6,8 +6,8 @@ docs/Final_Thesis_Phase2/05-agent-coding-rules.md).
 
 Implemented through milestone M1: TelemetryWindow, WindowLabel, AlertCandidate
 and their pieces (M0), ContextEvent, RetrievalBudget, RetrievalResult and
-JudgedAlert with the CTAV fields (M1, QD-011/QD-016). Incident and
-DiagnosticReport are added when services/rca_agent is ported, to keep this
+JudgedAlert with the CTAV fields (M1, QD-011/QD-016), Incident (M6, grouping).
+DiagnosticReport is added when the RCA summarizer is ported, to keep this
 module in sync with what is actually used.
 """
 
@@ -166,3 +166,17 @@ class JudgedAlert(BaseModel):
     # QD-016: model version returned by the API, cache key, tokens, parse
     # errors, the LLM's raw evidence list -- what a re-run or an audit needs.
     debug: dict[str, Any] = {}
+
+
+class Incident(BaseModel):
+    """Alerts grouped by time and service dependency (03 SS1.5, services/rca_agent/grouping.py)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    incident_id: str
+    run_id: str
+    alert_ids: list[str]
+    services: list[str]
+    start_ts: datetime
+    end_ts: datetime
+    grouping_reason: dict[str, Any]  # temporal_window_sec, graph_edges_used

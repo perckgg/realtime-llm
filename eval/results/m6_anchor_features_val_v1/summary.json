@@ -1,0 +1,38 @@
+{
+  "config": {
+    "kind": "anchor_features",
+    "run_id": "m6_anchor_features_val_v1",
+    "runs": [
+      "h0_val_bm25_v3",
+      "h0_val_c1_k0_v1"
+    ],
+    "rolling": {
+      "lookback_minutes": 60,
+      "guard_seconds": 60,
+      "min_spans": 30
+    },
+    "percentiles": [
+      90,
+      95,
+      99
+    ],
+    "dev_baseline": "data/span_baseline.parquet"
+  },
+  "index_seconds": 50.8,
+  "runs": {
+    "h0_val_bm25_v3": {
+      "trace": 6156,
+      "trace_rolling_covered": 5739,
+      "trace_dev_covered": 2041,
+      "log": 1542
+    },
+    "h0_val_c1_k0_v1": {
+      "trace": 7576,
+      "trace_rolling_covered": 7025,
+      "trace_dev_covered": 2412,
+      "log": 140
+    }
+  },
+  "wall_seconds": 54.0,
+  "git_commit": "87389382cce40f4020363922817e01ceb7ef9983\nmodified tracked files at run time:\n  docs/Final_Thesis_Phase2/01-architecture-design.md\n  docs/Final_Thesis_Phase2/02-data-and-experiment-protocol.md\n  docs/Final_Thesis_Phase2/07-setup-guide.md\n  docs/graph-coverage.md\n  docs/label-audit.md\n  docs/milestones/M1-detector-bm25-judge.md\n  docs/milestones/M2-harness-gport.md\n  eval/__main__.py\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py\n  services/judge/span_baseline.py\n  tests/test_harness.py"
+}

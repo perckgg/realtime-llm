@@ -115,6 +115,60 @@ def percentile_rows(durations: Mapping[tuple[str, str], Sequence[float]]) -> pd.
     return pd.DataFrame(rows, columns=columns)
 
 
+class RollingSpanBaseline:
+    """Per (service, operation) percentile over the spans of the `lookback` before an alert window
+    (V30, QD-031): the window [window_start - guard - lookback, window_start - guard).
+
+    The `dev` baseline covers only about 32% of the spans retrieved on `val`
+    (QD-030, Finding 8) because the split leaves several services without a `dev`
+    normal window. The rolling baseline needs no label: it uses the history every
+    deployment has. If a fault starts before the alert window, faulty spans can
+    enter it, which makes C3 more conservative, never less.
+    """
+
+    def __init__(self, spans: Mapping[tuple[str, str | None], tuple[np.ndarray, np.ndarray]]) -> None:
+        """`spans`: key -> (start timestamps in epoch seconds, durations in ms), sorted by time."""
+        self._spans = spans
+
+    @classmethod
+    def from_docs(cls, docs: Iterable[EvidenceDoc]) -> RollingSpanBaseline:
+        """Index trace docs by key; docs with the same id (overlapping minute files) count once."""
+        grouped: dict[tuple[str, str | None], dict[str, tuple[float, float]]] = defaultdict(dict)
+        for doc in docs:
+            if doc.event_type != "trace_span":
+                continue
+            grouped[(doc.service, span_operation(doc.message))][doc.doc_id] = (
+                doc.ts.timestamp(),
+                float(doc.duration_ms or 0.0),
+            )
+        spans = {}
+        for key, items in grouped.items():
+            rows = np.array(sorted(items.values()), dtype=float)
+            spans[key] = (rows[:, 0], rows[:, 1])
+        return cls(spans)
+
+    def thresholds(
+        self,
+        service: str,
+        operation: str | None,
+        window_start: datetime,
+        lookback_minutes: float,
+        guard_seconds: float,
+        percentiles: Sequence[int],
+        min_spans: int = MIN_SPANS,
+    ) -> tuple[int, dict[int, float] | None]:
+        """(spans in the lookback, {percentile: duration_ms}); None when fewer than `min_spans`."""
+        times, durations = self._spans.get((service, operation), (np.empty(0), np.empty(0)))
+        end = window_start.timestamp() - guard_seconds
+        hi = int(np.searchsorted(times, end, side="left"))
+        lo = int(np.searchsorted(times, end - lookback_minutes * 60, side="left"))
+        n = hi - lo
+        if n < min_spans:
+            return n, None
+        points = np.percentile(durations[lo:hi], list(percentiles))
+        return n, {int(p): float(v) for p, v in zip(percentiles, points, strict=True)}
+
+
 class SpanBaseline:
     def __init__(self, frame: pd.DataFrame) -> None:
         self._rows = {(r.service, r.operation): r for r in frame.itertuples(index=False)}

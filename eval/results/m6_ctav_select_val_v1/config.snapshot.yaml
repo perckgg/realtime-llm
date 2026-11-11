@@ -1,0 +1,42 @@
+# M6 (QD-031): CTAV theta / routing / C3 percentile selection on `val`, replayed on cached
+# H0 verdicts -- 0 LLM call. The selection rule is fixed here, before the run:
+# best F1 on the telemetry subset among two_tier points; ties -> fewer LLM calls, then lower FPR.
+# The selected point is then frozen in ctav_final.yaml.
+kind: ctav
+run_id: m6_ctav_select_val_v1
+split: val
+subset: telemetry
+model: gemini-2.5-flash  # QD-021, prices from services/judge/backends.py
+tiers:
+  local: h0_val_bm25_v3  # tier 1 = BM25 (bm25_hybrid)
+  topology: h0_val_c1_k0_v1  # tier 2 = C1 (hybrid_bm25_graph, paper fusion)
+anchor_features: m6_anchor_features_val_v1
+policy:
+  theta_local: 0.80  # GD1 symmetric threshold
+  theta_topo: 0.80  # overridden by the sweep
+  gating: true
+  anchoring: true
+  require_evidence: true
+  anchor:
+    baseline: rolling  # V30 -> QD-031
+    percentile: 95  # overridden by the sweep
+    log_levels: [ERROR, WARN]
+routing:
+  enabled: true
+  escalate_on: [no_context, uncertain, weak_fp]
+  fp_confidence: 0.80  # overridden by the sweep
+sweep:
+  metric: f1
+  apply_selection: true
+  grid:
+    mode: [two_tier, topology_only]
+    theta_topo: [0.80, 0.85, 0.90, 0.95]
+    fp_confidence: [0.80, 0.85, 0.90, 0.95]
+    percentile: [90, 95, 99]
+baselines:
+  bm25: h0_val_bm25_v3
+  c1: h0_val_c1_k0_v1
+  norag: h0_val_norag_v1
+budgets: [120, 250, 500, 1000, 2000, 4000]
+n_boot: 1000
+seed: 42

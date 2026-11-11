@@ -111,12 +111,17 @@ AlertCandidate (detector, + Rescue Score)
    ▼  JudgedAlert ─► RCA Agent (grouping → propagation → summary)
 ```
 
+> **Kết quả M6 (QĐ-031, trên `val`; chờ người dùng xem):** ablation H3 bỏ **C4** (bỏ C4 rẻ hơn và F1
+> cao hơn) và **C2** (bỏ C2: ΔFPR CI chạm 0). Cấu hình chốt `eval/configs/ctav_final.yaml`:
+> **mọi candidate chấm trên ngữ cảnh C1 → judge → θ = 0,80 → C3** (ngưỡng nền `dev`, p90).
+> Sơ đồ trên là thiết kế ban đầu, giữ để đối chiếu.
+
 | # | Thành phần | Giải quyết điểm yếu nào của paper | Hiện thực |
 |---|---|---|---|
 | C1 | **Fusion Score topology** — giữ nguyên công thức paper | Recall thấp của BM25 (network_delay) | `services/retrieval/hybrid_bm25_graph.py`, port từ `legacy/src/phase2/retrieval/` |
-| C2 | **Asymmetric Confidence Gating** — ~~theo nguồn gốc đồ thị~~ (QĐ-027): ngưỡng bất đối xứng theo **hồ sơ bằng chứng** judge trích — tầng sinh ra (BM25 / C1), độ gần thời gian, loại (trace / log); hồ sơ rủi ro cần `confidence ≥ θ_topo > θ_local`; ~~đặc trưng cụ thể chốt sau H1~~ **QĐ-029 (V28 (b)):** H1 không chọn được đặc trưng tách nhãn; M6 chỉ quét θ trên verdict đã cache, giữ hay bỏ C2 theo ablation H3; trọng tâm giảm FP chuyển sang C3 | FP tăng khi chọn bằng chứng sát thời điểm (Phát hiện 7) | `services/judge/policy.py`; chạy trên verdict đã cache — không tốn thêm lần gọi LLM |
-| C3 | **Evidence anchoring** (QĐ-027) — TRUE_ALERT phải trích ít nhất một bằng chứng **bất thường** tại `s_0`: log mức lỗi, hoặc span có `duration_ms` vượt ngưỡng nền của cùng service + operation (phân vị tính trên `dev`); không thì hạ xuống UNCERTAIN. Biến thể phụ: span lỗi/chậm trên đường gọi tới `s_0` | Judge xác nhận 30–42% normal có bằng chứng (Phát hiện 7) | `services/judge/policy.py`; mở rộng `require_evidence` sẵn có |
-| C4 | **Adaptive Two-Tier Routing** — chạy BM25 trước; chỉ mở rộng topology khi tầng 1 UNCERTAIN hoặc không có bằng chứng | Chi phí ×2.7 | `services/judge/routing.py` |
+| C2 | **Asymmetric Confidence Gating** — ~~theo nguồn gốc đồ thị~~ (QĐ-027): ngưỡng bất đối xứng theo **hồ sơ bằng chứng** judge trích — tầng sinh ra (BM25 / C1), độ gần thời gian, loại (trace / log); hồ sơ rủi ro cần `confidence ≥ θ_topo > θ_local`; ~~đặc trưng cụ thể chốt sau H1~~ **QĐ-029 (V28 (b)):** H1 không chọn được đặc trưng tách nhãn; M6 chỉ quét θ trên verdict đã cache, giữ hay bỏ C2 theo ablation H3; trọng tâm giảm FP chuyển sang C3. **QĐ-031: bỏ** — chọn θ_topo = 0,85 nhưng bỏ C2 chỉ thêm 2 FP, ΔFPR CI [+0,0000; +0,0007] | FP tăng khi chọn bằng chứng sát thời điểm (Phát hiện 7) | `services/judge/policy.py`; chạy trên verdict đã cache — không tốn thêm lần gọi LLM |
+| C3 | **Evidence anchoring** (QĐ-027) — TRUE_ALERT phải trích ít nhất một bằng chứng **bất thường** tại `s_0`: log mức lỗi, hoặc span có `duration_ms` vượt ngưỡng nền của cùng service + operation (phân vị tính trên `dev`; span không có ngưỡng nền thì không neo được); không thì hạ xuống UNCERTAIN. Biến thể phụ: span lỗi/chậm trên đường gọi tới `s_0`. **QĐ-031: giữ** — V30 thử baseline trượt 60 phút (phủ 93%) nhưng F1 thấp hơn có ý nghĩa; chọn `dev` p90 (phủ ≈ 32% span, 15 service không có ngưỡng — V31) | Judge xác nhận 30–42% normal có bằng chứng (Phát hiện 7) | `services/judge/policy.py`; mở rộng `require_evidence` sẵn có |
+| C4 | **Adaptive Two-Tier Routing** — chạy BM25 trước; mở rộng topology khi tầng 1 không có ngữ cảnh, UNCERTAIN (gồm bị C2/C3 hạ), hoặc FALSE_POSITIVE với confidence < `fp_confidence` (QĐ-031: trên `val` toàn bộ recall thêm của C1 đến từ FP của BM25). **QĐ-031: bỏ** — TRUE_ALERT tầng 1 qua θ_local thêm nhiều FP; chạy C1 cho mọi candidate rẻ hơn (3,28 vs 3,95–5,14 USD) và F1 không thấp hơn | Chi phí ×2.7 | `services/judge/routing.py` (giữ cho ablation) |
 | C5 | **Rescue Score** (η1, η2, η3, τ) — đưa cửa sổ detector bỏ sót vào pipeline | Detector bỏ sót | Đã có trong kế hoạch, giữ nguyên công thức QĐ-008 |
 | B | **RCA Agent** — grouping theo thời gian + topology → backward propagation → báo cáo JSON | SRE cần biết sự cố nào, gốc ở đâu | `services/rca_agent/`; Nezha có nhãn root-cause mức pod 100% (QĐ-001) ⇒ Hit@k hợp lệ (điểm 4 của GVHD) |
 

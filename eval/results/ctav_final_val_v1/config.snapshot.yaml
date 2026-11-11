@@ -1,0 +1,37 @@
+# CTAV final method (M6, QD-031), frozen for M7 registration and the M8 test run.
+# Selection: m6_ctav_select_val_v1 (two_tier, pre-specified) -> H3 drops C4;
+# m6_ctav_select_val_v2 (topology_only) selects C3 baseline=dev, percentile=90,
+# theta_topo=0.85 -> H3 drops C2 (removing it: dFPR CI95 [+0.0000; +0.0007], lower bound not > 0).
+# What remains: every candidate is judged on C1 (topology) context; one threshold theta_local;
+# C3 anchoring on an abnormal event of s0 (ERROR/WARN log or span slower than its dev p90).
+# The ablation below adds each dropped component back (no_c2 == main since gating is off).
+kind: ctav
+run_id: ctav_final_val_v1
+split: val
+subset: telemetry
+model: gemini-2.5-flash
+tiers:
+  local: h0_val_bm25_v3
+  topology: h0_val_c1_k0_v1
+anchor_features: m6_anchor_features_val_v1
+policy:
+  theta_local: 0.80
+  theta_topo: 0.85  # used only when gating is on (H3 dropped C2)
+  gating: false  # C2 dropped by H3 on val
+  anchoring: true  # C3
+  require_evidence: true
+  anchor:
+    baseline: dev  # data/span_baseline.parquet (QD-030); rolling rejected on val (QD-031)
+    percentile: 90
+    log_levels: [ERROR, WARN]
+routing:
+  enabled: false  # C4 dropped by H3 on val; with_c4 in the ablation
+  escalate_on: [no_context, uncertain, weak_fp]
+  fp_confidence: 0.95
+baselines:
+  bm25: h0_val_bm25_v3
+  c1: h0_val_c1_k0_v1
+  norag: h0_val_norag_v1
+budgets: [120, 250, 500, 1000, 2000, 4000]
+n_boot: 1000
+seed: 42

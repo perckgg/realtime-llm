@@ -120,3 +120,18 @@ def test_baseline_threshold_needs_min_spans() -> None:
     assert baseline.threshold("cart", "get", 99) == pytest.approx(99.01)
     assert baseline.threshold("cart", "rare", 95) is None
     assert baseline.threshold("cart", "unseen", 95) is None
+
+def test_rolling_baseline_uses_only_the_lookback_before_the_guard() -> None:
+    from dataclasses import replace
+
+    from services.judge.span_baseline import RollingSpanBaseline
+
+    docs = [_doc("cart-1", s) for s in range(0, 600)]  # one span per second, 1 ms each
+    docs.append(docs[0])  # duplicate doc_id from an overlapping minute file counts once
+    late = replace(_doc("cart-1", 650.0), doc_id="late", duration_ms=999.0)
+    baseline = RollingSpanBaseline.from_docs([*docs, late])
+    start = T0 + timedelta(seconds=660)
+    n, points = baseline.thresholds("cart", "op", start, 5, 60, [95], min_spans=30)
+    assert n == 300 and points == {95: 1.0}  # [300 s, 600 s): `late` sits in the guard
+    assert baseline.thresholds("cart", "op", T0 + timedelta(seconds=20), 5, 0, [95], min_spans=30) == (20, None)
+    assert baseline.thresholds("redis", "op", start, 5, 60, [95]) == (0, None)

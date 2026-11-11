@@ -1,0 +1,13 @@
+# M6 / QĐ-031 (V30): đặc trưng neo C3 cho mọi trace event mà hai run tầng đã retrieve trên `val`.
+# Ngưỡng nền chính: trượt `lookback_minutes` trước cửa sổ alert, kết thúc `guard_seconds` trước cửa sổ.
+# Ngưỡng `dev` (QĐ-030) giữ làm biến thể đối chứng. 0 lần gọi LLM, không dùng nhãn.
+# Chạy: py scripts/build_anchor_features.py --config eval/configs/m6_anchor_features_val.yaml
+kind: anchor_features
+run_id: m6_anchor_features_val_v1
+runs: [h0_val_bm25_v3, h0_val_c1_k0_v1]
+rolling:
+  lookback_minutes: 60
+  guard_seconds: 60
+  min_spans: 30
+percentiles: [90, 95, 99]
+dev_baseline: data/span_baseline.parquet

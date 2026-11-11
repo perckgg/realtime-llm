@@ -1,0 +1,48 @@
+# M6 (QD-031) step 2: re-selection after the H3 ablation of m6_ctav_select_val_v1.
+# v1 (selection fixed in advance, two_tier only) -> C4 does not contribute on `val`:
+# removing it is cheaper (3.28 vs 4.88 USD) and raises F1 (+0.036, CI95 [+0.022; +0.049]).
+# Per the H3 rule of 08 SS5.1 ("thanh phan khong dong gop => bo khoi phuong phap, ghi lai")
+# the method keeps C1 + C2 + C3 on every candidate (topology_only); C4 is reported as `with_c4`.
+# Same selection rule as v1 (best F1 on telemetry; ties -> fewer calls, then lower FPR);
+# the C3 baseline (rolling / dev, V30) is now a grid dimension. Second look at `val`:
+# the selection optimism is bounded only by the M8 test run.
+kind: ctav
+run_id: m6_ctav_select_val_v2
+split: val
+subset: telemetry
+model: gemini-2.5-flash
+tiers:
+  local: h0_val_bm25_v3
+  topology: h0_val_c1_k0_v1
+anchor_features: m6_anchor_features_val_v1
+policy:
+  theta_local: 0.80
+  theta_topo: 0.80  # overridden by the sweep
+  gating: true
+  anchoring: true
+  require_evidence: true
+  anchor:
+    baseline: rolling  # overridden by the sweep
+    percentile: 95  # overridden by the sweep
+    log_levels: [ERROR, WARN]
+routing:
+  enabled: false
+  escalate_on: [no_context, uncertain, weak_fp]
+  fp_confidence: 0.95  # only used by the two_tier points / with_c4
+sweep:
+  metric: f1
+  select_modes: [topology_only]
+  apply_selection: true
+  grid:
+    mode: [topology_only, two_tier]
+    baseline: [rolling, dev]
+    theta_topo: [0.80, 0.85, 0.90, 0.95]
+    fp_confidence: [0.80, 0.85, 0.90, 0.95]
+    percentile: [90, 95, 99]
+baselines:
+  bm25: h0_val_bm25_v3
+  c1: h0_val_c1_k0_v1
+  norag: h0_val_norag_v1
+budgets: [120, 250, 500, 1000, 2000, 4000]
+n_boot: 1000
+seed: 42

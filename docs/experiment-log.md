@@ -1512,3 +1512,132 @@ toàn. Baseline trượt có thể lẫn span lỗi nếu lỗi bắt đầu tr�
 cho biết C3 có tách được normal và fault hay không.
 
 **Chờ V30.** Đổi nguồn baseline là đổi đặc tả C3 trong `08`, người dùng quyết định.
+
+## QĐ-031 — M6: V30, CTAV replay trên verdict đã cache, H3 bỏ C2 và C4, chốt `ctav_final.yaml` (2026-11-01)
+
+**V30 — agent tự quyết trong chế độ tự chạy (người dùng cần xác nhận).** Dựng cả hai ngưỡng nền và để quy tắc
+chọn quyết định: baseline trượt 60 phút (lùi 60 s, ≥ 30 span; `RollingSpanBaseline` trong
+`services/judge/span_baseline.py`) và baseline `dev` (QĐ-030). Đặc trưng neo cho mọi event mà hai run H0 lấy
+về: `scripts/build_anchor_features.py`, `eval/configs/m6_anchor_features_val.yaml` →
+`eval/results/m6_anchor_features_val_v1/` (0 lần gọi LLM). Độ phủ span: trượt 93,2% / 92,7%, `dev` 33,2% /
+31,8% (BM25 / C1) — khớp probe QĐ-030.
+
+**Thiết kế.**
+- `services/judge/policy.py` (C2 + C3) và `services/judge/routing.py` (C4) là hàm thuần trên câu trả lời
+  judge; thứ tự luật: `require_evidence` → θ_local → gating (θ_local ≤ conf < θ_topo, chỉ tầng 2) → neo.
+  Neo = log ERROR/WARN hoặc span chậm hơn ngưỡng nền của chính `s_0`; span không có ngưỡng không neo được.
+- C4 đẩy lên tầng 2 khi tầng 1 không có ngữ cảnh, UNCERTAIN (gồm bị C2/C3 hạ) hoặc **FALSE_POSITIVE với
+  confidence < `fp_confidence`**. Lý do (đo trên `val`, telemetry): 28/209 fault được C1 bắt thêm đều là
+  câu FALSE_POSITIVE có ngữ cảnh của BM25, không câu UNCERTAIN nào. Tầng 2 không chấm khi C1 không lấy được
+  event nào.
+- `eval/harness/ctav.py` + `py -m eval ctav --config ...`: replay hai run H0 đã chấm **mọi** candidate
+  (tầng 1 = `h0_val_bm25_v3`, tầng 2 = `h0_val_c1_k0_v1`); chỉ cộng lần gọi / token của tầng thực sự dùng.
+  Ngân sách theo thứ tự thời gian như `runner.Gate`. 0 lần gọi LLM, 0 USD.
+- **Kiểm chứng replay:** tắt C2/C3 thì `local_only` và `topology_only` khớp quyết định của `h0_val_bm25_v3`
+  và `h0_val_c1_k0_v1` trên toàn bộ cửa sổ (0 lệch); mô phỏng ngân sách 120 khớp
+  `h0_val_{bm25,c1_k0,norag}_b120_v1` (0 lệch).
+- Đơn giá `gemini-2.5-flash` 0,30 / 2,50 USD mỗi 1M token (theo token, chưa nhân hệ số billing V26).
+
+**Bước 1 — chọn trước khi xem số** (`eval/configs/m6_ctav_select_val.yaml` → `m6_ctav_select_val_v1`).
+Lưới θ_topo ∈ {0,80; 0,85; 0,90; 0,95} × `fp_confidence` ∈ {0,80; …; 0,95} × phân vị ∈ {90, 95, 99}, baseline
+trượt. Quy tắc: F1 cao nhất trên cửa sổ có telemetry của `val`, chỉ trong điểm `two_tier`; hòa ⇒ ít lần gọi
+hơn ⇒ FPR thấp hơn. Chọn θ_topo 0,90, `fp_confidence` 0,95, p90.
+
+**Bảng M6-3. Ablation tại điểm bước 1** (`val`, 7.636 cửa sổ có telemetry, 209 fault; Δ = biến thể − CTAV).
+
+| Biến thể | TP | FP | P | R | F1 [CI95] | FPR | Lần gọi | USD | ΔF1 [CI95] | ΔFPR [CI95] |
+|---|---:|---:|---:|---:|---|---:|---:|---:|---|---|
+| CTAV hai tầng | 35 | 381 | 0,084 | 0,168 | 0,112 [0,079; 0,145] | 0,051 | 6.687 | 4,88 | | |
+| bỏ C2 | 35 | 414 | 0,078 | 0,168 | 0,106 | 0,056 | 6.687 | 4,88 | −0,006 [−0,008; −0,003] | +0,004 [+0,003; +0,006] |
+| bỏ C3 | 59 | 614 | 0,088 | 0,282 | 0,134 | 0,083 | 6.512 | 4,65 | +0,022 [−0,001; +0,045] | +0,031 [+0,028; +0,035] |
+| bỏ C4 (C1 mọi candidate) | 34 | 217 | 0,136 | 0,163 | 0,148 | 0,029 | 5.677 | 3,28 | **+0,036 [+0,022; +0,049]** | −0,022 [−0,026; −0,019] |
+| C3 với `dev` | 29 | 86 | 0,252 | 0,139 | 0,179 | 0,012 | 6.888 | 5,14 | +0,067 [+0,031; +0,104] | −0,040 [−0,044; −0,035] |
+
+**Phát hiện 9 — C4 không đóng góp trên `val`.** TRUE_ALERT của BM25 ở tầng 1 chỉ cần θ_local = 0,80 và
+đi thẳng ra quyết định: 276 cảnh báo, 15 TP / 261 FP. Chạy C1 cho mọi candidate với θ_topo và C3 vừa rẻ hơn
+(prompt C1 không dài hơn BM25 trên `val`: ≈ 911 / 937 token vào trung bình) vừa F1 cao hơn có ý nghĩa.
+Theo tiêu chí H3 (`08` §5.1, "không đóng góp ⇒ bỏ khỏi phương pháp, ghi lại") ⇒ **bỏ C4**.
+
+**Bước 2 — chọn lại trong phương pháp đã rút gọn** (`m6_ctav_select_val_v2.yaml` → `m6_ctav_select_val_v2`).
+Cùng quy tắc, chỉ trong điểm `topology_only`; baseline (trượt / `dev`) thành một chiều của lưới. **Đây là lần
+nhìn `val` thứ hai**: số `val` của cấu hình chốt lạc quan; chỉ M8 (`test`) cho số không thiên lệch chọn.
+Chọn: `dev`, p90, θ_topo 0,85.
+
+**Bảng M6-4. Đường θ** (C1 mọi candidate, C3 `dev` p90; θ_local 0,80).
+
+| θ_topo | TP | FP | Recall | FPR | F1 |
+|---|---:|---:|---:|---:|---:|
+| 0,80 | 29 | 51 | 0,139 | 0,0069 | 0,201 |
+| 0,85 | 29 | 49 | 0,139 | 0,0066 | 0,202 |
+| 0,90 | 27 | 47 | 0,129 | 0,0063 | 0,191 |
+| 0,95 | 2 | 2 | 0,010 | 0,0003 | 0,019 |
+
+Confidence của judge rời rạc (chủ yếu 0,80 / 0,85 / 0,90) nên đường θ chỉ có bậc. Bỏ C2 (θ_topo → 0,80) chỉ
+thêm 2 FP: ΔFPR +0,0003 [+0,0000; +0,0007], cận dưới không > 0 ⇒ theo QĐ-029 **bỏ C2**.
+
+**Cấu hình chốt** `eval/configs/ctav_final.yaml` → `ctav_final_val_v1`: mọi candidate chấm trên ngữ cảnh C1;
+θ = 0,80; C3 với ngưỡng `dev` p90, log ERROR/WARN. Ablation thêm lại từng thành phần đã bỏ.
+
+**Bảng M6-5. H3 trên `val` tại cấu hình chốt** (Δ = biến thể − CTAV; McNemar trên fault / normal).
+
+| Biến thể | TP | FP | P | R | F1 [CI95] | FPR | USD | ΔF1 [CI95] | ΔP [CI95] | ΔFPR [CI95] |
+|---|---:|---:|---:|---:|---|---:|---:|---|---|---|
+| **CTAV** | 29 | 51 | 0,363 | 0,139 | **0,201 [0,138; 0,264]** | 0,0069 | 3,28 | | | |
+| + C2 (θ_topo 0,85) | 29 | 49 | 0,372 | 0,139 | 0,202 | 0,0066 | 3,28 | +0,001 | | −0,0003 |
+| bỏ C3 (= C1) | 55 | 606 | 0,083 | 0,263 | 0,126 | 0,0816 | 3,28 | −0,074 [−0,124; −0,027] | −0,279 [−0,382; −0,187] | +0,075 [+0,068; +0,081] |
+| + C4 (`fp_confidence` 0,95) | 31 | 90 | 0,256 | 0,148 | 0,188 | 0,0121 | 5,14 | −0,013 [−0,030; +0,008] | | +0,005 [+0,004; +0,007] |
+| C3 baseline trượt | 34 | 255 | 0,118 | 0,163 | 0,137 | 0,0343 | 3,28 | −0,064 [−0,109; −0,022] | | +0,028 [+0,024; +0,031] |
+
+Kết luận H3 trên `val`: **C3 đóng góp** (bỏ C3 ⇒ precision giảm, CI < 0; McNemar normal p ≈ 10⁻¹⁶⁷).
+**C2 không đóng góp.** **C4 không đóng góp** (thêm C4 tốn hơn 57% và F1 không cao hơn). Theo QĐ-029 / `08`
+§5.1, C2 và C4 bỏ khỏi phương pháp; code giữ lại để chạy ablation ở M8.
+
+**Bảng M6-6. So với baseline (H2 sơ bộ trên `val` — chưa phải kiểm định).**
+
+| | TP | FP | P | R | F1 [CI95] | FPR | CTAV − X: ΔF1 [CI95] | ΔR [CI95] |
+|---|---:|---:|---:|---:|---|---:|---|---|
+| BM25 | 34 | 417 | 0,075 | 0,163 | 0,103 [0,072; 0,133] | 0,056 | +0,098 [+0,046; +0,149] | −0,024 (McNemar fault p = 0,41) |
+| C1 | 55 | 606 | 0,083 | 0,263 | 0,126 [0,095; 0,156] | 0,082 | +0,074 [+0,027; +0,124] | −0,124 [−0,170; −0,079] |
+| LLM không RAG | 18 | 166 | 0,098 | 0,086 | 0,092 [0,056; 0,134] | 0,022 | +0,109 [+0,051; +0,174] | +0,053 [0,000; +0,105] |
+| Detector-only | 109 | 1.640 | 0,062 | 0,522 | 0,111 [0,094; 0,131] | 0,221 | | |
+
+**Phát hiện 10 — CTAV trên `val` là phương pháp giảm FP, không giữ được recall của topology.** FPR giảm 8 lần
+so với BM25 và 12 lần so với C1; F1 cao hơn có ý nghĩa. Nhưng recall thấp hơn C1 0,124 [0,079; 0,170], nên vế
+"recall ≥ C1 − δ" của H2 chỉ đạt với δ ≥ 0,124 (ước lượng điểm; 0,17 theo cận CI). Recall mất chủ yếu ở `network_delay`: 10 fault C1 bắt được thì
+CTAV mất cả 10; 29 TP còn lại là `cpu_contention` 19, `cpu_consumed` 8, `exception` 2. Mọi neo đều là span
+(không có log ERROR/WARN nào được trích).
+
+**Phát hiện 11 — ngưỡng `dev` thắng một phần nhờ "im lặng có cấu trúc".** 15 service (`adservice`,
+`checkoutservice`, `ts-order-service`, `ts-seat-service`, `ts-inside-payment-service`, …) không có ngưỡng `dev`
+nên span của chúng không bao giờ neo được; với log toàn INFO, CTAV không thể cảnh báo trên các service này.
+Ngưỡng trượt phủ 93% nhưng thấp ≈ 0,3 lần `dev` (QĐ-030, chưa giải thích) nên neo quá dễ. Đây là rủi ro hiệu
+lực lớn nhất trước M8: phân bố service của `test` khác `val` thì số của CTAV có thể đổi mạnh (V31).
+
+**Bảng M6-7. H4 — F1 theo ngân sách** (lần gọi theo thứ tự thời gian; hết ngân sách ⇒ không cảnh báo).
+
+| Ngân sách | CTAV | BM25 | C1 | Không RAG |
+|---:|---|---|---|---|
+| 120 | 0,028 (3 TP / 0 FP) | 0,016 (2 / 44) | 0,023 (3 / 52) | 0,000 (0 / 8) |
+| 250 = 500 = 1.000 | 0,109 (12 / 0) | 0,081 (12 / 75) | 0,076 (12 / 95) | 0,053 (6 / 11) |
+| 2.000 | 0,195 (23 / 4) | 0,127 (26 / 175) | 0,141 (38 / 292) | 0,092 (12 / 39) |
+| 4.000 | 0,207 (25 / 7) | 0,096 (28 / 345) | 0,115 (42 / 479) | 0,075 (12 / 97) |
+| đủ (5.677) | 0,201 (29 / 51) | 0,103 | 0,126 | 0,092 |
+
+CTAV ≥ không-RAG ở 120 lần gọi và trội ở mọi mức (ước lượng điểm; CI ở 120 chồng nhau, ở `ctav.json`).
+Đoạn phẳng 250–1.000: candidate thứ 250–1.000 theo thời gian không có telemetry. Một lần gọi CTAV = một lần
+gọi C1, nên cùng ngân sách số lần gọi với C1.
+
+**Grouping (M6 việc 7).** `services/rca_agent/grouping.py` + model `Incident` (`03` §1.5): cụm thời gian
+liên kết đơn (khoảng cách ≤ `t_group_seconds`, mặc định 300 s do nơi gọi truyền từ config) → thành phần liên
+thông của đồ thị con dịch vụ (vô hướng) cảm sinh bởi các service bị cảnh báo. Không gọi LLM. Chưa chạy trên
+alert thật (M9).
+
+**Chi phí M6:** 0 lần gọi LLM, 0 USD.
+
+**Tái lập.**
+```bash
+py scripts/build_anchor_features.py --config eval/configs/m6_anchor_features_val.yaml   # ~1 phút, run_id mới
+py -m eval ctav --config eval/configs/m6_ctav_select_val.yaml      # bước 1, ~20 s
+py -m eval ctav --config eval/configs/m6_ctav_select_val_v2.yaml   # bước 2
+py -m eval ctav --config eval/configs/ctav_final.yaml              # cấu hình chốt
+```
