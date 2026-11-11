@@ -16,13 +16,13 @@
 | M3 | QUA (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
 | M4 | QUA (đóng 2026-10-29; GVHD đồng ý V24 (b)) | `docs/milestones/M4-h0.md`; QĐ-022..027 |
 | M5 | QUA (đóng 2026-11-01; H1 giữ một phần, V28 (b)) | `docs/milestones/M5-h1.md`; QĐ-028, QĐ-029 |
-| M6 | **XONG, CHỜ NGƯỜI DÙNG XEM** (2026-11-01; H3 bỏ C2, C4) | `docs/milestones/M6-ctav.md`; QĐ-030, QĐ-031 |
+| M6 | QUA CÓ ĐIỀU KIỆN (đóng 2026-11-11; H3 bỏ C2, C4; V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032 |
 
 M6 tóm tắt (QĐ-031): CTAV đánh giá bằng replay verdict H0 đã cache (`py -m eval ctav`, 0 USD). H3 trên `val`
 bỏ C4 (chạy C1 cho mọi candidate rẻ hơn và F1 cao hơn) và C2 (ΔFPR CI chạm 0). Cấu hình chốt
 `eval/configs/ctav_final.yaml` = C1 + θ 0,80 + C3 (`dev` p90): F1 0,201 [0,138; 0,264] vs BM25 0,103,
 FPR 0,007 vs 0,056, nhưng recall 0,139 < C1 0,263 (Phát hiện 10); 15 service không có ngưỡng `dev`
-(Phát hiện 11, V31).
+(Phát hiện 11; V31 (a): giữ cấu hình, C3-trượt là ablation bắt buộc ở M8 — QĐ-032).
 
 M4 tóm tắt: H0 trên `val` tái lập **hiện tượng** (C1-paper − BM25: ΔRecall +0,100 [+0,052; +0,155],
 ΔFPR +0,025 [+0,020; +0,031], McNemar có ý nghĩa; ΔF1 CI chứa 0) nhưng **không tái lập cơ chế**
@@ -60,9 +60,9 @@ Hạn 2026-12-06. Mở M7 sau khi người dùng xem báo cáo M6 và chốt V31
 | V26 | Billing 5 USD / ≈ 8k request so với ≈ 4,4 USD / ≈ 4.830 request trong log (QĐ-026) | Người dùng cho biết khung thời gian của dashboard ⇒ đối chiếu. Nếu billing thật cao hơn token > 1,3× thì tính lại bảng ngân sách dưới | Không (theo dõi) |
 | ~~V28~~ | Đặc trưng C2 sau H1 | Người dùng chốt (b) (QĐ-029) | |
 | V30 | ~~Nguồn ngưỡng nền cho C3~~ | Agent tự quyết khi chạy tự động: dựng cả hai, quy tắc chọn `dev` p90 (QĐ-031) — **người dùng xác nhận** | Không |
-| V31 | `dev` không phủ 15 service ⇒ CTAV không thể cảnh báo trên chúng (Phát hiện 11) | (a) giữ `ctav_final.yaml`, đăng ký C3-trượt làm ablation bắt buộc ở M8 | **M7** |
-| V32 | Recall CTAV < C1 (Phát hiện 10) — vế recall của H2 / mục tiêu (A) | (a) giữ H2 nguyên văn, báo trung thực ở M8 | **M7** |
-| V29 | GVHD chưa được báo V28 (b), nay thêm việc H3 bỏ C2, C4 (QĐ-031); cần biết thêm loại báo cáo tháng 11 (tiến độ hay kết quả) | Người dùng báo GVHD trước khi đăng ký giả thuyết M7 | M7 |
+| ~~V31~~ | `dev` không phủ 15 service (Phát hiện 11) | Người dùng chốt (a) 2026-11-11 (QĐ-032): giữ `ctav_final.yaml`, C3-trượt là ablation bắt buộc ở M8 | |
+| ~~V32~~ | Recall CTAV < C1 (Phát hiện 10) | Người dùng chốt (a) 2026-11-11 (QĐ-032): giữ H2 nguyên văn, báo trung thực ở M8 | |
+| V29 | GVHD chưa được báo V28 (b), nay thêm việc H3 bỏ C2, C4 (QĐ-031); cần biết thêm loại báo cáo tháng 11 (tiến độ hay kết quả) | Người dùng báo GVHD trước khi đăng ký giả thuyết M7 | **Đăng ký giả thuyết M7** |
 | V27 | Phạm vi chấm ở M8 (`test`): toàn bộ candidate (như H0, ≈ 14 USD) hay chỉ cửa sổ có telemetry (số chính, ≈ 5 USD) | Quyết định khi mở M8, theo số credit còn lại lúc đó | M8 |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
@@ -105,6 +105,11 @@ M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`r
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — phiên 2026-11-11
+
+**Trạng thái:** người dùng chốt V31 (a), V32 (a) (QĐ-032) ⇒ đóng M6, mở M7. V30 chờ xác nhận (không chặn).
+**Việc đầu tiên phiên sau:** M7 việc 1–2 (Rescue, không cần chờ GVHD). Đăng ký giả thuyết (việc 3) chờ V29.
 
 ## Ghi chú bàn giao — phiên 2026-11-01 (tiếp, M6)
 

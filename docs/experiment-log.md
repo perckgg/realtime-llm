@@ -1641,3 +1641,20 @@ py -m eval ctav --config eval/configs/m6_ctav_select_val.yaml      # bước 1, 
 py -m eval ctav --config eval/configs/m6_ctav_select_val_v2.yaml   # bước 2
 py -m eval ctav --config eval/configs/ctav_final.yaml              # cấu hình chốt
 ```
+
+## QĐ-032 — V31 (a), V32 (a); đóng M6, mở M7 (2026-11-11)
+
+**Người dùng chốt.**
+- **V31 → (a).** Giữ `eval/configs/ctav_final.yaml` (C3 dùng ngưỡng `dev` p90) như quy tắc chọn đã định
+  trước. Biến thể C3 dùng baseline trượt 60 phút được **đăng ký làm ablation bắt buộc ở M8** để đo rủi ro
+  15 service không có ngưỡng `dev` (Phát hiện 11). Không thêm biến thể "`dev`, thiếu thì trượt" (cần thêm một
+  lần nhìn `val`).
+- **V32 → (a).** Giữ H2 nguyên văn. M8 báo trung thực kết quả vế recall (Phát hiện 10: recall CTAV < C1 trên
+  `val`), không đăng ký lại H2 sau khi đã thấy `val`.
+
+**Đóng M6.** QUA CÓ ĐIỀU KIỆN, ngày đóng 2026-11-11 (hạn 2026-12-06). V30 vẫn chờ người dùng xác nhận
+(không chặn). V29 (báo GVHD việc V28 (b) và bỏ C2, C4) **chặn bước đăng ký giả thuyết M7**, không chặn việc
+Rescue của M7.
+
+**Mở M7.** Rescue Score (C5) + đăng ký giả thuyết H0–H5; danh sách config `test` phải gồm ablation C2/C3/C4 và
+C3-trượt (V31).

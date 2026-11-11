@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Ngày đóng mốc | 2026-11-01 (chờ người dùng xem để mở M7) |
+| Ngày đóng mốc | 2026-11-11 (việc xong 2026-11-01; V31 (a), V32 (a) chốt 2026-11-11 — QĐ-032) |
 | Hạn mục tiêu | 2026-12-06 (sớm 35 ngày) |
-| Kết luận | **QUA CÓ ĐIỀU KIỆN** — DoD đạt; V30 do agent tự quyết, V31 cần người dùng chốt trước M7 |
+| Kết luận | **QUA CÓ ĐIỀU KIỆN** — DoD đạt; V30 do agent tự quyết; V31 (a), V32 (a) người dùng chốt (QĐ-032) |
 | Commit | xem `git log` (commit "M6: CTAV ...") |
 | Quyết định liên quan | QĐ-029, QĐ-030, **QĐ-031** |
 
