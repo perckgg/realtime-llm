@@ -317,15 +317,21 @@ def _cost(outcome: Outcome, price_in: float, price_out: float) -> dict[str, Any]
 
 def ablations(main: Variant) -> list[Variant]:
     """H3: one component at a time (08 SS5.1). C4 is either removed from a two-tier main
-    (`no_c4`) or, when H3 already dropped it, added back to a topology-only main (`with_c4`)."""
+    (`no_c4`) or, when H3 already dropped it, added back to a topology-only main (`with_c4`).
+    C2 likewise: `no_c2` when the main gates, `with_c2` (the config's theta_topo) when H3
+    dropped it (QD-031) -- the "+C2" ablation registered for the test run (QD-034)."""
     other: Baseline = "dev" if main.baseline == "rolling" else "rolling"
     if main.mode == "two_tier":
         c4 = replace(main, name="no_c4", mode="topology_only", routing=replace(main.routing, enabled=False))
     else:
         c4 = replace(main, name="with_c4", mode="two_tier", routing=replace(main.routing, enabled=True))
+    if main.policy.gating:
+        c2 = replace(main, name="no_c2", policy=replace(main.policy, gating=False))
+    else:
+        c2 = replace(main, name="with_c2", policy=replace(main.policy, gating=True))
     return [
         main,
-        replace(main, name="no_c2", policy=replace(main.policy, gating=False)),
+        c2,
         replace(main, name="no_c3", policy=replace(main.policy, anchoring=False)),
         c4,
         replace(main, name=f"c3_{other}_baseline", baseline=other),
@@ -375,7 +381,13 @@ def select(points: Sequence[Mapping[str, Any]], metric: str) -> Mapping[str, Any
 
 def component_verdicts(pairs: Mapping[str, Any], costs: Mapping[str, Mapping[str, Any]], main: Variant) -> dict[str, Any]:
     """H3 criteria of 08 SS5.1, read off the ablation (pairs are `variant - ctav`)."""
-    c2 = pairs["no_c2 - ctav"]
+    if "no_c2 - ctav" in pairs:
+        with_c2, without_c2 = "ctav", "no_c2"
+        c2_fpr = pairs["no_c2 - ctav"]["d_fpr_ci95"]
+    else:  # main without gating: flip `with_c2 - ctav` to `without - with`
+        with_c2, without_c2 = "with_c2", "ctav"
+        flipped_fpr = pairs["with_c2 - ctav"]["d_fpr_ci95"]
+        c2_fpr = [0.0 - flipped_fpr[1], 0.0 - flipped_fpr[0]]  # 0.0 - x: no -0.0 in the report
     c3 = pairs["no_c3 - ctav"]
     if "no_c4 - ctav" in pairs:
         with_c4, without_c4 = "ctav", "no_c4"
@@ -387,11 +399,11 @@ def component_verdicts(pairs: Mapping[str, Any], costs: Mapping[str, Mapping[str
     return {
         "C2": {
             "rule": "removing C2 raises FPR: d_fpr CI95 lower bound > 0 (no-op if theta_topo == theta_local)",
-            "theta_topo_above_local": main.policy.gating and main.policy.theta_topo > main.policy.theta_local,
-            "d_fpr_ci95": c2.get("d_fpr_ci95"),
-            "contributes": main.policy.gating
-            and main.policy.theta_topo > main.policy.theta_local
-            and c2["d_fpr_ci95"][0] > 0,
+            "with": with_c2,
+            "without": without_c2,
+            "theta_topo_above_local": main.policy.theta_topo > main.policy.theta_local,
+            "d_fpr_ci95": c2_fpr,  # FPR(without C2) - FPR(with C2)
+            "contributes": main.policy.theta_topo > main.policy.theta_local and c2_fpr[0] > 0,
         },
         "C3": {
             "rule": "removing C3 lowers precision: d_precision CI95 upper bound < 0",

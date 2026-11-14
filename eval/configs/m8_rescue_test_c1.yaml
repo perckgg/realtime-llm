@@ -1,0 +1,49 @@
+# M8 / G-test, config đăng ký #7 (QĐ-034, V34 (b)): chấm các cửa sổ được cứu của điểm C5 đã chốt
+# bằng đúng tầng C1 của CTAV (retrieval + judge như h0_test_c1_k0). Chỉ các cửa sổ trong danh sách được chấm.
+# Chạy: py -m eval run --config eval/configs/m8_rescue_test_c1.yaml
+run_id: m8_rescue_test_c1_v1
+seed: 42
+split: test
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+rescue:
+  windows: eval/results/m8_rescue_plan_test_v1/rescue_windows.csv
+
+evidence:
+  store: nezha
+retrieval:
+  type: hybrid_bm25_graph
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  workers: 6
+  params:
+    bm25_pool: window
+    alpha: 0.35
+    beta: 0.25
+    gamma: 0.40
+    tau_seconds: 300
+    bm25_k: 60
+    graph_max_distance: 2
+    graph_per_service_limit: 20
+    time_margin_minutes: 8
+    engine: vectorized
+    k_graph: 0
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]

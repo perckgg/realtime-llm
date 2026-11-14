@@ -93,6 +93,7 @@ def test_tier_runs_must_cover_the_same_labelled_windows() -> None:
 def test_c4_verdict_on_a_topology_only_main() -> None:
     main = replace(MAIN, mode="topology_only", routing=replace(MAIN.routing, enabled=False))
     assert [v.name for v in ablations(main)][3] == "with_c4"
+    assert [v.name for v in ablations(main)][1] == "no_c2"  # MAIN gates
     pairs = {
         "no_c2 - ctav": {"d_fpr_ci95": [0.0, 0.001]},
         "no_c3 - ctav": {"d_precision_ci95": [-0.3, -0.1]},
@@ -102,3 +103,26 @@ def test_c4_verdict_on_a_topology_only_main() -> None:
     verdicts = component_verdicts(pairs, costs, main)
     assert verdicts["C2"]["contributes"] is False and verdicts["C3"]["contributes"] is True
     assert verdicts["C4"]["d_f1_ci95"] == [0.01, 0.09] and verdicts["C4"]["contributes"] is False
+
+
+def test_c2_is_added_back_when_the_main_does_not_gate() -> None:
+    """QD-034: the registered "+C2" ablation -- main without gating gets `with_c2`."""
+    main = replace(
+        MAIN,
+        mode="topology_only",
+        routing=replace(MAIN.routing, enabled=False),
+        policy=replace(MAIN.policy, gating=False, theta_local=0.80, theta_topo=0.85),
+    )
+    c2 = ablations(main)[1]
+    assert c2.name == "with_c2" and c2.policy.gating and c2.policy.theta_topo == 0.85
+    costs = {"ctav": {"estimated_cost_usd": 3.0}, "with_c4": {"estimated_cost_usd": 5.0}}
+    rest = {
+        "no_c3 - ctav": {"d_precision_ci95": [-0.3, -0.1]},
+        "with_c4 - ctav": {"d_f1": -0.05, "d_f1_ci95": [-0.09, -0.01]},
+    }
+    # adding C2 lowers FPR with a CI entirely below 0 -> without - with has lower bound > 0 -> contributes
+    helps = component_verdicts({"with_c2 - ctav": {"d_fpr_ci95": [-0.004, -0.001]}, **rest}, costs, main)
+    assert helps["C2"]["d_fpr_ci95"] == [0.001, 0.004] and helps["C2"]["contributes"] is True
+    # CI of the added C2 touches 0 -> the drop is confirmed
+    flat = component_verdicts({"with_c2 - ctav": {"d_fpr_ci95": [-0.0007, 0.0]}, **rest}, costs, main)
+    assert flat["C2"]["contributes"] is False and flat["C2"]["with"] == "with_c2"

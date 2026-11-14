@@ -1,0 +1,11 @@
+# M8 / G-test, config đăng ký #7 (QĐ-034): đặc trưng neo C3 cho run chấm Rescue trên `test`. 0 LLM, không nhãn.
+# Chạy: py scripts/build_anchor_features.py --config eval/configs/m8_anchor_features_rescue_test.yaml
+kind: anchor_features
+run_id: m8_anchor_features_rescue_test_v1
+runs: [m8_rescue_test_c1_v1]
+rolling:
+  lookback_minutes: 60
+  guard_seconds: 60
+  min_spans: 30
+percentiles: [90, 95, 99]
+dev_baseline: data/span_baseline.parquet

@@ -1,0 +1,20 @@
+# M8 / G-test, config đăng ký #7 (QĐ-034, V34 (b)): thành phần Rescue Score (C5) cho mọi cửa sổ `test`.
+# 0 LLM, không nhãn. Sao từ m7_rescue_features_val.yaml; chỉ đổi run_id, split, g_test, windows_run, alerts_run.
+# Chạy: py scripts/build_rescue_features.py --config eval/configs/m8_rescue_features_test.yaml
+kind: rescue_features
+run_id: m8_rescue_features_test_v1
+split: test
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+windows_run: h0_test_c1_k0_v1  # cửa sổ, detector (is_candidate), anomaly_score
+alerts_run: ctav_final_test_v1  # tập A
+window_seconds: 60
+graph: data/graph/service_graph.json
+log:
+  k_log: 10
+  levels: [ERROR, FATAL, CRITICAL]
+  patterns:
+    - '\b(?:status|code)\D{0,5}5\d\d\b'
+    - 'exception|panic|traceback'
+time:
+  sigma_seconds: 300
+  active_seconds: 300

@@ -67,6 +67,12 @@ def _read(path: Path, kind: str, required: Sequence[str]) -> dict[str, Any]:
 
 
 def grid_points(grid: Mapping[str, Any]) -> list[RescueParams]:
+    if "points" in grid:  # fixed points, no sweep (M8: the one point chosen on val, QD-033/QD-034)
+        fixed = []
+        for point in grid["points"]:
+            eta1, eta2, eta3 = (float(e) for e in point["eta"])
+            fixed.append(RescueParams(eta1, eta2, eta3, tau=float(point["tau"])))
+        return fixed
     return [RescueParams(*eta, tau=float(tau)) for eta in eta_grid(float(grid["eta_step"])) for tau in grid["tau"]]
 
 

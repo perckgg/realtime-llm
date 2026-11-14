@@ -1,0 +1,36 @@
+# M8 / G-test, config đăng ký #6 (QĐ-034): CTAV chốt (ctav_final.yaml) replay trên `test`, 0 lần gọi LLM.
+# Chính sách giữ nguyên từng tham số; chỉ đổi run_id, split, g_test, run tầng, anchor_features, baselines.
+# Ablation một-thay-đổi-một-lần quanh CTAV: with_c2 (+C2, θ_topo 0,85), no_c3, with_c4 (fp_confidence 0,95),
+# c3_rolling_baseline (C3-trượt, V31). Đường ngân sách H4: budgets.
+# Chạy: py -m eval ctav --config eval/configs/ctav_final_test.yaml
+kind: ctav
+run_id: ctav_final_test_v1
+split: test
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+subset: telemetry
+model: gemini-2.5-flash
+tiers:
+  local: h0_test_bm25_v1
+  topology: h0_test_c1_k0_v1
+anchor_features: m8_anchor_features_test_v1
+policy:
+  theta_local: 0.80
+  theta_topo: 0.85  # used only when gating is on (H3 dropped C2)
+  gating: false  # C2 dropped by H3 on val
+  anchoring: true  # C3
+  require_evidence: true
+  anchor:
+    baseline: dev  # data/span_baseline.parquet (QD-030); rolling rejected on val (QD-031)
+    percentile: 90
+    log_levels: [ERROR, WARN]
+routing:
+  enabled: false  # C4 dropped by H3 on val; with_c4 in the ablation
+  escalate_on: [no_context, uncertain, weak_fp]
+  fp_confidence: 0.95
+baselines:
+  bm25: h0_test_bm25_v1
+  c1: h0_test_c1_k0_v1
+  norag: h0_test_norag_v1
+budgets: [120, 250, 500, 1000, 2000, 4000]
+n_boot: 1000
+seed: 42

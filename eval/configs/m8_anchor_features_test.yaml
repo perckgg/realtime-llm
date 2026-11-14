@@ -1,0 +1,13 @@
+# M8 / G-test, config đăng ký #5 (QĐ-034): đặc trưng neo C3 cho mọi trace event mà hai run tầng đã
+# retrieve trên `test` (ngưỡng `dev` p90 cho CTAV; trượt 60 phút cho ablation C3-trượt, V31). 0 LLM, không nhãn.
+# Sao từ m6_anchor_features_val.yaml; chỉ đổi run_id và hai run tầng.
+# Chạy: py scripts/build_anchor_features.py --config eval/configs/m8_anchor_features_test.yaml
+kind: anchor_features
+run_id: m8_anchor_features_test_v1
+runs: [h0_test_bm25_v1, h0_test_c1_k0_v1]
+rolling:
+  lookback_minutes: 60
+  guard_seconds: 60
+  min_spans: 30
+percentiles: [90, 95, 99]
+dev_baseline: data/span_baseline.parquet

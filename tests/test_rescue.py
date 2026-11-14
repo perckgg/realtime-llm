@@ -104,3 +104,13 @@ def test_runner_reads_the_rescue_window_list(tmp_path: Path):
     rescue = _rescue_windows({"rescue": {"windows": str(path)}})
     assert rescue is not None and set(rescue) == {"w1"}
     assert rescue["w1"]["phi_topo"] == pytest.approx(0.5)
+
+
+def test_grid_can_be_a_fixed_list_of_points() -> None:
+    """QD-034: on test C5 is one registered point, not a sweep."""
+    from eval.harness.rescue import grid_points, point_name
+
+    points = grid_points({"points": [{"eta": [0.0, 0.4, 0.6], "tau": 0.8}]})
+    assert [point_name(p) for p in points] == ["eta=(0,0.4,0.6)|tau=0.8"]
+    with pytest.raises(ValueError):
+        grid_points({"points": [{"eta": [0.0, 0.4, 0.4], "tau": 0.8}]})
