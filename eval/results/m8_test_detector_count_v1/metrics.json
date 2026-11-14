@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 346,
+      "tn": 11639,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "precision_ci95": [
+        0.0,
+        0.0
+      ],
+      "recall_ci95": [
+        0.0,
+        0.0
+      ],
+      "f1_ci95": [
+        0.0,
+        0.0
+      ],
+      "fpr_ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    "detector_only": {
+      "tp": 224,
+      "fp": 3435,
+      "fn": 122,
+      "tn": 8204,
+      "precision": 0.06121891227111233,
+      "recall": 0.6473988439306358,
+      "f1": 0.11186017478152309,
+      "fpr": 0.2951284474611221,
+      "precision_ci95": [
+        0.05449515905947441,
+        0.06915857886557042
+      ],
+      "recall_ci95": [
+        0.6011102985173858,
+        0.6992441557568525
+      ],
+      "f1_ci95": [
+        0.10009845100909141,
+        0.12550660246972928
+      ],
+      "fpr_ci95": [
+        0.2870482792548904,
+        0.30361100772433586
+      ]
+    },
+    "operations": {
+      "windows": 11985,
+      "fault_windows": 346,
+      "candidates": 3659,
+      "retrieval_calls": 0,
+      "llm_calls": 0,
+      "api_calls": 0,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 0,
+      "context_coverage": 0.0,
+      "candidate_context_coverage": 0.0,
+      "avg_context_events": null,
+      "avg_context_tokens": null,
+      "retrieval_latency_ms_avg": null,
+      "retrieval_latency_ms_p95": null,
+      "llm_latency_ms_avg": null,
+      "llm_latency_ms_p95": null,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "downgraded_by_evidence_rule": 0,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 346,
+      "tn": 46503,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "fpr": 0.0,
+      "precision_ci95": [
+        0.0,
+        0.0
+      ],
+      "recall_ci95": [
+        0.0,
+        0.0
+      ],
+      "f1_ci95": [
+        0.0,
+        0.0
+      ],
+      "fpr_ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    "detector_only": {
+      "tp": 224,
+      "fp": 13475,
+      "fn": 122,
+      "tn": 33028,
+      "precision": 0.016351558507920288,
+      "recall": 0.6473988439306358,
+      "f1": 0.031897472410110365,
+      "fpr": 0.2897662516396792,
+      "precision_ci95": [
+        0.014451906266755925,
+        0.018541788110710212
+      ],
+      "recall_ci95": [
+        0.6,
+        0.7016586357358111
+      ],
+      "f1_ci95": [
+        0.028232332861263122,
+        0.03609603541741651
+      ],
+      "fpr_ci95": [
+        0.28565701822352146,
+        0.29369602319274024
+      ]
+    },
+    "operations": {
+      "windows": 46849,
+      "fault_windows": 346,
+      "candidates": 13699,
+      "retrieval_calls": 0,
+      "llm_calls": 0,
+      "api_calls": 0,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 0,
+      "context_coverage": 0.0,
+      "candidate_context_coverage": 0.0,
+      "avg_context_events": null,
+      "avg_context_tokens": null,
+      "retrieval_latency_ms_avg": null,
+      "retrieval_latency_ms_p95": null,
+      "llm_latency_ms_avg": null,
+      "llm_latency_ms_p95": null,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "downgraded_by_evidence_rule": 0,
+      "judge_errors": 0
+    }
+  }
+}

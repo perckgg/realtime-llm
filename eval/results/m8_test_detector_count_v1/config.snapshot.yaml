@@ -1,0 +1,16 @@
+run_id: m8_test_detector_count_v1
+seed: 42
+split: test
+g_test: true
+time_source: wall
+stages: detector
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  contamination: 0.05
+  n_estimators: 100
+  random_state: 42
+  fit:
+    strategy: split
+    split: dev

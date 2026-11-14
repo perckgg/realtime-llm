@@ -1798,3 +1798,37 @@ của H3, tham số chốt η = (0; 0,4; 0,6), τ = 0,8 (QĐ-033). Không tham s
 | 9 | `py -m eval compare` BM25, C1, không-RAG + detector-only | H0 compare | H0, H2 | 0 |
 
 Phạm vi chấm (toàn bộ candidate hay chỉ cửa sổ telemetry) theo V27, chốt khi mở M8.
+## QĐ-035 — M8: đếm candidate `test`, ước chi phí trước khi gọi API (2026-11-14)
+
+**Chuẩn bị (0 USD, đã commit trước khi chạy).** Config `test` #1–#8 của bản đăng ký (`30f3f92`, `e6a71cb`,
+`48ee7f5`), mỗi file chỉ khác bản `val` ở `run_id`, `split`, `g_test` và tên run đầu vào. Code đánh giá thêm
+cho M8, không đổi tham số phương pháp: runner từ chối `split: test` thiếu `g_test`; `ablations()` sinh `with_c2`
+khi phương pháp chính không gating (ablation "+C2 0,85" đã đăng ký; kiểm trên `val`: số chính trùng
+`ctav_final_val_v1`, ΔFPR bỏ C2 = [0,0000; +0,0007] như QĐ-031); `grid.points` cho Rescue một điểm;
+`scripts/make_repeat_subset.py` chọn 200 candidate có telemetry theo seed 42, không dùng nhãn hay verdict.
+
+**Lần đầu chạm `test`:** `m8_test_detector_count_v1` (chỉ detector, 512 s, 0 lần gọi LLM).
+
+| | Cửa sổ | Có telemetry | Candidate | Candidate có telemetry |
+|---|---:|---:|---:|---:|
+| `val` (`h0_val_bm25_v3`) | 28.898 | 7.636 | 5.677 (19,6%) | 1.749 |
+| `test` | 46.849 | 11.985 | **13.699 (29,2%)** | 3.659 |
+
+Detector (ngưỡng 0,85, fit `dev`, không đổi) đưa lên nhiều candidate hơn hẳn trên `test`: 2,41 × `val` trong khi
+số cửa sổ chỉ 1,62 ×. Ghi nhận, không chỉnh gì (tham số đã đóng băng).
+
+**Ước chi phí (đơn giá theo token đo trên `val`, đúng loại prompt — quy tắc ngân sách 1).** Từ `metrics.json`
+của ba run `val`: prompt không bằng chứng ≈ 0,00034 USD/lần; BM25 có bằng chứng ≈ 0,00121; C1 có bằng chứng
+≈ 0,00112. Trên `val` C1 và không-RAG chỉ gọi mới 1.286 và 1.283 lần (phần còn lại trùng prompt đã cache của BM25).
+
+| Run | Lần gọi API mới (ước) | USD theo token |
+|---|---:|---:|
+| `h0_test_bm25` | 13.699 (10.040 không telemetry + 3.659 có) | ≈ 7,8 |
+| `h0_test_c1_k0` | ≈ 2.700 (tối đa 3.659) | ≈ 3,0 (tối đa 4,1) |
+| `h0_test_norag` | ≈ 2.700 (tối đa 3.659) | ≈ 0,9 (tối đa 1,2) |
+| `repeat` 1, 2 × BM25, C1 (200 cửa sổ) | 800 | ≈ 1,0 |
+| C5 một điểm | vài trăm | ≈ 0,3 |
+| **Tổng** | | **≈ 13,0 (tối đa 14,4)** ⇒ ≈ 14,8 (tối đa 16,4) sau khi nhân 1,14 |
+
+Trong ngân sách M8 18 USD, dưới ngưỡng dừng 20 USD; số dư ≈ 38 USD. Thứ tự chạy: BM25 trước (điều kiện thử,
+quy tắc ngân sách 2), đọc `runtime.json`, rồi mới chạy C1 và không-RAG.

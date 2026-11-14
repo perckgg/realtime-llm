@@ -1,0 +1,16 @@
+{
+  "run_id": "m8_test_detector_count_v1",
+  "finished_at": "2026-11-14T05:20:59.713520+00:00",
+  "wall_seconds": 512.4,
+  "detector_fit_seconds": 45.2,
+  "replay_and_retrieval_seconds": 467.1,
+  "judge_seconds": 0.0,
+  "judge_workers": 8,
+  "retrieval_workers": 1,
+  "evaluated_windows": 46849,
+  "llm_calls": 0,
+  "api_calls": 0,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "none",
+  "judge_errors": 0
+}
