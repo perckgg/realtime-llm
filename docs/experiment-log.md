@@ -1832,3 +1832,52 @@ của ba run `val`: prompt không bằng chứng ≈ 0,00034 USD/lần; BM25 có
 
 Trong ngân sách M8 18 USD, dưới ngưỡng dừng 20 USD; số dư ≈ 38 USD. Thứ tự chạy: BM25 trước (điều kiện thử,
 quy tắc ngân sách 2), đọc `runtime.json`, rồi mới chạy C1 và không-RAG.
+
+## QĐ-036 — M8: độ lệch detector `dev` → `val` → `test` (mô tả, 0 USD) (2026-11-14)
+
+Phân tích mô tả theo yêu cầu bổ sung của người dùng; không chỉnh ngưỡng, không chạy cấu hình detector nào khác.
+Cùng một detector đã đóng băng (IForest, ngưỡng 0,85, fit `dev`) chấm ba split:
+`m8_test_shift_dev_detector_v1` (`dev`, chính tập fit), `val_detector_count_v1`, `m8_test_detector_count_v1`.
+Kết quả: `eval/results/m8_detector_shift_test_v1/` (`shift.json`, `tables.md` gồm Bảng S2 theo service, S3 theo ngày).
+
+**Bảng M8-S1. Detector theo split.**
+
+| | `dev` | `val` | `test` |
+|---|---:|---:|---:|
+| Cửa sổ | 19.316 | 28.898 | 46.849 |
+| Candidate | 2.898 (15,0%) | 5.677 (19,6%) | 13.699 (29,2%) |
+| Điểm anomaly p50 / p75 / p90 / p95 | 0,500 / 0,750 / 0,900 / 0,950 | 0,549 / 0,805 / 0,910 / 0,938 | 0,588 / 0,885 / 0,953 / 0,984 |
+| Candidate trong cửa sổ có telemetry | 898 / 5.030 (17,9%) | 1.749 / 7.636 (22,9%) | 3.659 / 11.985 (30,5%) |
+| Candidate trong cửa sổ không telemetry | 2.000 / 14.286 (14,0%) | 3.928 / 21.262 (18,5%) | 10.040 / 34.864 (28,8%) |
+| Candidate trong fault (= recall detector-only) | 73 / 149 (49,0%) | 109 / 209 (52,2%) | 224 / 346 (64,7%) |
+| Candidate trong normal có telemetry (= FPR detector-only, chỉ số chính) | 825 / 4.881 (16,9%) | 1.640 / 7.427 (22,1%) | 3.435 / 11.639 (29,5%) |
+| Candidate trong normal, mọi cửa sổ | 2.825 / 19.167 (14,7%) | 5.568 / 28.689 (19,4%) | 13.475 / 46.503 (29,0%) |
+| Cửa sổ ngày 2022-08 (Online Boutique): số, tỉ lệ candidate | 4.991 (25,8% split), 28,2% | 3.805 (13,2%), 42,8% | 10.191 (21,8%), 66,8% |
+| Cửa sổ ngày 2023-01 (TrainTicket): số, tỉ lệ candidate | 14.325, 10,4% | 25.093, 16,1% | 36.658, 18,8% |
+| Service "luôn bật" (≥ 90% cửa sổ là candidate, ≥ 100 cửa sổ) | 2 service, 1.431 cửa sổ | 3 service, 3.001 cửa sổ | 5 service, 6.435 cửa sổ |
+| Tỉ lệ candidate ở các service còn lại | 8,2% | 10,4% | 18,0% |
+
+**Đọc bảng.**
+- Điểm anomaly là hạng phần trăm trên `dev` (phân vị `dev` trùng đúng 0,10 … 0,99), nên ngưỡng 0,85 cho đúng 15%
+  candidate trên `dev` theo cách dựng. Ra ngoài `dev` tỉ lệ này tăng dần: 19,6% (`val`), 29,2% (`test`).
+- Độ lệch `val` → `test` đến từ **thành phần service của split**, không từ một ngày bất thường: `test` có nhiều
+  cửa sổ Online Boutique hơn (21,8% so với 13,2%) và ở đó tỉ lệ candidate cao hơn hẳn (66,8% so với 42,8%);
+  phần TrainTicket chỉ tăng 16,1% → 18,8%. Năm service "luôn bật" của `test` (`checkoutservice`,
+  `currencyservice`, `frontend`, `productcatalogservice`, `ts-ui-dashboard`) cho 6.407 candidate = 47% số
+  candidate của `test`; `frontend` (1.221 / 1.221) không có cửa sổ nào trong `val`. Split gom theo lần tiêm lỗi nên
+  tập service của mỗi split khác nhau (Bảng S2).
+- Lệch xảy ra ở cả cửa sổ có và không có telemetry, ở cả fault và normal.
+
+**Hệ quả (ghi trước khi có kết quả judge trên `test`).**
+- *Detector-only:* recall 0,647 và FPR 0,295 trên `test` (cửa sổ có telemetry), so với 0,522 và 0,221 trên `val`.
+  So sánh `val` cạnh `test` của mọi phương pháp phải đọc cùng độ lệch này: mẫu số candidate đã khác.
+- *Đường ngân sách H4:* mức "đủ" trên `test` là 13.699 lần gọi (5.677 trên `val`). Các mốc đã đăng ký
+  {120, …, 4.000} tính theo thứ tự thời gian nên phủ phần nhỏ hơn: 4.000 lần gọi = 29% candidate của `test`
+  (70% của `val`), và nằm trọn trong ngày 2022-08-22 (4.381 candidate), tức chỉ phản ánh Online Boutique.
+- *Chi phí:* số lần gọi BM25 trên `test` gấp 2,41 lần `val` (đã tính ở QĐ-035).
+
+**Tái lập.**
+```bash
+py -m eval run --config eval/configs/m8_test_shift_dev_detector.yaml       # ~4 phút, 0 LLM
+py scripts/m8_detector_shift.py --runs dev=m8_test_shift_dev_detector_v1,val=val_detector_count_v1,test=m8_test_detector_count_v1 --out <tên-mới>
+```

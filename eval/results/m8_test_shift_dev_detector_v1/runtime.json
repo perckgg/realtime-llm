@@ -1,0 +1,16 @@
+{
+  "run_id": "m8_test_shift_dev_detector_v1",
+  "finished_at": "2026-11-14T05:49:21.040854+00:00",
+  "wall_seconds": 210.4,
+  "detector_fit_seconds": 36.9,
+  "replay_and_retrieval_seconds": 173.4,
+  "judge_seconds": 0.0,
+  "judge_workers": 8,
+  "retrieval_workers": 1,
+  "evaluated_windows": 19316,
+  "llm_calls": 0,
+  "api_calls": 0,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "none",
+  "judge_errors": 0
+}

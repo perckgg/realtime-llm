@@ -1,0 +1,813 @@
+{
+  "created_at": "2026-11-14T05:49:39.237795+00:00",
+  "runs": {
+    "dev": "m8_test_shift_dev_detector_v1",
+    "val": "val_detector_count_v1",
+    "test": "m8_test_detector_count_v1"
+  },
+  "threshold": 0.85,
+  "git_commit": "804a56beac63e754a260ca29fe321dac43c03516\nmodified tracked files at run time:\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py",
+  "splits": {
+    "dev": {
+      "windows": 19316,
+      "candidates": 2898,
+      "rate": 0.1500310623317457,
+      "scored_windows": 19316,
+      "score_quantiles": {
+        "p10": 0.10005,
+        "p25": 0.250075,
+        "p50": 0.50005,
+        "p75": 0.7500249999999999,
+        "p90": 0.9,
+        "p95": 0.95,
+        "p99": 0.99
+      },
+      "score_mean": 0.5001534789811555,
+      "share_score_ge_threshold": 0.1500828328846552,
+      "by_telemetry": {
+        "no_telemetry": {
+          "windows": 14286,
+          "candidates": 2000,
+          "rate": 0.1399972000559989
+        },
+        "telemetry": {
+          "windows": 5030,
+          "candidates": 898,
+          "rate": 0.17852882703777337
+        }
+      },
+      "by_label": {
+        "fault": {
+          "windows": 149,
+          "candidates": 73,
+          "rate": 0.4899328859060403
+        },
+        "normal": {
+          "windows": 19167,
+          "candidates": 2825,
+          "rate": 0.14738874106537278
+        }
+      },
+      "by_label_telemetry": {
+        "fault|telemetry": {
+          "windows": 149,
+          "candidates": 73,
+          "rate": 0.4899328859060403
+        },
+        "normal|no_telemetry": {
+          "windows": 14286,
+          "candidates": 2000,
+          "rate": 0.1399972000559989
+        },
+        "normal|telemetry": {
+          "windows": 4881,
+          "candidates": 825,
+          "rate": 0.16902274124154887
+        }
+      },
+      "by_service": {
+        "adservice": {
+          "windows": 7,
+          "candidates": 6,
+          "rate": 0.8571428571428571
+        },
+        "cartservice": {
+          "windows": 1180,
+          "candidates": 648,
+          "rate": 0.5491525423728814
+        },
+        "checkoutservice": {
+          "windows": 21,
+          "candidates": 21,
+          "rate": 1.0
+        },
+        "emailservice": {
+          "windows": 7,
+          "candidates": 0,
+          "rate": 0.0
+        },
+        "frontend": {
+          "windows": 690,
+          "candidates": 690,
+          "rate": 1.0
+        },
+        "paymentservice": {
+          "windows": 699,
+          "candidates": 5,
+          "rate": 0.00715307582260372
+        },
+        "productcatalogservice": {
+          "windows": 8,
+          "candidates": 8,
+          "rate": 1.0
+        },
+        "recommendationservice": {
+          "windows": 1178,
+          "candidates": 25,
+          "rate": 0.021222410865874362
+        },
+        "shippingservice": {
+          "windows": 1201,
+          "candidates": 6,
+          "rate": 0.004995836802664446
+        },
+        "ts-auth-service": {
+          "windows": 919,
+          "candidates": 40,
+          "rate": 0.04352557127312296
+        },
+        "ts-basic-service": {
+          "windows": 7,
+          "candidates": 4,
+          "rate": 0.5714285714285714
+        },
+        "ts-config-service": {
+          "windows": 1660,
+          "candidates": 29,
+          "rate": 0.01746987951807229
+        },
+        "ts-consign-service": {
+          "windows": 1660,
+          "candidates": 10,
+          "rate": 0.006024096385542169
+        },
+        "ts-contacts-service": {
+          "windows": 14,
+          "candidates": 5,
+          "rate": 0.35714285714285715
+        },
+        "ts-food-delivery-service": {
+          "windows": 741,
+          "candidates": 4,
+          "rate": 0.005398110661268556
+        },
+        "ts-food-service": {
+          "windows": 15,
+          "candidates": 3,
+          "rate": 0.2
+        },
+        "ts-gateway-service": {
+          "windows": 741,
+          "candidates": 740,
+          "rate": 0.9986504723346828
+        },
+        "ts-notification-service": {
+          "windows": 1660,
+          "candidates": 72,
+          "rate": 0.043373493975903614
+        },
+        "ts-order-other-service": {
+          "windows": 741,
+          "candidates": 17,
+          "rate": 0.022941970310391364
+        },
+        "ts-price-service": {
+          "windows": 890,
+          "candidates": 41,
+          "rate": 0.046067415730337076
+        },
+        "ts-route-plan-service": {
+          "windows": 919,
+          "candidates": 6,
+          "rate": 0.006528835690968444
+        },
+        "ts-route-service": {
+          "windows": 14,
+          "candidates": 3,
+          "rate": 0.21428571428571427
+        },
+        "ts-security-service": {
+          "windows": 919,
+          "candidates": 81,
+          "rate": 0.088139281828074
+        },
+        "ts-ticket-office-service": {
+          "windows": 741,
+          "candidates": 13,
+          "rate": 0.017543859649122806
+        },
+        "ts-train-food-service": {
+          "windows": 919,
+          "candidates": 8,
+          "rate": 0.008705114254624592
+        },
+        "ts-travel-service": {
+          "windows": 883,
+          "candidates": 219,
+          "rate": 0.2480181200453001
+        },
+        "ts-travel2-service": {
+          "windows": 875,
+          "candidates": 194,
+          "rate": 0.22171428571428572
+        },
+        "ts-verification-code-service": {
+          "windows": 7,
+          "candidates": 0,
+          "rate": 0.0
+        }
+      },
+      "by_day": {
+        "2022-08-22": {
+          "windows": 3552,
+          "candidates": 680,
+          "rate": 0.19144144144144143
+        },
+        "2022-08-23": {
+          "windows": 1439,
+          "candidates": 729,
+          "rate": 0.5066018068102849
+        },
+        "2023-01-29": {
+          "windows": 9117,
+          "candidates": 675,
+          "rate": 0.07403751233958539
+        },
+        "2023-01-30": {
+          "windows": 5208,
+          "candidates": 814,
+          "rate": 0.15629800307219663
+        }
+      }
+    },
+    "val": {
+      "windows": 28898,
+      "candidates": 5677,
+      "rate": 0.19644958128590215,
+      "scored_windows": 28898,
+      "score_quantiles": {
+        "p10": 0.1147,
+        "p25": 0.32182499999999997,
+        "p50": 0.549,
+        "p75": 0.8047,
+        "p90": 0.9099,
+        "p95": 0.9381,
+        "p99": 0.9928
+      },
+      "score_mean": 0.5509729289224168,
+      "share_score_ge_threshold": 0.19655339469859506,
+      "by_telemetry": {
+        "no_telemetry": {
+          "windows": 21262,
+          "candidates": 3928,
+          "rate": 0.1847427335151914
+        },
+        "telemetry": {
+          "windows": 7636,
+          "candidates": 1749,
+          "rate": 0.2290466212676794
+        }
+      },
+      "by_label": {
+        "fault": {
+          "windows": 209,
+          "candidates": 109,
+          "rate": 0.5215311004784688
+        },
+        "normal": {
+          "windows": 28689,
+          "candidates": 5568,
+          "rate": 0.1940813552232563
+        }
+      },
+      "by_label_telemetry": {
+        "fault|telemetry": {
+          "windows": 209,
+          "candidates": 109,
+          "rate": 0.5215311004784688
+        },
+        "normal|no_telemetry": {
+          "windows": 21262,
+          "candidates": 3928,
+          "rate": 0.1847427335151914
+        },
+        "normal|telemetry": {
+          "windows": 7427,
+          "candidates": 1640,
+          "rate": 0.22081594183384948
+        }
+      },
+      "by_service": {
+        "adservice": {
+          "windows": 686,
+          "candidates": 397,
+          "rate": 0.5787172011661808
+        },
+        "cartservice": {
+          "windows": 14,
+          "candidates": 14,
+          "rate": 1.0
+        },
+        "checkoutservice": {
+          "windows": 1163,
+          "candidates": 1156,
+          "rate": 0.9939810834049871
+        },
+        "currencyservice": {
+          "windows": 7,
+          "candidates": 7,
+          "rate": 1.0
+        },
+        "emailservice": {
+          "windows": 7,
+          "candidates": 4,
+          "rate": 0.5714285714285714
+        },
+        "paymentservice": {
+          "windows": 1195,
+          "candidates": 5,
+          "rate": 0.0041841004184100415
+        },
+        "productcatalogservice": {
+          "windows": 14,
+          "candidates": 14,
+          "rate": 1.0
+        },
+        "recommendationservice": {
+          "windows": 712,
+          "candidates": 29,
+          "rate": 0.04073033707865169
+        },
+        "shippingservice": {
+          "windows": 7,
+          "candidates": 4,
+          "rate": 0.5714285714285714
+        },
+        "ts-admin-basic-info-service": {
+          "windows": 741,
+          "candidates": 14,
+          "rate": 0.018893387314439947
+        },
+        "ts-admin-order-service": {
+          "windows": 1660,
+          "candidates": 127,
+          "rate": 0.07650602409638554
+        },
+        "ts-admin-route-service": {
+          "windows": 1660,
+          "candidates": 39,
+          "rate": 0.023493975903614458
+        },
+        "ts-admin-travel-service": {
+          "windows": 919,
+          "candidates": 2,
+          "rate": 0.002176278563656148
+        },
+        "ts-admin-user-service": {
+          "windows": 741,
+          "candidates": 74,
+          "rate": 0.09986504723346828
+        },
+        "ts-auth-service": {
+          "windows": 741,
+          "candidates": 41,
+          "rate": 0.0553306342780027
+        },
+        "ts-avatar-service": {
+          "windows": 741,
+          "candidates": 58,
+          "rate": 0.07827260458839407
+        },
+        "ts-basic-service": {
+          "windows": 7,
+          "candidates": 4,
+          "rate": 0.5714285714285714
+        },
+        "ts-contacts-service": {
+          "windows": 14,
+          "candidates": 0,
+          "rate": 0.0
+        },
+        "ts-food-delivery-service": {
+          "windows": 919,
+          "candidates": 18,
+          "rate": 0.01958650707290533
+        },
+        "ts-food-service": {
+          "windows": 881,
+          "candidates": 117,
+          "rate": 0.13280363223609534
+        },
+        "ts-gateway-service": {
+          "windows": 919,
+          "candidates": 918,
+          "rate": 0.998911860718172
+        },
+        "ts-inside-payment-service": {
+          "windows": 1660,
+          "candidates": 604,
+          "rate": 0.363855421686747
+        },
+        "ts-news-service": {
+          "windows": 919,
+          "candidates": 29,
+          "rate": 0.031556039173014146
+        },
+        "ts-order-other-service": {
+          "windows": 919,
+          "candidates": 36,
+          "rate": 0.03917301414581066
+        },
+        "ts-order-service": {
+          "windows": 741,
+          "candidates": 330,
+          "rate": 0.44534412955465585
+        },
+        "ts-payment-service": {
+          "windows": 741,
+          "candidates": 95,
+          "rate": 0.1282051282051282
+        },
+        "ts-preserve-service": {
+          "windows": 7,
+          "candidates": 6,
+          "rate": 0.8571428571428571
+        },
+        "ts-price-service": {
+          "windows": 7,
+          "candidates": 0,
+          "rate": 0.0
+        },
+        "ts-route-plan-service": {
+          "windows": 741,
+          "candidates": 32,
+          "rate": 0.043184885290148446
+        },
+        "ts-route-service": {
+          "windows": 889,
+          "candidates": 69,
+          "rate": 0.07761529808773904
+        },
+        "ts-seat-service": {
+          "windows": 919,
+          "candidates": 302,
+          "rate": 0.32861806311207836
+        },
+        "ts-security-service": {
+          "windows": 7,
+          "candidates": 0,
+          "rate": 0.0
+        },
+        "ts-ticket-office-service": {
+          "windows": 919,
+          "candidates": 14,
+          "rate": 0.015233949945593036
+        },
+        "ts-travel-plan-service": {
+          "windows": 1660,
+          "candidates": 18,
+          "rate": 0.010843373493975903
+        },
+        "ts-travel-service": {
+          "windows": 14,
+          "candidates": 8,
+          "rate": 0.5714285714285714
+        },
+        "ts-travel2-service": {
+          "windows": 754,
+          "candidates": 130,
+          "rate": 0.1724137931034483
+        },
+        "ts-ui-dashboard": {
+          "windows": 919,
+          "candidates": 909,
+          "rate": 0.9891186071817193
+        },
+        "ts-user-service": {
+          "windows": 919,
+          "candidates": 20,
+          "rate": 0.02176278563656148
+        },
+        "ts-verification-code-service": {
+          "windows": 14,
+          "candidates": 5,
+          "rate": 0.35714285714285715
+        },
+        "ts-voucher-service": {
+          "windows": 741,
+          "candidates": 0,
+          "rate": 0.0
+        },
+        "ts-wait-order-service": {
+          "windows": 1660,
+          "candidates": 28,
+          "rate": 0.016867469879518072
+        }
+      },
+      "by_day": {
+        "2022-08-22": {
+          "windows": 2372,
+          "candidates": 1173,
+          "rate": 0.4945193929173693
+        },
+        "2022-08-23": {
+          "windows": 1433,
+          "candidates": 457,
+          "rate": 0.3189113747383112
+        },
+        "2023-01-29": {
+          "windows": 14684,
+          "candidates": 2815,
+          "rate": 0.1917052574230455
+        },
+        "2023-01-30": {
+          "windows": 10409,
+          "candidates": 1232,
+          "rate": 0.1183591123066577
+        }
+      }
+    },
+    "test": {
+      "windows": 46849,
+      "candidates": 13699,
+      "rate": 0.2924075220388909,
+      "scored_windows": 46849,
+      "score_quantiles": {
+        "p10": 0.1657,
+        "p25": 0.2804,
+        "p50": 0.5882,
+        "p75": 0.8853,
+        "p90": 0.9531,
+        "p95": 0.9835,
+        "p99": 0.9941519999999997
+      },
+      "score_mean": 0.5747476018698372,
+      "share_score_ge_threshold": 0.29251424790283675,
+      "by_telemetry": {
+        "no_telemetry": {
+          "windows": 34864,
+          "candidates": 10040,
+          "rate": 0.28797613584212944
+        },
+        "telemetry": {
+          "windows": 11985,
+          "candidates": 3659,
+          "rate": 0.3052982895285774
+        }
+      },
+      "by_label": {
+        "fault": {
+          "windows": 346,
+          "candidates": 224,
+          "rate": 0.6473988439306358
+        },
+        "normal": {
+          "windows": 46503,
+          "candidates": 13475,
+          "rate": 0.2897662516396792
+        }
+      },
+      "by_label_telemetry": {
+        "fault|telemetry": {
+          "windows": 346,
+          "candidates": 224,
+          "rate": 0.6473988439306358
+        },
+        "normal|no_telemetry": {
+          "windows": 34864,
+          "candidates": 10040,
+          "rate": 0.28797613584212944
+        },
+        "normal|telemetry": {
+          "windows": 11639,
+          "candidates": 3435,
+          "rate": 0.2951284474611221
+        }
+      },
+      "by_service": {
+        "adservice": {
+          "windows": 1201,
+          "candidates": 764,
+          "rate": 0.6361365528726062
+        },
+        "cartservice": {
+          "windows": 706,
+          "candidates": 351,
+          "rate": 0.4971671388101983
+        },
+        "checkoutservice": {
+          "windows": 711,
+          "candidates": 691,
+          "rate": 0.9718706047819972
+        },
+        "currencyservice": {
+          "windows": 1893,
+          "candidates": 1892,
+          "rate": 0.9994717379820391
+        },
+        "emailservice": {
+          "windows": 1885,
+          "candidates": 11,
+          "rate": 0.005835543766578249
+        },
+        "frontend": {
+          "windows": 1221,
+          "candidates": 1221,
+          "rate": 1.0
+        },
+        "paymentservice": {
+          "windows": 7,
+          "candidates": 0,
+          "rate": 0.0
+        },
+        "productcatalogservice": {
+          "windows": 1869,
+          "candidates": 1867,
+          "rate": 0.9989299090422686
+        },
+        "recommendationservice": {
+          "windows": 7,
+          "candidates": 0,
+          "rate": 0.0
+        },
+        "shippingservice": {
+          "windows": 691,
+          "candidates": 6,
+          "rate": 0.008683068017366137
+        },
+        "ts-admin-basic-info-service": {
+          "windows": 919,
+          "candidates": 6,
+          "rate": 0.006528835690968444
+        },
+        "ts-admin-travel-service": {
+          "windows": 741,
+          "candidates": 42,
+          "rate": 0.05668016194331984
+        },
+        "ts-admin-user-service": {
+          "windows": 919,
+          "candidates": 73,
+          "rate": 0.0794341675734494
+        },
+        "ts-assurance-service": {
+          "windows": 1660,
+          "candidates": 18,
+          "rate": 0.010843373493975903
+        },
+        "ts-avatar-service": {
+          "windows": 919,
+          "candidates": 30,
+          "rate": 0.03264417845484222
+        },
+        "ts-basic-service": {
+          "windows": 1613,
+          "candidates": 457,
+          "rate": 0.2833230006199628
+        },
+        "ts-cancel-service": {
+          "windows": 1660,
+          "candidates": 545,
+          "rate": 0.32831325301204817
+        },
+        "ts-consign-price-service": {
+          "windows": 1660,
+          "candidates": 77,
+          "rate": 0.0463855421686747
+        },
+        "ts-contacts-service": {
+          "windows": 1599,
+          "candidates": 105,
+          "rate": 0.06566604127579738
+        },
+        "ts-delivery-service": {
+          "windows": 1660,
+          "candidates": 69,
+          "rate": 0.04156626506024096
+        },
+        "ts-execute-service": {
+          "windows": 1660,
+          "candidates": 43,
+          "rate": 0.025903614457831327
+        },
+        "ts-food-service": {
+          "windows": 724,
+          "candidates": 357,
+          "rate": 0.4930939226519337
+        },
+        "ts-news-service": {
+          "windows": 741,
+          "candidates": 60,
+          "rate": 0.08097165991902834
+        },
+        "ts-order-service": {
+          "windows": 919,
+          "candidates": 585,
+          "rate": 0.6365614798694232
+        },
+        "ts-payment-service": {
+          "windows": 919,
+          "candidates": 19,
+          "rate": 0.020674646354733407
+        },
+        "ts-preserve-other-service": {
+          "windows": 1660,
+          "candidates": 1340,
+          "rate": 0.8072289156626506
+        },
+        "ts-preserve-service": {
+          "windows": 1627,
+          "candidates": 1391,
+          "rate": 0.8549477566072526
+        },
+        "ts-price-service": {
+          "windows": 748,
+          "candidates": 14,
+          "rate": 0.01871657754010695
+        },
+        "ts-rebook-service": {
+          "windows": 1660,
+          "candidates": 40,
+          "rate": 0.024096385542168676
+        },
+        "ts-route-service": {
+          "windows": 727,
+          "candidates": 66,
+          "rate": 0.0907840440165062
+        },
+        "ts-seat-service": {
+          "windows": 741,
+          "candidates": 164,
+          "rate": 0.2213225371120108
+        },
+        "ts-security-service": {
+          "windows": 720,
+          "candidates": 100,
+          "rate": 0.1388888888888889
+        },
+        "ts-station-food-service": {
+          "windows": 1660,
+          "candidates": 93,
+          "rate": 0.05602409638554217
+        },
+        "ts-station-service": {
+          "windows": 1660,
+          "candidates": 58,
+          "rate": 0.03493975903614458
+        },
+        "ts-train-food-service": {
+          "windows": 741,
+          "candidates": 15,
+          "rate": 0.020242914979757085
+        },
+        "ts-train-service": {
+          "windows": 1660,
+          "candidates": 31,
+          "rate": 0.018674698795180723
+        },
+        "ts-travel-service": {
+          "windows": 734,
+          "candidates": 319,
+          "rate": 0.43460490463215257
+        },
+        "ts-travel2-service": {
+          "windows": 7,
+          "candidates": 7,
+          "rate": 1.0
+        },
+        "ts-ui-dashboard": {
+          "windows": 741,
+          "candidates": 736,
+          "rate": 0.9932523616734144
+        },
+        "ts-user-service": {
+          "windows": 741,
+          "candidates": 19,
+          "rate": 0.02564102564102564
+        },
+        "ts-verification-code-service": {
+          "windows": 1599,
+          "candidates": 17,
+          "rate": 0.010631644777986242
+        },
+        "ts-voucher-service": {
+          "windows": 919,
+          "candidates": 0,
+          "rate": 0.0
+        }
+      },
+      "by_day": {
+        "2022-08-22": {
+          "windows": 6021,
+          "candidates": 4381,
+          "rate": 0.7276199966782927
+        },
+        "2022-08-23": {
+          "windows": 4170,
+          "candidates": 2422,
+          "rate": 0.5808153477218225
+        },
+        "2023-01-29": {
+          "windows": 18301,
+          "candidates": 3293,
+          "rate": 0.17993552264903556
+        },
+        "2023-01-30": {
+          "windows": 18357,
+          "candidates": 3603,
+          "rate": 0.19627390096420985
+        }
+      }
+    }
+  }
+}
