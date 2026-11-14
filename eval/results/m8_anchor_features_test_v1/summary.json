@@ -1,0 +1,38 @@
+{
+  "config": {
+    "kind": "anchor_features",
+    "run_id": "m8_anchor_features_test_v1",
+    "runs": [
+      "h0_test_bm25_v1",
+      "h0_test_c1_k0_v1"
+    ],
+    "rolling": {
+      "lookback_minutes": 60,
+      "guard_seconds": 60,
+      "min_spans": 30
+    },
+    "percentiles": [
+      90,
+      95,
+      99
+    ],
+    "dev_baseline": "data/span_baseline.parquet"
+  },
+  "index_seconds": 78.8,
+  "runs": {
+    "h0_test_bm25_v1": {
+      "trace": 13992,
+      "trace_rolling_covered": 13364,
+      "trace_dev_covered": 2676,
+      "log": 5730
+    },
+    "h0_test_c1_k0_v1": {
+      "trace": 18928,
+      "trace_rolling_covered": 17261,
+      "trace_dev_covered": 3044,
+      "log": 866
+    }
+  },
+  "wall_seconds": 90.9,
+  "git_commit": "0c7689eb90b61220137e9090d46e72d371351bb5\nmodified tracked files at run time:\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py"
+}
