@@ -123,6 +123,13 @@ M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`r
 **Trạng thái:** người dùng báo đã gửi GVHD (V29), chốt V33 (a), V34 (b), V27 toàn bộ, V26 đóng (QĐ-034). Mục
 đăng ký H0–H5 commit riêng `be2b985` trước mọi lệnh chạm `test`. M7 đóng, M8 mở.
 **Việc đang làm:** M8 việc 1–3 (xem danh sách trên).
+**Cập nhật 15:45:** BM25 xong (8,87 USD theo token). `h0_test_c1_k0_v1` đang chạy (tiến trình sống sót qua lần phiên bị ngắt 15:40 —
+không chạy lại). Chuỗi nền 1: chờ C1 → `h0_test_norag` → `m8_anchor_features_test` → `ctav_final_test` → `m8_finding11_test_v1` →
+`h0_test_compare_v1`, `h0_test_compare_c1ref_v1` → `m8_test_tables_v1`. Chuỗi 2 (chạy sau chuỗi 1): C5 một điểm → `repeat` ×4 →
+`m8_test_tables_v2` → mẫu context precision → ba bản `_b120`. **Chưa xong phần API** (phiên khác vẫn dùng backend `mock`).
+**Ngân sách:** người dùng báo đã tốn ≈ 300.000 đ sau BM25 (≈ 28.000–33.800 đ cho mỗi USD theo token, tùy thời điểm đọc); dự phóng cả
+M8 440–570 nghìn đ, có thể vượt ngưỡng dừng 20 USD (≈ 520 nghìn đ). **Người dùng đồng ý chạy tiếp `repeat` và C5 dù vượt ngưỡng**
+(2026-11-14, ghi lại ở QĐ-037 cùng kết quả).
 
 ## Ghi chú bàn giao — phiên 2026-11-11 (tiếp, M7)
 
