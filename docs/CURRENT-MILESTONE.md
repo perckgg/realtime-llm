@@ -54,8 +54,8 @@ commit `be2b985`). Không chỉnh tham số nào sau khi xem `test`; mọi lệc
 
 1. - [x] Tạo config `test` #1–#8 (sao từ bản `val`, chỉ đổi `split: test`, `g_test: true`, `run_id`) — `30f3f92`, `e6a71cb`, `48ee7f5`
 2. - [x] Đếm candidate `test` (detector-only, 0 USD) ⇒ ước số lần gọi và chi phí trước khi gọi API — 13.699 candidate, ước 14,8–16,4 USD (QĐ-035, `a6d044f`)
-3. - [ ] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2 — **đang chạy nền từ 2026-11-14 12:26** (`h0_test_bm25_v1`)
-4. - [ ] `h0_test_c1_k0`, `h0_test_norag`, ba bản `_b120` (100% cache)
+3. - [x] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2 — `h0_test_bm25_v1` xong 15:20: 13.699 lần gọi API, 0 lỗi, **8,87 USD theo token** (ước 7,8; prompt có bằng chứng 0,00165 USD/lần thay vì 0,00121)
+4. - [ ] `h0_test_c1_k0`, `h0_test_norag`, ba bản `_b120` (100% cache) — `h0_test_c1_k0_v1` **đang chạy nền từ 15:21**
 5. - [ ] `m8_anchor_features_test`, `ctav_final_test` (replay + ablation +C2, bỏ C3, +C4, C3-trượt; 0 USD)
 6. - [ ] C5 một điểm: `m8_rescue_{features,plan}_test`, `m8_rescue_test_c1`, `m8_rescue_test` (≈ 1 USD)
 7. - [ ] `repeat` 1, 2 trên tập con 200 cửa sổ telemetry (seed 42) của BM25, C1

@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 34,
+      "fp": 369,
+      "fn": 312,
+      "tn": 11270,
+      "precision": 0.08436724565756824,
+      "recall": 0.09826589595375723,
+      "f1": 0.09078771695594125,
+      "fpr": 0.03170375461809434,
+      "precision_ci95": [
+        0.05817023602717767,
+        0.11112459546925564
+      ],
+      "recall_ci95": [
+        0.06963304704425875,
+        0.13018065268065268
+      ],
+      "f1_ci95": [
+        0.06393295123661895,
+        0.11905070318282752
+      ],
+      "fpr_ci95": [
+        0.02848928735024051,
+        0.03496688674119867
+      ]
+    },
+    "detector_only": {
+      "tp": 224,
+      "fp": 3435,
+      "fn": 122,
+      "tn": 8204,
+      "precision": 0.06121891227111233,
+      "recall": 0.6473988439306358,
+      "f1": 0.11186017478152309,
+      "fpr": 0.2951284474611221,
+      "precision_ci95": [
+        0.05449515905947441,
+        0.06915857886557042
+      ],
+      "recall_ci95": [
+        0.6011102985173858,
+        0.6992441557568525
+      ],
+      "f1_ci95": [
+        0.10009845100909141,
+        0.12550660246972928
+      ],
+      "fpr_ci95": [
+        0.2870482792548904,
+        0.30361100772433586
+      ]
+    },
+    "operations": {
+      "windows": 11985,
+      "fault_windows": 346,
+      "candidates": 3659,
+      "retrieval_calls": 3659,
+      "llm_calls": 3659,
+      "api_calls": 3659,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 208,
+      "context_coverage": 0.6473988439306358,
+      "candidate_context_coverage": 0.8983328778354742,
+      "avg_context_events": 5.389997267012845,
+      "avg_context_tokens": 41.89805957911998,
+      "retrieval_latency_ms_avg": 838.7838723694998,
+      "retrieval_latency_ms_p95": 3632.381,
+      "llm_latency_ms_avg": 2842.9258133369776,
+      "llm_latency_ms_p95": 3849.252,
+      "prompt_tokens": 7269460,
+      "completion_tokens": 1344920,
+      "estimated_cost_usd": 5.543137999999999,
+      "downgraded_by_evidence_rule": 89,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 34,
+      "fp": 369,
+      "fn": 312,
+      "tn": 46134,
+      "precision": 0.08436724565756824,
+      "recall": 0.09826589595375723,
+      "f1": 0.09078771695594125,
+      "fpr": 0.007934971937294368,
+      "precision_ci95": [
+        0.058108711650927236,
+        0.111681302258945
+      ],
+      "recall_ci95": [
+        0.06937614145774532,
+        0.12991942178821153
+      ],
+      "f1_ci95": [
+        0.06362259899425682,
+        0.11838873790269125
+      ],
+      "fpr_ci95": [
+        0.0071326588576850185,
+        0.008752147047138486
+      ]
+    },
+    "detector_only": {
+      "tp": 224,
+      "fp": 13475,
+      "fn": 122,
+      "tn": 33028,
+      "precision": 0.016351558507920288,
+      "recall": 0.6473988439306358,
+      "f1": 0.031897472410110365,
+      "fpr": 0.2897662516396792,
+      "precision_ci95": [
+        0.014451906266755925,
+        0.018541788110710212
+      ],
+      "recall_ci95": [
+        0.6,
+        0.7016586357358111
+      ],
+      "f1_ci95": [
+        0.028232332861263122,
+        0.03609603541741651
+      ],
+      "fpr_ci95": [
+        0.28565701822352146,
+        0.29369602319274024
+      ]
+    },
+    "operations": {
+      "windows": 46849,
+      "fault_windows": 346,
+      "candidates": 13699,
+      "retrieval_calls": 13699,
+      "llm_calls": 13699,
+      "api_calls": 13699,
+      "cache_hits": 0,
+      "cache_hit_rate": 0.0,
+      "manual_review": 4658,
+      "context_coverage": 0.6473988439306358,
+      "candidate_context_coverage": 0.23994452149791956,
+      "avg_context_events": 1.4396671289875174,
+      "avg_context_tokens": 11.190962844003211,
+      "retrieval_latency_ms_avg": 224.08802795824514,
+      "retrieval_latency_ms_p95": 1676.812,
+      "llm_latency_ms_avg": 5409.647292430104,
+      "llm_latency_ms_p95": 3453.297,
+      "prompt_tokens": 13304247,
+      "completion_tokens": 1952107,
+      "estimated_cost_usd": 8.8715416,
+      "downgraded_by_evidence_rule": 972,
+      "judge_errors": 0
+    }
+  }
+}
