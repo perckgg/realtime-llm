@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Ngày đóng mốc | **chưa đóng** — Rescue xong 2026-11-11; đăng ký giả thuyết là bản nháp, chờ V29, V33, V34 |
-| Hạn mục tiêu | 2026-12-13 |
-| Kết luận | Việc 1–2 xong; việc 3 (đăng ký) **chưa** — DoD M7 chưa đạt |
-| Commit | xem `git log` ("M7: Rescue Score ..." và "M7: draft hypothesis registration") |
-| Quyết định liên quan | QĐ-032, **QĐ-033**, mục "Đăng ký giả thuyết H0–H5" cuối `docs/experiment-log.md` |
+| Ngày đóng mốc | 2026-11-14 (Rescue xong 2026-11-11; đăng ký giả thuyết commit `be2b985`) |
+| Hạn mục tiêu | 2026-12-13 (sớm 29 ngày) |
+| Kết luận | QUA — DoD đạt: H0–H5 đã đăng ký và commit trước khi chạm `test` (QĐ-034) |
+| Commit | `dd45bb8` (Rescue), `3ccacf7` (nháp đăng ký), `be2b985` (đăng ký chính thức) |
+| Quyết định liên quan | QĐ-032, **QĐ-033**, **QĐ-034**, mục "Đăng ký giả thuyết H0–H5" cuối `docs/experiment-log.md` |
 
 ## 1. Kết quả hiện tại
 
@@ -15,8 +15,8 @@
 | 1. Tính trước Λ_log, Φ_topo, Δ_time cho mọi cửa sổ | Có | `scripts/build_rescue_features.py` → `eval/results/m7_rescue_features_val_v1/` (28.898 cửa sổ, 0 LLM) |
 | 2. Quét 147 tổ hợp, đường τ, giữ 3 hay rút 2 | Có | `eval/results/m7_rescue_val_v1/` (`rescue.json`, `points.csv`); **rút về 2** (Φ_topo, Δ_time) |
 | 2b. Chỉ chấm cửa sổ được cứu | Có | `m7_rescue_val_c1_v1`: 1.459 lần gọi, 1,03 USD theo token, 0 lỗi |
-| 3. Đăng ký H0–H5 + danh sách config `test`, commit riêng | **Nháp** | Cuối `docs/experiment-log.md`; chờ V29, V33, V34 |
-| DoD: giả thuyết commit trước khi chạm `test` | Chưa | `test` chưa bị chạm (không config nào dùng `split: test`) |
+| 3. Đăng ký H0–H5 + danh sách config `test`, commit riêng | Có | Cuối `docs/experiment-log.md`, "ĐÃ ĐĂNG KÝ 2026-11-14"; commit `be2b985` chỉ chứa mục này và QĐ-034 |
+| DoD: giả thuyết commit trước khi chạm `test` | Có | Tại `be2b985` không có config nào dùng `split: test` và không có thư mục kết quả `test` |
 
 **Cách làm.** A = cảnh báo của chính CTAV chốt (không nhãn, nhân quả, 300 s). Cửa sổ được cứu không quay lại A
 ⇒ cả lưới tính offline; hợp 1.459 cửa sổ được cứu của 147 tổ hợp (đều khả thi, ≤ +50% lần gọi) chấm một lần
@@ -54,19 +54,19 @@ cửa sổ > 0) vì log lỗi của Nezha nằm ở pod không có cửa sổ (`
 
 | # | Vấn đề | Phương án | Khuyến nghị | Chặn mốc sau? |
 |---|---|---|---|---|
-| V29 | GVHD chưa biết V28 (b), việc bỏ C2/C4 (QĐ-031), nay thêm kết quả C5 (QĐ-033) | Báo GVHD cùng lúc | Báo trước khi chốt đăng ký | **Đăng ký → M8** |
-| V33 | δ trong vế "recall ≥ C1 − δ" của H2 | (a) δ = 0,05 cố định; (b) δ = ½ mức tăng recall của C1 so với BM25 đo trên `test`; (c) giá trị khác | (a) — chọn trước, không nhìn theo `val` (trên `val` CTAV cần δ ≥ 0,124 nên vế này dự kiến không đạt, đúng tinh thần V32 (a)) | Đăng ký |
-| V34 | Vai trò C5 ở M8 | (a) theo quy tắc: phương pháp chính = CTAV + C5; (b) phương pháp chính = CTAV, C5 chỉ là ablation H3 (một điểm, không quét); (c) bỏ C5, không chạy trên `test` | (b) — ΔF1 không có ý nghĩa, FPR tệ hơn có ý nghĩa; vẫn đo trên `test` để luận văn có kết quả C5 (≈ 1 USD) | Đăng ký |
+| ~~V29~~ | GVHD chưa biết V28 (b), việc bỏ C2/C4 (QĐ-031), nay thêm kết quả C5 (QĐ-033) | Báo GVHD cùng lúc | **Đã gửi 2026-11-14** (QĐ-034); phản hồi của GVHD ghi QĐ mới | |
+| ~~V33~~ (chốt (a), QĐ-034) | δ trong vế "recall ≥ C1 − δ" của H2 | (a) δ = 0,05 cố định; (b) δ = ½ mức tăng recall của C1 so với BM25 đo trên `test`; (c) giá trị khác | (a) — chọn trước, không nhìn theo `val` (trên `val` CTAV cần δ ≥ 0,124 nên vế này dự kiến không đạt, đúng tinh thần V32 (a)) | Đăng ký |
+| ~~V34~~ (chốt (b), QĐ-034) | Vai trò C5 ở M8 | (a) theo quy tắc: phương pháp chính = CTAV + C5; (b) phương pháp chính = CTAV, C5 chỉ là ablation H3 (một điểm, không quét); (c) bỏ C5, không chạy trên `test` | (b) — ΔF1 không có ý nghĩa, FPR tệ hơn có ý nghĩa; vẫn đo trên `test` để luận văn có kết quả C5 (≈ 1 USD) | Đăng ký |
 | V30 | Nguồn ngưỡng nền C3 (agent tự quyết ở M6) | | Bạn xác nhận | Không |
-| V26 | Billing chưa đối chiếu | | Như cũ | Không |
-| V27 | Phạm vi chấm `test` ở M8 | | Quyết định khi mở M8 | M8 |
+| ~~V26~~ | Billing chưa đối chiếu | | Đóng (QĐ-034): billing đã reset, số dư ≈ 1.000.000 đ ≈ 38 USD | |
+| ~~V27~~ | Phạm vi chấm `test` ở M8 | | Chốt **toàn bộ candidate** (QĐ-034) | |
 
 ## 4. Plan cho mốc tiếp theo
 
-- Đóng M7: bạn báo GVHD (V29), chốt V33, V34 ⇒ agent sửa bản nháp thành "ĐÃ ĐĂNG KÝ", commit riêng.
+- M7 đã đóng 2026-11-14 (QĐ-034).
 - M8 (G-test): tạo config `test` theo danh sách đăng ký; chạy BM25, C1, không-RAG một lần; build anchor
-  features `test`; replay CTAV + ablation; C5 theo V34; compare + McNemar. Ngân sách M8 17 USD (8 nếu V27
-  "chỉ telemetry"), cộng ≈ 1 USD nếu chạy C5.
+  features `test`; replay CTAV + ablation; C5 theo V34; compare + McNemar. Ngân sách M8 17 USD (V27 toàn bộ) + ≈ 1 USD cho C5
+  (V34 (b)); số dư credit ≈ 38 USD.
 - Rủi ro: Phát hiện 11 (15 service không có ngưỡng `dev`) — nếu `test` nhiều service này thì CTAV mất recall.
 
 ## Phụ lục
