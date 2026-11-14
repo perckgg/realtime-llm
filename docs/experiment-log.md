@@ -1736,21 +1736,38 @@ py -m eval rescue --config eval/configs/m7_rescue_val.yaml                      
 ```
 (Mỗi lệnh cần `run_id` mới nếu thư mục kết quả đã có.)
 
-## Đăng ký giả thuyết H0–H5 (M7) — **BẢN NHÁP, chờ V29 (GVHD), V33, V34**
+## QĐ-034 — V29 đã gửi, V33 (a), V34 (b), V27 toàn bộ, V26 đóng; đăng ký giả thuyết, đóng M7, mở M8 (2026-11-14)
 
-> Trạng thái: **nháp**, 2026-11-11. Chỉ thành bản đăng ký khi (1) GVHD đã được báo V28 (b), việc bỏ C2/C4
-> (QĐ-031) và kết quả C5 (QĐ-033) — V29; (2) người dùng chốt δ (V33) và vai trò C5 (V34). Khi chốt: sửa dòng
-> trạng thái thành "ĐÃ ĐĂNG KÝ <ngày>", commit riêng, **trước** mọi lệnh chạm `test`. Sau đó không sửa mục này;
-> mọi lệch khi chạy M8 ghi thành QĐ mới.
+**Người dùng chốt (2026-11-14).**
+- **V29:** đã gửi GVHD nội dung V28 (b), việc H3 bỏ C2, C4 (QĐ-031) và kết quả C5 (QĐ-033). Điều kiện của bản
+  đăng ký là GVHD **đã được báo**; phản hồi của GVHD (nếu có) ghi thành QĐ mới, không sửa bản đăng ký.
+- **V33 → (a):** δ = 0,05 cố định trong vế "recall ≥ C1 − δ" của H2 (người dùng chốt theo khuyến nghị của báo
+  cáo M7 §3).
+- **V34 → (b):** phương pháp chính = CTAV (`ctav_final.yaml`); C5 chỉ là một điểm ablation của H3 trên `test`
+  (η = (0; 0,4; 0,6), τ = 0,8, không quét) (người dùng chốt theo khuyến nghị của báo cáo M7 §3).
+- **V27 → toàn bộ:** M8 chấm mọi candidate của `test` (như H0 trên `val`), không giới hạn ở cửa sổ có telemetry.
+- **V26 → đóng:** người dùng báo billing đã reset; số dư credit còn ≈ 1.000.000 đ ≈ 38 USD (≈ 26.000 đ/USD).
+  Bảng ngân sách tính lại từ số dư này; không đối chiếu ngược các lần chạy trước.
+
+**Đóng M7.** DoD đạt khi mục "Đăng ký giả thuyết H0–H5" dưới đây được commit riêng trước mọi lệnh chạm `test`.
+**Mở M8** (G-test) sau commit đó.
+
+## Đăng ký giả thuyết H0–H5 (M7) — **ĐÃ ĐĂNG KÝ 2026-11-14**
+
+> Trạng thái: **ĐÃ ĐĂNG KÝ 2026-11-14** (QĐ-034): GVHD đã được báo V28 (b), việc bỏ C2/C4 (QĐ-031) và kết quả
+> C5 (QĐ-033) — V29; người dùng chốt δ = 0,05 (V33 (a)), C5 chỉ là ablation (V34 (b)), chấm toàn bộ candidate
+> (V27). Mục này được commit riêng **trước** mọi lệnh chạm `test` và **không sửa** sau đó; mọi lệch khi chạy
+> M8 ghi thành QĐ mới.
 
 **Phương pháp đóng băng.** CTAV = `eval/configs/ctav_final.yaml`: C1-paper (`k_graph` 0) cho mọi candidate →
 judge `gemini-2.5-flash`, temperature 0, `repeat` 0 → θ 0,80, `require_evidence` → C3 (log ERROR/WARN hoặc
 span vượt ngưỡng `dev` p90 của `data/span_baseline.parquet` của chính service). Detector IForest ngưỡng 0,85
-fit trên `dev`. C2, C4 đã bỏ (QĐ-031). C5 theo V34 (đề xuất: chỉ là ablation, tham số chốt η = (0; 0,4; 0,6),
-τ = 0,8 — QĐ-033). Không tham số nào được chỉnh sau khi xem `test`.
+fit trên `dev`. C2, C4 đã bỏ (QĐ-031). C5 **không** thuộc phương pháp chính (V34 (b)): chỉ là một điểm ablation
+của H3, tham số chốt η = (0; 0,4; 0,6), τ = 0,8 (QĐ-033). Không tham số nào được chỉnh sau khi xem `test`.
 
 **Giao thức chung.**
-- `test` chạy một lần (G-test, M8). Chỉ số chính: cửa sổ có telemetry (QĐ-016/017); "mọi cửa sổ" là phụ.
+- `test` chạy một lần (G-test, M8). Phạm vi chấm: **toàn bộ candidate** của `test` (V27). Chỉ số chính: cửa sổ
+  có telemetry (QĐ-016/017); "mọi cửa sổ" là phụ.
 - CI 95% bootstrap (1.000 mẫu, seed 42) cho chỉ số và hiệu ghép cặp; McNemar chính xác hai phía, α = 0,05.
   H2 là giả thuyết chính; H0, H3, H4 là phụ — báo p thô, không hiệu chỉnh đa so sánh, ghi rõ trong luận văn.
 - Cùng judge, prompt, temperature cho mọi phương pháp. Phương sai LLM: `repeat` 1, 2 trên tập con 200 cửa sổ
@@ -1761,7 +1778,7 @@ fit trên `dev`. C2, C4 đã bỏ (QĐ-031). C5 theo V34 (đề xuất: chỉ l�
 |---|---|---|---|
 | **H0** | Topology chưa hiệu chỉnh tăng recall và tăng FPR so với BM25 | C1 − BM25 | CI ΔRecall có cận dưới > 0 **và** CI ΔFPR có cận dưới > 0; McNemar fault, normal p < 0,05 |
 | **H1** | (Cơ chế — đã kiểm trên mẫu `val` ở M5, QĐ-028: giữ một phần) | Không chạy lại trên `test` | — |
-| **H2** (chính) | CTAV tốt hơn BM25 | CTAV − BM25; phụ: CTAV − C1, − LLM-không-RAG, − detector-only | (i) CI ΔF1(CTAV − BM25) cận dưới > 0 và McNemar p < 0,05; (ii) FPR không tệ hơn BM25 có ý nghĩa: CI ΔFPR(CTAV − BM25) **không** có cận dưới > 0; (iii) recall ≥ C1 − δ: ước lượng điểm ΔRecall(CTAV − C1) ≥ −δ, **δ = 0,05** (đề xuất, V33; báo kèm CI). Báo riêng từng vế; vế (iii) không đạt thì ghi "H2 đạt một phần" (V32 (a)) |
+| **H2** (chính) | CTAV tốt hơn BM25 | CTAV − BM25; phụ: CTAV − C1, − LLM-không-RAG, − detector-only | (i) CI ΔF1(CTAV − BM25) cận dưới > 0 và McNemar p < 0,05; (ii) FPR không tệ hơn BM25 có ý nghĩa: CI ΔFPR(CTAV − BM25) **không** có cận dưới > 0; (iii) recall ≥ C1 − δ: ước lượng điểm ΔRecall(CTAV − C1) ≥ −δ, **δ = 0,05** (V33 (a); báo kèm CI). Báo riêng từng vế; vế (iii) không đạt thì ghi "H2 đạt một phần" (V32 (a)) |
 | **H3** | Mỗi thành phần còn lại đóng góp; thành phần đã bỏ không đóng góp | Một-thay-đổi-một-lần quanh CTAV | **C3:** bỏ C3 ⇒ CI ΔPrecision cận trên < 0. **C2** (thêm θ_topo 0,85): xác nhận bỏ nếu CI ΔFPR chứa 0 hoặc > 0. **C4** (thêm, `fp_confidence` 0,95): xác nhận bỏ nếu chi phí tăng và CI ΔF1 không có cận dưới > 0. **C3-trượt** (V31): báo ΔF1, ΔFPR, số service không neo được. **C5** (QĐ-033): báo ΔRecall, ΔFPR, +lần gọi |
 | **H4** | Ở ngân sách nhỏ CTAV không kém LLM-không-RAG | Ngân sách 120 lần gọi theo thứ tự thời gian; đường {120, 250, 500, 1.000, 2.000, 4.000, đủ} | Ước lượng điểm F1(CTAV) ≥ F1(không-RAG) ở 120; báo CI và đường F1 của CTAV, BM25, C1, không-RAG |
 | **H5** | Tác tử RCA định vị đúng service gốc | Incident `test` gom từ cảnh báo CTAV của M8 (grouping `01` §6.5); baseline "service có anomaly score cao nhất" | Hit@1 ≥ 0,60, Hit@3 ≥ 0,80, CI ΔHit@1 (RCA − baseline) cận dưới > 0; Alert Reduction ≥ 30% trên incident cascade. Chạy sau M9 |
