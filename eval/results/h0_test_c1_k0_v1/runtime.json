@@ -1,0 +1,16 @@
+{
+  "run_id": "h0_test_c1_k0_v1",
+  "finished_at": "2026-11-14T08:53:15.041120+00:00",
+  "wall_seconds": 1953.1,
+  "detector_fit_seconds": 38.3,
+  "replay_and_retrieval_seconds": 830.9,
+  "judge_seconds": 1082.7,
+  "judge_workers": 8,
+  "retrieval_workers": 6,
+  "evaluated_windows": 46849,
+  "llm_calls": 13699,
+  "api_calls": 3299,
+  "cache_hit_rate": 0.7591795021534419,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 0
+}

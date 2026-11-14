@@ -1,0 +1,158 @@
+{
+  "telemetry": {
+    "pipeline": {
+      "tp": 96,
+      "fp": 1235,
+      "fn": 250,
+      "tn": 10404,
+      "precision": 0.07212622088655146,
+      "recall": 0.2774566473988439,
+      "f1": 0.11449016100178891,
+      "fpr": 0.10610877223129135,
+      "precision_ci95": [
+        0.05850828740575989,
+        0.08533351236458381
+      ],
+      "recall_ci95": [
+        0.22950443675740714,
+        0.32121505917904813
+      ],
+      "f1_ci95": [
+        0.09318864642631247,
+        0.13483302644269915
+      ],
+      "fpr_ci95": [
+        0.10067926483637177,
+        0.1118373856897794
+      ]
+    },
+    "detector_only": {
+      "tp": 224,
+      "fp": 3435,
+      "fn": 122,
+      "tn": 8204,
+      "precision": 0.06121891227111233,
+      "recall": 0.6473988439306358,
+      "f1": 0.11186017478152309,
+      "fpr": 0.2951284474611221,
+      "precision_ci95": [
+        0.05449515905947441,
+        0.06915857886557042
+      ],
+      "recall_ci95": [
+        0.6011102985173858,
+        0.6992441557568525
+      ],
+      "f1_ci95": [
+        0.10009845100909141,
+        0.12550660246972928
+      ],
+      "fpr_ci95": [
+        0.2870482792548904,
+        0.30361100772433586
+      ]
+    },
+    "operations": {
+      "windows": 11985,
+      "fault_windows": 346,
+      "candidates": 3659,
+      "retrieval_calls": 3659,
+      "llm_calls": 3659,
+      "api_calls": 3299,
+      "cache_hits": 360,
+      "cache_hit_rate": 0.09838753757857338,
+      "manual_review": 201,
+      "context_coverage": 0.6473988439306358,
+      "candidate_context_coverage": 0.9016124624214267,
+      "avg_context_events": 5.409674774528559,
+      "avg_context_tokens": 35.22410494670675,
+      "retrieval_latency_ms_avg": 393.963708936868,
+      "retrieval_latency_ms_p95": 1138.1,
+      "llm_latency_ms_avg": 2364.627935774802,
+      "llm_latency_ms_p95": 3250.074,
+      "prompt_tokens": 6702033,
+      "completion_tokens": 1127621,
+      "estimated_cost_usd": 4.8296624,
+      "downgraded_by_evidence_rule": 87,
+      "judge_errors": 0
+    }
+  },
+  "all": {
+    "pipeline": {
+      "tp": 96,
+      "fp": 1235,
+      "fn": 250,
+      "tn": 45268,
+      "precision": 0.07212622088655146,
+      "recall": 0.2774566473988439,
+      "f1": 0.11449016100178891,
+      "fpr": 0.026557426402597683,
+      "precision_ci95": [
+        0.058598493643188324,
+        0.08607202142911038
+      ],
+      "recall_ci95": [
+        0.2309781058336899,
+        0.3241795366795367
+      ],
+      "f1_ci95": [
+        0.09425020290096352,
+        0.13522052748591554
+      ],
+      "fpr_ci95": [
+        0.025090476442409217,
+        0.028094280280372905
+      ]
+    },
+    "detector_only": {
+      "tp": 224,
+      "fp": 13475,
+      "fn": 122,
+      "tn": 33028,
+      "precision": 0.016351558507920288,
+      "recall": 0.6473988439306358,
+      "f1": 0.031897472410110365,
+      "fpr": 0.2897662516396792,
+      "precision_ci95": [
+        0.014451906266755925,
+        0.018541788110710212
+      ],
+      "recall_ci95": [
+        0.6,
+        0.7016586357358111
+      ],
+      "f1_ci95": [
+        0.028232332861263122,
+        0.03609603541741651
+      ],
+      "fpr_ci95": [
+        0.28565701822352146,
+        0.29369602319274024
+      ]
+    },
+    "operations": {
+      "windows": 46849,
+      "fault_windows": 346,
+      "candidates": 13699,
+      "retrieval_calls": 13699,
+      "llm_calls": 13699,
+      "api_calls": 3299,
+      "cache_hits": 10400,
+      "cache_hit_rate": 0.7591795021534419,
+      "manual_review": 4651,
+      "context_coverage": 0.6473988439306358,
+      "candidate_context_coverage": 0.24082049784655815,
+      "avg_context_events": 1.444922987079349,
+      "avg_context_tokens": 9.408350974523687,
+      "retrieval_latency_ms_avg": 105.34547974304694,
+      "retrieval_latency_ms_p95": 619.078,
+      "llm_latency_ms_avg": 631.6404509088255,
+      "llm_latency_ms_p95": 2953.797,
+      "prompt_tokens": 12736820,
+      "completion_tokens": 1734808,
+      "estimated_cost_usd": 8.158066,
+      "downgraded_by_evidence_rule": 970,
+      "judge_errors": 0
+    }
+  }
+}
