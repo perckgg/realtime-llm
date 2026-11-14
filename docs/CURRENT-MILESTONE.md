@@ -52,9 +52,9 @@ commit `be2b985`). Không chỉnh tham số nào sau khi xem `test`; mọi lệc
 
 ### Việc (chi tiết ở `04` M8 và danh sách config đã đăng ký)
 
-1. - [ ] Tạo config `test` #1–#8 (sao từ bản `val`, chỉ đổi `split: test`, `g_test: true`, `run_id`)
-2. - [ ] Đếm candidate `test` (detector-only, 0 USD) ⇒ ước số lần gọi và chi phí trước khi gọi API
-3. - [ ] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2
+1. - [x] Tạo config `test` #1–#8 (sao từ bản `val`, chỉ đổi `split: test`, `g_test: true`, `run_id`) — `30f3f92`, `e6a71cb`, `48ee7f5`
+2. - [x] Đếm candidate `test` (detector-only, 0 USD) ⇒ ước số lần gọi và chi phí trước khi gọi API — 13.699 candidate, ước 14,8–16,4 USD (QĐ-035, `a6d044f`)
+3. - [ ] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2 — **đang chạy nền từ 2026-11-14 12:26** (`h0_test_bm25_v1`)
 4. - [ ] `h0_test_c1_k0`, `h0_test_norag`, ba bản `_b120` (100% cache)
 5. - [ ] `m8_anchor_features_test`, `ctav_final_test` (replay + ablation +C2, bỏ C3, +C4, C3-trượt; 0 USD)
 6. - [ ] C5 một điểm: `m8_rescue_{features,plan}_test`, `m8_rescue_test_c1`, `m8_rescue_test` (≈ 1 USD)
