@@ -1,0 +1,51 @@
+# M8 / G-test, config đăng ký #8 (QĐ-034): phương sai của judge — `repeat` 1 của h0_test_c1_k0 trên
+# tập con cố định 200 candidate có telemetry (chọn không dùng nhãn hay verdict). Chỉ để báo độ lệch,
+# không dùng để quyết định giả thuyết. Ước ≈ 200 lần gọi API mỗi run.
+# Sao từ h0_test_c1_k0.yaml; đổi run_id, split → window_set, thêm judge.repeat.
+run_id: h0_test_c1_k0_rep1_v1
+seed: 42
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+window_set:  # 200 candidate có telemetry của `test`, seed 42 (scripts/make_repeat_subset.py)
+  path: eval/samples/m8_repeat_test_v1.csv
+  role: evaluated
+  labels: dataset
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+retrieval:
+  type: hybrid_bm25_graph
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  workers: 6
+  params:
+    bm25_pool: window
+    alpha: 0.35
+    beta: 0.25
+    gamma: 0.40
+    tau_seconds: 300
+    bm25_k: 60
+    graph_max_distance: 2
+    graph_per_service_limit: 20
+    time_margin_minutes: 8
+    engine: vectorized
+    k_graph: 0
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  repeat: 1  # khóa cache riêng ⇒ gọi API thật (QĐ-013)
+  require_evidence: true
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]
