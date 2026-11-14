@@ -1,0 +1,19 @@
+# M8 (QĐ-034): đếm candidate trên `test` trước khi gọi API (quy tắc ngân sách 1). Chỉ chạy detector
+# (đúng cấu hình của val_detector_count); không retrieval, không judge, 0 USD.
+run_id: m8_test_detector_count_v1
+seed: 42
+split: test
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+time_source: wall
+stages: detector
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  contamination: 0.05
+  n_estimators: 100
+  random_state: 42
+  fit:
+    strategy: split
+    split: dev

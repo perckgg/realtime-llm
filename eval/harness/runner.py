@@ -96,6 +96,9 @@ def load_config(path: Path) -> dict[str, Any]:
             raise ValueError(f"{path}: missing `{key}`")
     if ("split" in config) == ("window_set" in config):
         raise ValueError(f"{path}: give exactly one of `split` or `window_set`")
+    if config.get("split") == "test" and not config.get("g_test", False):
+        # Rule 2 (AGENTS.md): no `test` before M8 and the hypothesis registration of M7 (QD-034).
+        raise ValueError(f"{path}: split test is only allowed at M8 (set g_test: true there)")
     if config.get("split") in {"val", "test"}:
         # QD-016/QD-021: GD1-parity switches read labels or label-filtered data.
         if (config.get("retrieval") or {}).get("parity_query_terms"):

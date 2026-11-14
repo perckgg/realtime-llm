@@ -1,0 +1,33 @@
+# M8 / G-test, config đăng ký #3 (QĐ-034): LLM-không-RAG trên `test` (require_evidence = false).
+# Sao từ h0_val_norag.yaml; chỉ đổi run_id, split, g_test.
+run_id: h0_test_norag_v1
+seed: 42
+split: test
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+time_source: wall
+
+detector:
+  type: isolation_forest
+  threshold: 0.85
+  buffer_size: 2
+  fit:
+    strategy: split
+    split: dev
+
+evidence:
+  store: nezha
+retrieval:
+  type: none
+  top_k: 6
+  max_tokens: 4000
+  timeout_ms: 500
+  params: {}
+judge:
+  backend: api
+  model: gemini-2.5-flash
+  temperature: 0
+  require_evidence: false
+  confidence_threshold: 0.80
+  max_calls_per_minute: 200
+  workers: 8
+  drop_metrics: ["PodSuccessRate(%)"]

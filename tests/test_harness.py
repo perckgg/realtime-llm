@@ -265,3 +265,16 @@ def test_parity_switches_are_forbidden_on_val_and_test(tmp_path: Path, extra: di
             load_config(path)
     path.write_text(yaml.safe_dump({"run_id": "x", "split": "dev", "detector": {}, **extra}), encoding="utf-8")
     load_config(path)  # allowed on dev (parity checks)
+
+
+def test_split_test_needs_g_test_flag(tmp_path: Path):
+    """QD-034: the runner refuses `split: test` unless the config says it is the M8 G-test run."""
+    import yaml
+
+    base = {"run_id": "x", "split": "test", "detector": {}, "retrieval": {"type": "bm25_hybrid"}, "judge": {}}
+    path = tmp_path / "c.yaml"
+    path.write_text(yaml.safe_dump(base), encoding="utf-8")
+    with pytest.raises(ValueError, match="g_test"):
+        load_config(path)
+    path.write_text(yaml.safe_dump({**base, "g_test": True}), encoding="utf-8")
+    assert load_config(path)["split"] == "test"
