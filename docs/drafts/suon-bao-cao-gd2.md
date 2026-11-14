@@ -1,12 +1,13 @@
 # Sườn báo cáo luận văn GĐ2 — CTAV và tác tử RCA
 
 > Bản nháp sườn, dựng theo cấu trúc luận văn GĐ1 (`docs/Thesis_Phase1.pdf`) và template `docs/Template_LuanVan.docx`.
-> Trạng thái mốc: M7 (đăng ký H0–H5 còn chờ V29/V33/V34). Mọi số `test` = [CHỜ M8]. Số liệu hiện có đều trên `val`/`dev`, kèm nguồn.
+> Trạng thái mốc (cập nhật 2026-11-14): M7 đã đóng, H0–H5 **đã đăng ký 2026-11-14** (QĐ-034: δ = 0,05; C5 chỉ là ablation; chấm toàn bộ candidate trên `test`); M8 đang chạy. Mọi số `test` = [CHỜ M8] trừ khi mục ghi khác. Số liệu hiện có đều trên `val`/`dev`, kèm nguồn.
 
 ## Quy ước
 
 - `[TÁI SỬ DỤNG GĐ1 §x]`: lấy lại và rút gọn từ luận văn GĐ1 · `[MỚI]`: nội dung GĐ2.
 - ✅ đã có dữ liệu/hiện thực · ⏳ chờ mốc Mx · ✂️ đã loại khỏi phương pháp chính (giữ làm ablation) · [CẦN TRA CỨU]: trích dẫn chưa xác minh.
+- Ký hiệu: τ_F = hằng số thời gian của Fusion Score (300 s); τ = ngưỡng của Rescue Score.
 - Judge GĐ2: `gemini-2.5-flash` (QĐ-021, QĐ-023); `gemini-2.5-flash-lite` chỉ dùng để phát lại cache paper (G-paper).
 
 ## Đối chiếu cấu trúc với GĐ1 / template
@@ -59,7 +60,7 @@ Quy ước: đánh số "1.2.1"; chỗ hình `[Chèn hình minh họa tại đâ
 ### 4. Tóm tắt (tiếng Việt, ≤ 1 trang)
 - Bối cảnh: phát hiện bất thường tạo nhiều cảnh báo; LLM thẩm định cần ngữ cảnh (RAG).
 - Vấn đề (paper ICAETM 2026, GĐ1): ngữ cảnh topology tăng recall nhưng tăng báo động giả so với BM25.
-- Đề xuất **CTAV**: thành phần còn lại sau ablation là C1 (retrieval topology) + C3 (evidence anchoring); C2, C4 bị bỏ; C5 (Rescue) `[chốt theo V34]`.
+- Đề xuất **CTAV**: thành phần còn lại sau ablation là C1 (retrieval topology) + C3 (evidence anchoring); C2, C4 bị bỏ; C5 (Rescue) không thuộc phương pháp chính, chỉ là một điểm ablation (V34 (b), QĐ-034).
 - Tác tử RCA (grouping → propagation → báo cáo JSON) + platform demo offline.
 - Phương pháp: Nezha, split dev/val/test theo lần tiêm lỗi, giả thuyết H0–H5 viết trước, bootstrap CI + McNemar, `test` chạy một lần.
 - Kết quả `val`: CTAV F1 0,201, FPR 0,0069 (BM25 0,103 / 0,056; C1 0,126 / 0,082); recall 0,139 < C1 0,263. Kết quả `test`, H5: `[CHỜ M8, M10]`.
@@ -172,10 +173,12 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 #### 1.2.3 Câu hỏi nghiên cứu [MỚI]
 - RQ1: Topology có tăng recall thẩm định cảnh báo trên split GĐ2 không, giá FPR là bao nhiêu? (H0)
 - RQ2: Thiên lệch xác nhận phụ thuộc đặc tính nào của bằng chứng (độ gần thời gian, loại)? (H1)
-- RQ3: Có chính sách quyết định nào giữ recall của C1 mà FPR không tệ hơn BM25 trong cùng ngân sách; thành phần nào cần thiết? (H2, H3, H4)
-- RQ4: Dựa trên cảnh báo CTAV, tác tử RCA định vị đúng service gốc ở mức nào? (H5)
+- RQ3: Có chính sách quyết định nào giữ recall của C1 mà FPR không tệ hơn BM25 trong cùng ngân sách? (H2, H4)
+- RQ4: Thành phần nào của chính sách đó là cần thiết? (H3)
+- RQ5: Dựa trên cảnh báo CTAV, tác tử RCA định vị đúng service gốc ở mức nào? (H5)
+- (Năm câu hỏi, đánh số khớp với §8.1.)
 
-> Nguồn: `08` §3, §5.1. Trạng thái: ✅ (phát biểu); trả lời RQ3–RQ4 ⏳ M8–M9
+> Nguồn: `08` §3, §5.1. Trạng thái: ✅ (phát biểu); trả lời RQ3–RQ5 ⏳ M8–M9
 
 #### 1.2.4 Đóng góp [MỚI]
 - ĐG1: CTAV — chính sách thẩm định hiệu chỉnh theo nội dung/nguồn gốc bằng chứng (evidence anchoring + ngưỡng θ).
@@ -219,7 +222,7 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 > Nguồn: Phát hiện 7, 10, 12; `08` §5.2. Trạng thái: ✅ (`val`), ⏳ M8
 
 ### 1.5 Bố cục luận văn [MỚI]
-- Tóm tắt từng chương (Ch3 công trình liên quan, Ch4 phương pháp CTAV + RCA, Ch5 platform, Ch6 thực nghiệm H0–H5, Ch7 kết luận/GĐ3); chỉnh sau khi chốt mục lục cuối.
+- Tóm tắt từng chương theo cấu trúc 8 chương: Ch2 cơ sở lý thuyết, Ch3 công trình liên quan, Ch4 phương pháp CTAV + RCA, Ch5 thực nghiệm H0–H5, Ch6 demo platform, Ch7 thảo luận, hạn chế, hướng phát triển, Ch8 kết luận; chỉnh sau khi chốt mục lục cuối (xem ghi chú 6 chương của template).
 
 > Nguồn: `08` §7. Trạng thái: ✅ (khung)
 
@@ -269,7 +272,7 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 > Nguồn: QĐ-021; `docs/graph-coverage.md`. Trạng thái: ✅
 
 #### 2.3.3 Fusion retrieval và Fusion Score [MỚI]
-- Score = α·BM25_norm + β·exp(−|t_e−t₀|/τ) + γ·GraphSim, α+β+γ = 1, τ = 300 s; cấu hình A4 (0,35; 0,25; 0,40), 2-hop, top-6.
+- Score = α·BM25_norm + β·exp(−|t_e−t₀|/τ_F) + γ·GraphSim, α+β+γ = 1, hằng số thời gian τ_F = 300 s (viết τ_F để phân biệt với ngưỡng τ của Rescue Score); cấu hình A4 (0,35; 0,25; 0,40), 2-hop, top-6.
 - Temporal-only / graph-only là ablation của C1; RRF/reranker/cross-modal không dùng (QĐ-011), chỉ nhắc để định vị.
 - `k_graph` quét ở QĐ-024/025; CTAV dùng C1-paper `k_graph` 0 (`ctav_final.yaml`).
 
@@ -304,10 +307,10 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 #### 2.4.4 Rescue Score (C5) [MỚI, nối GĐ1 §2.9]
 - RescueScore = η1·Λ_log + η2·Φ_topo + η3·Δ_time; η ≥ 0, Σ = 1; ngưỡng τ.
-- `val` (QĐ-033): rút về 2 thành phần (η = 0; 0,4; 0,6; τ = 0,8), +2 TP / +16 FP, ΔF1 +0,001 [−0,014; +0,022] — không đáng kể; vai trò ở M8 theo V34 (đề xuất: chỉ ablation). Số `test` [CHỜ M8].
+- `val` (QĐ-033): rút về 2 thành phần (η = 0; 0,4; 0,6; τ = 0,8), +2 TP / +16 FP, ΔF1 +0,001 [−0,014; +0,022] — không đáng kể; ở M8 chỉ là một điểm ablation của H3 (V34 (b), QĐ-034). Số `test` [CHỜ M8].
 - Viết ngắn; không phải đóng góp chính.
 
-> Nguồn: `01` §6.2; QĐ-008, QĐ-033; `CURRENT-MILESTONE.md` V34. Trạng thái: ✅ (`val`), ⏳ V34/M8
+> Nguồn: `01` §6.2; QĐ-008, QĐ-033; QĐ-034. Trạng thái: ✅ (`val`), ⏳ M8
 
 ### 2.5 Phân tích nguyên nhân gốc (RCA) trên microservice
 
@@ -345,7 +348,7 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 - Bootstrap 95% (1.000 mẫu, seed 42) cho chỉ số và hiệu ghép cặp; McNemar chính xác hai phía, α = 0,05.
 - H2 chính; H0, H3, H4 phụ, báo p thô, không hiệu chỉnh đa so sánh (nêu hạn chế); phương sai LLM bằng `repeat` 0/1/2 trên tập con 200 cửa sổ.
 
-> Nguồn: bản nháp đăng ký H0–H5 cuối `experiment-log.md`; `01` §6.8. Trạng thái: ✅ (nháp, chờ V29/V33/V34)
+> Nguồn: mục "Đăng ký giả thuyết H0–H5" cuối `experiment-log.md` (đã đăng ký 2026-11-14, commit `be2b985`); `01` §6.8. Trạng thái: ✅
 
 #### 2.6.4 Đánh giá theo ngân sách và chi phí [MỚI]
 - Ngân sách gọi LLM, đường F1 theo ngân sách (120 … đủ), chi phí token/USD; cache key = sha256(prompt+model+temperature+max_tokens+repeat).
@@ -353,10 +356,10 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 > Nguồn: `08` §4.1, §5; QĐ-013, QĐ-026. Trạng thái: ✅ (thiết kế), ⏳ M8
 
 ### 2.7 Giả thuyết nghiên cứu và đăng ký trước [MỚI]
-- Bảng H0–H5 (giả thuyết, so sánh, tiêu chí chấp nhận); H2 chính, δ = 0,05 đề xuất (V33); H1 đã kiểm trên `val`, không chạy lại trên `test`.
-- Kỷ luật: tuning chỉ trên `val`, `test` một lần sau đăng ký; hiện là **bản nháp** (chờ V29, V33, V34).
+- Vì sao đăng ký trước, và đăng ký những gì (giả thuyết, so sánh, tiêu chí chấp nhận). **Không lặp bảng ở đây:** bảng H0–H5 đầy đủ chỉ đặt ở §5.1 (Bảng 5.1), mục này trỏ sang đó. H2 là giả thuyết chính, δ = 0,05 (V33 (a)); H1 đã kiểm trên `val`, không chạy lại trên `test`.
+- Kỷ luật: tuning chỉ trên `val`, `test` một lần sau đăng ký; bản đăng ký được commit riêng ngày 2026-11-14 (`be2b985`), trước mọi lần chạy trên `test`.
 
-> Nguồn: `08` §5.1; bản nháp đăng ký cuối `experiment-log.md`. Trạng thái: ⏳ M7 (đăng ký), M8 (kết quả)
+> Nguồn: `08` §5.1; mục đăng ký cuối `experiment-log.md`; QĐ-034. Trạng thái: ✅ (đăng ký), ⏳ M8 (kết quả)
 
 ### 2.8 Tóm tắt chương [MỚI]
 - Bảng ánh xạ khái niệm Ch2 → thành phần (C1…C5, RCA) → giả thuyết kiểm.
@@ -561,7 +564,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 
 ## Chương 4 — Phương pháp đề xuất: CTAV và tác tử RCA
 
-> Trạng thái tại 2026-11-11 (`docs/CURRENT-MILESTONE.md`): M0–M6 đã qua (M6 qua có điều kiện), M7 đang làm (Rescue xong, đăng ký giả thuyết nháp chờ V29/V33/V34), M8 (G-test) chưa chạy. RCA agent mới có `grouping.py`; `propagation`, `summarizer`, `pipeline` thuộc M9 (⏳). API/dashboard dữ liệu thật thuộc M10 (⏳).
+> Trạng thái tại 2026-11-11 (`docs/CURRENT-MILESTONE.md`): M0–M6 đã qua (M6 qua có điều kiện), M7 đã đóng 2026-11-14 (H0–H5 đã đăng ký, QĐ-034), M8 (G-test) đang chạy. RCA agent mới có `grouping.py`; `propagation`, `summarizer`, `pipeline` thuộc M9 (⏳). API/dashboard dữ liệu thật thuộc M10 (⏳).
 > Ký hiệu: ✅ đã hiện thực · ⏳ chờ mốc · ✂️ đã thử rồi bỏ/ablation (có QĐ).
 
 ### 4.1 Phát biểu bài toán hình thức
@@ -571,7 +574,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Cần thiết kế ánh xạ `(w, E(w)) → verdict`, `E(w)` = bằng chứng truy hồi (top-k, ngân sách token), dưới **ngân sách LLM** `B` (số lần gọi); đo Recall, FPR, F1 cùng `B`.
 - Vấn đề nghiên cứu: topology tăng recall nhưng gây thiên lệch xác nhận (paper: BM25 F1 0,703/FP 7 vs topology 0,476/FP 137); phát biểu lại theo QĐ-027 là thiên lệch theo **nội dung/nguồn gốc bằng chứng**.
 - Bài toán B (RCA): từ alert đã xác nhận + đồ thị phụ thuộc `G`, gom incident và xếp hạng service gốc (Hit@k).
-- Hình/bảng: **Bảng 4.1** Bảng ký hiệu (w, s_0, t_0, E(w), θ, α/β/γ, η, τ, B). **Hình 4.1** Cửa sổ 60 s + ngữ cảnh + nhãn wall-clock.
+- Hình/bảng: **Bảng 4.1** Bảng ký hiệu (w, s_0, t_0, E(w), θ, α/β/γ, τ_F của Fusion, η và τ của Rescue, B). **Hình 4.1** Cửa sổ 60 s + ngữ cảnh + nhãn wall-clock.
 > Nguồn: `08-research-direction.md` §2–§3, QĐ-002..004, QĐ-027; `03-schemas-and-contracts.md` §1.1–1.4; `02-data-and-experiment-protocol.md` §1–2. Trạng thái: ✅
 
 ### 4.2 Kiến trúc tổng thể của platform
@@ -591,7 +594,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - **C5 Rescue Score** (`rescue.py`): cửa sổ chưa qua ngưỡng tính `η1·Λ_log + η2·Φ_topo + η3·Δ_time`; `Λ_log = 1 − exp(−N_err/k_log)`; `Φ_topo = max 1/(1+d_G)`; `Δ_time = max exp(−|t_w−t_a|/σ)`; `≥ τ` ⇒ `source="rescue"`; ràng buộc nhân quả (không dùng alert tương lai); lưới η bước 0,2 (21 điểm).
 - Kết quả M7 (QĐ-033, `val`): η = (0; 0,4; 0,6), τ = 0,8 ⇒ rút về 2 thành phần (Λ_log không đóng góp); +2 TP/+16 FP, ΔF1 +0,001 CI chứa 0 (Phát hiện 12: nút thắt ở judge). Vai trò C5 ở M8 chờ V34 — ghi là thành phần chờ quyết định, không khẳng định đóng góp.
 - Hình/bảng: **Hình 4.4** Luồng detector + Rescue gate. **Bảng 4.3** Tham số Detector/Rescue (ngưỡng, k_log, σ, η, τ) + nguồn config. **Bảng 4.4** Quét η/τ (tham chiếu Ch5).
-> Nguồn: `01` §6.2; `02` §6.1–6.4; `services/detector/*`; QĐ-008, QĐ-015, QĐ-033. Trạng thái: IForest ✅; Rescue ✅ (offline, M7); đưa vào CTAV cuối ⏳ V34/M8
+> Nguồn: `01` §6.2; `02` §6.1–6.4; `services/detector/*`; QĐ-008, QĐ-015, QĐ-033. Trạng thái: IForest ✅; Rescue ✅ (offline, M7); không đưa vào CTAV cuối (V34 (b)); một điểm ablation trên `test` ⏳ M8
 
 ### 4.4 CTAV — Calibrated Topology-Aware Alert Validation
 
@@ -599,7 +602,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 
 - Thiết kế ban đầu (08 §4): tầng 1 BM25 → judge; tầng 2 topology (C4) khi cần; chính sách C2 gating + C3 anchoring.
 - **Cấu hình chốt sau M6 (QĐ-031, `ctav_final.yaml`)**: mọi candidate → C1 → judge → θ_local = 0,80 → C3; `gating: false`, `routing.enabled: false`.
-- Bảng vai trò: C1 ✅ chính (port từ paper) · C2 ✂️ bỏ (QĐ-031: bỏ C2 chỉ thêm 2 FP, ΔFPR CI [0,0000; +0,0007]) · C3 ✅ chính (ngưỡng nền `dev` p90, QĐ-030..032) · C4 ✂️ bỏ (C1 cho mọi candidate rẻ hơn: 3,28 vs 3,95–5,14 USD, F1 không thấp hơn) · C5 ⏳ chờ V34 (QĐ-033). Code C2/C4 giữ cho ablation H3.
+- Bảng vai trò: C1 ✅ chính (port từ paper) · C2 ✂️ bỏ (QĐ-031: bỏ C2 chỉ thêm 2 FP, ΔFPR CI [0,0000; +0,0007]) · C3 ✅ chính (ngưỡng nền `dev` p90, QĐ-030..032) · C4 ✂️ bỏ (C1 cho mọi candidate rẻ hơn: 3,28 vs 3,95–5,14 USD, F1 không thấp hơn) · C5 ✂️ chỉ là ablation (QĐ-033, V34 (b)). Code C2/C4 giữ cho ablation H3.
 - Kết quả `val` (QĐ-031): F1 0,201 [0,138; 0,264] vs BM25 0,103; FPR 0,007 vs 0,056; nhưng recall 0,139 < C1 0,263 (Phát hiện 10) ⇒ chưa đạt "giữ recall của C1"; nêu như hạn chế (M6 "qua có điều kiện"; H2/H3 trên `test` ⏳ M8).
 - Hình/bảng: **Hình 4.5** CTAV thiết kế vs cấu hình chốt. **Bảng 4.5** Vai trò & trạng thái C1–C5 kèm QĐ.
 > Nguồn: `08` §4 (khối "Kết quả M6"), `eval/configs/ctav_final.yaml`, QĐ-027, QĐ-029..033. Trạng thái: ✅ (cấu hình `val`); kiểm định `test` ⏳ M8
@@ -613,7 +616,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 
 #### 4.4.3 Tầng 2 — Topology retrieval C1 (Fusion Score)
 
-- Công thức: `Score = α·BM25_norm + β·exp(−|t_i−t_0|/τ) + γ·GraphSim(s_i,s_0)`, `α+β+γ=1`, τ = 300 s (khác τ của Rescue — cần đổi ký hiệu); cấu hình A4: α 0,35, β 0,25, γ 0,40; mở rộng 2-hop; top-k = 6.
+- Công thức: `Score = α·BM25_norm + β·exp(−|t_i−t_0|/τ_F) + γ·GraphSim(s_i,s_0)`, `α+β+γ=1`, τ_F = 300 s (τ không chỉ số dành cho ngưỡng của Rescue); cấu hình A4: α 0,35, β 0,25, γ 0,40; mở rộng 2-hop; top-k = 6.
 - `HybridBm25GraphRetriever` (`build_pool` → `top_events` → `reweighted`): pool BM25 top-`bm25_k` + mở rộng đồ thị (`packages/graph/service_graph.py`); ngân sách token; biến thể quota `k_graph` (C1-quota).
 - Cơ chế (QĐ-026/027, Phát hiện 7): C1-quota ≡ C1-paper; hiệu ứng đến từ bằng chứng cục bộ sát t_0 (chủ yếu trace span), không từ lân cận; judge xác nhận 30–42% candidate normal có bằng chứng ⇒ động cơ của C3.
 - Ablation α/β/γ (β=1, γ=1 là temporal/graph thuần) và k-hop (`m4_kgraph_val_k0..k3`).
@@ -679,17 +682,17 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 ### 5.1 Mục tiêu thực nghiệm và giả thuyết H0–H5
 
 - Mục tiêu (A): chứng minh CTAV giữ recall của topology mà không tăng FPR so với BM25 trong cùng ngân sách LLM; mục tiêu (B): CTAV làm nền cho tác tử RCA định vị service gốc. Khác GĐ1 (khả thi tổng thể, ảnh hưởng ngữ cảnh), GĐ2 phát biểu thành giả thuyết kiểm định được, đăng ký trước khi chạm `test`.
-- Quy ước đăng ký (bản nháp cuối `docs/experiment-log.md`, mục "Đăng ký giả thuyết H0–H5 (M7)"): CI 95% bootstrap (1.000 mẫu, seed 42), McNemar chính xác hai phía α = 0,05; H2 là giả thuyết chính, H0/H3/H4 là phụ, báo p thô không hiệu chỉnh đa so sánh; chỉ số chính trên cửa sổ có telemetry.
-- Trạng thái đăng ký: **nháp**, chưa "ĐÃ ĐĂNG KÝ" — còn chờ V29 (báo GVHD việc bỏ C2/C4 + kết quả C5), V33 (δ), V34 (vai trò C5; đề xuất: chỉ là ablation).
+- Quy ước đăng ký (cuối `docs/experiment-log.md`, mục "Đăng ký giả thuyết H0–H5 (M7)"): CI 95% bootstrap (1.000 mẫu, seed 42), McNemar chính xác hai phía α = 0,05; H2 là giả thuyết chính, H0/H3/H4 là phụ, báo p thô không hiệu chỉnh đa so sánh; chỉ số chính trên cửa sổ có telemetry.
+- Trạng thái đăng ký: **ĐÃ ĐĂNG KÝ 2026-11-14** (QĐ-034, commit `be2b985`, trước mọi lần chạy trên `test`): GVHD đã được báo việc bỏ C2/C4 và kết quả C5 (V29); δ = 0,05 (V33 (a)); C5 chỉ là một điểm ablation (V34 (b)); judge chấm toàn bộ candidate của `test` (V27).
 - Giả thuyết đã được định hình lại sau M4–M6 (QĐ-027: đổi trục C2/C3/H1; QĐ-031: CTAV chốt chỉ còn C1 + C3, bỏ C2 và C4) — luận văn phải nêu rõ đây là thay đổi phương pháp có ghi lại, không phải chỉnh sau khi xem `test`.
 
 #### Bảng 5.1: Giả thuyết H0–H5, tiêu chí chấp nhận đã đăng ký và trạng thái
 
-| | Giả thuyết | Tiêu chí chấp nhận (bản nháp đăng ký) | Trạng thái |
+| | Giả thuyết | Tiêu chí chấp nhận (đã đăng ký) | Trạng thái |
 |---|---|---|---|
 | H0 | Topology chưa hiệu chỉnh (C1) tăng recall và tăng FPR so với BM25 | CI ΔRecall và CI ΔFPR có cận dưới > 0; McNemar fault/normal p < 0,05 | ✅ `val` (tái lập hiện tượng, không tái lập cơ chế); ⏳ `test` M8 |
 | H1 | Cơ chế: TRUE_ALERT trên normal tăng theo độ gần thời gian và loại bằng chứng (trace) | Xu hướng đơn điệu + CI; **không chạy lại trên `test`** | ✅ `val` — giữ một phần (QĐ-028) |
-| H2 (chính) | CTAV tốt hơn BM25 | (i) CI ΔF1 (CTAV−BM25) cận dưới > 0 và p < 0,05; (ii) CI ΔFPR không có cận dưới > 0; (iii) ΔRecall(CTAV−C1) ≥ −δ, δ = 0,05 (đề xuất V33). Vế (iii) không đạt ⇒ "H2 đạt một phần" (V32 (a)) | ✅ sơ bộ `val`; ⏳ M8; δ chờ V33 |
+| H2 (chính) | CTAV tốt hơn BM25 | (i) CI ΔF1 (CTAV−BM25) cận dưới > 0 và p < 0,05; (ii) CI ΔFPR không có cận dưới > 0; (iii) ΔRecall(CTAV−C1) ≥ −δ, δ = 0,05 (V33 (a)). Vế (iii) không đạt ⇒ "H2 đạt một phần" (V32 (a)) | ✅ sơ bộ `val`; ⏳ M8 |
 | H3 | Từng thành phần đóng góp; thành phần đã bỏ không đóng góp | C3: bỏ C3 ⇒ CI ΔPrecision cận trên < 0; C2/C4: xác nhận bỏ; báo C3-trượt (V31) và C5 | ✅ `val`; ⏳ M8 |
 | H4 | Ở ngân sách 120 lần gọi CTAV không kém LLM-không-RAG | F1(CTAV) ≥ F1(không-RAG) ở 120; báo đường {120…đủ} | ✅ `val` (điểm); ⏳ M8 |
 | H5 | Tác tử RCA: Hit@1 ≥ 0,60, Hit@3 ≥ 0,80, vượt baseline "anomaly score cao nhất"; Alert Reduction ≥ 30% trên cascade | CI ΔHit@1 cận dưới > 0 | ⏳ sau M9/M10 |
@@ -739,7 +742,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 | M5 | H1: 6.988 lần gọi thành công | 9,4755 USD theo token | ước tính, không phải billing |
 | M6 | CTAV: replay | 0 USD | mô phỏng 3,28 USD/run C1 mọi candidate |
 | M7 | Rescue: 1.459 lần gọi | 1,03 USD theo token | `m7_rescue_val_c1_v1` |
-| M8 (kế hoạch) | Chấm `test` | ≈ 17 USD (≈ 8 nếu chỉ telemetry) + ≈ 1 USD C5 | V27 chưa chốt |
+| M8 (đang chạy) | Chấm `test`, toàn bộ candidate (V27) | BM25 8,87 + C1 4,71 USD theo token đã chạy; còn không-RAG, `repeat`, C5 [CHỜ M8] | ước ban đầu 13,0 USD (QĐ-035); `test` có 13.699 candidate |
 
 > Nguồn: `docs/milestones/M2..M7`; `eval/configs/*.yaml`; `services/judge/backends.py` (`PRICES_PER_1M`). Cảnh báo: giá chưa đối chiếu billing (V26). Trạng thái: ✅ (chưa có tổng USD M1; bổ sung nếu cần tổng cộng).
 
@@ -880,7 +883,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 
 - A = cảnh báo CTAV (không nhãn, nhân quả, cửa sổ 300 s); tính offline 147 tổ hợp (η1, η2, η3, τ), chấm một lần 1.459 cửa sổ được cứu (1,03 USD theo token). Chọn η = (0; 0,4; 0,6), τ = 0,8 ⇒ công thức **rút về 2 thành phần** (Φ_topo, Δ_time; Λ_log không đóng góp).
 - Kết quả: +52 lần gọi; +2 TP / +16 FP; ΔF1 +0,001 [−0,014; +0,022], ΔRecall +0,010 [0,000; +0,025], ΔFPR +0,0022 [+0,0011; +0,0034], McNemar p = 0,0013 (16 vs 2). P12: C5 không thêm được recall; nút thắt ở judge (21 fault đưa vào: 16 bị C1 trả FALSE_POSITIVE, 3 bị C3 hạ); Λ_log gần như luôn 0 (13 cửa sổ).
-- Vai trò C5 ở M8 chờ V34 (đề xuất: chỉ ablation, một điểm không quét).
+- Vai trò C5 ở M8: chỉ là ablation, một điểm không quét (V34 (b), QĐ-034).
 
 #### Bảng 5.13: Rescue trên CTAV (M7-1)
 
@@ -893,7 +896,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 
 ### 5.7 Kết quả trên `test` (G-test, M8) — ⏳ CHỜ M8
 
-- Điều kiện mở: bản đăng ký H0–H5 chuyển "ĐÃ ĐĂNG KÝ" và commit riêng (V29, V33, V34 chốt); phạm vi chấm V27 (toàn bộ hay chỉ telemetry); config `test` sao từ `val` (chỉ đổi `split`, `g_test`, `run_id`) theo danh sách 9 nhóm trong bản nháp đăng ký.
+- Điều kiện mở (đã đạt 2026-11-14): bản đăng ký H0–H5 "ĐÃ ĐĂNG KÝ" và commit riêng `be2b985`; phạm vi chấm V27 = toàn bộ candidate; config `test` sao từ `val` (chỉ đổi `split`, `g_test`, `run_id`) theo danh sách 9 nhóm trong bản nháp đăng ký.
 - Chạy một lần: BM25, C1, không-RAG, detector-only, replay CTAV + ablation (+C2 0,85; bỏ C3; +C4 0,95; C3-trượt), C5 một điểm; `repeat` 1, 2 trên tập con 200 cửa sổ; chấm tay context precision 50 cửa sổ. Kết luận H2 viết ra **dù kết quả là gì**.
 - Rủi ro báo trước: P11 (phân bố service `test` khác `val`).
 
@@ -904,7 +907,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 | H0 | C1 − BM25 | ΔRecall, ΔFPR | ⏳ | ⏳ | CI cận dưới > 0 cả hai; p < 0,05 | ⏳ | ⏳ |
 | H2 (i) | CTAV − BM25 | ΔF1 | ⏳ | ⏳ | cận dưới > 0, p < 0,05 | ⏳ | ⏳ |
 | H2 (ii) | CTAV − BM25 | ΔFPR | ⏳ | ⏳ | cận dưới không > 0 | ⏳ | ⏳ |
-| H2 (iii) | CTAV − C1 | ΔRecall | ⏳ | ⏳ | ≥ −δ (δ = 0,05, chờ V33) | ⏳ | ⏳ |
+| H2 (iii) | CTAV − C1 | ΔRecall | ⏳ | ⏳ | ≥ −δ (δ = 0,05) | ⏳ | ⏳ |
 | H2 phụ | CTAV − {C1, không-RAG, detector-only} | ΔF1 | ⏳ | ⏳ | — | ⏳ | ⏳ |
 | H3 | bỏ C3 / +C2 / +C4 / C3-trượt / +C5 | ΔPrecision, ΔFPR, ΔF1, chi phí | ⏳ | ⏳ | theo bản đăng ký | ⏳ | ⏳ |
 | H4 | CTAV vs không-RAG, ngân sách 120 | F1 | ⏳ | ⏳ | F1(CTAV) ≥ F1(không-RAG) | ⏳ | ⏳ |
@@ -1031,7 +1034,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 ### 6.4 Kịch bản demo 5 phút
 - (1) `docker compose --profile dev up -d` → replay → alert vào Timeline.
 - (2) Alert normal mà topology chưa hiệu chỉnh xác nhận nhầm → CTAV hạ xuống (C3: chỉ có telemetry bình thường).
-- (3) Ca `network_delay` BM25 bỏ sót → tầng topology tìm span chậm downstream. **Lưu ý trung thực:** trên `val` CTAV mất cả 10 ca `network_delay` mà C1 bắt được (Phát hiện 10) ⇒ chọn ca CTAV thực sự bắt được, hoặc đổi bước này `[CHỜ M8/M11, hỏi người dùng]`.
+- (3) Ca `network_delay` BM25 bỏ sót → tầng topology tìm span chậm downstream. **Lưu ý trung thực:** trên `val` CTAV mất cả 10 ca `network_delay` mà C1 bắt được (Phát hiện 10) ⇒ **không dựng bước này trên ca `network_delay` trước khi có số `test`**: sau M8 chọn một ca CTAV thực sự bắt được trên `test` (theo loại lỗi có TP), hoặc đổi thông điệp của bước thành "C1 thấy, CTAV thận trọng" `[CHỜ M8, hỏi người dùng]`.
 - (4) Cascade → nhiều alert gom thành một Incident → đồ thị chỉ root cause.
 - (5) Tab Experiment → bảng sinh tự động.
 > Nguồn: 08 §6; Phát hiện 10. ⏳ chờ M10; duyệt lần 1 ở M11, lần 2 ở M12.
@@ -1095,7 +1098,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - RQ1 topology có tăng recall và FPR không? → H0 `[val ✅; test ⏳ M8]`.
 - RQ2 cơ chế? → H1 giữ một phần (độ gần thời gian + loại bằng chứng; vế số lượng chưa kiểm).
 - RQ3 CTAV hơn BM25 trong cùng ngân sách? → H2 `[CHỜ M8]`; sơ bộ `val` ΔF1 +0,098 [+0,046; +0,149] nhưng vế recall ≥ C1 − δ không đạt.
-- RQ4 thành phần nào cần? → H3: C3 có; C2, C4 không; C5 `[chốt V34]`.
+- RQ4 thành phần nào cần? → H3: C3 có; C2, C4 không; C5 chỉ là ablation `[CHỜ M8]`.
 - RQ5 RCA định vị tốt không? → H5 `[CHỜ M9–M10]`.
 > Nguồn: 08 §5.1; registration. ⏳ M8, M10.
 
@@ -1115,7 +1118,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 | H3 | `[CHỜ M8]` (val: C3 có; C2, C4 không) | ⏳ |
 | H4 | `[CHỜ M8]` | ⏳ |
 | H5 | `[CHỜ M9–M10]` | ⏳ |
-> Nguồn: registration (bản nháp, chờ V29/V33/V34). Viết H2 dù kết quả là gì.
+> Nguồn: bản đăng ký (2026-11-14, QĐ-034). Viết H2 dù kết quả là gì.
 
 ### 8.4 Ý nghĩa và kết luận chung
 - Hiệu chỉnh theo nguồn gốc bằng chứng quan trọng hơn thêm ngữ cảnh; FPR và chi phí là ràng buộc cốt lõi.
