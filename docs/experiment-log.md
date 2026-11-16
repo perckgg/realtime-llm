@@ -1953,6 +1953,11 @@ Bảng QĐ-037-2. Bốn vế tiêu chí H0 đã đăng ký trên `test` (C1 − 
 - `py scripts/export_web_snapshot.py` chạy thành công; `py -m ruff check scripts/export_web_snapshot.py` sạch.
 - Tại `services/web/`: `npm.cmd run check` (`tsc -b --noEmit` + `scripts/smoke.tsx` render cả 4 màn hình trong jsdom) đạt **18/18** kiểm tra; `VITE_BASE_PATH=/realtime-llm/ npm.cmd run build` tạo `dist/` thành công (`index.html` 0,98 kB, CSS 6,38 kB gzip, JS 726,21 kB gzip).
 
+**Cập nhật chuẩn hoá tiếng Anh & thiết kế lại UI (2026-11-16, nhánh `demo/gh-pages`).**
+- Chuyển 100% nhãn giao diện, biểu đồ, bảng chỉ số, action playbook, lý do gated alerts và `snapshot.json` (**4.717,3 KB**) sang tiếng Anh chuẩn; loại bỏ hoàn toàn các ký hiệu viết tắt nội bộ (`C1`–`C5`, `QĐ-*`, `M8`/`M9`/`V35`, `H0`–`H4`, `GĐ1`) khỏi văn bản hiển thị người dùng và thay bằng thuật ngữ miền AIOps tự giải thích (`CTAV (Calibrated Topology-Aware Validation)`, `Uncalibrated Topology RAG`, `BM25 Lexical RAG (Baseline)`, `Baseline Evidence Gate` / `Historical p90 Latency`, v.v.).
+- Cải tiến UI/UX trên `App.tsx`, `ui.tsx`, `Timeline.tsx`, `AlertDetail.tsx`, `IncidentDetail.tsx`, `ExperimentComparison.tsx`: header cố định kèm badge `CTAV`, thanh `Guided Walkthrough` tô sáng tuyến đang xem, dải 4 bước `CTAV Validation Pipeline` trên `Timeline`, callout nổi bật quyết định cổng p90 trên `AlertDetail`, bảng & thẻ nâng độ tương phản sạch sẽ.
+- **Kiểm chứng sau sửa:** `py scripts/export_web_snapshot.py` (4.717,3 KB) + `py -m ruff check` sạch; quét regex tiếng Việt / `C1`–`C5` / `QĐ` / `H0`–`H5` trong `snapshot.json` ra 0 kết quả; `npm.cmd run check` (`tsc -b --noEmit` + `smoke.tsx`) đạt **18/18**; `npm.cmd run build -- --base=/realtime-llm/` thành công (`index.html` 0,95 kB, CSS 39,67 kB / 7,31 kB gzip, JS 5.691,80 kB / 727,31 kB gzip).
+
 **Tái lập.**
 ```bash
 py scripts/export_web_snapshot.py

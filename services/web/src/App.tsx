@@ -12,8 +12,8 @@ import IncidentDetail from "@/screens/IncidentDetail";
 import ExperimentComparison from "@/screens/ExperimentComparison";
 
 const NAV = [
-  { to: "/timeline", label: "Timeline", hint: "Cảnh báo và sự cố theo thời gian" },
-  { to: "/compare", label: "So sánh thực nghiệm", hint: "CTAV vs BM25, C1, Không RAG, Detector & Ablation" },
+  { to: "/timeline", label: "Alert & Incident Timeline", hint: "Chronological validation verdicts and service-level incidents" },
+  { to: "/compare", label: "Benchmark & Ablation", hint: "5-method performance comparison, ablations, budget curves & holdout test" },
 ];
 
 export default function App() {
@@ -26,59 +26,77 @@ export default function App() {
     [runs, effectiveRunId],
   );
 
-  if (loading || !runs) return <Loading label="Đang tải danh sách run…" />;
+  if (loading || !runs) return <Loading label="Loading evaluation runs…" />;
 
   return (
     <RunContext.Provider value={ctx}>
       <div className="flex min-h-full flex-col">
         <FixtureBanner />
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[color:var(--color-hairline)] bg-surface px-5 py-3">
-          <div className="flex items-baseline gap-6">
-            <div>
-              <div className="text-[13px] font-semibold tracking-tight text-ink">
-                AIOps RCA — CTAV Demo & Bảng điều khiển thực nghiệm
-              </div>
-              <div className="text-[11px] text-ink-muted">
-                Nezha · split {snapshotMeta.split} ({snapshotMeta.val_telemetry_windows.toLocaleString("vi-VN")} cửa sổ telemetry) · judge {snapshotMeta.judge_model} · chỉ đọc
-              </div>
-            </div>
-            <nav className="flex items-center gap-1">
-              {NAV.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  title={item.hint}
-                  className={({ isActive }) =>
-                    `rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors ${
-                      isActive
-                        ? "bg-[color:var(--color-plane)] text-ink"
-                        : "text-ink-muted hover:text-ink-2"
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-          </div>
 
-          <label className="flex items-center gap-2 text-[11px] text-ink-muted">
-            Run
-            <select
-              value={effectiveRunId}
-              onChange={(e) => setRunId(e.target.value)}
-              className="rounded-md border border-[color:var(--color-hairline)] bg-surface px-2 py-1.5 text-[12px] text-ink"
-            >
-              {runs.map((r) => (
-                <option key={r.run_id} value={r.run_id}>
-                  {strategyShortLabel[r.retrieval_strategy]} — {r.run_id}
-                </option>
-              ))}
-            </select>
-          </label>
+        <header className="sticky top-0 z-30 border-b border-[color:var(--color-hairline)] bg-surface/95 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-6 py-3">
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-mono text-[11px] font-bold tracking-tight text-white shadow-xs"
+                  style={{ background: "var(--color-seq-700)" }}
+                  aria-hidden
+                >
+                  CTAV
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[14px] font-semibold tracking-tight text-ink">
+                      AIOps RCA Platform
+                    </span>
+                    <span className="rounded border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)] px-1.5 py-0.5 text-[10px] font-medium text-ink-muted">
+                      Calibrated Validation
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-ink-muted">
+                    Nezha Microservice Benchmark · {snapshotMeta.val_telemetry_windows.toLocaleString("en-US")} telemetry windows · Judge: {snapshotMeta.judge_model}
+                  </div>
+                </div>
+              </div>
+
+              <nav className="flex items-center gap-1 rounded-lg border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)] p-1">
+                {NAV.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    title={item.hint}
+                    className={({ isActive }) =>
+                      `rounded-md px-3 py-1.5 text-[12px] font-medium transition-all ${
+                        isActive
+                          ? "bg-surface text-ink shadow-xs"
+                          : "text-ink-muted hover:text-ink-2"
+                      }`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+            </div>
+
+            <label className="flex items-center gap-2 text-[11.5px] font-medium text-ink-muted">
+              Evaluation Run
+              <select
+                value={effectiveRunId}
+                onChange={(e) => setRunId(e.target.value)}
+                className="rounded-lg border border-[color:var(--color-hairline)] bg-surface px-3 py-1.5 text-[12px] font-medium text-ink shadow-[0_1px_2px_rgba(15,23,42,0.03)] focus:border-[color:var(--color-seq-550)] focus:outline-none"
+              >
+                {runs.map((r) => (
+                  <option key={r.run_id} value={r.run_id}>
+                    {strategyShortLabel[r.retrieval_strategy]} — {r.run_id}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1400px] flex-1 px-5 py-5">
+        <main className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-6">
           <Routes>
             <Route path="/" element={<Navigate to="/timeline" replace />} />
             <Route path="/timeline" element={<Timeline />} />
@@ -89,10 +107,15 @@ export default function App() {
           </Routes>
         </main>
 
-        <footer className="border-t border-[color:var(--color-hairline)] px-5 py-3 text-[11px] text-ink-muted">
-          Bốn màn hình theo <code className="font-mono">01-architecture-design.md</code> §6.7 —
-          Timeline · Alert detail · Incident detail · Experiment comparison. Không thêm màn hình
-          nào khác (<code className="font-mono">06-scope-guard.md</code> §6.4).
+        <footer className="border-t border-[color:var(--color-hairline)] bg-surface px-6 py-3">
+          <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 text-[11px] text-ink-muted">
+            <span>
+              CTAV — Calibrated Topology-Aware Alert Validation &amp; Root Cause Analysis Platform
+            </span>
+            <span>
+              Four analytical views: Timeline · Alert Inspection · Incident RCA Graph · Benchmark &amp; Ablation (Read-Only Demo)
+            </span>
+          </div>
         </footer>
       </div>
     </RunContext.Provider>

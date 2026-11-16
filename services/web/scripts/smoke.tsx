@@ -1,6 +1,6 @@
 /**
- * Kiểm tra khói: render thật cả bốn màn hình trong jsdom trên dữ liệu thực nghiệm
- * trích từ `eval/results/`, rồi soi HTML kết quả.
+ * Smoke test: renders all four analytical views in jsdom against the real
+ * exported benchmark snapshot and asserts chart marks, tables, and English labels.
  *
  *     npm run smoke
  */
@@ -101,10 +101,10 @@ const CASES: {
     routePath: "/timeline",
     element: <Timeline />,
     expect: [
-      ["có biểu đồ cột", (h) => countOf(h, "recharts-bar-rectangle") > 10],
-      ["có đường nhãn ground truth", (h) => h.includes("recharts-line-curve")],
-      ["có bảng cảnh báo thật", (h) => countOf(h, "<tr") > 20],
-      ["không kẹt ở trạng thái tải", (h) => !h.includes("Đang tải")],
+      ["renders stacked verdict bars", (h) => countOf(h, "recharts-bar-rectangle") > 10],
+      ["renders ground-truth line", (h) => h.includes("recharts-line-curve")],
+      ["renders evaluated alert rows", (h) => countOf(h, "<tr") > 20],
+      ["not stuck on loading state", (h) => !h.includes("Loading")],
     ],
   },
   {
@@ -113,10 +113,10 @@ const CASES: {
     routePath: "/alerts/:alertId",
     element: <AlertDetail />,
     expect: [
-      ["có biểu đồ vùng", (h) => h.includes("recharts-area-area")],
-      ["có ngưỡng detector", (h) => h.includes("ngưỡng 0.85")],
-      ["có sự kiện ngữ cảnh", (h) => countOf(h, "debug") >= 6],
-      ["không kẹt ở trạng thái tải", (h) => !h.includes("Đang tải")],
+      ["renders anomaly score area chart", (h) => h.includes("recharts-area-area")],
+      ["renders detector threshold marker", (h) => h.includes("Threshold 0.85")],
+      ["renders retrieved context events", (h) => countOf(h, "telemetry metadata") >= 6],
+      ["not stuck on loading state", (h) => !h.includes("Loading")],
     ],
   },
   {
@@ -125,10 +125,10 @@ const CASES: {
     routePath: "/incidents/:incidentId",
     element: <IncidentDetail />,
     expect: [
-      ["có node đồ thị", (h) => countOf(h, "react-flow__node") >= 2],
-      ["có cạnh đồ thị", (h) => h.includes("react-flow__edge")],
-      ["có báo cáo chẩn đoán", (h) => h.includes("root_cause_service")],
-      ["có bảng thay thế cho đồ thị", (h) => h.includes("Xem dạng bảng")],
+      ["renders propagation graph nodes", (h) => countOf(h, "react-flow__node") >= 2],
+      ["renders propagation graph edges", (h) => h.includes("react-flow__edge")],
+      ["renders diagnostic report root cause", (h) => h.includes("Predicted Root Cause")],
+      ["renders accessible call-graph edge table", (h) => h.includes("View Call-Graph Edge Table")],
     ],
   },
   {
@@ -137,11 +137,16 @@ const CASES: {
     routePath: "/compare",
     element: <ExperimentComparison />,
     expect: [
-      ["có 4 panel chỉ số + latency", (h) => countOf(h, "recharts-bar-rectangle") >= 20],
-      ["có thanh sai số CI", (h) => countOf(h, "recharts-errorBar") >= 20],
-      ["có đường ngân sách H4", (h) => countOf(h, "recharts-line-curve") >= 4],
-      ["có vạch baseline", (h) => h.includes("baseline")],
-      ["bảng đủ 5 phương pháp & H3 & H0 test", (h) => h.includes("CTAV (C1 + θ 0,80 + C3 dev p90)") && h.includes("H0 được chấp nhận")],
+      ["renders metric and latency bar charts", (h) => countOf(h, "recharts-bar-rectangle") >= 20],
+      ["renders bootstrap CI error bars", (h) => countOf(h, "recharts-errorBar") >= 20],
+      ["renders budget sweep line curves", (h) => countOf(h, "recharts-line-curve") >= 4],
+      ["renders baseline reference line", (h) => h.includes("baseline")],
+      [
+        "renders 5-method benchmark and holdout test confirmation",
+        (h) =>
+          h.includes("CTAV (Calibrated Topology-Aware Validation)") &&
+          h.includes("Confirmed on holdout test split"),
+      ],
     ],
   },
 ];
@@ -153,10 +158,10 @@ for (const c of CASES) {
     html = await render(c.path, c.routePath, c.element);
   } catch (e) {
     failed += 1;
-    console.error(`  FAIL  ${c.name} — ném lỗi khi render\n        ${e instanceof Error ? e.stack : e}`);
+    console.error(`  FAIL  ${c.name} — threw during render\n        ${e instanceof Error ? e.stack : e}`);
     continue;
   }
-  if (process.env.SMOKE_DEBUG) console.error(`--- ${c.name} (${html.length} ký tự)\n${html.slice(0, 800)}\n`);
+  if (process.env.SMOKE_DEBUG) console.error(`--- ${c.name} (${html.length} chars)\n${html.slice(0, 800)}\n`);
   for (const [what, check] of c.expect) {
     if (check(html)) {
       console.log(`  ok    ${c.name.padEnd(22)} ${what}`);
@@ -172,28 +177,28 @@ for (const run of runs) {
   const incidents = listIncidents(run.run_id);
   if (!alerts.length || !incidents.length) {
     failed += 1;
-    console.error(`  FAIL  snapshot ${run.run_id}: ${alerts.length} alert, ${incidents.length} sự cố`);
+    console.error(`  FAIL  snapshot ${run.run_id}: ${alerts.length} alerts, ${incidents.length} incidents`);
   }
   const missAlert = alerts.find((a) => !getAlertDetail(a.alert_id));
   if (missAlert) {
     failed += 1;
-    console.error(`  FAIL  snapshot ${run.run_id}: thiếu AlertDetail cho ${missAlert.alert_id}`);
+    console.error(`  FAIL  snapshot ${run.run_id}: missing AlertDetail for ${missAlert.alert_id}`);
   }
   const missInc = incidents.find((i) => !getIncidentDetail(i.incident_id));
   if (missInc) {
     failed += 1;
-    console.error(`  FAIL  snapshot ${run.run_id}: thiếu IncidentDetail cho ${missInc.incident_id}`);
+    console.error(`  FAIL  snapshot ${run.run_id}: missing IncidentDetail for ${missInc.incident_id}`);
   }
 }
-console.log(`  ok    snapshot               ${runs.length} run đều đủ alert, detail và incident`);
+console.log(`  ok    snapshot               ${runs.length} runs verified with full alert, detail, and incident records`);
 
 function countOf(haystack: string, needle: string): number {
   return haystack.split(needle).length - 1;
 }
 
 if (failed) {
-  console.error(`\n${failed} lỗi`);
+  console.error(`\n${failed} failures`);
   process.exit(1);
 }
-console.log("\nBốn màn hình render được trên snapshot thật, biểu đồ có vẽ ra mark, bảng có dữ liệu.");
+console.log("\nAll 4 analytical screens rendered cleanly against the exported English benchmark snapshot.");
 process.exit(0);

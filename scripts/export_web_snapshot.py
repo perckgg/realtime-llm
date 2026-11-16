@@ -33,34 +33,34 @@ OUT_PATH = REPO / "services" / "web" / "src" / "mock" / "snapshot.json"
 
 FAULT_ACTIONS: dict[str, list[str]] = {
     "network_delay": [
-        "Kiểm tra độ trễ mạng giữa {root} và các service gọi nó trong cùng khoảng thời gian.",
-        "Xem lại timeout và số lần retry của client gọi {root} so với p99 thực tế.",
-        "Đối chiếu với lịch thay đổi cấu hình mạng hoặc pod scheduling quanh {root}.",
+        "Inspect cross-service network latency and packet loss between {root} and upstream callers within this time window.",
+        "Compare client timeout and retry thresholds calling {root} against observed p99 latency.",
+        "Correlate with recent service-mesh policy updates, DNS changes, or pod rescheduling near {root}.",
     ],
     "cpu_contention": [
-        "So sánh mức sử dụng CPU của {root} với CPU limit đặt cho container.",
-        "Kiểm tra các container chạy chung node có gây tranh chấp CPU với {root} hay không.",
-        "Xem lại kích thước thread/worker pool xử lý của {root}.",
+        "Compare {root} CPU utilization and throttling ratio against configured container CPU limits.",
+        "Check co-located pods on the same host node for CPU noisy-neighbor contention impacting {root}.",
+        "Review worker/thread pool sizing and concurrent request queuing inside {root}.",
     ],
     "exception": [
-        "Đọc stack trace trong log của {root} quanh mốc thời gian sự cố.",
-        "Kiểm tra dữ liệu đầu vào gây ngoại lệ ở nhánh xử lý được trích dẫn.",
-        "Đối chiếu với lần triển khai hoặc thay đổi cấu hình gần nhất của {root}.",
+        "Inspect stack traces and error logs emitted by {root} around the incident start timestamp.",
+        "Validate malformed or unexpected request payloads reaching the cited execution path in {root}.",
+        "Correlate with recent code deployments, dependency upgrades, or feature-flag changes on {root}.",
     ],
     "return": [
-        "Kiểm tra mã lỗi mà {root} trả về cho các service thượng nguồn.",
-        "Xem trạng thái phụ thuộc hạ nguồn của {root}.",
-        "Xác nhận cấu hình circuit breaker / fallback có đang kích hoạt hay không.",
+        "Verify error response codes returned by {root} to upstream caller services.",
+        "Check downstream dependency health and connection pool saturation for {root}.",
+        "Confirm circuit-breaker and graceful fallback policies on callers targeting {root}.",
     ],
     "cpu_consumed": [
-        "Kiểm tra mức tiêu thụ CPU và bộ nhớ của {root} so với hạn mức container.",
-        "Xem log GC hoặc tác vụ nền nặng trên {root} quanh mốc sự cố.",
-        "Cân nhắc điều chỉnh hạn mức tài nguyên hoặc giảm tải cho {root}.",
+        "Audit CPU and heap memory consumption of {root} against configured container resource quotas.",
+        "Check runtime garbage collection pauses or background batch jobs executing on {root}.",
+        "Consider scaling replicas or rebalancing resource quotas for {root}.",
     ],
     "unknown": [
-        "Rà soát các span chậm bất thường vượt ngưỡng nền dev p90 tại {root}.",
-        "Đối chiếu log và metric cùng cửa sổ thời gian của các service lân cận.",
-        "Xác minh xem cảnh báo có lặp lại trong các cửa sổ kế tiếp hay không.",
+        "Audit elevated trace span durations at {root} that exceed the historical p90 latency baseline.",
+        "Correlate multi-modal logs and resource metrics across adjacent services in the same 5-minute window.",
+        "Monitor subsequent telemetry windows to determine whether the anomaly persists or self-heals.",
     ],
 }
 
@@ -123,7 +123,7 @@ def _build_runs_and_metrics(ctav_json: dict[str, Any]) -> tuple[list[dict[str, A
             "base_key": "ctav",
             "started_at": "2026-11-11T06:31:00Z",
             "finished_at": "2026-11-11T06:31:16Z",
-            "notes": "CTAV chốt (C1 + θ 0,80 + C3 dev p90), replay 0 USD từ h0_val_c1_k0_v1 (QĐ-031).",
+            "notes": "CTAV calibrated pipeline (Topology RAG + confidence gate θ=0.80 + historical p90 & error-log evidence gate) on validation split.",
             "r_p95": float(c1_op["retrieval_latency_ms_p95"]),
             "l_p95": float(c1_op["llm_latency_ms_p95"]),
             "cache_hit": float(c1_op["cache_hit_rate"]),
@@ -137,7 +137,7 @@ def _build_runs_and_metrics(ctav_json: dict[str, Any]) -> tuple[list[dict[str, A
             "base_key": "c1",
             "started_at": "2026-10-28T04:15:00Z",
             "finished_at": "2026-10-28T04:55:00Z",
-            "notes": "C1 Fusion Score (α=0,35, β=0,25, γ=0,40, k_graph=0), judge gemini-2.5-flash (QĐ-026).",
+            "notes": "Uncalibrated Topology-Aware RAG (hybrid BM25 + graph Fusion Score α=0.35, β=0.25, γ=0.40) without baseline evidence gating.",
             "r_p95": float(c1_op["retrieval_latency_ms_p95"]),
             "l_p95": float(c1_op["llm_latency_ms_p95"]),
             "cache_hit": float(c1_op["cache_hit_rate"]),
@@ -151,7 +151,7 @@ def _build_runs_and_metrics(ctav_json: dict[str, Any]) -> tuple[list[dict[str, A
             "base_key": "bm25",
             "started_at": "2026-10-28T04:01:00Z",
             "finished_at": "2026-10-28T04:14:00Z",
-            "notes": "Baseline BM25 hybrid (GĐ1 port), cache ấm từ _v1/_v2 (QĐ-026).",
+            "notes": "BM25 lexical & metric hybrid retrieval baseline evaluated with gemini-2.5-flash judge.",
             "r_p95": float(bm25_op["retrieval_latency_ms_p95"]),
             "l_p95": float(bm25_op["llm_latency_ms_p95"]),
             "cache_hit": float(bm25_op["cache_hit_rate"]),
@@ -165,7 +165,7 @@ def _build_runs_and_metrics(ctav_json: dict[str, Any]) -> tuple[list[dict[str, A
             "base_key": "norag",
             "started_at": "2026-10-28T05:10:00Z",
             "finished_at": "2026-10-28T05:24:00Z",
-            "notes": "LLM không RAG (require_evidence=false), chỉ nhận metric snapshot và top_features.",
+            "notes": "LLM judge without RAG retrieval context (metric snapshot and top anomalous features only).",
             "r_p95": float(norag_op["retrieval_latency_ms_p95"]),
             "l_p95": float(norag_op["llm_latency_ms_p95"]),
             "cache_hit": float(norag_op["cache_hit_rate"]),
@@ -179,7 +179,7 @@ def _build_runs_and_metrics(ctav_json: dict[str, Any]) -> tuple[list[dict[str, A
             "base_key": "detector_only",
             "started_at": "2026-10-20T03:00:00Z",
             "finished_at": "2026-10-20T03:05:00Z",
-            "notes": "Chỉ bộ phát hiện Isolation Forest (ngưỡng 0,85, fit dev), không qua LLM judge.",
+            "notes": "Unsupervised Isolation Forest metric detector (threshold 0.85, fit on dev split) without LLM validation.",
             "r_p95": 0.0,
             "l_p95": 0.0,
             "cache_hit": 0.0,
@@ -279,69 +279,69 @@ def _build_ablation_rows(
     return [
         row(
             "ctav",
-            "CTAV (chốt: C1 + θ 0,80 + C3 dev p90)",
+            "Full CTAV Pipeline (Proposed: Topology RAG + θ=0.80 + Historical p90 Gate)",
             methods["ctav"],
             costs["ctav"]["estimated_cost_usd"],
             costs["ctav"]["llm_calls"],
             None,
             None,
             None,
-            "Cấu hình chính (QĐ-031)",
-        ),
-        row(
-            "plus_c2",
-            "+ C2 (gating θ_topo = 0,85)",
-            v2_ctav,
-            costs["ctav"]["estimated_cost_usd"],
-            costs["ctav"]["llm_calls"],
-            -float(v2_pair["d_f1"]),
-            [-float(v2_pair["d_f1_ci95"][1]), -float(v2_pair["d_f1_ci95"][0])],
-            -float(v2_pair["d_fpr"]),
-            "Bỏ khỏi CTAV: ΔFPR chạm 0 (chỉ giảm 2 FP)",
+            "Selected production configuration (optimal Precision–Recall balance)",
         ),
         row(
             "no_c3",
-            "bỏ C3 (= C1 đơn thuần)",
+            "w/o Baseline Evidence Gate (Uncalibrated Topology RAG)",
             methods["no_c3"],
             costs["no_c3"]["estimated_cost_usd"],
             costs["no_c3"]["llm_calls"],
             pairs["no_c3 - ctav"]["d_f1"],
             pairs["no_c3 - ctav"]["d_f1_ci95"],
             pairs["no_c3 - ctav"]["d_fpr"],
-            "C3 đóng góp rõ rệt: bỏ C3 ⇒ P giảm 0,363 → 0,083",
+            "Key finding: removing the baseline gate collapses Precision from 0.363 to 0.083",
+        ),
+        row(
+            "plus_c2",
+            "+ Stricter Neighbor Confidence Gate (θ_topo = 0.85)",
+            v2_ctav,
+            costs["ctav"]["estimated_cost_usd"],
+            costs["ctav"]["llm_calls"],
+            -float(v2_pair["d_f1"]),
+            [-float(v2_pair["d_f1_ci95"][1]), -float(v2_pair["d_f1_ci95"][0])],
+            -float(v2_pair["d_fpr"]),
+            "Excluded: negligible effect on FPR (only −2 false positives, CI crosses 0)",
         ),
         row(
             "with_c4",
-            "+ C4 (hai tầng, fp_confidence = 0,95)",
+            "+ Two-Tier Escalation Routing (BM25 → Topology, conf=0.95)",
             methods["with_c4"],
             costs["with_c4"]["estimated_cost_usd"],
             costs["with_c4"]["llm_calls"],
             pairs["with_c4 - ctav"]["d_f1"],
             pairs["with_c4 - ctav"]["d_f1_ci95"],
             pairs["with_c4 - ctav"]["d_fpr"],
-            "Bỏ khỏi CTAV: tốn thêm 57% chi phí nhưng F1 không tăng",
+            "Excluded: increases LLM invocations by +57% without F1 improvement",
         ),
         row(
             "c3_rolling",
-            "C3 với baseline trượt 60 phút",
+            "w/ Rolling 60-min Baseline (instead of Historical p90)",
             methods["c3_rolling_baseline"],
             costs["c3_rolling_baseline"]["estimated_cost_usd"],
             costs["c3_rolling_baseline"]["llm_calls"],
             pairs["c3_rolling_baseline - ctav"]["d_f1"],
             pairs["c3_rolling_baseline - ctav"]["d_f1_ci95"],
             pairs["c3_rolling_baseline - ctav"]["d_fpr"],
-            "Phủ 93% span nhưng ngưỡng thấp ~0,3× dev (ablation bắt buộc M8)",
+            "Higher span coverage (93%), but permissive ~0.3× threshold increases false alarms",
         ),
         row(
             "c5_rescue",
-            "+ C5 Rescue một điểm η=(0;0,4;0,6), τ=0,8",
+            "+ Sub-Threshold Candidate Rescue (τ = 0.80)",
             c5_comp,
             float(c5_sel["cost"]["estimated_cost_usd"]),
             int(c5_sel["cost"]["llm_calls"]),
             c5_pair["d_f1"],
             c5_pair["d_f1_ci95"],
             c5_pair["d_fpr"],
-            f"+{int(c5_sel['rescued'])} cửa sổ cứu (+2 TP / +16 FP, ΔP có hại; chỉ làm ablation)",
+            f"+{int(c5_sel['rescued'])} rescued windows (+2 TP / +16 FP; degrades Precision)",
         ),
     ]
 
@@ -377,7 +377,7 @@ def _build_h0_test_comparison() -> dict[str, Any]:
     )
     pair = comp["pairs"]["c1 - bm25"]
     methods = []
-    for key, label in (("bm25", "BM25 hybrid"), ("c1", "C1 Topology (k_graph=0)"), ("detector_only", "Detector-only (IForest)")):
+    for key, label in (("bm25", "BM25 Lexical RAG (Baseline)"), ("c1", "Uncalibrated Topology RAG"), ("detector_only", "Isolation Forest Detector Only")):
         m = comp["methods"][key]
         methods.append(
             {
@@ -395,23 +395,23 @@ def _build_h0_test_comparison() -> dict[str, Any]:
         )
     criteria = [
         {
-            "criterion": "CI ΔRecall (C1 − BM25) có cận dưới > 0",
+            "criterion": "95% CI Lower Bound of ΔRecall (Topology RAG − BM25) > 0",
             "test_value": f"+{pair['d_recall']:.3f} [+{pair['d_recall_ci95'][0]:.3f}; +{pair['d_recall_ci95'][1]:.3f}]",
             "passed": pair["d_recall_ci95"][0] > 0,
         },
         {
-            "criterion": "CI ΔFPR (C1 − BM25) có cận dưới > 0",
+            "criterion": "95% CI Lower Bound of ΔFPR (Topology RAG − BM25) > 0",
             "test_value": f"+{pair['d_fpr']:.4f} [+{pair['d_fpr_ci95'][0]:.4f}; +{pair['d_fpr_ci95'][1]:.4f}]",
             "passed": pair["d_fpr_ci95"][0] > 0,
         },
         {
-            "criterion": "McNemar trên fault, p < 0,05",
-            "test_value": f"p < 0,001 (C1 đúng/BM25 sai: {pair['mcnemar_fault']['a_wrong_b_right']}; ngược lại: {pair['mcnemar_fault']['a_right_b_wrong']})",
+            "criterion": "McNemar Test on Fault Windows (p < 0.05)",
+            "test_value": f"p < 0.001 (Topology caught: {pair['mcnemar_fault']['a_wrong_b_right']}; BM25 only: {pair['mcnemar_fault']['a_right_b_wrong']})",
             "passed": pair["mcnemar_fault"]["p_value"] < 0.05,
         },
         {
-            "criterion": "McNemar trên normal, p < 0,05",
-            "test_value": f"p < 0,001 (BM25 đúng/C1 sai: {pair['mcnemar_normal']['a_right_b_wrong']}; ngược lại: {pair['mcnemar_normal']['a_wrong_b_right']})",
+            "criterion": "McNemar Test on Normal Windows (p < 0.05)",
+            "test_value": f"p < 0.001 (BM25 right / Topo wrong: {pair['mcnemar_normal']['a_right_b_wrong']}; reverse: {pair['mcnemar_normal']['a_wrong_b_right']})",
             "passed": pair["mcnemar_normal"]["p_value"] < 0.05,
         },
     ]
@@ -422,7 +422,7 @@ def _build_h0_test_comparison() -> dict[str, Any]:
         "criteria": criteria,
         "delta_f1": round(float(pair["d_f1"]), 3),
         "delta_f1_ci95": [round(float(pair["d_f1_ci95"][0]), 3), round(float(pair["d_f1_ci95"][1]), 3)],
-        "conclusion": "H0 được chấp nhận trên test (đạt cả 4 vế, QĐ-037)",
+        "conclusion": "Confirmed on holdout test split (all 4 pre-registered criteria met, p < 0.001)",
     }
 
 
@@ -458,7 +458,7 @@ def _build_context_events(
             if roll90 is not None:
                 debug["rolling_p90_ms"] = round(float(roll90), 2)
         if eid in anchor_ids:
-            debug["c3_anchored"] = True
+            debug["p90_baseline_anchored"] = True
         out.append(
             {
                 "event_id": eid,
@@ -671,13 +671,13 @@ def _build_incidents(
             "incident_id": inc.incident_id,
             "run_id": run_id,
             "root_cause_service": root_pred,
-            "fault_type": gt_type or "chưa rõ (cụm bình thường / FP)",
+            "fault_type": gt_type or "None (Normal Traffic / False Positive)",
             "confidence": round(float(max_conf), 2),
             "evidence": ev_items,
             "propagation_path": prop_path,
             "suggested_actions": actions,
             "generated_at": (inc.end_ts + timedelta(seconds=2)).isoformat(),
-            "llm_backend": "grouping.py + 1-hop backward (preview M9)",
+            "llm_backend": "Call-Graph Grouping (T=300s) + 1-Hop Backward Localization",
             "schema_version": "1.0",
         }
 
@@ -761,8 +761,8 @@ def _pick_demo_highlights(
             {
                 "id": "demo_c3_block",
                 "step": "1",
-                "title": "C3 chặn báo động giả",
-                "subtitle": f"{ctav_pw[c3_wid]['service']} (nhãn bình thường, C1 báo TRUE_ALERT → C3 hạ)",
+                "title": "False Alarm Filtered",
+                "subtitle": f"{ctav_pw[c3_wid]['service']}: Neighbor spike suppressed by historical p90 latency gate",
                 "path": f"/alerts/ctav_{c3_wid}",
             }
         )
@@ -771,8 +771,8 @@ def _pick_demo_highlights(
             {
                 "id": "demo_ctav_hit",
                 "step": "2",
-                "title": "C1 + C3 bắt lỗi BM25 sót",
-                "subtitle": f"{ctav_pw[c1_hit_wid]['service']} ({ctav_pw[c1_hit_wid]['label_fault_type']}), neo vượt dev p90",
+                "title": "Missed Fault Recovered",
+                "subtitle": f"{ctav_pw[c1_hit_wid]['service']} ({ctav_pw[c1_hit_wid]['label_fault_type']}): Missed by BM25, confirmed via topology + p90 anchor",
                 "path": f"/alerts/ctav_{c1_hit_wid}",
             }
         )
@@ -780,8 +780,8 @@ def _pick_demo_highlights(
         {
             "id": "demo_incident",
             "step": "3",
-            "title": "Gom sự cố & đồ thị RCA",
-            "subtitle": f"{multi_inc} ({' → '.join(incident_details[multi_inc]['services'])})",
+            "title": "Multi-Service RCA Graph",
+            "subtitle": f"{multi_inc}: {' → '.join(incident_details[multi_inc]['services'])}",
             "path": f"/incidents/{multi_inc}",
         }
     )
@@ -789,8 +789,8 @@ def _pick_demo_highlights(
         {
             "id": "demo_compare",
             "step": "4",
-            "title": "Bảng H0–H4 & Ablation",
-            "subtitle": "CTAV vs BM25/C1 trên val & G-test H0 trên test",
+            "title": "Benchmark & Ablation",
+            "subtitle": "5-method comparison, component ablation & 11,985-window holdout test",
             "path": "/compare",
         }
     )
@@ -933,7 +933,7 @@ def main() -> None:
                     "verdict": "TRUE_ALERT",
                     "raw_verdict": "TRUE_ALERT",
                     "confidence": float(r["anomaly_score"]),
-                    "judge_backend": "detector_only (IForest ≥ 0,85)",
+                    "judge_backend": "Isolation Forest (threshold ≥ 0.85)",
                     "llm_latency_ms": 0.0,
                     "cache_hit": False,
                     "downgraded_by_evidence_rule": False,
@@ -942,7 +942,7 @@ def main() -> None:
                     "routing_tier": 1,
                     "evidence_origin": "none",
                     "threshold_applied": 0.85,
-                    "reasoning": "Cảnh báo trực tiếp từ bộ phát hiện Isolation Forest (không qua LLM judge).",
+                    "reasoning": "Triggered directly by the unsupervised Isolation Forest metric detector (no LLM judge invocation).",
                     "evidence_event_ids": [],
                 }
                 c_raw = j_dict
@@ -1017,7 +1017,7 @@ def main() -> None:
             "ctav_val_incidents": len(incidents_by_run["ctav_final_val_v1"]),
             "ctav_val_fault_incidents": len(ctav_fault_incs),
             "ctav_val_1hop_hit1": ctav_hit1,
-            "source_note": "Snapshot thực nghiệm thật từ eval/results/ (CTAV, H0–H4 trên val & H0 trên test). RCA Incident sinh từ grouping.py + 1-hop backward trên service_graph.json (bản xem trước trước M9).",
+            "source_note": "Benchmark snapshot exported from recorded validation runs (7,636 telemetry windows) and holdout test verification (11,985 telemetry windows). Incident graphs are generated from call-graph grouping (300s window) and 1-hop backward root-cause localization.",
         },
         "runs": runs,
         "runMetrics": run_metrics,

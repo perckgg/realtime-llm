@@ -16,13 +16,13 @@ import { api } from "@/api/client";
 import type { GraphNode, IncidentDetail as IncidentDetailT } from "@/api/types";
 import { Card, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, num, stampUTC, useAsync } from "@/lib/util";
-import { ink, series, status } from "@/theme/tokens";
+import { formatFaultType, ink, series, status } from "@/theme/tokens";
 
 const ROLE: Record<GraphNode["role"], { color: string; glyph: string; label: string }> = {
-  root_cause: { color: status.critical, glyph: "◉", label: "Nguyên nhân gốc (dự đoán)" },
-  ground_truth: { color: status.good, glyph: "✓", label: "Nhãn Nezha" },
-  affected: { color: status.serious, glyph: "◐", label: "Bị ảnh hưởng" },
-  healthy: { color: ink.muted, glyph: "○", label: "Hàng xóm bình thường" },
+  root_cause: { color: status.critical, glyph: "◉", label: "Predicted Root Cause" },
+  ground_truth: { color: status.good, glyph: "✓", label: "Ground-Truth Service" },
+  affected: { color: status.serious, glyph: "◐", label: "Affected Upstream Service" },
+  healthy: { color: ink.muted, glyph: "○", label: "Healthy Neighbor" },
 };
 
 type ServiceNodeData = {
@@ -37,7 +37,7 @@ function ServiceNode({ data }: NodeProps<Node<ServiceNodeData>>) {
   return (
     <div
       className={cx(
-        "min-w-[168px] rounded-lg border bg-surface px-3 py-2 shadow-sm",
+        "min-w-[178px] rounded-xl border bg-surface px-3.5 py-2.5 shadow-sm",
         emphasised && "shadow-md",
       )}
       style={{
@@ -52,16 +52,18 @@ function ServiceNode({ data }: NodeProps<Node<ServiceNodeData>>) {
         <span aria-hidden style={{ color: role.color }} className="text-[12px]">
           {role.glyph}
         </span>
-        <span className="text-[12px] font-semibold text-ink">{node.service}</span>
+        <span className="font-mono text-[11.5px] font-semibold text-ink">{node.service}</span>
         {pathIndex !== null && (
-          <span className="ml-auto text-[10px] tabular-nums text-ink-muted">#{pathIndex + 1}</span>
+          <span className="ml-auto font-mono text-[10px] tabular-nums text-ink-muted">
+            #{pathIndex + 1}
+          </span>
         )}
       </div>
-      <div className="mt-0.5 text-[10px]" style={{ color: role.color }}>
+      <div className="mt-0.5 text-[10.5px] font-medium" style={{ color: role.color }}>
         {role.label}
       </div>
       {node.alert_count > 0 && (
-        <div className="mt-1.5 flex items-center gap-2">
+        <div className="mt-2 flex items-center gap-2">
           <span className="h-1.5 flex-1 rounded-full" style={{ background: ink.grid }}>
             <span
               className="block h-1.5 rounded-full"
@@ -69,7 +71,7 @@ function ServiceNode({ data }: NodeProps<Node<ServiceNodeData>>) {
             />
           </span>
           <span className="text-[10px] tabular-nums text-ink-2">
-            {node.alert_count} alert · {num(node.max_anomaly_score, 2)}
+            {node.alert_count} {node.alert_count === 1 ? "alert" : "alerts"} · {num(node.max_anomaly_score, 2)}
           </span>
         </div>
       )}
@@ -82,8 +84,8 @@ const nodeTypes = { service: ServiceNode };
 
 function layout(detail: IncidentDetailT): { nodes: Node<ServiceNodeData>[]; edges: Edge[] } {
   const path = detail.services;
-  const X = 250;
-  const Y = 110;
+  const X = 260;
+  const Y = 115;
 
   const placed = new Map<string, { x: number; y: number }>();
   path.forEach((s, i) => placed.set(s, { x: i * X, y: 0 }));
@@ -115,7 +117,7 @@ function layout(detail: IncidentDetailT): { nodes: Node<ServiceNodeData>[]; edge
   }));
 
   const edges: Edge[] = detail.edges.map((e) => ({
-    // Cạnh gọi đi theo chiều caller → callee; lỗi lan theo chiều ngược lại.
+    // Call graph direction is caller → callee; fault propagation flows callee → caller.
     id: `${e.source}->${e.target}`,
     source: e.on_path ? e.target : e.source,
     target: e.on_path ? e.source : e.target,
@@ -132,10 +134,10 @@ function layout(detail: IncidentDetailT): { nodes: Node<ServiceNodeData>[]; edge
     },
     label: e.on_path
       ? e.error_rate != null
-        ? `${(e.error_rate * 100).toFixed(0)}% lỗi`
-        : `${e.call_count.toLocaleString("vi-VN")} span`
+        ? `${(e.error_rate * 100).toFixed(0)}% errors`
+        : `${e.call_count.toLocaleString("en-US")} spans`
       : undefined,
-    labelStyle: { fill: status.critical, fontSize: 10 },
+    labelStyle: { fill: status.critical, fontSize: 10, fontWeight: 600 },
     labelBgStyle: { fill: ink.surface },
   }));
 
@@ -149,27 +151,30 @@ export default function IncidentDetail() {
 
   const graph = useMemo(() => (data ? layout(data) : null), [data]);
 
-  if (loading) return <Loading />;
-  if (error || !data || !graph) return <ErrorBox message={error ?? "Không tìm thấy sự cố"} />;
+  if (loading) return <Loading label="Loading incident topology…" />;
+  if (error || !data || !graph) return <ErrorBox message={error ?? `Incident '${incidentId}' not found`} />;
 
   const hasGt = data.ground_truth_service !== null;
   const correct = hasGt && data.root_cause_service === data.ground_truth_service;
   const report = data.report;
 
   return (
-    <div className="space-y-4">
-      <Link to="/timeline" className="inline-block text-[11.5px] text-ink-muted hover:text-ink-2">
-        ← Timeline
+    <div className="space-y-5">
+      <Link
+        to="/timeline"
+        className="inline-flex items-center gap-1 text-[12px] font-medium text-ink-muted hover:text-ink"
+      >
+        ← Back to Timeline
       </Link>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-[19px] font-semibold tracking-tight text-ink">
-              {data.root_cause_service ?? "Không kết luận được"}
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-[20px] font-semibold tracking-tight text-ink">
+              {data.root_cause_service ?? "Unresolved Root Cause"}
             </h1>
             <span
-              className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium"
+              className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium"
               style={{
                 borderColor: !report
                   ? status.warning
@@ -185,47 +190,62 @@ export default function IncidentDetail() {
                     : correct
                       ? status.good
                       : status.critical,
+                background: !report
+                  ? `${status.warning}12`
+                  : !hasGt
+                    ? `${ink.muted}10`
+                    : correct
+                      ? `${status.good}10`
+                      : `${status.critical}10`,
               }}
             >
               <span aria-hidden>{!report ? "⚠" : !hasGt ? "○" : correct ? "✓" : "✗"}</span>
               {!report
-                ? "Báo cáo bị từ chối"
+                ? "Report Rejected"
                 : !hasGt
-                  ? "Cụm bình thường (FP của tầng thẩm định)"
+                  ? "Normal Traffic Cluster (False Positive)"
                   : correct
-                    ? "Khớp nhãn Nezha"
-                    : `Sai — nhãn là ${data.ground_truth_service}`}
+                    ? "Matches Ground-Truth Root Cause"
+                    : `Mismatched — Ground Truth: ${data.ground_truth_service}`}
             </span>
           </div>
           <p className="mt-1 font-mono text-[11px] text-ink-muted">
-            {data.incident_id} · {stampUTC(data.start_ts)} → {clockUTC(data.end_ts)}
+            {data.incident_id} · {stampUTC(data.start_ts)} → {clockUTC(data.end_ts)} UTC
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile label="Loại lỗi" value={data.fault_type ?? "bình thường"} hint="theo nhãn Nezha" />
+      <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4">
         <StatTile
-          label="Confidence"
-          value={report ? num(report.confidence, 2) : "—"}
-          hint={report?.llm_backend ?? "không có báo cáo"}
+          label="Fault Category"
+          value={formatFaultType(data.fault_type)}
+          hint="Benchmark ground truth"
         />
-        <StatTile label="Alert gom vào" value={String(data.alert_ids.length)} hint={`cửa sổ gom ${data.grouping_reason.temporal_window_sec}s`} />
         <StatTile
-          label="Cạnh đồ thị dùng"
+          label="Report Confidence"
+          value={report ? num(report.confidence, 2) : "—"}
+          hint={report?.llm_backend ?? "No diagnostic report generated"}
+        />
+        <StatTile
+          label="Clustered Alerts"
+          value={String(data.alert_ids.length)}
+          hint={`Correlation window: ${data.grouping_reason.temporal_window_sec}s`}
+        />
+        <StatTile
+          label="Topology Edges Used"
           value={String(data.grouping_reason.graph_edges_used)}
-          hint="cạnh service_graph.json nối các alert"
+          hint="Call-graph edges connecting alerts"
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.7fr_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[1.65fr_1fr]">
         <Card
-          title="Đồ thị lan truyền (từ data/graph/service_graph.json)"
-          subtitle="Mũi tên đỏ chỉ chiều lỗi lan đi (ngược chiều lời gọi). Node xám là hàng xóm lân cận trên đồ thị để thấy phạm vi ảnh hưởng."
+          title="Service Dependency & Fault Propagation Graph"
+          subtitle="Animated red edges show backward fault propagation (callee → caller). Gray nodes display healthy adjacent neighbors for blast-radius context."
           right={
-            <ul className="flex flex-wrap gap-x-3 gap-y-1">
+            <ul className="flex flex-wrap gap-x-3.5 gap-y-1">
               {(Object.keys(ROLE) as GraphNode["role"][]).map((r) => (
-                <li key={r} className="flex items-center gap-1 text-[10.5px] text-ink-2">
+                <li key={r} className="flex items-center gap-1 text-[10.5px] font-medium text-ink-2">
                   <span aria-hidden style={{ color: ROLE[r].color }}>
                     {ROLE[r].glyph}
                   </span>
@@ -235,7 +255,7 @@ export default function IncidentDetail() {
             </ul>
           }
         >
-          <div className="h-[420px] rounded-md border border-[color:var(--color-hairline)]">
+          <div className="h-[430px] rounded-xl border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)]/40">
             <ReactFlow
               nodes={graph.nodes}
               edges={graph.edges}
@@ -254,29 +274,31 @@ export default function IncidentDetail() {
           </div>
 
           <details className="mt-3">
-            <summary className="cursor-pointer text-[11px] text-ink-muted hover:text-ink-2">
-              Xem dạng bảng
+            <summary className="cursor-pointer text-[11.5px] font-medium text-ink-muted hover:text-ink">
+              View Call-Graph Edge Table
             </summary>
-            <table className="mt-2 w-full border-collapse text-[11.5px]">
+            <table className="mt-2.5 w-full border-collapse text-[11.5px]">
               <thead>
-                <tr className="border-b border-[color:var(--color-hairline)] text-left text-[10.5px] text-ink-muted">
-                  <th className="py-1 pr-3 font-medium">Caller</th>
-                  <th className="py-1 pr-3 font-medium">Callee</th>
-                  <th className="py-1 pr-3 text-right font-medium">Số span</th>
-                  <th className="py-1 pr-3 text-right font-medium">Độ trễ TB</th>
-                  <th className="py-1 font-medium">Trên đường lan</th>
+                <tr className="border-b border-[color:var(--color-hairline)] text-left text-[10.5px] font-semibold tracking-wide text-ink-muted uppercase">
+                  <th className="py-1.5 pr-3">Caller Service</th>
+                  <th className="py-1.5 pr-3">Callee Service</th>
+                  <th className="py-1.5 pr-3 text-right">Observed Spans</th>
+                  <th className="py-1.5 pr-3 text-right">Mean Latency</th>
+                  <th className="py-1.5">On Fault Path</th>
                 </tr>
               </thead>
               <tbody>
                 {data.edges.map((e) => (
                   <tr key={`${e.source}-${e.target}`} className="border-b border-[color:var(--color-hairline)] last:border-0">
-                    <td className="py-1 pr-3 font-mono">{e.source}</td>
-                    <td className="py-1 pr-3 font-mono">{e.target}</td>
-                    <td className="py-1 pr-3 text-right tabular-nums">{e.call_count.toLocaleString("vi-VN")}</td>
-                    <td className="py-1 pr-3 text-right tabular-nums">
+                    <td className="py-1.5 pr-3 font-mono">{e.source}</td>
+                    <td className="py-1.5 pr-3 font-mono">{e.target}</td>
+                    <td className="py-1.5 pr-3 text-right tabular-nums">
+                      {e.call_count.toLocaleString("en-US")}
+                    </td>
+                    <td className="py-1.5 pr-3 text-right tabular-nums">
                       {e.avg_duration_ms != null ? `${num(e.avg_duration_ms, 1)} ms` : "—"}
                     </td>
-                    <td className="py-1">{e.on_path ? "có" : "—"}</td>
+                    <td className="py-1.5">{e.on_path ? "Yes" : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -286,133 +308,143 @@ export default function IncidentDetail() {
 
         <div className="space-y-4">
           {report ? (
-            <>
-              <Card
-                title="Báo cáo chẩn đoán"
-                subtitle={`schema ${report.schema_version} · ${report.llm_backend} · ${stampUTC(report.generated_at)}`}
-                right={
-                  <button
-                    type="button"
-                    onClick={() => setRawJson((v) => !v)}
-                    className="rounded border border-[color:var(--color-hairline)] px-2 py-1 text-[11px] text-ink-muted hover:text-ink-2"
-                  >
-                    {rawJson ? "Dạng đọc" : "JSON thô"}
-                  </button>
-                }
-              >
-                {rawJson ? (
-                  <pre className="max-h-[420px] overflow-auto rounded bg-[color:var(--color-plane)] p-3 font-mono text-[11px] leading-relaxed text-ink-2">
-                    {JSON.stringify(report, null, 2)}
-                  </pre>
-                ) : (
-                  <div className="space-y-3">
-                    <dl className="divide-y divide-[color:var(--color-hairline)]">
-                      <KV k="root_cause_service" v={<span className="font-mono">{report.root_cause_service}</span>} />
-                      <KV k="fault_type" v={<span className="font-mono">{report.fault_type}</span>} />
-                      <KV k="confidence" v={num(report.confidence, 2)} />
-                    </dl>
+            <Card
+              title="Automated Diagnostic Report"
+              subtitle={`Schema v${report.schema_version} · ${report.llm_backend} · ${stampUTC(report.generated_at)}`}
+              right={
+                <button
+                  type="button"
+                  onClick={() => setRawJson((v) => !v)}
+                  className="rounded-md border border-[color:var(--color-hairline)] bg-surface px-2.5 py-1 text-[11px] font-medium text-ink-2 hover:text-ink"
+                >
+                  {rawJson ? "Formatted View" : "Raw JSON"}
+                </button>
+              }
+            >
+              {rawJson ? (
+                <pre className="max-h-[420px] overflow-auto rounded-lg bg-[color:var(--color-plane)] p-3 font-mono text-[11px] leading-relaxed text-ink-2">
+                  {JSON.stringify(report, null, 2)}
+                </pre>
+              ) : (
+                <div className="space-y-4">
+                  <dl className="divide-y divide-[color:var(--color-hairline)]">
+                    <KV
+                      k="Predicted Root Cause"
+                      v={<span className="font-mono font-semibold">{report.root_cause_service}</span>}
+                    />
+                    <KV
+                      k="Fault Category"
+                      v={<span className="font-mono">{formatFaultType(report.fault_type)}</span>}
+                    />
+                    <KV k="Confidence" v={num(report.confidence, 2)} />
+                  </dl>
 
-                    <div>
-                      <div className="mb-1.5 text-[11px] text-ink-muted">Đường lan truyền</div>
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        {report.propagation_path.map((s, i) => (
-                          <span key={s} className="flex items-center gap-1.5">
-                            {i > 0 && <span className="text-ink-muted">→</span>}
-                            <span
-                              className="rounded border px-1.5 py-0.5 font-mono text-[11px]"
-                              style={{
-                                borderColor: i === 0 ? status.critical : "var(--color-hairline)",
-                                color: i === 0 ? status.critical : "var(--color-ink-2)",
-                              }}
-                            >
-                              {s}
-                            </span>
+                  <div>
+                    <div className="mb-1.5 text-[11px] font-semibold tracking-wide text-ink-muted uppercase">
+                      Fault Propagation Chain
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {report.propagation_path.map((s, i) => (
+                        <span key={s} className="flex items-center gap-1.5">
+                          {i > 0 && <span className="text-ink-muted">→</span>}
+                          <span
+                            className="rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium"
+                            style={{
+                              borderColor: i === 0 ? status.critical : "var(--color-hairline)",
+                              color: i === 0 ? status.critical : "var(--color-ink-2)",
+                              background: i === 0 ? `${status.critical}0d` : "var(--color-plane)",
+                            }}
+                          >
+                            {s}
                           </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="mb-1.5 text-[11px] text-ink-muted">
-                        Bằng chứng trích dẫn ({report.evidence.length})
-                      </div>
-                      <ul className="space-y-1.5">
-                        {report.evidence.length ? (
-                          report.evidence.map((ev) => (
-                            <li
-                              key={ev.event_id}
-                              className="rounded border border-[color:var(--color-hairline)] p-2"
-                            >
-                              <div className="flex items-center gap-2 text-[10.5px] text-ink-muted">
-                                <Pill>{ev.modality}</Pill>
-                                <span className="font-mono">{ev.service}</span>
-                                <span>{clockUTC(ev.ts)}</span>
-                              </div>
-                              <p className="mt-1 font-mono text-[11px] break-words text-ink-2">
-                                {ev.excerpt}
-                              </p>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="text-[11.5px] text-ink-muted">
-                            Chưa có trích dẫn bằng chứng ở run này.
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <div className="mb-1.5 text-[11px] text-ink-muted">
-                        Hành động gợi ý — chỉ mô tả, không sinh câu lệnh (03 §2.1)
-                      </div>
-                      <ul className="space-y-1.5">
-                        {report.suggested_actions.map((s) => (
-                          <li key={s.description} className="flex items-start gap-2 text-[12px] text-ink-2">
-                            <span
-                              className="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium"
-                              style={{
-                                background: `color-mix(in srgb, ${
-                                  s.priority === "high"
-                                    ? status.critical
-                                    : s.priority === "medium"
-                                      ? status.warning
-                                      : ink.muted
-                                } 14%, ${ink.surface})`,
-                                color:
-                                  s.priority === "high"
-                                    ? status.critical
-                                    : s.priority === "medium"
-                                      ? "#8a6000"
-                                      : ink.secondary,
-                              }}
-                            >
-                              {s.priority}
-                            </span>
-                            {s.description}
-                          </li>
-                        ))}
-                      </ul>
+                        </span>
+                      ))}
                     </div>
                   </div>
-                )}
-              </Card>
-            </>
+
+                  <div>
+                    <div className="mb-1.5 text-[11px] font-semibold tracking-wide text-ink-muted uppercase">
+                      Supporting Evidence ({report.evidence.length})
+                    </div>
+                    <ul className="space-y-2">
+                      {report.evidence.length ? (
+                        report.evidence.map((ev) => (
+                          <li
+                            key={ev.event_id}
+                            className="rounded-lg border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)]/60 p-2.5"
+                          >
+                            <div className="flex items-center gap-2 text-[10.5px] text-ink-muted">
+                              <Pill>{ev.modality}</Pill>
+                              <span className="font-mono font-medium text-ink">{ev.service}</span>
+                              <span className="tabular-nums">{clockUTC(ev.ts)} UTC</span>
+                            </div>
+                            <p className="mt-1 font-mono text-[11px] leading-relaxed break-words text-ink-2">
+                              {ev.excerpt}
+                            </p>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-[11.5px] text-ink-muted">
+                          No telemetry evidence excerpts attached to this cluster.
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="mb-1.5 text-[11px] font-semibold tracking-wide text-ink-muted uppercase">
+                      Recommended Remediation Actions
+                    </div>
+                    <ul className="space-y-2">
+                      {report.suggested_actions.map((s) => (
+                        <li key={s.description} className="flex items-start gap-2 text-[12px] leading-relaxed text-ink-2">
+                          <span
+                            className="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase"
+                            style={{
+                              background: `color-mix(in srgb, ${
+                                s.priority === "high"
+                                  ? status.critical
+                                  : s.priority === "medium"
+                                    ? status.warning
+                                    : ink.muted
+                              } 14%, ${ink.surface})`,
+                              color:
+                                s.priority === "high"
+                                  ? status.critical
+                                  : s.priority === "medium"
+                                    ? "#8a6000"
+                                    : ink.secondary,
+                            }}
+                          >
+                            {s.priority}
+                          </span>
+                          <span>{s.description}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </Card>
           ) : (
-            <Card title="Báo cáo bị từ chối" subtitle="Ghi vào bảng diagnostic_rejected, không nuốt lỗi im lặng (03 §4).">
+            <Card
+              title="Diagnostic Report Rejected"
+              subtitle="Schema validation failure recorded to reject store without silent suppression."
+            >
               <p className="text-[12.5px] text-ink-2">{data.rejected_reason}</p>
             </Card>
           )}
 
-          <Card title={`Alert trong sự cố (${data.alerts.length})`}>
+          <Card title={`Correlated Alerts (${data.alerts.length})`}>
             <ul className="space-y-1.5">
               {data.alerts.map((a) => (
                 <li key={a.alert_id}>
                   <Link
                     to={`/alerts/${a.alert_id}`}
-                    className="flex items-center gap-2 rounded px-1.5 py-1 text-[11.5px] hover:bg-[color:var(--color-plane)]"
+                    className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[11.5px] transition-colors hover:bg-[color:var(--color-plane)]"
                   >
                     <span className="tabular-nums text-ink-muted">{clockUTC(a.ts)}</span>
-                    <span className="font-mono text-ink-2">{a.service}</span>
+                    <span className="font-mono font-medium text-ink-2">{a.service}</span>
                     <span className="ml-auto">
                       <VerdictBadge verdict={a.verdict} compact />
                     </span>

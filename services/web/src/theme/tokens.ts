@@ -1,23 +1,19 @@
 /**
- * Token màu dùng cho SVG (Recharts / react-flow cần giá trị thật, không phải
- * biến CSS). Giữ đồng bộ thủ công với `src/index.css` — hai file, một bảng màu.
- *
- * Bảng màu này đã qua kiểm định: chạy
- *   node scripts/validate_palette.js "#2a78d6,#eb6834,#1baf7a,#eda100,#e87ba4" --mode light
- * → ALL CHECKS PASS.
+ * Explicit hex tokens for SVG renderers (Recharts / React Flow), kept synchronized
+ * with `src/index.css`.
  */
 
 export const ink = {
-  primary: "#0b0b0b",
-  secondary: "#52514e",
-  muted: "#898781",
-  grid: "#e1e0d9",
-  axis: "#c3c2b7",
-  surface: "#fcfcfb",
-  plane: "#f9f9f7",
+  primary: "#0f172a",
+  secondary: "#475569",
+  muted: "#64748b",
+  grid: "#e2e8f0",
+  axis: "#cbd5e1",
+  surface: "#ffffff",
+  plane: "#f7f7f5",
 } as const;
 
-/** Categorical — gán theo thứ tự cố định, không xoay vòng. */
+/** Fixed categorical palette — assigned by entity, never rotated. */
 export const series = [
   "#2a78d6", // 1 blue
   "#eb6834", // 2 orange
@@ -26,10 +22,10 @@ export const series = [
   "#e87ba4", // 5 magenta
 ] as const;
 
-/** Sequential một sắc (blue) cho độ lớn liên tục. */
+/** Sequential blue ramp for normalized scores. */
 export const sequential = ["#86b6ef", "#3987e5", "#1c5cab", "#0d366b"] as const;
 
-/** Status — dành riêng, luôn đi kèm icon + nhãn chữ, không bao giờ chỉ có màu. */
+/** Reserved status colors — always paired with a symbol and text label. */
 export const status = {
   good: "#0ca30c",
   warning: "#fab219",
@@ -52,9 +48,15 @@ export const verdictGlyph: Record<Verdict, string> = {
 };
 
 export const verdictLabel: Record<Verdict, string> = {
-  TRUE_ALERT: "Đúng cảnh báo",
-  FALSE_POSITIVE: "Dương tính giả",
-  UNCERTAIN: "Không chắc",
+  TRUE_ALERT: "Confirmed Alert",
+  FALSE_POSITIVE: "False Positive",
+  UNCERTAIN: "Suppressed / Uncertain",
+};
+
+export const verdictShortLabel: Record<Verdict, string> = {
+  TRUE_ALERT: "Confirmed",
+  FALSE_POSITIVE: "False Pos.",
+  UNCERTAIN: "Suppressed",
 };
 
 export const VERDICT_ORDER: Verdict[] = [
@@ -72,15 +74,21 @@ export const FAULT_TYPE_ORDER: FaultType[] = [
 ];
 
 export const faultTypeLabel: Record<FaultType, string> = {
-  network_delay: "network_delay",
-  cpu_contention: "cpu_contention",
-  exception: "exception",
-  return: "return",
-  cpu_consumed: "cpu_consumed",
+  network_delay: "Network Delay",
+  cpu_contention: "CPU Contention",
+  exception: "Unhandled Exception",
+  return: "Return Payload Fault",
+  cpu_consumed: "CPU Exhaustion",
 };
 
+export function formatFaultType(ft: string | null | undefined): string {
+  if (!ft) return "Normal Traffic";
+  if (ft in faultTypeLabel) return faultTypeLabel[ft as FaultType];
+  return ft;
+}
+
 /**
- * Màu đi theo *thực thể* (5 phương pháp trong luận văn), không đi theo thứ hạng.
+ * Fixed colors for the five evaluated validation architectures.
  */
 export const STRATEGY_ORDER: RetrievalStrategy[] = [
   "ctav",
@@ -91,31 +99,31 @@ export const STRATEGY_ORDER: RetrievalStrategy[] = [
 ];
 
 export const strategyColor: Record<RetrievalStrategy, string> = {
-  ctav: series[2], // aqua — phương pháp đề xuất
-  hybrid_bm25_graph: series[4], // magenta — C1 topology chưa hiệu chỉnh
-  bm25_hybrid: series[0], // blue — baseline
-  no_rag: series[3], // yellow — LLM không RAG
-  detector_only: series[1], // orange — IForest không LLM
+  ctav: series[2], // aqua — proposed CTAV pipeline
+  hybrid_bm25_graph: series[4], // magenta — uncalibrated topology RAG
+  bm25_hybrid: series[0], // blue — lexical RAG baseline
+  no_rag: series[3], // yellow — LLM judge without RAG
+  detector_only: series[1], // orange — unsupervised Isolation Forest
 };
 
 export const strategyLabel: Record<RetrievalStrategy, string> = {
-  ctav: "CTAV (C1 + θ 0,80 + C3 dev p90)",
-  hybrid_bm25_graph: "C1 Topology (chưa hiệu chỉnh)",
-  bm25_hybrid: "BM25 hybrid (baseline)",
-  no_rag: "LLM không RAG",
-  detector_only: "Detector-only (IForest)",
+  ctav: "CTAV (Calibrated Topology-Aware Validation)",
+  hybrid_bm25_graph: "Uncalibrated Topology RAG",
+  bm25_hybrid: "BM25 Lexical RAG (Baseline)",
+  no_rag: "LLM Judge without RAG",
+  detector_only: "Isolation Forest Detector Only",
 };
 
 export const strategyShortLabel: Record<RetrievalStrategy, string> = {
-  ctav: "CTAV",
-  hybrid_bm25_graph: "C1 topo",
-  bm25_hybrid: "BM25 (base)",
-  no_rag: "Không RAG",
-  detector_only: "Detector",
+  ctav: "CTAV (Proposed)",
+  hybrid_bm25_graph: "Topology RAG",
+  bm25_hybrid: "BM25 Baseline",
+  no_rag: "LLM (No RAG)",
+  detector_only: "IForest Only",
 };
 
 export const modalityLabel: Record<"log" | "trace" | "metric", string> = {
-  log: "log",
-  trace: "trace",
-  metric: "metric",
+  log: "Log",
+  trace: "Trace",
+  metric: "Metric",
 };
