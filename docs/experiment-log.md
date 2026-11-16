@@ -2049,3 +2049,155 @@ M8 đã xong phần API nên M9 được gọi Gemini thật trong ngân sách 1
   điểm; cùng ngân sách đó C1 đạt F1 0,058, cao hơn CTAV.
 - *Vế C2 của H3:* ΔFPR bằng đúng 0 vì cả 54 cửa sổ C2 hạ đều đã bị C3 hạ trước — đạt theo tiêu chí, nhưng không
   phải bằng chứng độc lập rằng C2 vô ích khi không có C3.
+
+---
+
+## QĐ-040 — M9-A: thiết lập đánh giá RCA trên `val`; định nghĩa và quy tắc chọn viết trước khi xem số (2026-11-16)
+
+**Bối cảnh.** Người dùng giao M9-A qua prompt P2 (`docs/prompts/M8-M12-prompts.md`), dẫn chiếu QĐ-037 và QĐ-039.
+So với lúc prompt được viết: M8 đã đóng nên không còn phiên chạy song song, và "M8: xong phần API" đã đạt nên
+summarizer được gọi Gemini thật. Phiên này **chỉ dùng `val`**: không đọc, không chạy, không tạo gì thuộc `test`.
+
+**Quyết định (đều nằm trong code ở commit `e455004`, trước lần chạy đầu tiên trên `val`).**
+
+1. *Đầu vào.* 80 cảnh báo của `ctav_final_val_v1` (`decision == alert`); nội dung bằng chứng lấy từ
+   `h0_val_c1_k0_v1/retrieval.jsonl`. Harness còn đọc được cảnh báo của một biến thể ablation replay từ config
+   CTAV (`input.ctav_config` + `input.variant`) để M9-B làm dòng độ nhạy V36 (a); trên `val` đã kiểm: biến thể
+   `ctav` cho đúng 80 cảnh báo, `c3_rolling_baseline` cho 289 = TP + FP ghi ở `ctav.json`.
+2. *Nhãn incident* (`02` §4.3, QĐ-001, QĐ-003). Một lần tiêm lỗi phủ [cửa sổ fault đầu; cửa sổ fault cuối + 60 s).
+   Một cảnh báo thuộc mọi lần tiêm lỗi mà cửa sổ của nó giao về thời gian, **bất kể service**. Incident `labelled`
+   khi các cảnh báo của nó thuộc đúng một lần tiêm lỗi; `ambiguous` khi thuộc từ hai lần trở lên (loại khỏi Hit@k,
+   có đếm); `no_fault` khi không thuộc lần nào (không có root cause để tìm; loại, có đếm). Lần tiêm lỗi của split
+   lấy từ `data/window_index.csv` **lọc theo `window_id` của split đang chạy**.
+3. *Alert Reduction Ratio* trên một tập cảnh báo = 1 − (số incident chứa ít nhất một cảnh báo của tập) / (số cảnh
+   báo của tập). Các tập: `all`; `fault`; `type:<loại lỗi>`; `cascade`.
+4. *Propagation mức 1* (`services/rca_agent/propagation.py`). Lỗi lan ngược chiều gọi, nên từ mỗi service có cảnh
+   báo đi **một bước theo chiều gọi**: service đó đổ lỗi cho các callee trực tiếp có dấu hiệu bất thường, không có
+   thì đổ cho chính nó; mỗi service có cảnh báo góp đúng một phiếu, chia đều. Điểm = số phiếu / số service có cảnh
+   báo; hoà thì xét anomaly score cao nhất của service trong khoảng thời gian incident, rồi tên. Phiếu đếm theo
+   **service**, không theo số cảnh báo, và chia cho số service có cảnh báo ⇒ thứ hạng không phụ thuộc số cảnh báo
+   tuyệt đối. Baseline của H5: xếp các service có cảnh báo theo anomaly score cao nhất trong các cảnh báo của incident.
+5. *Hit@k* trên incident `labelled`; báo thêm Hit@k trên **mọi lần tiêm lỗi** của split (lần không có incident
+   `labelled` nào tính là trượt; có nhiều incident thì lấy incident sớm nhất).
+6. *CI.* Bootstrap percentile, 1.000 mẫu, seed 42. Hit@k lấy mẫu lại theo incident (ΔHit@1 ghép cặp dùng cùng bộ
+   mẫu); ARR lấy mẫu lại theo cụm thời gian của `T_group` lớn nhất đang xét (chứa trọn incident của mọi `T_group`
+   nhỏ hơn).
+7. *Quy tắc chọn `T_group`* (`select_t_group`): (i) chỉ giữ các `T` có ít incident `ambiguous` nhất; (ii) mốc
+   tham chiếu là 300 s (`01` §6.5) nếu còn được giữ, không thì `T` nhỏ nhất còn lại; (iii) một `T` khác chỉ thay
+   mốc khi ARR trên tập `fault` cao hơn với cận dưới CI95 ghép cặp > 0, nhiều `T` như vậy thì lấy ARR cao nhất rồi
+   `T` nhỏ hơn; (iv) chênh lệch nằm trong CI, hoặc hoà, thì giữ mốc.
+8. *Quy tắc chọn dấu hiệu bất thường* (`select_sign`): mặc định `alert` (chỉ service có cảnh báo CTAV mới tính
+   là bất thường — không phụ thuộc số candidate của detector); `candidate` (thêm service có cửa sổ bị detector
+   gắn cờ trong khoảng incident ± 60 s) chỉ thay khi ΔHit@1 ghép cặp có cận dưới CI95 > 0.
+9. *Summarizer.* Service gốc trong báo cáo **không do LLM chọn**: lấy hạng 1 của mức 1. LLM chỉ viết loại lỗi, độ
+   tin cậy, bằng chứng, đường lan truyền, việc nên làm. JSON valid rate = số báo cáo qua validation / số lần gọi LLM.
+10. *Mức 2 (LLM lập luận trên toàn call chain)*: **không làm**, đã cắt theo `04` §9 ưu tiên 1 (QĐ-037). Hệ quả: luận
+    văn không có so sánh 1-hop với full path; `01` §6.5 ghi "cả hai mức phải chạy được" không còn áp dụng.
+
+**Agent tự quyết — chờ người dùng xác nhận (V40..V43, báo cáo M9 §3).**
+- *V40 — định nghĩa "cascade".* Tài liệu không định nghĩa. Chọn: lần tiêm lỗi mà cảnh báo của nó chạm **≥ 2
+  service** (`labels.cascade_min_services: 2`). Đã bỏ: "≥ 2 cảnh báo" (không phải lan truyền, chỉ là lỗi kéo dài).
+- *V41 — nhãn `ambiguous` giữ nguyên văn `02` §4.3*, kể cả khi hai lần tiêm lỗi liền nhau có cùng service gốc.
+- *V42 — chỗ đặt code ghi PostgreSQL:* `services/rca_agent/store.py` (vùng file của P2), không phải `packages/storage/`.
+- *V43 — sửa ngoài vùng file P2*, đều là thêm: `packages/schemas/models.py` (thêm `DiagnosticReport`,
+  `EvidenceItem`, `SuggestedAction` đúng `03` §2), `tests/test_harness.py` (thêm loại config `rca` vào test duyệt
+  mọi config), `eval/__main__.py` (thêm lệnh con `rca`, 39 dòng thêm, 0 dòng đổi).
+
+---
+
+## QĐ-041 — M9-A: kết quả RCA trên `val`, chốt `eval/configs/rca_final.yaml` (2026-11-16)
+
+**Chạy.** `rca_select_val_v1` (quét, 0 LLM) → `rca_mock_val_v1` (summarizer backend `mock`, có ghi PostgreSQL —
+chỉ để kiểm đường chạy, không phải kết quả) → `rca_final_val_v1` (Gemini thật). Thứ tự commit: `e455004` (code +
+quy tắc chọn) → chạy quét → `77786ec` (**commit riêng chỉ chứa `rca_final.yaml`**) → commit kết quả và tài liệu.
+
+**Đầu vào trên `val`.** 80 cảnh báo ở 8 service; 36 cảnh báo giao thời gian với một lần tiêm lỗi (29 trong đó nằm
+đúng pod bị tiêm = 29 TP mức cửa sổ của M6; 7 nằm ở pod / service khác trong lúc có lỗi), 44 nằm ngoài mọi lần tiêm
+lỗi. `val` có 30 lần tiêm lỗi (9 `network_delay`, 7 `cpu_contention`, 6 `exception`, 5 `return`, 3 `cpu_consumed`);
+**18 / 30 lần không có cảnh báo CTAV nào** (cả 5 `return`, 4 / 6 `exception`, 6 / 9 `network_delay`, 2 / 7
+`cpu_contention`, 1 / 3 `cpu_consumed`).
+
+**Bảng QĐ-041-1. Quét `T_group` trên `val` (`rca_select_val_v1`; CI95 bootstrap theo 13 cụm thời gian của 600 s).**
+
+| `T_group` | Incident | `labelled` | `ambiguous` | `no_fault` | Nhiều service | ARR `all` [CI95] | ARR `fault` [CI95] | ARR `network_delay` [CI95] | Hit@1 mức 1 | Hit@1 baseline |
+|---:|---:|---:|---:|---:|---:|---|---|---|---|---|
+| **180 s** | 26 | 11 | 1 | 14 | 1 | 0,675 [0,543; 0,728] | 0,667 [0,545; 0,733] | 0,250 [0,000; 0,500] | 7 / 11 = 0,636 | 7 / 11 = 0,636 |
+| 300 s | 19 | 9 | 2 | 8 | 1 | 0,763 [0,585; 0,835] | 0,694 [0,550; 0,788] | 0,250 [0,000; 0,500] | 5 / 9 = 0,556 | 5 / 9 = 0,556 |
+| 600 s | 17 | 9 | 2 | 6 | 1 | 0,788 [0,590; 0,865] | 0,694 [0,550; 0,788] | 0,250 [0,000; 0,500] | 5 / 9 = 0,556 | 5 / 9 = 0,556 |
+
+- *Chọn `T_group` = 180 s* theo quy tắc (i)–(ii): 180 s có 1 incident `ambiguous`, 300 s và 600 s có 2 (ở 300 s
+  hai lần tiêm lỗi `2022-08-22#018` và `#019` trên `recommendationservice`, cách nhau 240 s, bị gộp làm một).
+  300 s − 180 s trên tập `fault`: ΔARR +0,028 [0,000; +0,067] — cận dưới không > 0, và 300 s đã bị loại ở bước (i).
+  **Đây là khác biệt 1 incident**; quy tắc viết trước nên giữ nguyên kết quả, không diễn giải thêm.
+- *Chọn dấu hiệu `alert`:* `candidate` − `alert` ở 180 s: ΔHit@1 +0,091 [0,000; +0,273] (8 / 11 so với 7 / 11) —
+  cận dưới không > 0 ⇒ giữ mặc định.
+
+**Bảng QĐ-041-2. Kết quả cấu hình chốt trên `val` (`rca_final_val_v1`: `T_group` 180 s, dấu hiệu `alert`; CI95
+bootstrap 1.000 mẫu, seed 42; ARR lấy mẫu theo 22 cụm thời gian, Hit@k theo 11 incident `labelled`).**
+
+| Chỉ số | Giá trị | CI95 | Ngưỡng | Đạt? |
+|---|---|---|---|---|
+| Incident / `labelled` / `ambiguous` / `no_fault` | 26 / 11 / 1 / 14 | | | |
+| ARR mọi cảnh báo (80 → 26) | 0,675 | [0,600; 0,730] | | |
+| ARR cảnh báo trong lỗi (36 → 12) | 0,667 | [0,565; 0,725] | | |
+| ARR `cascade` (6 → 2; chỉ 1 lần tiêm lỗi) | 0,667 | [0,667; 0,667] (suy biến) | ≥ 0,30 (H5, trên `test`) | — |
+| **ARR `network_delay` (4 → 3)** | **0,250** | [0,000; 0,500] | ≥ 0,30 (DoD M9) | **Không** |
+| ARR `cpu_contention` (21 → 6) / `cpu_consumed` (8 → 2) / `exception` (3 → 1) | 0,714 / 0,750 / 0,667 | | | |
+| **Hit@1 mức 1** | **7 / 11 = 0,636** | [0,364; 0,909] | ≥ 0,60 (H5, trên `test`) | — |
+| **Hit@3 mức 1** | **7 / 11 = 0,636** | [0,364; 0,909] | ≥ 0,80 (H5, trên `test`) | — |
+| Hit@1 / Hit@3 baseline | 7 / 11 = 0,636 / 0,636 | [0,364; 0,909] | | |
+| **ΔHit@1 (mức 1 − baseline), ghép cặp** | **0,000** | [0,000; 0,000] (0 cặp lệch) | cận dưới > 0 (H5) | — |
+| Hit@1 = Hit@3 trên mọi lần tiêm lỗi (30) | 6 / 30 = 0,200 | [0,067; 0,333] | | |
+| **JSON valid rate** | **26 / 26 = 1,000** | [1,000; 1,000] | ≥ 0,95 (DoD M9) | **Có** |
+
+**Nguyên nhân từ dữ liệu.**
+- *ARR `network_delay` 0,25 < 0,30:* chỉ 3 / 9 lần tiêm `network_delay` có cảnh báo CTAV, với 1, 2 và 1 cảnh báo.
+  Mỗi lần tiêm lỗi thành đúng một incident, tức grouping đã gom hết mức có thể; trần của ARR trên 4 cảnh báo này
+  (không gộp lỗi khác nhau) là 1 − 3 / 4 = 0,25 ở **mọi** `T_group`. Chỉ số bị chặn bởi recall của CTAV trên
+  `network_delay`, không phải bởi `T_group`.
+- *Mức 1 ≡ baseline:* 25 / 26 incident chỉ có một service, khi đó cả hai cách đều trả về chính service đó. Incident
+  nhiều service duy nhất (`ts-gateway-service` + `ts-travel2-service`) là `ambiguous` nên không được chấm; ở đó mức
+  1 xếp `ts-travel2-service` (đúng service gốc của cả hai lần tiêm lỗi) hạng 1, baseline xếp `ts-gateway-service`.
+- *Hit@3 = Hit@1:* danh sách xếp hạng của incident một service chỉ có một phần tử.
+- *4 incident trượt:* cả 3 incident `network_delay` (cảnh báo ở `recommendationservice`, lỗi ở
+  `productcatalogservice` — callee trực tiếp; cảnh báo ở `ts-travel2-service`, lỗi ở `ts-contacts-service` và
+  `ts-security-service` — cách 2 bước trên đồ thị vô hướng, không có đường gọi có hướng) và 1 incident
+  `cpu_contention` (cảnh báo sớm ở `ts-travel2-service`, lỗi ở `ts-travel-service`; hai service không kề nhau nên
+  cùng lần tiêm lỗi `2023-01-30#009` tách thành hai incident, incident sau trúng). Ca `productcatalogservice` là ca
+  duy nhất dấu hiệu `candidate` gỡ được.
+- *14 / 26 incident là `no_fault`* (44 cảnh báo sai của CTAV, dồn ở `ts-travel2-service` và `ts-auth-service` ngày
+  2023-01-30): grouping giảm số việc SRE phải xem nhưng không lọc được cảnh báo sai.
+
+**Summarizer (`rca-summary-v1`, `gemini-2.5-flash`, temperature 0).** 26 lần gọi, 26 báo cáo qua validation, 0 bị
+loại, 0 `suspicious`, 0 báo cáo trích id bằng chứng bịa; mỗi báo cáo trích 3–4 bằng chứng, 2–3 việc nên làm; độ trễ
+trung vị 2,64 s / incident. **Hạn chế đã thấy (mô tả, ngoài DoD):** loại lỗi LLM ghi là `cpu_contention` ở 22 / 26
+báo cáo và `network_delay` ở 4, không lần nào `unknown`, kể cả 14 incident `no_fault`; trên 11 incident `labelled`
+khớp nhãn 7 (6 `cpu_contention`, 1 `network_delay`), 2 `cpu_consumed` bị ghi `cpu_contention` (từ vựng `03` §2 không
+có `cpu_consumed`), 2 `network_delay` bị ghi `cpu_contention`. JSON valid rate chỉ đo cú pháp và quy tắc `03` §2.1,
+không đo độ đúng của nội dung — việc đó thuộc M11.
+
+**PostgreSQL** (`services/rca_agent/store.py`, một transaction): `run_registry` 1 dòng, `incidents` 26,
+`diagnostic_reports` 26, `diagnostic_rejected` 0 cho `rca_final_val_v1` (và 26 / 26 / 0 cho `rca_mock_val_v1`).
+
+**Chi phí API.** 26 lần gọi mới, 66.080 token vào / 9.528 token ra = **0,0436 USD theo token** (ước trước khi chạy:
+tối đa 0,080 USD; ngân sách M9 1 USD, ngưỡng dừng 2 USD). Cache `data/llm_cache/gemini.jsonl`: 40.251 → 40.277 dòng.
+
+**Chốt.** `eval/configs/rca_final.yaml` (commit `77786ec`): `T_group` 180 s; mức 1 với dấu hiệu `alert`, đệm 60 s;
+`cascade_min_services` 2; summarizer `gemini-2.5-flash`, `max_output_tokens` 1024, `max_evidence` 12, prompt
+`rca-summary-v1` (dấu vân tay `8c1d50e6ba757ee6`), `require_evidence`; 1.000 mẫu bootstrap, seed 42. Dấu vân tay
+phương pháp do harness in ra: **`b0c54fa68ef65535`** — bản `test` của M9-B phải in đúng giá trị này. Từ đây không
+đổi tham số RCA.
+
+**Điều cần biết trước M9-B (không sửa được, chỉ để đọc kết quả cho đúng).** Trên `val`: Hit@1 0,636 có CI rộng
+(n = 11); Hit@3 0,636 < 0,80; ΔHit@1 bằng đúng 0 vì gần như mọi incident chỉ có một service. Nếu incident trên
+`test` cũng chủ yếu một service thì vế "cận dưới CI ΔHit@1 > 0" và vế Hit@3 của H5 sẽ không đạt; kết quả đó phải
+báo đúng như nó là.
+
+Lệnh tái lập (cần `docker compose --profile dev up -d`; `run_id` đã có thì đổi `run_id`):
+
+```bash
+py -m eval rca --config eval/configs/rca_select_val.yaml   # 0 LLM
+py -m eval rca --config eval/configs/rca_mock_val.yaml     # summarizer mock + PostgreSQL
+py -m eval rca --config eval/configs/rca_final.yaml        # 100% cache sau lần chạy đầu
+py -m pytest tests/test_rca_propagation.py tests/test_rca_summarizer.py tests/test_rca_harness.py tests/test_grouping.py -q
+```

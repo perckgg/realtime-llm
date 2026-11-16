@@ -159,11 +159,13 @@ def test_committed_configs_load():
     import yaml
 
     from eval.harness.ctav import load_anchor_config, load_ctav_config
+    from eval.harness.rca import load_rca_config
     from eval.harness.rescue import load_features_config, load_rescue_config
 
     loaders = {
         "anchor_features": load_anchor_config,
         "ctav": load_ctav_config,
+        "rca": load_rca_config,
         "rescue": load_rescue_config,
         "rescue_features": load_features_config,
     }

@@ -19,7 +19,7 @@
 | M6 | QUA (đóng 2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032, QĐ-037 |
 | M7 | QUA (đóng 2026-11-14; H0–H5 đã đăng ký, commit `be2b985`; V33 (a), V34 (b)) | `docs/milestones/M7-rescue-dang-ky.md`; QĐ-033, QĐ-034 |
 | M8 | **QUA (đóng 2026-11-16; người dùng đã xem báo cáo, V36 (a) — QĐ-039; M8: xong phần API)** — hoàn tất 2026-11-16 (21.094 gọi mới, 0 lỗi, 15,85 USD theo token): **H0 đạt, H2 không đạt** (do 61% fault rơi vào 32 service thiếu ngưỡng `dev`; đối chứng `C3-trượt` đạt F1 0,120), **H3 & H4 đạt** | `docs/milestones/M8-g-test.md`; QĐ-034..039 |
-| M9 | **Đang làm** (mở 2026-11-16; M9-A `val` → M9-B `test`) | QĐ-037, QĐ-039; báo cáo sẽ ở `docs/milestones/M9-rca.md` |
+| M9 | **Đang làm** (mở 2026-11-16; **M9-A `val` xong 2026-11-16**, `rca_final.yaml` chốt ở `77786ec`; còn M9-B `test`) | QĐ-037, QĐ-039, QĐ-040, QĐ-041; bản nháp `docs/milestones/M9-rca.md` |
 
 M8 tóm tắt (QĐ-038, QĐ-039): G-test trên `test` (11.985 cửa sổ telemetry, 346 fault), 21.094 lần gọi mới, 15,85 USD
 theo token, 0 lỗi judge. **H0 chấp nhận** (C1 − BM25: ΔRecall +0,179, ΔFPR +0,0744). **H2 không được chấp nhận**:
@@ -64,18 +64,22 @@ chốt ở `eval/configs/rca_final.yaml` bằng commit riêng **trước** khi c
 
 **M9-A — trên `val`** (đầu vào: 80 cảnh báo của `ctav_final_val_v1`: 29 TP, 51 FP; replay 0 USD)
 
-1. - [ ] Harness RCA `py -m eval rca --config ...`: đọc cảnh báo CTAV của một run, gom incident, định vị root cause,
+1. - [x] Harness RCA `py -m eval rca --config ...`: đọc cảnh báo CTAV của một run, gom incident, định vị root cause,
    chấm Hit@1 / Hit@3 mức service theo nhãn root-cause (QĐ-001) có CI bootstrap; ghi `incidents` vào PostgreSQL (`03` §4)
-2. - [ ] Grouping (`services/rca_agent/grouping.py` đã có + `tests/test_grouping.py`): quét `T_group ∈ {180, 300, 600}` s;
+2. - [x] Grouping (`services/rca_agent/grouping.py` đã có + `tests/test_grouping.py`): quét `T_group ∈ {180, 300, 600}` s;
    Alert Reduction Ratio chung và riêng trên incident cascade / `network_delay`; quy tắc chọn `T_group` (kể cả khi hoà)
    viết vào code trước khi xem số
-3. - [ ] `propagation.py` mức 1 (lan truyền ngược 1-hop thuần thuật toán) + baseline "service có anomaly score cao nhất
+3. - [x] `propagation.py` mức 1 (lan truyền ngược 1-hop thuần thuật toán) + baseline "service có anomaly score cao nhất
    trong incident"; báo cả hai kèm ΔHit@1 ghép cặp có CI
 4. - [x] ~~`propagation.py` mức 2 (LLM full call chain)~~ — đã cắt theo `04` §9 ưu tiên 1 (QĐ-037); ghi vào QĐ và báo cáo M9
-5. - [ ] `summarizer.py`: JSON theo `03` §2, validator + `diagnostic_rejected`, `require_evidence`, chặn câu lệnh thực thi;
+5. - [x] `summarizer.py`: JSON theo `03` §2, validator + `diagnostic_rejected`, `require_evidence`, chặn câu lệnh thực thi;
    test bằng backend `mock` trước, rồi đo JSON valid rate bằng Gemini thật (M8 đã xong phần API; ngân sách 1 USD, ngưỡng dừng 2 USD)
-6. - [ ] Chốt `eval/configs/rca_final.yaml` (`T_group`, quy tắc xếp hạng, prompt summarizer), commit riêng
-7. - [ ] Nháp `docs/milestones/M9-rca.md` (phần `val`) + `docs/drafts/ch5-rca-val.md` (bảng + đoạn văn cho §5.9, mô tả RCA cho Ch4)
+6. - [x] Chốt `eval/configs/rca_final.yaml` (`T_group`, quy tắc xếp hạng, prompt summarizer), commit riêng
+7. - [x] Nháp `docs/milestones/M9-rca.md` (phần `val`) + `docs/drafts/ch5-rca-val.md` (bảng + đoạn văn cho §5.9, mô tả RCA cho Ch4)
+
+Kết quả M9-A trên `val` (QĐ-041, `rca_final_val_v1`): `T_group` 180 s, mức 1 dấu hiệu `alert`; 80 cảnh báo → 26 incident
+(11 có nhãn, 1 `ambiguous`, 14 không ứng với lỗi); Hit@1 = Hit@3 = 0,636 [0,364; 0,909] = baseline (ΔHit@1 0,000);
+ARR 0,675 chung, **0,250 trên `network_delay` (DoD ≥ 0,30 không đạt)**; JSON valid rate 26 / 26. Chờ người dùng: V40, V44.
 
 **M9-B — trên `test`** (điều kiện vào: `rca_final.yaml` đã commit; M8 QUA — đã đạt, QĐ-039)
 
@@ -131,7 +135,7 @@ suy từ một lần đối chiếu, giá trong code và số dư credit chưa �
 | M6 | Xong: 0 lần gọi (replay cache H0, QĐ-031) | 2 USD | 4 USD — đổi prompt judge = lập lại ngân sách trước khi chạy |
 | M7 | Xong phần Rescue: 1.459 lần gọi, 1,03 USD **theo token** (`m7_rescue_val_c1_v1`) | 4 USD | 6 USD |
 | M8 | **Xong phần API** (`test` một lần, toàn bộ candidate — V27): **15,85 USD theo token** / 21.094 câu mới (`bm25` 8,87 + `c1_k0` 4,71 + `norag` 1,10 + `C5` 0,09 + `repeat` 1,08) | 18 USD | 20 USD (người dùng đã duyệt vượt ở QĐ-037) |
-| M9 | Tóm tắt incident bằng LLM (vài trăm) | 1 USD | 2 USD |
+| M9 | Tóm tắt incident bằng LLM (vài trăm). **M9-A xong: 26 lần gọi, 0,0436 USD theo token** (`rca_final_val_v1`, QĐ-041); còn M9-B | 1 USD | 2 USD |
 | M10–M12 | Demo offline từ cache; đánh giá bằng người | 0 | 1 USD |
 | Dự phòng | Chạy lại do lỗi pipeline / đổi prompt | 8 USD | — |
 | **Tổng còn phải chi (M9–M12 + dự phòng)** | | **≈ 9 USD** (riêng M9 ≈ 1 USD; người dùng báo ngày 2026-11-16 trước đợt chạy cuối còn ≈ 300k đ, đợt cuối chỉ tiêu thêm **1,29 USD theo token** ≈ 35–44k đ) | |
@@ -142,7 +146,8 @@ M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`r
 `usage` trong cache), 2026-11-01 1,0093 USD (`neighbor_trace` 0,0016, `repeat` 1 0,5022, `repeat` 2 0,5056);
 M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD / 21.094 lần gọi mới trong cache**
 (`h0_test_bm25_v1` 8,8715 / 13.699; `h0_test_c1_k0_v1` 4,7072 / 3.299; `h0_test_norag` `_v1 + _v2` 1,0976 / 3.287;
-`m8_rescue_test_c1_v1` 0,0897 / 61; 4 run `repeat` 1,0804 / 748).
+`m8_rescue_test_c1_v1` 0,0897 / 61; 4 run `repeat` 1,0804 / 748); **M9-A (2026-11-16) = 0,0436 USD / 26 lần gọi**
+(`rca_final_val_v1`; cache 40.277 dòng).
 
 **Quy tắc (áp cho mọi mốc):**
 1. Trước mỗi lần chạy có gọi API: ước số lần gọi mới (trừ phần trúng cache) × đơn giá theo **token của
@@ -154,6 +159,32 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-16 (M9-A xong, chờ M9-B)
+
+**Trạng thái:** M9-A việc 1–7 xong (QĐ-040, QĐ-041; bản nháp `docs/milestones/M9-rca.md`, `docs/drafts/ch5-rca-val.md`).
+Phiên này không đọc, không chạy, không tạo gì thuộc `test`. Commit: `e455004` (code + quy tắc chọn, trước số `val`) →
+`77786ec` (**chỉ** `eval/configs/rca_final.yaml`) → commit kết quả + tài liệu. Chưa push.
+**Cấu hình chốt (`rca_final.yaml`, dấu vân tay phương pháp `b0c54fa68ef65535`):** `T_group` 180 s; mức 1 với dấu hiệu
+`alert`, đệm 60 s; cascade = lần tiêm lỗi có cảnh báo ở ≥ 2 service; summarizer `gemini-2.5-flash`, prompt
+`rca-summary-v1` (`8c1d50e6ba757ee6`), `max_evidence` 12, `require_evidence`; bootstrap 1.000 mẫu, seed 42.
+**Số `val`:** 80 cảnh báo → 26 incident (11 có nhãn, 1 `ambiguous`, 14 không ứng với lỗi); Hit@1 = Hit@3 = 7 / 11 = 0,636
+[0,364; 0,909], **bằng baseline** (ΔHit@1 0,000 [0,000; 0,000]: 25 / 26 incident chỉ có một service); Hit@1 trên mọi
+lần tiêm lỗi 6 / 30; ARR 0,675 [0,600; 0,730] chung, 0,667 cascade (1 lần tiêm lỗi), **0,250 [0,000; 0,500] trên
+`network_delay` — DoD ≥ 0,30 không đạt** (chỉ 3 / 9 lần tiêm có cảnh báo, 4 cảnh báo → 3 incident là trần);
+JSON valid rate 26 / 26 = 1,000. Chi phí 0,0436 USD theo token (26 lần gọi).
+**Kiểm:** 239 test qua (gồm `tests/test_storage.py` và test ghi PostgreSQL thật — Docker đang bật); `mypy packages
+services` sạch; `ruff` chỉ còn E402 cũ ở `scripts/`.
+**Chưa làm / chưa kiểm:** mức 2 (cắt, QĐ-037); chưa có ai đọc nội dung 26 báo cáo (M11); `packages/storage/README.md`
+vẫn ghi "PostgreSQL client chưa có" (ngoài vùng file P2 — code ghi nằm ở `services/rca_agent/store.py`, V42); chưa đo
+E2E latency đúng nghĩa (M10; số 2,64 s / incident ở QĐ-041 chỉ là định vị + một lần gọi LLM).
+**Chờ người dùng trước M9-B:** V40 (định nghĩa cascade ≥ 2 service), V44 (đồng ý sang M9-B dù DoD ARR `network_delay`
+không đạt trên `val`); V41–V43 không chặn (báo cáo M9 §3).
+**Việc đầu tiên phiên M9-B (prompt P3):** bật Docker; tạo `eval/configs/rca_final_test.yaml` = `rca_final.yaml` chỉ đổi
+`split: test`, thêm `h5_test: true`, `input.alerts_run` / `input.evidence_run` sang run `test`, `run_id`; in diff, commit,
+chạy một lần, kiểm harness in `method fingerprint b0c54fa68ef65535`. Dòng độ nhạy V36 (a): cùng tham số với
+`input: {ctav_config: ..., variant: c3_rolling_baseline, evidence_run: ...}` và `run_id` riêng (đường này đã kiểm trên
+`val`: 289 cảnh báo = TP + FP của `ctav.json`). Harness tự ước chi phí và dừng nếu vượt 1 USD.
 
 ## Ghi chú bàn giao — 2026-11-16 (đóng M8, mở M9)
 
