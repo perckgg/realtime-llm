@@ -1958,6 +1958,12 @@ Bảng QĐ-037-2. Bốn vế tiêu chí H0 đã đăng ký trên `test` (C1 − 
 - Cải tiến UI/UX trên `App.tsx`, `ui.tsx`, `Timeline.tsx`, `AlertDetail.tsx`, `IncidentDetail.tsx`, `ExperimentComparison.tsx`: header cố định kèm badge `CTAV`, thanh `Guided Walkthrough` tô sáng tuyến đang xem, dải 4 bước `CTAV Validation Pipeline` trên `Timeline`, callout nổi bật quyết định cổng p90 trên `AlertDetail`, bảng & thẻ nâng độ tương phản sạch sẽ.
 - **Kiểm chứng sau sửa:** `py scripts/export_web_snapshot.py` (4.717,3 KB) + `py -m ruff check` sạch; quét regex tiếng Việt / `C1`–`C5` / `QĐ` / `H0`–`H5` trong `snapshot.json` ra 0 kết quả; `npm.cmd run check` (`tsc -b --noEmit` + `smoke.tsx`) đạt **18/18**; `npm.cmd run build -- --base=/realtime-llm/` thành công (`index.html` 0,95 kB, CSS 39,67 kB / 7,31 kB gzip, JS 5.691,80 kB / 727,31 kB gzip).
 
+**Nâng cấp đồ thị RCA tương tác & bổ sung tab `/guide` cho giảng viên (2026-11-16, nhánh `demo/gh-pages`).**
+- `scripts/export_web_snapshot.py` & `api/types.ts`: làm giàu mỗi `GraphNode` bằng dữ liệu thật trong `±300 s` quanh sự cố (`suppressed_count`, `suppressed_alert_ids`, `confirmed_alert_ids`, `sample_span_ms`, `baseline_p90_ms`, `first_alert_ts`), ưu tiên đưa các service hàng xóm có false positive bị CTAV chặn lên đồ thị và đảm bảo toàn bộ alert liên kết đều có mặt trong `snapshot.json` (**4.788,8 KB**).
+- `IncidentDetail.tsx`: thêm chế độ chuyển đổi **Calibrated CTAV View** ↔ **Before vs. After CTAV Gate (Diff)**, điều khiển từng bước lan truyền (`All Layers` → `1. Root Origin` → `2. Upstream Cascade` → `3. Neighbor Noise Blocked`), bố cục phân tầng cho node hàng xóm bị chặn, và **Node / Edge Telemetry Inspector** khi click trực tiếp lên đồ thị (hiển thị thanh so sánh latency span vs. `p90` nền và link mở thẳng các alert bị chặn).
+- `MethodologyGuide.tsx` (`/guide` + mục menu `Methodology & Guide`): trang tổng hợp cho giảng viên gồm ma trận tiến độ các pha luận văn, phân tích trực quan **Topology Paradox**, đầy đủ công thức 4 tầng (IForest → Fusion Score → Calibrated Baseline Gate → Grouping/Localization + Ablations) và bảng chú giải thuật ngữ / thống kê.
+- **Kiểm chứng:** `py scripts/export_web_snapshot.py` + `py -m ruff check` sạch; `npm.cmd run check` (`tsc -b --noEmit` + `smoke.tsx`) đạt **23/23** trên cả 5 route và 5 run (bao gồm kiểm toàn vẹn link `confirmed_alert_ids` & `suppressed_alert_ids`); `npm.cmd run build -- --base=/realtime-llm/` thành công (`index.html` 0,98 kB, CSS 41,88 kB / 7,60 kB gzip, JS 5.792,21 kB / 745,01 kB gzip).
+
 **Tái lập.**
 ```bash
 py scripts/export_web_snapshot.py

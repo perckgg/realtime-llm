@@ -175,6 +175,12 @@ export interface GraphNode {
   role: "root_cause" | "ground_truth" | "affected" | "healthy";
   alert_count: number;
   max_anomaly_score: number;
+  suppressed_count?: number;
+  suppressed_alert_ids?: string[];
+  confirmed_alert_ids?: string[];
+  sample_span_ms?: number | null;
+  baseline_p90_ms?: number | null;
+  first_alert_ts?: string | null;
 }
 
 /** `GET /incidents/{incident_id}` */

@@ -10,10 +10,12 @@ import Timeline from "@/screens/Timeline";
 import AlertDetail from "@/screens/AlertDetail";
 import IncidentDetail from "@/screens/IncidentDetail";
 import ExperimentComparison from "@/screens/ExperimentComparison";
+import MethodologyGuide from "@/screens/MethodologyGuide";
 
 const NAV = [
   { to: "/timeline", label: "Alert & Incident Timeline", hint: "Chronological validation verdicts and service-level incidents" },
   { to: "/compare", label: "Benchmark & Ablation", hint: "5-method performance comparison, ablations, budget curves & holdout test" },
+  { to: "/guide", label: "Methodology & Guide", hint: "Formulas, architecture, glossary & thesis progress for advisor review" },
 ];
 
 export default function App() {
@@ -103,6 +105,7 @@ export default function App() {
             <Route path="/alerts/:alertId" element={<AlertDetail />} />
             <Route path="/incidents/:incidentId" element={<IncidentDetail />} />
             <Route path="/compare" element={<ExperimentComparison />} />
+            <Route path="/guide" element={<MethodologyGuide />} />
             <Route path="*" element={<Navigate to="/timeline" replace />} />
           </Routes>
         </main>
@@ -113,7 +116,7 @@ export default function App() {
               CTAV — Calibrated Topology-Aware Alert Validation &amp; Root Cause Analysis Platform
             </span>
             <span>
-              Four analytical views: Timeline · Alert Inspection · Incident RCA Graph · Benchmark &amp; Ablation (Read-Only Demo)
+              Timeline · Alert Inspection · Incident RCA Graph · Benchmark &amp; Ablation · Methodology &amp; Guide (Read-Only Demo)
             </span>
           </div>
         </footer>

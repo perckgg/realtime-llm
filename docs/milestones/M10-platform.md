@@ -14,10 +14,10 @@
 |---|---|---|
 | 1. `services/rca_agent/pipeline.py` điều phối E2E + ghi ClickHouse/Postgres | Chờ Pha 2 | Cần cấu hình `rca_final.yaml` (M9-A) và dữ liệu `test` (M8 / M9-B) |
 | 2. `services/api` (FastAPI) đọc ClickHouse/Postgres | Chờ Pha 2 | Dựng ở Pha 2; giao diện vẫn giữ nguyên lớp trừu tượng `VITE_DATA_SOURCE=http` trong `services/web/src/api/client.ts` |
-| 3. Nối 4 màn hình dashboard sang **dữ liệu thật**; hiện nguồn gốc bằng chứng + lý do cổng ngưỡng nền p90 | **Đạt (Pha 1, trên `val` + H0 `test`)** | `scripts/export_web_snapshot.py` → `services/web/src/mock/snapshot.json` (4.717,3 KB); 4 màn hình `Timeline`, `AlertDetail`, `IncidentDetail`, `ExperimentComparison` tiếng Anh chuẩn, bỏ toàn bộ ký hiệu nội bộ (`C1`–`C5`, `QĐ-*`) |
+| 3. Nối 4 màn hình dashboard sang **dữ liệu thật** + đồ thị tương tác & trang hướng dẫn `/guide` | **Đạt (Pha 1, trên `val` + H0 `test`)** | `scripts/export_web_snapshot.py` → `services/web/src/mock/snapshot.json` (4.788,8 KB); 4 màn hình chính + `/guide` (`MethodologyGuide`) tiếng Anh chuẩn, đồ thị hỗ trợ chế độ Diff trước/sau CTAV, từng bước lan truyền và bấm node/cạnh xem telemetry |
 | 4. Chế độ demo **offline** (không cần mạng/API key) + deploy GitHub Pages | **Đạt (Pha 1)** | Chạy thuần tĩnh trên client; `.github/workflows/deploy-pages.yml` + `public/404.html` + `VITE_BASE_PATH` trên nhánh `demo/gh-pages` |
 | 5. Chạy E2E trên `test` → kiểm parity H5 với M9-B + `runtime.json` | Chờ Pha 2 | Thực hiện sau M8 và M9-B |
-| Kiểm tra build & render `services/web` | **Đạt** | `npm.cmd run check` (`tsc -b --noEmit` + `smoke.tsx` 18/18 assertions trên 4 màn hình & 5 run); `vite build --base=/realtime-llm/` thành công (`dist/assets/*.css` 7,31 kB gzip, `dist/assets/*.js` 727,31 kB gzip) |
+| Kiểm tra build & render `services/web` | **Đạt** | `npm.cmd run check` (`tsc -b --noEmit` + `smoke.tsx` 23/23 assertions trên 5 route & 5 run); `vite build --base=/realtime-llm/` thành công (`dist/assets/*.css` 7,60 kB gzip, `dist/assets/*.js` 745,01 kB gzip) |
 
 **Thống kê dữ liệu thật đã đưa vào Dashboard Pha 1 (`val` + H0 `test`, 0 USD):**
 - 5 phương pháp trên `val` (7.636 cửa sổ có telemetry, 209 fault): `ctav_final_val_v1` (F1 0,201; FPR 0,0069; 80 `TRUE_ALERT` xuất đủ), `h0_val_c1_k0_v1` (F1 0,126; FPR 0,0816), `h0_val_bm25_v3` (F1 0,103; FPR 0,0561), `h0_val_norag_v1` (F1 0,092; FPR 0,0224), `detector_only_val_v1` (F1 0,111; FPR 0,2208).
@@ -28,7 +28,7 @@
 
 | # | Kiểm gì | Ở đâu | Vì sao rủi ro |
 |---|---|---|---|
-| 1 | Mở trực tiếp giao diện trên trình duyệt (local `npm run dev` hoặc link GitHub Pages) | `services/web/` · thanh **Guided Walkthrough** (4 nút kịch bản tiếng Anh) | `smoke.tsx` chạy trong jsdom không kiểm được tràn chữ, độ rộng bảng hay bố cục React Flow |
+| 1 | Mở trực tiếp giao diện trên trình duyệt (local `npm run dev` hoặc link GitHub Pages) | `services/web/` · thanh **Guided Walkthrough** (5 nút kịch bản + `/guide`) | `smoke.tsx` chạy trong jsdom không kiểm được tràn chữ, độ rộng bảng hay bố cục React Flow |
 | 2 | Báo cáo trong `IncidentDetail` hiện sinh từ `grouping.py` + lan truyền 1-hop preview (chưa qua LLM Summarizer M9) | `scripts/export_web_snapshot.py` `_build_incidents` | Phân biệt rõ đây là bản xem trước giao diện trên `val`, không dùng thay cho kết quả chính thức H5 (M9-B) |
 | 3 | Kích thước bundle JS ~5,68 MB thô (~726 kB gzip) do nhúng trực tiếp `snapshot.json` (4,7 MB) | `services/web/src/mock/snapshot.json` | Chấp nhận được cho demo/GitHub Pages (tải một lần ~726 kB gzip), nhưng ở Pha 2 nên đọc qua API hoặc tách lazy chunk nếu thêm nhiều dữ liệu `test` |
 

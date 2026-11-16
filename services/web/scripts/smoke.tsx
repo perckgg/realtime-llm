@@ -58,6 +58,7 @@ const Timeline = (await import("@/screens/Timeline")).default;
 const AlertDetail = (await import("@/screens/AlertDetail")).default;
 const IncidentDetail = (await import("@/screens/IncidentDetail")).default;
 const ExperimentComparison = (await import("@/screens/ExperimentComparison")).default;
+const MethodologyGuide = (await import("@/screens/MethodologyGuide")).default;
 
 const firstRun = runs[0]!;
 const firstAlert = listAlerts(firstRun.run_id).find((a) => a.context_event_count >= 6) ?? listAlerts(firstRun.run_id)[0]!;
@@ -129,6 +130,10 @@ const CASES: {
       ["renders propagation graph edges", (h) => h.includes("react-flow__edge")],
       ["renders diagnostic report root cause", (h) => h.includes("Predicted Root Cause")],
       ["renders accessible call-graph edge table", (h) => h.includes("View Call-Graph Edge Table")],
+      [
+        "renders interactive node inspector and CTAV diff mode",
+        (h) => h.includes("Node Inspector") && h.includes("Before vs. After CTAV Gate (Diff)"),
+      ],
     ],
   },
   {
@@ -147,6 +152,18 @@ const CASES: {
           h.includes("CTAV (Calibrated Topology-Aware Validation)") &&
           h.includes("Confirmed on holdout test split"),
       ],
+    ],
+  },
+  {
+    name: "Methodology & Guide",
+    path: "/guide",
+    routePath: "/guide",
+    element: <MethodologyGuide />,
+    expect: [
+      ["renders thesis milestone table", (h) => h.includes("Phase 3 · CTAV Calibration Policy")],
+      ["renders Topology Paradox section", (h) => h.includes("The Core Research Problem: Solving the Topology Paradox")],
+      ["renders mathematical formulations", (h) => h.includes("S_fusion(e, w)") && h.includes("LocalAnchor(w)")],
+      ["renders terminology glossary", (h) => h.includes("McNemar") && h.includes("Historical p90 Baseline Anchor")],
     ],
   },
 ];
@@ -189,6 +206,18 @@ for (const run of runs) {
     failed += 1;
     console.error(`  FAIL  snapshot ${run.run_id}: missing IncidentDetail for ${missInc.incident_id}`);
   }
+  for (const i of incidents) {
+    const det = getIncidentDetail(i.incident_id);
+    if (!det) continue;
+    for (const node of det.nodes) {
+      for (const sid of [...(node.confirmed_alert_ids ?? []), ...(node.suppressed_alert_ids ?? [])]) {
+        if (!getAlertDetail(sid)) {
+          failed += 1;
+          console.error(`  FAIL  snapshot ${run.run_id}: missing linked AlertDetail ${sid} on ${i.incident_id}`);
+        }
+      }
+    }
+  }
 }
 console.log(`  ok    snapshot               ${runs.length} runs verified with full alert, detail, and incident records`);
 
@@ -200,5 +229,5 @@ if (failed) {
   console.error(`\n${failed} failures`);
   process.exit(1);
 }
-console.log("\nAll 4 analytical screens rendered cleanly against the exported English benchmark snapshot.");
+console.log("\nAll 5 views (4 analytical screens + Methodology & Guide) rendered cleanly against the benchmark snapshot.");
 process.exit(0);

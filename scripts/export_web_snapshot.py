@@ -542,20 +542,65 @@ def _select_incidents(
     for s in prioritized:
         for aid in s["alert_ids"]:
             wids.add(aid.split("_", 1)[1])
+    for d in filtered_details.values():
+        for node in d["nodes"]:
+            for aid in node.get("suppressed_alert_ids", []):
+                wids.add(aid.split("_", 1)[1])
     return prioritized, filtered_details, wids
+
+
+def _service_span_sample(
+    service: str,
+    window_ids: list[str],
+    prefer_exceeding: bool,
+    ret_map: dict[str, dict[str, Any]],
+    anchor_map: dict[tuple[str, str, str], dict[str, Any]],
+    anchor_run: str,
+) -> tuple[float | None, float | None]:
+    candidates: list[tuple[bool, float, float, float]] = []
+    for wid in window_ids:
+        for ev in ret_map.get(wid, {}).get("events", []):
+            if ev["service"] != service:
+                continue
+            anc = anchor_map.get((anchor_run, wid, ev["event_id"]))
+            if not anc:
+                continue
+            dur = anc.get("duration_ms")
+            dev90 = (anc.get("dev") or {}).get("90")
+            if dur is None or dev90 is None:
+                continue
+            dur_f = float(dur)
+            dev_f = float(dev90)
+            ratio = dur_f / dev_f if dev_f > 0 else dur_f
+            candidates.append((dur_f > dev_f, ratio, dur_f, dev_f))
+    if not candidates:
+        return None, None
+    if prefer_exceeding:
+        best = max(candidates, key=lambda c: (c[0], c[1]))
+    else:
+        best = min(candidates, key=lambda c: (c[0], -c[1]))
+    return round(best[2], 2), round(best[3], 2)
 
 
 def _build_incidents(
     confirmed: list[JudgedAlert],
     pw_map: dict[str, dict[str, str]],
+    pw_rows: list[dict[str, str]],
     ret_map: dict[str, dict[str, Any]],
     jud_map: dict[str, dict[str, Any]],
+    anchor_map: dict[tuple[str, str, str], dict[str, Any]],
+    anchor_run: str,
     graph: ServiceGraph,
     run_id: str,
     prefix: str,
 ) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
     grouped = group_alerts(confirmed, graph, run_id, 300.0)
     by_alert_id = {a.alert_id: a for a in confirmed}
+
+    tel_cands_by_svc: dict[str, list[tuple[datetime, dict[str, str]]]] = defaultdict(list)
+    for r in pw_rows:
+        if _flag(r["has_telemetry"]) and _flag(r["is_candidate"]):
+            tel_cands_by_svc[r["service"]].append((datetime.fromisoformat(r["window_ts"]), r))
 
     summaries: list[dict[str, Any]] = []
     details: dict[str, dict[str, Any]] = {}
@@ -565,8 +610,10 @@ def _build_incidents(
         svcs = set(inc.services)
         sub = graph.directed.subgraph(svcs)
         svc_stats: dict[str, tuple[int, float]] = {}
+        confirmed_by_svc: dict[str, list[JudgedAlert]] = {}
         for s in svcs:
-            s_alerts = [a for a in member_objs if a.service == s]
+            s_alerts = sorted([a for a in member_objs if a.service == s], key=lambda a: a.ts)
+            confirmed_by_svc[s] = s_alerts
             max_anom = max(float(pw_map[a.window_id]["anomaly_score"]) for a in s_alerts)
             svc_stats[s] = (len(s_alerts), max_anom)
 
@@ -595,14 +642,33 @@ def _build_incidents(
             if s not in prop_path:
                 prop_path.append(s)
 
-        # Neighbor healthy nodes from service_graph.json (up to 6 total nodes)
-        neighbors: list[str] = []
+        lo_ts = inc.start_ts - timedelta(seconds=300)
+        hi_ts = inc.end_ts + timedelta(seconds=300)
+
+        def _suppressed_rows(service: str) -> list[dict[str, str]]:
+            rows = [
+                r
+                for ts, r in tel_cands_by_svc.get(service, [])
+                if lo_ts <= ts <= hi_ts and _flag(r.get("downgraded_by_anchoring", "0"))
+            ]
+            rows.sort(key=lambda r: (float(r["anomaly_score"]), r["window_ts"]), reverse=True)
+            return rows
+
+        # Prioritize 1-hop neighbors that had false alarms suppressed by the p90 gate in [start-300s, end+300s]
+        neighbor_candidates: dict[str, int] = {}
         for s in sorted(svcs):
             if s in graph.directed:
                 for nbr in list(graph.directed.predecessors(s)) + list(graph.directed.successors(s)):
-                    if nbr not in svcs and nbr not in neighbors:
-                        neighbors.append(nbr)
-        all_node_svcs = list(prop_path) + neighbors[: max(0, 6 - len(prop_path))]
+                    if nbr not in svcs and nbr not in neighbor_candidates:
+                        edge_w = max(
+                            int(graph.directed[s][nbr].get("weight", 0)) if graph.directed.has_edge(s, nbr) else 0,
+                            int(graph.directed[nbr][s].get("weight", 0)) if graph.directed.has_edge(nbr, s) else 0,
+                        )
+                        sup_cnt = len(_suppressed_rows(nbr))
+                        neighbor_candidates[nbr] = sup_cnt * 1_000_000 + edge_w
+
+        neighbors = sorted(neighbor_candidates, key=lambda n: (neighbor_candidates[n], n), reverse=True)
+        all_node_svcs = list(prop_path) + neighbors[: max(0, 7 - len(prop_path))]
 
         nodes = []
         for s in all_node_svcs:
@@ -615,7 +681,37 @@ def _build_incidents(
             else:
                 role = "healthy"
             cnt, mx = svc_stats.get(s, (0, 0.0))
-            nodes.append({"service": s, "role": role, "alert_count": cnt, "max_anomaly_score": round(mx, 3)})
+            sup_rows = _suppressed_rows(s)
+            if cnt == 0:
+                nbr_cands = [r for ts, r in tel_cands_by_svc.get(s, []) if lo_ts <= ts <= hi_ts]
+                if nbr_cands:
+                    mx = max(float(r["anomaly_score"]) for r in nbr_cands)
+            s_conf = confirmed_by_svc.get(s, [])
+            conf_wids = [a.window_id for a in s_conf]
+            sup_wids = [r["window_id"] for r in sup_rows]
+            sample_span, baseline_p90 = _service_span_sample(
+                s,
+                conf_wids + sup_wids,
+                prefer_exceeding=(s in svcs),
+                ret_map=ret_map,
+                anchor_map=anchor_map,
+                anchor_run=anchor_run,
+            )
+            first_ts = s_conf[0].ts.isoformat() if s_conf else (sup_rows[0]["window_ts"] if sup_rows else None)
+            nodes.append(
+                {
+                    "service": s,
+                    "role": role,
+                    "alert_count": cnt,
+                    "max_anomaly_score": round(mx, 3),
+                    "suppressed_count": len(sup_rows),
+                    "suppressed_alert_ids": [f"{prefix}_{w}" for w in sup_wids[:3]],
+                    "confirmed_alert_ids": [f"{prefix}_{w}" for w in conf_wids[:5]],
+                    "sample_span_ms": sample_span,
+                    "baseline_p90_ms": baseline_p90,
+                    "first_alert_ts": first_ts,
+                }
+            )
 
         path_pairs = {(prop_path[i], prop_path[i + 1]) for i in range(len(prop_path) - 1)}
         present = set(all_node_svcs)
@@ -794,6 +890,15 @@ def _pick_demo_highlights(
             "path": "/compare",
         }
     )
+    out.append(
+        {
+            "id": "demo_guide",
+            "step": "5",
+            "title": "Formulas & Guide",
+            "subtitle": "CTAV equations, Topology Paradox intuition & thesis milestone progress",
+            "path": "/guide",
+        }
+    )
     return out
 
 
@@ -846,20 +951,20 @@ def main() -> None:
     ]
 
     incident_specs = [
-        ("ctav_final_val_v1", "ctav", ctav_jud_models, ctav_pw, c1_ret, c1_jud, None),
-        ("h0_val_c1_k0_v1", "c1", c1_jud_models, c1_pw, c1_ret, c1_jud, 6),
-        ("h0_val_bm25_v3", "bm25", bm25_jud_models, bm25_pw, bm25_ret, bm25_jud, 6),
-        ("h0_val_norag_v1", "norag", norag_jud_models, norag_pw, {}, norag_jud, 6),
-        ("detector_only_val_v1", "det", det_confirmed, ctav_pw, {}, {}, 6),
+        ("ctav_final_val_v1", "ctav", ctav_jud_models, ctav_pw, ctav_pw_rows, c1_ret, c1_jud, "h0_val_c1_k0_v1", None),
+        ("h0_val_c1_k0_v1", "c1", c1_jud_models, c1_pw, c1_pw_rows, c1_ret, c1_jud, "h0_val_c1_k0_v1", 6),
+        ("h0_val_bm25_v3", "bm25", bm25_jud_models, bm25_pw, bm25_pw_rows, bm25_ret, bm25_jud, "h0_val_bm25_v3", 6),
+        ("h0_val_norag_v1", "norag", norag_jud_models, norag_pw, norag_pw_rows, {}, norag_jud, "", 6),
+        ("detector_only_val_v1", "det", det_confirmed, ctav_pw, ctav_pw_rows, {}, {}, "", 6),
     ]
 
     incidents_by_run: dict[str, list[dict[str, Any]]] = {}
     incident_details: dict[str, dict[str, Any]] = {}
     required_wids_by_run: dict[str, set[str]] = defaultdict(set)
 
-    for rid, prefix, jud_models, pw_map, ret_map, j_map, limit in incident_specs:
+    for rid, prefix, jud_models, pw_map, pw_rows, ret_map, j_map, anchor_run, limit in incident_specs:
         confirmed = [a for a in jud_models if a.verdict == "TRUE_ALERT" and _flag(pw_map[a.window_id]["has_telemetry"])]
-        raw_sum, raw_det = _build_incidents(confirmed, pw_map, ret_map, j_map, graph, rid, prefix)
+        raw_sum, raw_det = _build_incidents(confirmed, pw_map, pw_rows, ret_map, j_map, anchor_map, anchor_run, graph, rid, prefix)
         sel_sum, sel_det, inc_wids = _select_incidents(raw_sum, raw_det, limit)
         incidents_by_run[rid] = sel_sum
         incident_details.update(sel_det)
@@ -872,7 +977,7 @@ def main() -> None:
     for h in demo_highlights:
         if h["path"].startswith("/alerts/ctav_"):
             wid = h["path"].split("/alerts/ctav_")[1]
-            for rid, _, _, _, _, _, _ in incident_specs:
+            for rid, _, _, _, _, _, _, _, _ in incident_specs:
                 required_wids_by_run[rid].add(wid)
 
     # Ground-truth fault buckets across ALL 7,636 telemetry windows of val (10-min bins)
