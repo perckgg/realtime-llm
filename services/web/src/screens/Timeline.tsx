@@ -10,11 +10,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { api } from "@/api/client";
+import { api, USING_FIXTURES } from "@/api/client";
 import type { Alert, Incident, Verdict } from "@/api/types";
 import { Legend, TooltipRow, TooltipShell, axisProps } from "@/components/charts";
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
-import { clockUTC, cx, ms, num, pct, stampUTC, useAsync } from "@/lib/util";
+import { clockUTC, cx, ms, num, stampUTC, useAsync } from "@/lib/util";
+import { groundTruthBuckets } from "@/mock/fixtures";
 import { ink, status, verdictColor, verdictGlyph, verdictLabel, VERDICT_ORDER } from "@/theme/tokens";
 import { useRuns } from "@/lib/runContext";
 
@@ -30,6 +31,7 @@ export default function Timeline() {
 
   const alertsQ = useAsync(() => api.listAlerts({ runId }), [runId]);
   const incidentsQ = useAsync(() => api.listIncidents(runId), [runId]);
+  const metricsQ = useAsync(() => api.runMetrics(runId), [runId]);
 
   const alerts = alertsQ.data ?? [];
 
@@ -48,15 +50,29 @@ export default function Timeline() {
     [alerts, verdict, service],
   );
 
-  const buckets = useMemo(() => bucketise(filtered), [filtered]);
+  const useFullGt = USING_FIXTURES && service === "ALL" && verdict === "ALL";
+  const buckets = useMemo(() => bucketise(filtered, useFullGt), [filtered, useFullGt]);
   const stats = useMemo(() => summarise(filtered), [filtered]);
+  const fullMetrics = metricsQ.data;
+  const unfiltered = verdict === "ALL" && service === "ALL";
 
   if (alertsQ.loading) return <Loading />;
   if (alertsQ.error) return <ErrorBox message={alertsQ.error} />;
 
+  const trueAlertCount = unfiltered && fullMetrics ? fullMetrics.tp + fullMetrics.fp : stats.tp + stats.fp;
+  const trueAlertHint =
+    unfiltered && fullMetrics
+      ? `${fullMetrics.tp} khớp nhãn · ${fullMetrics.fp} sai (toàn split val)`
+      : `${stats.tp} khớp nhãn · ${stats.fp} sai (trong mẫu lọc)`;
+  const precisionValue =
+    unfiltered && fullMetrics
+      ? num(fullMetrics.precision.value, 3)
+      : stats.tp + stats.fp
+        ? num(stats.tp / (stats.tp + stats.fp), 3)
+        : "—";
+
   return (
     <div className="space-y-4">
-      {/* Bộ lọc nằm trên một hàng, ngay phía trên biểu đồ nó điều khiển. */}
       <div className="flex flex-wrap items-end gap-3">
         <Segmented
           label="Verdict"
@@ -87,34 +103,42 @@ export default function Timeline() {
           </select>
         </label>
         <div className="ml-auto text-[11px] text-ink-muted">
-          {filtered.length} / {alerts.length} cảnh báo · gộp {BUCKET_MINUTES} phút
+          Hiển thị {filtered.length} / {alerts.length} cảnh báo mẫu · gộp {BUCKET_MINUTES} phút
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile label="Cảnh báo" value={String(filtered.length)} hint={`trên ${alerts.length} của run`} />
+        <StatTile
+          label="Cửa sổ mẫu"
+          value={String(filtered.length)}
+          hint={
+            fullMetrics
+              ? `tổng ${fullMetrics.tp + fullMetrics.fp + fullMetrics.fn + fullMetrics.tn} cửa sổ telemetry`
+              : `trên ${alerts.length} của run`
+          }
+        />
         <StatTile
           label="Đúng cảnh báo"
-          value={String(stats.tp + stats.fp)}
-          hint={`${stats.tp} khớp nhãn · ${stats.fp} sai`}
+          value={String(trueAlertCount)}
+          hint={trueAlertHint}
           accent={verdictColor.TRUE_ALERT}
         />
         <StatTile
           label="Precision"
-          value={stats.tp + stats.fp ? num(stats.tp / (stats.tp + stats.fp), 3) : "—"}
+          value={precisionValue}
           hint="TRUE_ALERT khớp nhãn Nezha"
         />
         <StatTile
-          label="Từ Rescue Score"
-          value={String(stats.rescue)}
-          hint="cảnh báo được promote dù dưới ngưỡng"
+          label="Hạ bởi C3 (mẫu)"
+          value={String(stats.anchoredDown)}
+          hint={`${stats.anchoredConfirmed} cảnh báo có neo dev p90`}
           accent={status.warning}
         />
       </div>
 
       <Card
         title="Cảnh báo theo thời gian, tách theo verdict"
-        subtitle={`Cột xếp chồng: số cảnh báo mỗi ${BUCKET_MINUTES} phút. Đường liền: số cửa sổ thực sự là lỗi theo nhãn Nezha. Cùng một đơn vị — số cửa sổ — nên dùng chung một trục.`}
+        subtitle={`Cột xếp chồng: số cảnh báo trong mẫu theo cửa sổ ${BUCKET_MINUTES} phút. Đường liền: số cửa sổ thực sự là lỗi theo nhãn Nezha${useFullGt ? " (toàn split val)" : ""}.`}
         right={
           <Legend
             items={[
@@ -172,7 +196,6 @@ export default function Timeline() {
                   dataKey={v}
                   stackId="verdict"
                   fill={verdictColor[v]}
-                  // Viền màu bề mặt tạo khe 2px giữa các đoạn xếp chồng.
                   stroke={ink.surface}
                   strokeWidth={2}
                   maxBarSize={18}
@@ -193,11 +216,11 @@ export default function Timeline() {
       </Card>
 
       <Card
-        title={tab === "alerts" ? "Danh sách cảnh báo" : "Sự cố đã gom nhóm"}
+        title={tab === "alerts" ? "Danh sách cảnh báo thật" : "Sự cố đã gom nhóm (grouping.py)"}
         subtitle={
           tab === "alerts"
-            ? "Bảng số liệu đi kèm biểu đồ ở trên. Bấm một dòng để mở màn hình chi tiết."
-            : "Alert được gom theo cửa sổ thời gian và cạnh đồ thị phụ thuộc. Bấm để xem đồ thị lan truyền."
+            ? "Bấm một dòng để xem lý do LLM, 6 bằng chứng truy xuất và quyết định neo của cổng C3."
+            : "Alert TRUE_ALERT được gom theo T_group = 300s và cạnh đồ thị service_graph.json. Bấm để xem đồ thị lan truyền."
         }
         right={
           <Segmented
@@ -234,11 +257,10 @@ function AlertTable({ alerts }: { alerts: Alert[] }) {
             <th className="py-2 pr-3 font-medium">Service</th>
             <th className="py-2 pr-3 font-medium">Verdict</th>
             <th className="py-2 pr-3 text-right font-medium">Anomaly</th>
-            <th className="py-2 pr-3 text-right font-medium">Confidence</th>
-            <th className="py-2 pr-3 font-medium">Nhãn</th>
-            <th className="py-2 pr-3 text-right font-medium">Retrieval</th>
-            <th className="py-2 pr-3 text-right font-medium">LLM</th>
-            <th className="py-2 font-medium">Nguồn</th>
+            <th className="py-2 pr-3 text-right font-medium">Conf</th>
+            <th className="py-2 pr-3 font-medium">Nhãn Nezha</th>
+            <th className="py-2 pr-3 font-medium">Chính sách C3 / Bằng chứng</th>
+            <th className="py-2 text-right font-medium">LLM</th>
           </tr>
         </thead>
         <tbody>
@@ -248,7 +270,7 @@ function AlertTable({ alerts }: { alerts: Alert[] }) {
               className="border-b border-[color:var(--color-hairline)] last:border-0 hover:bg-[color:var(--color-plane)]"
             >
               <td className="py-1.5 pr-3 tabular-nums whitespace-nowrap">
-                <Link to={`/alerts/${a.alert_id}`} className="hover:underline">
+                <Link to={`/alerts/${a.alert_id}`} className="font-medium text-ink hover:underline">
                   {stampUTC(a.ts)}
                 </Link>
               </td>
@@ -267,17 +289,22 @@ function AlertTable({ alerts }: { alerts: Alert[] }) {
                   <span className="text-[11px] text-ink-muted">bình thường</span>
                 )}
               </td>
-              <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
-                {ms(a.retrieval_latency_ms)}
+              <td className="py-1.5 pr-3">
+                <div className="flex flex-wrap items-center gap-1">
+                  {a.downgraded_by_anchoring ? (
+                    <Pill tone="warn">C3 hạ ({a.raw_verdict?.split("_")[0]})</Pill>
+                  ) : a.anchor_ids && a.anchor_ids.length > 0 ? (
+                    <Pill tone="good">⚓ Neo C3 ({a.anchor_ids.length})</Pill>
+                  ) : a.downgraded_by_evidence_rule ? (
+                    <Pill tone="warn">thiếu bằng chứng</Pill>
+                  ) : (
+                    <Pill>{a.evidence_origin ?? "none"}</Pill>
+                  )}
+                </div>
               </td>
-              <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
+              <td className="py-1.5 text-right tabular-nums text-ink-2">
                 {ms(a.llm_latency_ms)}
                 {a.cache_hit && <span className="ml-1 text-ink-muted">·cache</span>}
-              </td>
-              <td className="py-1.5">
-                <Pill tone={a.candidate_source === "rescue" ? "warn" : "neutral"}>
-                  {a.candidate_source}
-                </Pill>
               </td>
             </tr>
           ))}
@@ -292,7 +319,8 @@ function IncidentTable({ incidents }: { incidents: Incident[] }) {
   return (
     <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       {incidents.map((i) => {
-        const correct = i.root_cause_service === i.ground_truth_service;
+        const hasGt = i.ground_truth_service !== null;
+        const correct = hasGt && i.root_cause_service === i.ground_truth_service;
         return (
           <li key={i.incident_id}>
             <Link
@@ -303,22 +331,36 @@ function IncidentTable({ incidents }: { incidents: Incident[] }) {
                 <span className="font-mono text-[11px] text-ink-muted">{i.incident_id}</span>
                 <span
                   className="text-[11px] font-medium"
-                  style={{ color: i.root_cause_service ? (correct ? status.good : status.critical) : status.warning }}
+                  style={{
+                    color: !i.root_cause_service
+                      ? status.warning
+                      : !hasGt
+                        ? ink.muted
+                        : correct
+                          ? status.good
+                          : status.critical,
+                  }}
                 >
-                  {i.root_cause_service ? (correct ? "✓ đúng gốc" : "✗ sai gốc") : "⚠ bị từ chối"}
+                  {!i.root_cause_service
+                    ? "⚠ bị từ chối"
+                    : !hasGt
+                      ? "○ cụm bình thường (FP)"
+                      : correct
+                        ? "✓ đúng gốc"
+                        : "✗ sai gốc"}
                 </span>
               </div>
               <div className="mt-2 text-[13px] font-semibold text-ink">
                 {i.root_cause_service ?? "—"}
                 <span className="ml-2 text-[11px] font-normal text-ink-muted">
-                  nhãn: {i.ground_truth_service}
+                  nhãn: {i.ground_truth_service ?? "bình thường"}
                 </span>
               </div>
               <div className="mt-1.5 text-[11px] text-ink-2">
                 {i.services.join("  →  ")}
               </div>
               <dl className="mt-2 border-t border-[color:var(--color-hairline)] pt-1.5">
-                <KV k="Loại lỗi" v={i.fault_type ?? "—"} />
+                <KV k="Loại lỗi" v={i.fault_type ?? "bình thường"} />
                 <KV k="Khoảng" v={`${clockUTC(i.start_ts)} – ${clockUTC(i.end_ts)}`} />
                 <KV k="Số alert" v={i.alert_ids.length} />
               </dl>
@@ -370,33 +412,48 @@ function Segmented({
   );
 }
 
-function bucketise(alerts: Alert[]) {
+function bucketise(alerts: Alert[], useFullGt: boolean) {
   const size = BUCKET_MINUTES * 60_000;
   const map = new Map<
     number,
     { TRUE_ALERT: number; FALSE_POSITIVE: number; UNCERTAIN: number; ground_truth_faults: number }
   >();
+  if (useFullGt) {
+    for (const g of groundTruthBuckets) {
+      map.set(g.ts_ms, {
+        TRUE_ALERT: 0,
+        FALSE_POSITIVE: 0,
+        UNCERTAIN: 0,
+        ground_truth_faults: g.faults,
+      });
+    }
+  }
   for (const a of alerts) {
     const key = Math.floor(Date.parse(a.ts) / size) * size;
     const row =
       map.get(key) ??
       { TRUE_ALERT: 0, FALSE_POSITIVE: 0, UNCERTAIN: 0, ground_truth_faults: 0 };
     row[a.verdict] += 1;
-    if (a.label.is_fault) row.ground_truth_faults += 1;
+    if (!useFullGt && a.label.is_fault) row.ground_truth_faults += 1;
     map.set(key, row);
   }
   return [...map.entries()]
     .sort((a, b) => a[0] - b[0])
-    .map(([ts, row]) => ({ label: clockUTC(new Date(ts).toISOString()).slice(0, 5), ...row }));
+    .map(([ts, row]) => ({
+      label: stampUTC(new Date(ts).toISOString()).slice(5, 16),
+      ...row,
+    }));
 }
 
 function summarise(alerts: Alert[]) {
   let tp = 0;
   let fp = 0;
-  let rescue = 0;
+  let anchoredDown = 0;
+  let anchoredConfirmed = 0;
   for (const a of alerts) {
-    if (a.verdict === "TRUE_ALERT") (a.label.is_fault ? tp++ : fp++);
-    if (a.candidate_source === "rescue") rescue++;
+    if (a.verdict === "TRUE_ALERT") a.label.is_fault ? tp++ : fp++;
+    if (a.downgraded_by_anchoring) anchoredDown++;
+    if (a.anchor_ids && a.anchor_ids.length > 0) anchoredConfirmed++;
   }
-  return { tp, fp, rescue, coverage: alerts.length ? pct(tp / alerts.length) : "—" };
+  return { tp, fp, anchoredDown, anchoredConfirmed };
 }

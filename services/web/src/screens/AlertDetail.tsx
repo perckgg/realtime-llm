@@ -4,7 +4,6 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -42,13 +41,21 @@ export default function AlertDetail() {
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-[19px] font-semibold tracking-tight text-ink">{a.service}</h1>
             <VerdictBadge verdict={a.verdict} />
+            {a.downgraded_by_anchoring && (
+              <Pill tone="warn">
+                ⚠ C3 hạ cấp: {a.raw_verdict} → {a.verdict} (thiếu bằng chứng vượt dev p90)
+              </Pill>
+            )}
+            {!a.downgraded_by_anchoring && a.anchor_ids && a.anchor_ids.length > 0 && (
+              <Pill tone="good">
+                ⚓ Neo C3 hợp lệ ({a.anchor_ids.length} span vượt dev p90)
+              </Pill>
+            )}
             {a.downgraded_by_evidence_rule && (
-              <span className="text-[11px]" style={{ color: status.serious }}>
-                ⚠ bị hạ cấp vì thiếu bằng chứng
-              </span>
+              <Pill tone="warn">⚠ hạ cấp do quy tắc thiếu bằng chứng</Pill>
             )}
           </div>
           <p className="mt-1 font-mono text-[11px] text-ink-muted">
@@ -63,8 +70,16 @@ export default function AlertDetail() {
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatTile label="Anomaly score" value={num(a.anomaly_score, 2)} hint={`ngưỡng ${a.detector_threshold}`} />
-        <StatTile label="Confidence" value={num(a.confidence, 2)} hint={a.judge_backend} />
-        <StatTile label="Ngữ cảnh" value={`${a.context_event_count}`} hint={`${a.context_tokens.toLocaleString("vi-VN")} token${a.retrieval_truncated ? " · đã cắt" : ""}`} />
+        <StatTile
+          label="Confidence"
+          value={num(a.confidence, 2)}
+          hint={`${a.judge_backend}${a.threshold_applied ? ` · θ=${num(a.threshold_applied, 2)}` : ""}`}
+        />
+        <StatTile
+          label="Ngữ cảnh"
+          value={`${a.context_event_count}`}
+          hint={`${a.context_tokens.toLocaleString("vi-VN")} token · origin=${a.evidence_origin ?? "none"}`}
+        />
         <StatTile
           label="Nhãn Nezha"
           value={a.label.is_fault ? "Lỗi" : "Bình thường"}
@@ -76,7 +91,7 @@ export default function AlertDetail() {
       <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
         <Card
           title={a.metric_name}
-          subtitle="Một chuỗi duy nhất quanh cửa sổ cảnh báo. Đường ngang là ngưỡng detector; vùng tô đậm là cửa sổ đã sinh ra cảnh báo này."
+          subtitle="Chuỗi anomaly_score thật của cùng pod quanh cửa sổ cảnh báo. Đường ngang đỏ là ngưỡng detector 0,85; đường dọc xanh là cửa sổ hiện tại."
         >
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -93,7 +108,7 @@ export default function AlertDetail() {
                 <CartesianGrid vertical={false} stroke={ink.grid} />
                 <XAxis dataKey="t" {...axisProps} minTickGap={24} />
                 <YAxis {...axisProps} domain={[0, 1]} width={40} />
-                <ReferenceArea x1={alertTime} x2={alertTime} fill={series[0]} fillOpacity={0.12} />
+                <ReferenceLine x={alertTime} stroke={series[0]} strokeWidth={2} strokeDasharray="3 3" />
                 <ReferenceLine
                   y={a.detector_threshold}
                   stroke={status.critical}
@@ -135,51 +150,24 @@ export default function AlertDetail() {
         <div className="space-y-4">
           <Card title="Lý do LLM ra verdict" subtitle={`${a.judge_backend} · ${ms(a.llm_latency_ms)}${a.cache_hit ? " · lấy từ cache" : ""}`}>
             <p className="text-[12.5px] leading-relaxed text-ink-2">{a.reasoning}</p>
-            <div className="mt-3 border-t border-[color:var(--color-hairline)] pt-2 text-[11px] text-ink-muted">
-              Bằng chứng LLM viện dẫn: {a.evidence_event_ids.length
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-[color:var(--color-hairline)] pt-2 text-[11px] text-ink-muted">
+              <span>Bằng chứng LLM viện dẫn:</span>
+              {a.evidence_event_ids.length
                 ? a.evidence_event_ids.map((id) => <Pill key={id}>{id}</Pill>)
                 : "không có — quy tắc bằng chứng sẽ hạ verdict xuống UNCERTAIN"}
             </div>
           </Card>
 
-          {a.candidate_source === "rescue" && a.rescue_components && (
-            <Card
-              title="Rescue Score"
-              subtitle={`Cảnh báo này dưới ngưỡng detector nhưng được promote với điểm ${num(a.rescue_score ?? 0, 2)}.`}
-            >
-              <div className="space-y-2">
-                {(
-                  [
-                    ["λ log", a.rescue_components.lambda_log],
-                    ["φ topo", a.rescue_components.phi_topo],
-                    ["Δ time", a.rescue_components.delta_time],
-                  ] as const
-                ).map(([label, v]) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <span className="w-14 shrink-0 text-[11px] text-ink-2">{label}</span>
-                    <div className="h-2 flex-1 rounded-full" style={{ background: ink.grid }}>
-                      <div
-                        className="h-2 rounded-full"
-                        style={{ width: `${v * 100}%`, background: series[0] }}
-                      />
-                    </div>
-                    <span className="w-10 text-right text-[11px] tabular-nums text-ink">
-                      {num(v, 2)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-
-          <Card title="Siêu dữ liệu">
+          <Card title="Siêu dữ liệu & Chính sách CTAV">
             <dl className="divide-y divide-[color:var(--color-hairline)]">
               <KV k="candidate_id" v={<span className="font-mono">{a.candidate_id}</span>} />
-              <KV k="Nguồn ứng viên" v={a.candidate_source} />
+              <KV k="Raw verdict (LLM)" v={a.raw_verdict ?? a.verdict} />
+              <KV k="Final verdict" v={a.verdict} />
+              <KV k="Nguồn bằng chứng" v={a.evidence_origin ?? "none"} />
+              <KV k="Hạ bởi C3 (dev p90)" v={a.downgraded_by_anchoring ? "có" : "không"} />
               <KV k="Độ trễ retrieval" v={ms(a.retrieval_latency_ms)} />
               <KV k="Độ trễ LLM" v={ms(a.llm_latency_ms)} />
               <KV k="Cache" v={a.cache_hit ? "hit" : "miss"} />
-              <KV k="Truncated" v={a.retrieval_truncated ? "có" : "không"} />
             </dl>
           </Card>
         </div>
@@ -187,12 +175,16 @@ export default function AlertDetail() {
 
       <Card
         title={`Bằng chứng RAG đã truy xuất (${a.context_events.length})`}
-        subtitle="Sắp theo điểm retrieval giảm dần. Ô debug là dữ liệu để chấm context precision — mỗi strategy ghi những trường đặc thù của nó (03 §1.3)."
+        subtitle="Sắp theo điểm retrieval giảm dần. C3 chỉ giữ TRUE_ALERT khi có log ERROR/WARN hoặc span tại s₀ có duration_ms vượt ngưỡng nền dev p90."
       >
         <ol className="space-y-2">
-          {a.context_events.map((e, i) => (
-            <EventRow key={e.event_id} e={e} rank={i + 1} cited={evidence.has(e.event_id)} />
-          ))}
+          {a.context_events.length ? (
+            a.context_events.map((e, i) => (
+              <EventRow key={e.event_id} e={e} rank={i + 1} cited={evidence.has(e.event_id)} />
+            ))
+          ) : (
+            <p className="text-[12px] text-ink-muted">Không truy xuất được sự kiện telemetry nào trong ±8 phút.</p>
+          )}
         </ol>
       </Card>
     </div>
@@ -201,13 +193,16 @@ export default function AlertDetail() {
 
 function EventRow({ e, rank, cited }: { e: ContextEvent; rank: number; cited: boolean }) {
   const [open, setOpen] = useState(false);
+  const dur = typeof e.debug.duration_ms === "number" ? e.debug.duration_ms : null;
+  const dev90 = typeof e.debug.dev_p90_ms === "number" ? e.debug.dev_p90_ms : null;
+
   return (
     <li
       className={cx(
         "rounded-lg border p-3",
         cited ? "bg-[color:var(--color-plane)]" : "",
       )}
-      style={{ borderColor: cited ? series[0] : "var(--color-hairline)" }}
+      style={{ borderColor: e.is_c3_anchor ? status.good : cited ? series[0] : "var(--color-hairline)" }}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="w-5 text-[11px] tabular-nums text-ink-muted">#{rank}</span>
@@ -219,17 +214,25 @@ function EventRow({ e, rank, cited }: { e: ContextEvent; rank: number; cited: bo
         </Pill>
         <span className="font-mono text-[11px] text-ink-2">{e.service}</span>
         <span className="text-[11px] text-ink-muted">{clockUTC(e.ts)}</span>
+        {e.origin && (
+          <Pill>{e.origin === "graph" ? `graph d=${e.graph_distance ?? "?"}` : "local"}</Pill>
+        )}
+        {e.is_c3_anchor && <Pill tone="good">⚓ Neo C3 (&gt; dev p90)</Pill>}
         {cited && (
           <span className="text-[11px] font-medium" style={{ color: series[0] }}>
             ● LLM viện dẫn
           </span>
         )}
+        {dur !== null && (
+          <span className="font-mono text-[10.5px] text-ink-2">
+            dur={num(dur, 1)}ms {dev90 !== null ? `(dev p90=${num(dev90, 1)}ms)` : "(thiếu dev p90)"}
+          </span>
+        )}
         <span className="ml-auto flex items-center gap-2">
-          {/* Thanh điểm dùng sắc độ tuần tự của cùng một màu — độ lớn, không phải danh tính. */}
           <span className="h-1.5 w-24 rounded-full" style={{ background: ink.grid }}>
             <span
               className="block h-1.5 rounded-full"
-              style={{ width: `${e.score * 100}%`, background: sequential[1] }}
+              style={{ width: `${Math.min(1, e.score) * 100}%`, background: sequential[1] }}
             />
           </span>
           <span className="w-9 text-right text-[11px] tabular-nums text-ink">{num(e.score, 2)}</span>

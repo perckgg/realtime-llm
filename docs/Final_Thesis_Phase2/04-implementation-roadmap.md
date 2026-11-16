@@ -27,7 +27,7 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | **Xong** (2026-11-14; H0–H5 đã đăng ký, V33 (a), V34 (b) — QĐ-033, QĐ-034) — `docs/milestones/M7-rescue-dang-ky.md` |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | **Đang làm** (mở 2026-11-14; V27 chấm toàn bộ candidate — QĐ-034) |
 | M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | |
-| M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | |
+| M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | **Đang làm (Pha 1 xong 2026-11-16 trên `demo/gh-pages`, QĐ-038)** — `docs/milestones/M10-platform.md` |
 | M11 | Đánh giá bằng người + phân tích lỗi | | 2027-01-17 | |
 | M12 | Đóng gói: số liệu, luận văn, repo, bảo vệ | | Bảo vệ tuần 2027-02-08 | |
 
@@ -253,6 +253,8 @@ vượt BM25" cũng là kết quả hợp lệ, phải báo cáo trung thực.
 
 **DoD M10:** `docker compose --profile dev up -d` + replay → 4 màn hình hiển thị dữ liệu thật,
 có loading/empty state; chạy được khi rút mạng; kịch bản demo `08` §6 chạy trọn.
+
+> **Tiến độ Pha 1 (2026-11-16, QĐ-038, nhánh `demo/gh-pages`):** Đã hoàn tất dashboard tĩnh 4 màn hình nối dữ liệu thực nghiệm thật từ `eval/results/` (`val` + H0 `test`) qua `scripts/export_web_snapshot.py` kèm GitHub Actions deploy lên GitHub Pages. Phần Pha 2 (`pipeline.py`, `services/api`, nạp kết quả `test` đầy đủ và kiểm parity H5) tiếp tục sau M8 và M9-B.
 
 ---
 

@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { cx } from "@/lib/util";
 import { USING_FIXTURES } from "@/api/client";
 import type { Verdict } from "@/api/types";
+import { demoHighlights, snapshotMeta } from "@/mock/fixtures";
 import { verdictColor, verdictGlyph, verdictLabel } from "@/theme/tokens";
 
 export function Card({
@@ -38,10 +40,6 @@ export function Card({
   );
 }
 
-/**
- * Con số đơn lẻ không cần biểu đồ. Dùng chữ số tỉ lệ (mặc định) cho số lớn,
- * chỉ bật tabular-nums ở bảng nơi các cột phải thẳng hàng.
- */
 export function StatTile({
   label,
   value,
@@ -90,14 +88,22 @@ export function VerdictBadge({ verdict, compact }: { verdict: Verdict; compact?:
   );
 }
 
-export function Pill({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "warn" }) {
+export function Pill({
+  children,
+  tone = "neutral",
+}: {
+  children: ReactNode;
+  tone?: "neutral" | "warn" | "good";
+}) {
   return (
     <span
       className={cx(
         "inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10.5px]",
         tone === "warn"
           ? "border-[color:var(--color-serious)] text-[color:var(--color-serious)]"
-          : "border-[color:var(--color-hairline)] text-ink-muted",
+          : tone === "good"
+            ? "border-[color:var(--color-good)] text-[color:var(--color-good)]"
+            : "border-[color:var(--color-hairline)] text-ink-muted",
       )}
     >
       {children}
@@ -106,28 +112,47 @@ export function Pill({ children, tone = "neutral" }: { children: ReactNode; tone
 }
 
 /**
- * Dải cảnh báo dữ liệu giả. Hiện trên mọi màn hình khi chạy bằng fixture — để
- * không ai chụp ảnh màn hình rồi đưa vào luận văn như kết quả thật.
+ * Thanh thông tin chế độ Demo Offline (Snapshot thực nghiệm thật từ eval/results/)
+ * kèm các lối tắt tương ứng với kịch bản trình diễn 5 phút (08 §6).
  */
 export function FixtureBanner() {
   if (!USING_FIXTURES) return null;
   return (
     <div
-      className="flex items-center gap-2 border-b px-5 py-1.5 text-[11.5px]"
+      className="flex flex-wrap items-center justify-between gap-2 border-b px-5 py-2 text-[11.5px]"
       style={{
         borderColor: "var(--color-hairline)",
-        background: "color-mix(in srgb, var(--color-warning) 14%, var(--color-surface))",
+        background: "color-mix(in srgb, var(--color-seq-250) 10%, var(--color-surface))",
         color: "var(--color-ink-2)",
       }}
       role="status"
     >
-      <span aria-hidden>⚠</span>
-      <span>
-        <strong className="font-semibold">Dữ liệu giả.</strong> Pipeline chưa chạy — mọi con số
-        trên màn hình là fixture sinh từ seed cố định, không phải kết quả thực nghiệm. Đặt{" "}
-        <code className="font-mono">VITE_DATA_SOURCE=http</code> để đọc từ{" "}
-        <code className="font-mono">services/api</code>.
-      </span>
+      <div className="flex items-center gap-2">
+        <span
+          className="rounded border px-1.5 py-0.5 font-mono text-[10px] font-semibold"
+          style={{ borderColor: "var(--color-seq-550)", color: "var(--color-seq-550)" }}
+        >
+          DEMO OFFLINE
+        </span>
+        <span>
+          Dữ liệu thực nghiệm thật từ <code className="font-mono">eval/results/</code> (
+          <code className="font-mono">val</code> {snapshotMeta.val_telemetry_windows.toLocaleString("vi-VN")} cửa sổ telemetry · H0{" "}
+          <code className="font-mono">test</code> {snapshotMeta.test_h0_telemetry_windows.toLocaleString("vi-VN")} cửa sổ).
+        </span>
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-[10.5px] text-ink-muted">Kịch bản:</span>
+        {demoHighlights.map((h) => (
+          <Link
+            key={h.id}
+            to={h.path}
+            title={h.subtitle}
+            className="rounded border border-[color:var(--color-hairline)] bg-surface px-2 py-0.5 text-[11px] text-ink-2 transition-colors hover:border-[color:var(--color-seq-550)] hover:text-ink"
+          >
+            {h.step}. {h.title}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
@@ -151,7 +176,6 @@ export function Empty({ children }: { children: ReactNode }) {
   return <div className="py-10 text-center text-[12px] text-ink-muted">{children}</div>;
 }
 
-/** Nhãn khoá–giá trị cho các khối siêu dữ liệu. */
 export function KV({ k, v }: { k: string; v: ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-1">

@@ -1930,3 +1930,31 @@ Bảng QĐ-037-2. Bốn vế tiêu chí H0 đã đăng ký trên `test` (C1 − 
   1. Cho phép chạy song song các làn (M8 thực nghiệm `test` / M9-A trên `val` dùng backend `mock` tới khi M8 xong phần API / viết nháp Ch1–Ch4) thay vì chờ tuần tự từng mốc.
   2. Tính kết quả chính thức **H5 ngay ở M9-B qua harness** (trên cảnh báo CTAV của M8); sang M10 pipeline E2E phải tái lập khớp (parity) đúng tập incident đó và đo thêm độ trễ.
   3. Áp dụng sẵn 3 ưu tiên cắt giảm theo `04` §9: cắt `propagation.py` mức 2 (LLM full call chain — ưu tiên cắt 1), chỉ làm mức 1 (1-hop ngược thuần thuật toán); màn hình `ExperimentComparison` trên Dashboard dùng bảng tĩnh sinh từ `eval/results/` (ưu tiên cắt 4); và ở M11 xuất 30 incident ngẫu nhiên để người dùng chấm tối thiểu **15 incident đầu** là đủ hợp lệ (ưu tiên cắt 3).
+
+---
+
+## QĐ-038 — Dựng sớm MVP tĩnh M10 (Pha 1) với dữ liệu thực nghiệm thật CTAV (`val` + H0 `test`) trên nhánh `demo/gh-pages` (2026-11-16)
+
+**Bối cảnh & tách nhánh.** Theo yêu cầu của người dùng (muốn có bản demo UI chạy được trên GitHub Pages nhưng tách riêng khỏi nhánh chính đang chạy M8), tạo nhánh `demo/gh-pages` từ `master` (`a5e74bd`). Đây là **Pha 1 của mốc M10** (dashboard dữ liệu thật chạy tĩnh / offline cho demo trước khi có API FastAPI); phần **Pha 2** (`services/rca_agent/pipeline.py`, `services/api/` đọc ClickHouse/Postgres, nạp kết quả `test` đầy đủ và kiểm parity H5) giữ nguyên chờ sau khi M8 và M9-B đóng.
+
+**Xuất dữ liệu thực nghiệm thật (`scripts/export_web_snapshot.py`, 0 lần gọi LLM, 0 USD).**
+- Đọc trực tiếp từ `eval/results/`: `ctav_final_val_v1` (`ctav.json`, `per_window.csv`, `judged.jsonl`), `m6_ctav_select_val_v2/ctav.json` (số `+C2`), `m7_rescue_val_v1/rescue.json` (số `+C5`), `m6_anchor_features_val_v1/events.jsonl.gz` (đặc trưng neo C3 `duration_ms` vs `dev` p90), `h0_val_{bm25_v3,c1_k0_v1,norag_v1}`, `h0_test_{bm25_v1,c1_k0_v1}` (tái tính bảng H0 `test` bằng `compare_subset(..., n_boot=1000, seed=42)`), và đồ thị thật `data/graph/service_graph.json`.
+- Sinh `services/web/src/mock/snapshot.json` (**4.711,5 KB**):
+  - **5 phương pháp thật trên `val`:** `ctav` (`ctav_final_val_v1`, 216 alert gồm đủ 80 `TRUE_ALERT`), `hybrid_bm25_graph` (`h0_val_c1_k0_v1`, 383 alert), `bm25_hybrid` (`h0_val_bm25_v3`, 187 alert), `no_rag` (`h0_val_norag_v1`, 119 alert), `detector_only` (`detector_only_val_v1`, 158 alert). Chuỗi `anomaly_score` của pod trên `AlertDetail` trích trực tiếp từ `per_window.csv` (không sinh số giả).
+  - **Gom incident thật (`services.rca_agent.grouping.group_alerts`, `t_group_seconds=300.0`):** `ctav_final_val_v1` cho **19 incident** (7 incident có nhãn fault Nezha, 12 cụm bình thường FP; có 1 incident đa service `inc-1a08015d9cfd7e81`: `ts-gateway-service`, `ts-travel2-service`). Bộ xếp hạng xem trước lan truyền ngược 1-hop trên đồ thị có hướng đạt sơ bộ **7/7** trên 7 fault incident của CTAV `val` (chỉ phục vụ xem trước cấu trúc báo cáo; đánh giá H5 chính thức thực hiện ở M9).
+  - **4 lối tắt kịch bản demo (`08` §6):** (1) C3 chặn báo động giả `27951cf78be19314` (`recommendationservice`, nhãn bình thường, C1 báo `TRUE_ALERT` trên 6 span `4,7–7,8 ms ≤ dev p90 23,8–24,4 ms` → C3 hạ `UNCERTAIN`); (2) C1+C3 bắt lỗi BM25 sót `77d5b78b630644ee` (`cartservice`, `cpu_contention`, 3 span `98,5–103,7 ms > dev p90 1,9 ms`); (3) cụm đa service `inc-1a08015d9cfd7e81`; (4) màn hình `/compare` (chỉ số `val`, đường ngân sách H4, ablation H3/C5 và G-test H0 trên `test`).
+
+**Cập nhật giao diện & deploy GitHub Pages (`services/web/`, `.github/workflows/deploy-pages.yml`).**
+- Cập nhật `types.ts` và `tokens.ts` sang đúng 5 phương pháp của luận văn (thay fixture M0 cũ `temporal`, `cross_modal`, `graph`), giữ nguyên bảng màu CVD và 4 màn hình chuẩn `01` §6.7. Không điền số giả cho các chỉ số chưa chạy (`Hit@1`/`Hit@3` chờ M9, `Context precision` chờ V35).
+- `Timeline.tsx` & `AlertDetail.tsx` hiển thị rõ quyết định hạ cấp của **C3 Evidence Anchoring (`dev` p90)**, `duration_ms` vs `dev p90` trên từng sự kiện và nguồn gốc `local`/`graph`. `IncidentDetail.tsx` hiển thị `call_count` và `avg_duration_ms` thật từ `service_graph.json`. `ExperimentComparison.tsx` hiển thị 4 chỉ số chính trên `val`, đường cong ngân sách H4, độ trễ p95, bảng chỉ số đầy đủ, bảng ablation H3/C5 (`val`) và bảng G-test H0 (`test`, QĐ-037).
+- Hỗ trợ subpath GitHub Pages (`VITE_BASE_PATH`), `BrowserRouter` `basename`, fallback SPA `services/web/public/404.html` + `index.html`, và GitHub Actions workflow `.github/workflows/deploy-pages.yml` tự build và publish khi push nhánh `demo/gh-pages`.
+
+**Kiểm chứng.**
+- `py scripts/export_web_snapshot.py` chạy thành công; `py -m ruff check scripts/export_web_snapshot.py` sạch.
+- Tại `services/web/`: `npm.cmd run check` (`tsc -b --noEmit` + `scripts/smoke.tsx` render cả 4 màn hình trong jsdom) đạt **18/18** kiểm tra; `VITE_BASE_PATH=/realtime-llm/ npm.cmd run build` tạo `dist/` thành công (`index.html` 0,98 kB, CSS 6,38 kB gzip, JS 726,21 kB gzip).
+
+**Tái lập.**
+```bash
+py scripts/export_web_snapshot.py
+cd services/web && npm run check && VITE_BASE_PATH=/realtime-llm/ npm run build
+```

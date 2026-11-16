@@ -1,10 +1,6 @@
 /**
  * Bản dịch TypeScript của `packages/schemas/` (tài liệu 03 §1, §2) và của các
  * cột trong `fact_alert_evaluation` (tài liệu 03 §3.1).
- *
- * QUY TẮC: file này là *bản sao chiếu*, không phải nguồn sự thật. Pydantic model
- * trong `packages/schemas/` mới là nguồn. Khi model đổi, sửa ở đây cho khớp —
- * đừng thêm trường chỉ tồn tại ở web.
  */
 
 export type Verdict = "TRUE_ALERT" | "FALSE_POSITIVE" | "UNCERTAIN";
@@ -17,11 +13,11 @@ export type FaultType =
   | "cpu_consumed";
 
 export type RetrievalStrategy =
+  | "ctav"
+  | "hybrid_bm25_graph"
   | "bm25_hybrid"
-  | "temporal"
-  | "cross_modal"
-  | "graph"
-  | "hybrid_bm25_graph";
+  | "no_rag"
+  | "detector_only";
 
 export type Modality = "log" | "trace" | "metric";
 
@@ -33,6 +29,9 @@ export interface ContextEvent {
   service: string;
   content: string;
   score: number;
+  origin?: "local" | "graph";
+  graph_distance?: number | null;
+  is_c3_anchor?: boolean;
   /** Bắt buộc không rỗng — là dữ liệu chấm context precision. */
   debug: Record<string, string | number | boolean>;
 }
@@ -61,8 +60,7 @@ export interface WindowLabel {
 }
 
 /**
- * 03 §1.4 JudgedAlert, dẹt lại kèm nhãn ground truth và số liệu retrieval —
- * đúng một dòng của `fact_alert_evaluation`. Đây là thứ `GET /alerts` trả về.
+ * 03 §1.4 JudgedAlert, dẹt lại kèm nhãn ground truth và các trường CTAV.
  */
 export interface Alert {
   alert_id: string;
@@ -70,6 +68,7 @@ export interface Alert {
   window_id: string;
   run_id: string;
   service: string;
+  pod?: string;
   ts: string;
   anomaly_score: number;
   candidate_source: "metric" | "rescue";
@@ -87,21 +86,28 @@ export interface Alert {
   retrieval_truncated: boolean;
 
   verdict: Verdict;
+  raw_verdict?: Verdict;
   confidence: number;
   judge_backend: string;
   llm_latency_ms: number;
   cache_hit: boolean;
   downgraded_by_evidence_rule: boolean;
+  downgraded_by_gating?: boolean;
+  downgraded_by_anchoring?: boolean;
+  routing_tier?: number;
+  evidence_origin?: "local" | "graph" | "mixed" | "none";
+  threshold_applied?: number | null;
+  anchor_ids?: string[];
 
   label: WindowLabel;
 }
 
-/** `GET /alerts/{alert_id}` — thêm phần đắt tiền. */
+/** `GET /alerts/{alert_id}` — thêm phần chi tiết. */
 export interface AlertDetail extends Alert {
   reasoning: string;
   evidence_event_ids: string[];
   context_events: ContextEvent[];
-  /** Chuỗi giá trị metric của cửa sổ, để vẽ biểu đồ ngữ cảnh. */
+  /** Chuỗi giá trị anomaly_score quanh cửa sổ, để vẽ biểu đồ ngữ cảnh. */
   metric_series: { ts: string; value: number }[];
   metric_name: string;
   detector_threshold: number;
@@ -149,7 +155,6 @@ export interface Incident {
     temporal_window_sec: number;
     graph_edges_used: number;
   };
-  /** Chỉ có ở danh sách, để hiển thị nhanh mà không phải tải chi tiết. */
   root_cause_service: string | null;
   ground_truth_service: string | null;
   fault_type: FaultType | null;
@@ -160,14 +165,13 @@ export interface GraphEdge {
   source: string;
   target: string;
   call_count: number;
-  error_rate: number;
-  /** Cạnh này nằm trên đường lan truyền mà báo cáo chẩn đoán nêu ra. */
+  avg_duration_ms?: number | null;
+  error_rate?: number | null;
   on_path: boolean;
 }
 
 export interface GraphNode {
   service: string;
-  /** `root_cause` là service mà tác tử kết luận; `ground_truth` là nhãn Nezha. */
   role: "root_cause" | "ground_truth" | "affected" | "healthy";
   alert_count: number;
   max_anomaly_score: number;
@@ -178,7 +182,6 @@ export interface IncidentDetail extends Incident {
   nodes: GraphNode[];
   edges: GraphEdge[];
   report: DiagnosticReport | null;
-  /** Điền khi report bị từ chối — bảng `diagnostic_rejected` (03 §4). */
   rejected_reason: string | null;
   alerts: Alert[];
 }
@@ -196,7 +199,7 @@ export interface Run {
   notes: string;
 }
 
-/** Khoảng tin cậy bootstrap — 02 §4 yêu cầu mọi chỉ số đều có CI. */
+/** Khoảng tin cậy bootstrap 95%. */
 export interface MetricWithCI {
   value: number;
   ci_low: number;
@@ -216,13 +219,15 @@ export interface RunMetrics {
   recall: MetricWithCI;
   f1: MetricWithCI;
   fpr: MetricWithCI;
-  hit_at_1: MetricWithCI;
-  hit_at_3: MetricWithCI;
-  context_precision: MetricWithCI;
+  hit_at_1?: MetricWithCI | null;
+  hit_at_3?: MetricWithCI | null;
+  context_precision?: MetricWithCI | null;
   retrieval_latency_p95_ms: number;
   llm_latency_p95_ms: number;
   cache_hit_rate: number;
-  json_valid_rate: number;
+  json_valid_rate?: number | null;
+  llm_calls?: number | null;
+  estimated_cost_usd?: number | null;
 }
 
 /** Một điểm trên trục thời gian của màn hình Timeline. */
@@ -231,6 +236,92 @@ export interface TimelineBucket {
   TRUE_ALERT: number;
   FALSE_POSITIVE: number;
   UNCERTAIN: number;
-  /** Số cửa sổ thực sự là lỗi theo nhãn Nezha, để đối chiếu. */
   ground_truth_faults: number;
+}
+
+/** Bảng ablation H3 + C5 trên `val`. */
+export interface AblationRow {
+  key: string;
+  label: string;
+  tp: number;
+  fp: number;
+  precision: number;
+  recall: number;
+  f1: number;
+  f1_ci95: [number, number];
+  fpr: number;
+  llm_calls: number;
+  estimated_cost_usd: number;
+  delta_f1: number | null;
+  delta_f1_ci95: [number, number] | null;
+  delta_fpr: number | null;
+  note: string;
+}
+
+/** Đường cong F1 theo ngân sách gọi LLM (H4). */
+export interface BudgetCurvePoint {
+  budget: number;
+  ctav: number;
+  ctav_tp: number;
+  ctav_fp: number;
+  bm25: number;
+  bm25_tp: number;
+  bm25_fp: number;
+  c1: number;
+  c1_tp: number;
+  c1_fp: number;
+  norag: number;
+  norag_tp: number;
+  norag_fp: number;
+}
+
+export interface H0TestMethod {
+  key: string;
+  label: string;
+  tp: number;
+  fp: number;
+  fn: number;
+  tn: number;
+  precision: number;
+  recall: number;
+  f1: number;
+  fpr: number;
+}
+
+export interface H0TestCriterion {
+  criterion: string;
+  test_value: string;
+  passed: boolean;
+}
+
+export interface H0TestComparison {
+  windows: number;
+  fault_windows: number;
+  methods: H0TestMethod[];
+  criteria: H0TestCriterion[];
+  delta_f1: number;
+  delta_f1_ci95: [number, number];
+  conclusion: string;
+}
+
+export interface DemoHighlight {
+  id: string;
+  step: string;
+  title: string;
+  subtitle: string;
+  path: string;
+}
+
+export interface SnapshotMeta {
+  generated_at: string;
+  split: string;
+  val_telemetry_windows: number;
+  val_fault_windows: number;
+  test_h0_telemetry_windows: number;
+  test_h0_fault_windows: number;
+  judge_model: string;
+  ctav_val_incidents: number;
+  ctav_val_fault_incidents: number;
+  ctav_val_1hop_hit1: number;
+  source_note: string;
 }

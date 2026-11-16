@@ -4,7 +4,8 @@ import { api } from "@/api/client";
 import { FixtureBanner, Loading } from "@/components/ui";
 import { RunContext, type RunCtx } from "@/lib/runContext";
 import { useAsync } from "@/lib/util";
-import { strategyLabel } from "@/theme/tokens";
+import { snapshotMeta } from "@/mock/fixtures";
+import { strategyShortLabel } from "@/theme/tokens";
 import Timeline from "@/screens/Timeline";
 import AlertDetail from "@/screens/AlertDetail";
 import IncidentDetail from "@/screens/IncidentDetail";
@@ -12,7 +13,7 @@ import ExperimentComparison from "@/screens/ExperimentComparison";
 
 const NAV = [
   { to: "/timeline", label: "Timeline", hint: "Cảnh báo và sự cố theo thời gian" },
-  { to: "/compare", label: "So sánh thực nghiệm", hint: "Năm biến thể RAG" },
+  { to: "/compare", label: "So sánh thực nghiệm", hint: "CTAV vs BM25, C1, Không RAG, Detector & Ablation" },
 ];
 
 export default function App() {
@@ -35,10 +36,10 @@ export default function App() {
           <div className="flex items-baseline gap-6">
             <div>
               <div className="text-[13px] font-semibold tracking-tight text-ink">
-                AIOps RCA — bảng điều khiển thực nghiệm
+                AIOps RCA — CTAV Demo & Bảng điều khiển thực nghiệm
               </div>
               <div className="text-[11px] text-ink-muted">
-                Nezha · split dev · seed 42 · chỉ đọc
+                Nezha · split {snapshotMeta.split} ({snapshotMeta.val_telemetry_windows.toLocaleString("vi-VN")} cửa sổ telemetry) · judge {snapshotMeta.judge_model} · chỉ đọc
               </div>
             </div>
             <nav className="flex items-center gap-1">
@@ -70,7 +71,7 @@ export default function App() {
             >
               {runs.map((r) => (
                 <option key={r.run_id} value={r.run_id}>
-                  {strategyLabel[r.retrieval_strategy]} — {r.run_id}
+                  {strategyShortLabel[r.retrieval_strategy]} — {r.run_id}
                 </option>
               ))}
             </select>
@@ -91,7 +92,7 @@ export default function App() {
         <footer className="border-t border-[color:var(--color-hairline)] px-5 py-3 text-[11px] text-ink-muted">
           Bốn màn hình theo <code className="font-mono">01-architecture-design.md</code> §6.7 —
           Timeline · Alert detail · Incident detail · Experiment comparison. Không thêm màn hình
-          nào khác (xem <code className="font-mono">06-scope-guard.md</code> §6.4).
+          nào khác (<code className="font-mono">06-scope-guard.md</code> §6.4).
         </footer>
       </div>
     </RunContext.Provider>

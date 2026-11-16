@@ -19,6 +19,7 @@
 | M6 | QUA (đóng 2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032, QĐ-037 |
 | M7 | QUA (đóng 2026-11-14; H0–H5 đã đăng ký, commit `be2b985`; V33 (a), V34 (b)) | `docs/milestones/M7-rescue-dang-ky.md`; QĐ-033, QĐ-034 |
 | M8 | ĐANG LÀM — G-test, mở 2026-11-14; V27 chấm toàn bộ candidate (BM25 + C1 xong, H0 đạt; `norag_v1` dở 2.917/3.287) | QĐ-034..037; báo cáo `docs/milestones/M8-g-test.md` (chưa viết) |
+| M10 (Pha 1) | ĐANG LÀM — **Pha 1 XONG** trên nhánh `demo/gh-pages` (Dashboard tĩnh dữ liệu thật + GitHub Pages); Pha 2 chờ M8/M9-B | QĐ-038; `docs/milestones/M10-platform.md` |
 
 M7 tóm tắt (QĐ-033): Rescue Score tính offline với A = cảnh báo CTAV; 147/147 tổ hợp khả thi, hợp 1.459 cửa
 sổ chấm một lần (1,03 USD theo token). Quy tắc chọn η = (0; 0,4; 0,6), τ = 0,8 ⇒ công thức rút về 2 thành phần
@@ -126,6 +127,7 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 tới 2026-11-16 = 14,55 USD / 19.915 
 - **Đã xong:** `h0_test_bm25_v1` (8,87 USD, `da2bb91`), `h0_test_c1_k0_v1` (3.299 gọi mới, 4,71 USD, `0c7689e`), `m8_anchor_features_test_v1` (90,9 s, 0 USD, `cb191d5`), bản nháp §5.7.1–5.7.3 ở `docs/drafts/ch5-ket-qua-test.md` (**H0 đạt cả 4 vế trên `test`**), và các dàn ý luận văn (`759fb2f`, `7198e2d`, `4f736aa`).
 - **Đang dở:** `h0_test_norag_v1` bị ngắt lúc 16:18 ngày 2026-11-14; không còn tiến trình Python nào đang chạy. Thư mục `eval/results/h0_test_norag_v1/` đang rỗng (giữ nguyên, không ghi đè). Trong `data/llm_cache/gemini.jsonl` (39.072 dòng) đã lưu **2.917 / 3.287** câu mới của `norag` (0,97 USD theo token), chỉ còn **370 lần gọi API** (≈ 0,12 USD).
 - **Chưa xong phần API** (phiên song song như M9-A vẫn phải dùng backend `mock` cho tới khi xong `norag_v2`, C5 một điểm và `repeat` ×4).
+- **Nhánh `demo/gh-pages` (M10 Pha 1, QĐ-038):** Đã dựng dashboard MVP tĩnh đọc dữ liệu thật từ `eval/results/` (`val` + H0 `test`) qua `scripts/export_web_snapshot.py`, kèm workflow `.github/workflows/deploy-pages.yml` và báo cáo `docs/milestones/M10-platform.md` (nhánh `master` giữ nguyên để chạy M8).
 - **Quyết định người dùng chốt 2026-11-16 (QĐ-037):** V30 → (c) (M6 **QUA**); V35 → (a) (không chặn); V29 người dùng tự giải quyết; xác nhận 2 thiết kế Rescue M7/M8 ($A$ = cảnh báo CTAV không lan truyền dây chuyền, file `eval/results/m7_rescue_features_<split>_v1/rescue_features.parquet`); đồng ý 3 lựa chọn rút ngắn đường găng M8–M12 (chạy song song các làn, H5 tính ở M9-B + M10 parity, cắt `propagation` mức 2 / `ExperimentComparison` bảng tĩnh / M11 chấm tối thiểu 15/30 incident).
 - **Ngân sách:** đã tiêu tại M8 **14,55 USD theo token**; phần gọi API còn lại ước **≈ 1,2–1,5 USD theo token** (tổng ≈ 15,8–16,0 USD theo token; người dùng đã duyệt chạy tiếp dù quy đổi billing có thể vượt ngưỡng dừng 20 USD).
 - **Thứ tự chạy tiếp phiên sau (theo `P1b` trong `docs/prompts/M8-M12-prompts.md`):**
