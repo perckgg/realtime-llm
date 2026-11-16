@@ -14,15 +14,15 @@
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Surfaces & ink */
-  --color-surface: #ffffff;
-  --color-plane: #f7f7f5;
-  --color-ink: #0f172a;
-  --color-ink-2: #475569;
-  --color-ink-muted: #64748b;
-  --color-grid: #e2e8f0;
-  --color-axis: #cbd5e1;
-  --color-hairline: rgb(15 23 42 / 0.1);
+  /* Surfaces & ink — warm eye-comfort paper-yellow theme */
+  --color-surface: #faf6ed;
+  --color-plane: #f3ede0;
+  --color-ink: #1f1b16;
+  --color-ink-2: #524a3e;
+  --color-ink-muted: #7a7062;
+  --color-grid: #e3dac8;
+  --color-axis: #c7bca6;
+  --color-hairline: rgb(68 52 28 / 0.13);
 
   /* Categorical series — fixed assignment, never cycled */
   --color-series-1: #2a78d6; /* blue */

@@ -4,13 +4,13 @@
  */
 
 export const ink = {
-  primary: "#0f172a",
-  secondary: "#475569",
-  muted: "#64748b",
-  grid: "#e2e8f0",
-  axis: "#cbd5e1",
-  surface: "#ffffff",
-  plane: "#f7f7f5",
+  primary: "#1f1b16",
+  secondary: "#524a3e",
+  muted: "#7a7062",
+  grid: "#e3dac8",
+  axis: "#c7bca6",
+  surface: "#faf6ed",
+  plane: "#f3ede0",
 } as const;
 
 /** Fixed categorical palette — assigned by entity, never rotated. */

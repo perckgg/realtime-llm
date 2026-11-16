@@ -128,7 +128,7 @@ export function FixtureBanner() {
       className="border-b px-6 py-2 text-[11.5px]"
       style={{
         borderColor: "var(--color-hairline)",
-        background: "color-mix(in srgb, var(--color-seq-250) 9%, var(--color-surface))",
+        background: "color-mix(in srgb, #e8d9b8 28%, var(--color-surface))",
         color: "var(--color-ink-2)",
       }}
       role="status"
@@ -138,9 +138,9 @@ export function FixtureBanner() {
           <span
             className="rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wide"
             style={{
-              borderColor: "var(--color-seq-550)",
-              color: "var(--color-seq-700)",
-              background: "color-mix(in srgb, var(--color-seq-250) 18%, var(--color-surface))",
+              borderColor: "#b48a3e",
+              color: "#6b4b12",
+              background: "color-mix(in srgb, #ebdcb9 45%, var(--color-surface))",
             }}
           >
             STATIC BENCHMARK SNAPSHOT
