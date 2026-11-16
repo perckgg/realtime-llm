@@ -40,7 +40,7 @@ Hai điểm phải giữ xuyên suốt, vì đây là điểm mạnh của luậ
 | Phần | Nội dung | Trang | Hình | Bảng | Viết được ngay |
 |---|---|---:|---:|---:|---|
 | Phần đầu | Bìa, cam đoan, cảm ơn, tóm tắt, abstract, mục lục, danh sách hình/bảng, từ viết tắt | 10 | — | — | khung ✅; tóm tắt, abstract viết cuối cùng |
-| Chương 1 | Giới thiệu đề tài | 8 | 3 | 2 | ✅ trừ câu số ở 1.2.4 (📊, ⏳ M9) |
+| Chương 1 | Giới thiệu đề tài | 8 | 2 | 1 | ✅ trừ câu số ở 1.2.4 (📊, ⏳ M9) |
 | Chương 2 | Cơ sở lý thuyết | 14 | 9 | 4 | ✅ toàn chương |
 | Chương 3 | Công trình liên quan | 12 | 1 | 1 | ✅ (cần tra cứu trích dẫn) |
 | Chương 4 | Phương pháp đề xuất: CTAV và tác tử RCA | 18 | 12 | 10 | ✅ trừ 4.5 chi tiết (⏳ M9) |
@@ -75,9 +75,9 @@ Bài báo ICAETM chỉ xuất hiện ở 1.1.2, như một trích dẫn. Viết 
 
 | Mục | Viết kiểu gì | Hình | Bảng | Trang | Trạng thái |
 |---|---|---|---|---:|---|
-| 1.1.1 Vận hành AIOps trên microservice và quá tải cảnh báo | 2 đoạn: telemetry nhiều, detector báo nhiều, cảnh báo thiếu bằng chứng | H1.1 | | 1 | ✅ |
-| 1.1.2 Khảo sát bước đầu về giám sát lai và đánh đổi ngữ cảnh đồ thị | Nêu hiện tượng bằng số đếm (FP 7 so với 137); trích bài báo kèm giới hạn nó tự nhận | H1.2 | B1.1 | 1½ | ✅ |
-| 1.1.3 Những thách thức cho giải pháp tổng thể | 3–4 thách thức: giảm cảnh báo sai mà giữ độ phủ; cơ chế chưa rõ (hiện tượng lặp lại, cơ chế thì không); ngân sách LLM; từ cảnh báo tới service gốc | H1.3 | | 1 | ✅ |
+| 1.1.1 Vận hành AIOps trên microservice và quá tải cảnh báo | 2 đoạn: telemetry nhiều, detector báo nhiều, cảnh báo thiếu bằng chứng | H1.1 (`thesis/figures/ch1/fig-tong-quan.tex`) | | 1 | ✅ |
+| 1.1.2 Khảo sát bước đầu về giám sát lai và đánh đổi ngữ cảnh đồ thị | Nêu hiện tượng bằng lời, không số; cơ chế "nhiễu lân cận" viết là giải thích ban đầu; trích bài báo kèm giới hạn nó tự nhận | H1.2 (`fig-danh-doi.tex`) | | 1½ | ✅ |
+| 1.1.3 Những thách thức cho giải pháp tổng thể | 3–4 thách thức: giảm cảnh báo sai mà giữ độ phủ; cơ chế chưa rõ (hiện tượng lặp lại, cơ chế thì không); ngân sách LLM; từ cảnh báo tới service gốc | | | 1 | ✅ |
 | 1.2.1 Mục tiêu tổng quát | 1 đoạn | | | ½ | ✅ |
 | 1.2.2 Mục tiêu cụ thể | 5 gạch đầu dòng, mỗi dòng 1–2 câu (bản đã chốt 2026-11-16) | | | ½ | ✅ |
 | 1.2.3 Câu hỏi nghiên cứu RQ1–RQ5 | Bảng RQ → giả thuyết → chương trả lời | | B1.2 | ½ | ✅ |
@@ -262,9 +262,8 @@ Loại: **SĐ** sơ đồ vẽ tay bằng công cụ · **BĐ** biểu đồ sin
 
 | Mã | Tên | Loại | Nội dung cần thể hiện | Nguồn | Trạng thái |
 |---|---|---|---|---|---|
-| H1.1 | Vị trí của tầng thẩm định cảnh báo | SĐ | Telemetry, detector, dòng cảnh báo, judge có ngữ cảnh, người vận hành | mới | ✅ |
-| H1.2 | Đánh đổi của ngữ cảnh topology | BĐ | Cột TP và FP của BM25 và Topology trên `paper_500` (FP 7 so với 137); chỉ số đếm, không số thập phân (Ch1) | G-paper, M3 | ✅ |
-| H1.3 | Tổng quan hệ thống bốn khâu | SĐ | Detector → CTAV → RCA → platform, mỗi khâu một câu hỏi của người vận hành; bản giản lược của H4.2 | mới | ✅ |
+| H1.1 | Tổng quan hệ thống và khoảng trống ngữ nghĩa | SĐ | Telemetry → detector → CTAV (truy xuất, judge, chính sách) → tác tử RCA → dashboard; dưới mỗi khối một câu hỏi của người vận hành; ngoặc "khoảng trống ngữ nghĩa" giữa detector và CTAV. Gộp H1.1 cũ và H1.3 | `thesis/figures/ch1/fig-tong-quan.tex` | ✅ đã vẽ |
+| H1.2 | Đánh đổi của ngữ cảnh topology | SĐ | Khái niệm, không số: (a) BM25 cục bộ, (b) mở rộng 2-hop; mỗi bên một hàng cửa sổ có sự cố và một hàng cửa sổ bình thường. Biểu đồ số TP/FP chuyển sang 5.5.2 (G-paper) | `thesis/figures/ch1/fig-danh-doi.tex` | ✅ đã vẽ |
 | H2.1 | Cửa sổ trượt và nhãn | SĐ | Cửa sổ 60 s, khoảng nhãn quanh thời điểm tiêm lỗi | ♻️ GĐ1 hình 1, sửa 120 s thành 60 s | ✅ |
 | H2.2 | Metric, log, trace của một request | SĐ | Cây span cha–con, log gắn theo pod | mới | ✅ |
 | H2.3 | Khoảng trống ngữ nghĩa | SĐ | Điểm bất thường cao không cho biết có sự cố hay không | ♻️ GĐ1 hình 2 | ✅ |
@@ -377,7 +376,6 @@ flowchart LR
 
 | Mã | Tên | Mục | Trạng thái |
 |---|---|---|---|
-| B1.1 | Khảo sát bước đầu (bài báo) và luận văn: phạm vi, câu hỏi, judge, dữ liệu, đầu ra | 1.1.2 | ✅ |
 | B1.2 | Câu hỏi nghiên cứu, giả thuyết, chương trả lời | 1.2.3 | ✅ |
 | B2.1 | Nguồn telemetry ♻️ | 2.1 | ✅ |
 | B2.2 | Định dạng đầu ra của judge ♻️ | 2.4 | ✅ |
@@ -437,7 +435,7 @@ Thứ tự viết khác thứ tự trình bày: viết trước phần đã có 
 | 1 | Ngay bây giờ | Ch4 (trừ 4.5 chi tiết) · Ch5 5.1–5.6, 5.7.1–5.7.4 | H4.1–H4.10, H4.12; H5.1–H5.8; B4.x, B5.1–B5.17, B5.29, B5.30 |
 | 2 | Song song đợt 1 | Ch2 · Ch3 | H2.1–H2.9, H3.1; B2.x, B3.1 |
 | 3 | Ngay khi bạn có số M8 trên máy (hoặc push để agent điền) | 5.7.5–5.8.5 · 5.10 · Ch7 7.1, 7.2 | H5.9–H5.13, H5.16; B5.18–B5.27, B7.1 |
-| 4 | Sau đợt 1, 3 | Ch1 (viết sau Ch4, Ch5) · Ch7 7.3, 7.4, 7.6 · Công bố khoa học · Kế hoạch | H1.1–H1.3, HK.1; B1.x, B7.2, B7.4, BK.1 |
+| 4 | Sau đợt 1, 3 | Ch1 (viết sau Ch4, Ch5) · Ch7 7.3, 7.4, 7.6 · Công bố khoa học · Kế hoạch | H1.1, H1.2, HK.1; B1.2, B7.2, B7.4, BK.1 |
 | 5 | M9 đóng | 4.5 chi tiết · 5.9 · câu RCA ở 1.2.4 | H4.11, H5.14, H5.15; B5.31, B5.32 |
 | 6 | M10 đóng | Ch6 | H6.1–H6.7; B6.x |
 | 7 | M11 đóng (bạn chấm tay) | 5.8.6 · 7.5 | H7.1; B5.28, B5.33, B7.3 |
