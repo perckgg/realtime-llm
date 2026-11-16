@@ -4,9 +4,9 @@
 |---|---|
 | Ngày đóng mốc | 2026-11-11 (việc xong 2026-11-01; V31 (a), V32 (a) chốt 2026-11-11 — QĐ-032) |
 | Hạn mục tiêu | 2026-12-06 (sớm 35 ngày) |
-| Kết luận | **QUA CÓ ĐIỀU KIỆN** — DoD đạt; V30 do agent tự quyết; V31 (a), V32 (a) người dùng chốt (QĐ-032) |
+| Kết luận | **QUA** — DoD đạt; V30 (c) xác nhận 2026-11-16 (QĐ-037); V31 (a), V32 (a) người dùng chốt 2026-11-11 (QĐ-032) |
 | Commit | xem `git log` (commit "M6: CTAV ...") |
-| Quyết định liên quan | QĐ-029, QĐ-030, **QĐ-031** |
+| Quyết định liên quan | QĐ-029, QĐ-030, **QĐ-031**, QĐ-032, QĐ-037 |
 
 ## 1. Kết quả hiện tại
 
@@ -70,7 +70,7 @@ mức ngân sách (ước lượng điểm). Bảng M6-7 trong QĐ-031.
 
 | # | Vấn đề | Phương án | Khuyến nghị | Chặn mốc sau? |
 |---|---|---|---|---|
-| V30 | Nguồn ngưỡng nền C3 (agent tự quyết khi chạy tự động) | (a) trượt 60 phút; (b) `dev`; (c) để quy tắc chọn | Đã làm (c): dựng cả hai, quy tắc chọn `dev` p90. Bạn xác nhận | Không |
+| ~~V30~~ | Nguồn ngưỡng nền C3 (agent tự quyết khi chạy tự động) | (a) trượt 60 phút; (b) `dev`; (c) để quy tắc chọn | **Đã chốt (c) 2026-11-16 (QĐ-037)**: dựng cả hai, quy tắc chọn `dev` p90 (giữ trượt 60 phút làm ablation ở M8) | Không |
 | V31 | Chấp nhận cấu hình chốt dù `dev` không phủ 15 service (Phát hiện 11)? | (a) giữ `ctav_final.yaml` như quy tắc chọn; (b) dùng baseline trượt (F1 0,137, vẫn > BM25, phủ 93%); (c) M7 thêm biến thể "`dev`, thiếu thì trượt" — cần thêm một lần nhìn `val` | (a) và đăng ký (b) làm ablation bắt buộc ở M8 để đo rủi ro | **M7** (đăng ký giả thuyết) |
 | V32 | Viết lại H2 / mục tiêu (A) theo Phát hiện 10? | (a) giữ H2 nguyên văn, M8 báo trung thực "vế recall không đạt"; (b) M7 đăng ký lại H2 thành "FPR giảm, F1 tăng, recall không thấp hơn BM25 quá δ" | (a) — đổi giả thuyết sau khi thấy `val` là tối ưu theo dữ liệu | M7 |
 | V29 | GVHD chưa biết V28 (b), nay thêm việc bỏ C2/C4 | Báo GVHD cùng lúc | Báo trước khi đăng ký M7 | M7 |

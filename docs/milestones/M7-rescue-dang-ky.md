@@ -6,7 +6,7 @@
 | Hạn mục tiêu | 2026-12-13 (sớm 29 ngày) |
 | Kết luận | QUA — DoD đạt: H0–H5 đã đăng ký và commit trước khi chạm `test` (QĐ-034) |
 | Commit | `dd45bb8` (Rescue), `3ccacf7` (nháp đăng ký), `be2b985` (đăng ký chính thức) |
-| Quyết định liên quan | QĐ-032, **QĐ-033**, **QĐ-034**, mục "Đăng ký giả thuyết H0–H5" cuối `docs/experiment-log.md` |
+| Quyết định liên quan | QĐ-032, **QĐ-033**, **QĐ-034**, QĐ-037, mục "Đăng ký giả thuyết H0–H5" cuối `docs/experiment-log.md` |
 
 ## 1. Kết quả hiện tại
 
@@ -45,19 +45,19 @@ cửa sổ > 0) vì log lỗi của Nezha nằm ở pod không có cửa sổ (`
 | # | Kiểm gì | Ở đâu | Vì sao rủi ro |
 |---|---|---|---|
 | 1 | Quy tắc chọn giữ C5 chỉ vì ΔF1 +0,0013 (đổi 2 TP lấy 16 FP) | `eval/harness/rescue.py` `_select`; QĐ-033 | Theo chữ của quy tắc thì "giữ", theo ý nghĩa thống kê thì không đóng góp và FPR tệ hơn (V34) |
-| 2 | A = cảnh báo CTAV, không lan truyền dây chuyền, cửa sổ hoạt động 300 s | `scripts/build_rescue_features.py`, `services/detector/rescue.py` | Thiết kế này agent tự chọn (spec không nói rõ A); lan truyền dây chuyền có thể cứu thêm nhưng cần gọi LLM theo vòng |
+| 2 | A = cảnh báo CTAV, không lan truyền dây chuyền, cửa sổ hoạt động 300 s | `scripts/build_rescue_features.py`, `services/detector/rescue.py` | Thiết kế này agent tự chọn (spec không nói rõ A); lan truyền dây chuyền có thể cứu thêm nhưng cần gọi LLM theo vòng (**đã được người dùng xác nhận giữ nguyên cho M7/M8 ở QĐ-037**) |
 | 3 | Bản nháp đăng ký: ngưỡng δ = 0,05, tiêu chí từng H, danh sách config `test` | cuối `docs/experiment-log.md` | Không sửa được sau M8 |
 | 4 | Runner chế độ `rescue.windows` (chỉ chấm cửa sổ trong danh sách) | `eval/harness/runner.py` `_rescue_windows` + nhánh rescue trong `run()` | Số lần gọi / chi phí M8 của C5 dựa vào đây |
-| 5 | Đường dẫn kết quả lệch roadmap (`eval/results/...` thay vì `data/rescue_features.parquet`) | QĐ-033 | Chỉ là vị trí file, có snapshot config |
+| 5 | Đường dẫn kết quả lệch roadmap (`eval/results/...` thay vì `data/rescue_features.parquet`) | QĐ-033 | Chỉ là vị trí file, có snapshot config (**đã được người dùng xác nhận giữ nguyên cho M7/M8 ở QĐ-037**) |
 
 ## 3. Vấn đề cần bạn giải quyết
 
 | # | Vấn đề | Phương án | Khuyến nghị | Chặn mốc sau? |
 |---|---|---|---|---|
-| ~~V29~~ | GVHD chưa biết V28 (b), việc bỏ C2/C4 (QĐ-031), nay thêm kết quả C5 (QĐ-033) | Báo GVHD cùng lúc | **Đã gửi 2026-11-14** (QĐ-034); phản hồi của GVHD ghi QĐ mới | |
+| ~~V29~~ | GVHD chưa biết V28 (b), việc bỏ C2/C4 (QĐ-031), nay thêm kết quả C5 (QĐ-033) | Báo GVHD cùng lúc | **Đã gửi 2026-11-14** (QĐ-034); **người dùng tự giải quyết phần GVHD (QĐ-037)** | |
 | ~~V33~~ (chốt (a), QĐ-034) | δ trong vế "recall ≥ C1 − δ" của H2 | (a) δ = 0,05 cố định; (b) δ = ½ mức tăng recall của C1 so với BM25 đo trên `test`; (c) giá trị khác | (a) — chọn trước, không nhìn theo `val` (trên `val` CTAV cần δ ≥ 0,124 nên vế này dự kiến không đạt, đúng tinh thần V32 (a)) | Đăng ký |
 | ~~V34~~ (chốt (b), QĐ-034) | Vai trò C5 ở M8 | (a) theo quy tắc: phương pháp chính = CTAV + C5; (b) phương pháp chính = CTAV, C5 chỉ là ablation H3 (một điểm, không quét); (c) bỏ C5, không chạy trên `test` | (b) — ΔF1 không có ý nghĩa, FPR tệ hơn có ý nghĩa; vẫn đo trên `test` để luận văn có kết quả C5 (≈ 1 USD) | Đăng ký |
-| V30 | Nguồn ngưỡng nền C3 (agent tự quyết ở M6) | | Bạn xác nhận | Không |
+| ~~V30~~ (chốt (c), QĐ-037) | Nguồn ngưỡng nền C3 (agent tự quyết ở M6) | | Đã chốt (c) 2026-11-16 (QĐ-037) | |
 | ~~V26~~ | Billing chưa đối chiếu | | Đóng (QĐ-034): billing đã reset, số dư ≈ 1.000.000 đ ≈ 38 USD | |
 | ~~V27~~ | Phạm vi chấm `test` ở M8 | | Chốt **toàn bộ candidate** (QĐ-034) | |
 

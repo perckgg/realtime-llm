@@ -1881,3 +1881,52 @@ Kết quả: `eval/results/m8_detector_shift_test_v1/` (`shift.json`, `tables.md
 py -m eval run --config eval/configs/m8_test_shift_dev_detector.yaml       # ~4 phút, 0 LLM
 py scripts/m8_detector_shift.py --runs dev=m8_test_shift_dev_detector_v1,val=val_detector_count_v1,test=m8_test_detector_count_v1 --out <tên-mới>
 ```
+
+---
+
+## QĐ-037 — M8 (tiếp): hoàn tất BM25, C1 (H0 đạt trên `test`) và đặc trưng neo C3; `h0_test_norag_v1` dừng ở 2.917/3.287 câu (2026-11-14 → kiểm kê 2026-11-16)
+
+**Các run đã xong.**
+- **`h0_test_bm25_v1`** (`da2bb91`, 10.650,1 s): 13.699 lần gọi LLM = 13.699 lần gọi API mới (3.287 có bằng chứng, 10.412 retrieval rỗng), 0 lỗi judge, 13.304.247 token vào / 1.952.107 token ra = **8,87 USD theo token** (trên cửa sổ có telemetry: 3.659 lần gọi, 7.269.460 / 1.344.920 token, 5,54 USD).
+- **`h0_test_c1_k0_v1`** (`0c7689e`, 1.953,1 s): 13.699 lần gọi LLM, **3.299 lần gọi API mới** (10.400 trúng cache BM25 = 75,9%), 0 lỗi judge, **4,71 USD theo token** tính trên 3.299 câu mới trong cache (6.483.088 token vào / 1.104.891 token ra; tổng cả run gồm phần cache là 8,16 USD; riêng cửa sổ telemetry: 3.659 lần gọi, 4,83 USD).
+- **`m8_anchor_features_test_v1`** (`cb191d5`, 90,9 s, 0 LLM): dựng đặc trưng neo cho `h0_test_bm25_v1` và `h0_test_c1_k0_v1`. Độ phủ ngưỡng nền trên span truy xuất: baseline trượt 60 phút phủ **95,5%** (13.364/13.992, BM25) và **91,2%** (17.261/18.928, C1); baseline `dev` chỉ phủ **19,1%** (2.676/13.992, BM25) và **16,1%** (3.044/18.928, C1) — thấp hơn trên `val` (33,2% / 31,8%) do `test` có nhiều cửa sổ của các service thiếu ngưỡng `dev` (khớp QĐ-036 và Phát hiện 11).
+
+**Kết quả H0 trên `test`** (đối chiếu từ `eval/results/h0_test_{bm25,c1_k0}_v1/metrics.json`, `eval.harness.compare.compare_subset(..., n_boot=1000, seed=42)` và bản nháp `docs/drafts/ch5-ket-qua-test.md` §5.7.3).
+
+Bảng QĐ-037-1. BM25, C1 và detector-only trên `test` (cửa sổ có telemetry: 11.985 cửa sổ, 346 fault; mọi cửa sổ: 46.849).
+
+| Phương pháp | Tập cửa sổ | TP | FP | P [CI95] | R [CI95] | F1 [CI95] | FPR [CI95] |
+|---|---|---:|---:|---|---|---|---|
+| BM25 | có telemetry | 34 | 369 | 0,084 [0,058; 0,111] | 0,098 [0,070; 0,130] | 0,091 [0,064; 0,119] | 0,0317 [0,0285; 0,0350] |
+| C1 (`k_graph = 0`) | có telemetry | 96 | 1.235 | 0,072 [0,059; 0,085] | 0,277 [0,230; 0,321] | 0,115 [0,093; 0,135] | 0,1061 [0,1007; 0,1118] |
+| Detector-only | có telemetry | 224 | 3.435 | 0,061 [0,054; 0,069] | 0,647 [0,601; 0,699] | 0,112 [0,100; 0,126] | 0,2951 [0,2870; 0,3036] |
+| BM25 | mọi cửa sổ | 34 | 369 | 0,084 [0,058; 0,112] | 0,098 [0,069; 0,130] | 0,091 [0,064; 0,118] | 0,0079 [0,0071; 0,0088] |
+| C1 (`k_graph = 0`) | mọi cửa sổ | 96 | 1.235 | 0,072 [0,059; 0,086] | 0,277 [0,231; 0,324] | 0,115 [0,094; 0,135] | 0,0266 [0,0251; 0,0281] |
+| Detector-only | mọi cửa sổ | 224 | 13.475 | 0,016 [0,014; 0,019] | 0,647 [0,600; 0,702] | 0,032 [0,028; 0,036] | 0,2898 [0,2857; 0,2937] |
+
+Bảng QĐ-037-2. Bốn vế tiêu chí H0 đã đăng ký trên `test` (C1 − BM25, cửa sổ có telemetry).
+
+| Vế của tiêu chí | `test` | Kết quả | `val` (tham chiếu, M4) |
+|---|---|---|---|
+| CI ΔRecall có cận dưới > 0 | **+0,179 [+0,138; +0,226]** | **Đạt** | +0,100 [+0,052; +0,155] |
+| CI ΔFPR có cận dưới > 0 | **+0,0744 [+0,0694; +0,0798]** | **Đạt** | +0,0254 [+0,0204; +0,0306] |
+| McNemar trên fault, p < 0,05 | **p < 0,001** (p = 3,6 × 10⁻¹⁶; C1 đúng / BM25 sai: 65; ngược lại: 3) | **Đạt** | p < 0,001 (28; 7) |
+| McNemar trên normal, p < 0,05 | **p < 0,001** (p = 1,5 × 10⁻¹⁷⁸; BM25 đúng / C1 sai: 966; ngược lại: 100) | **Đạt** | p < 0,001 (276; 87) |
+| ΔF1 (báo kèm, không thuộc tiêu chí) | +0,024 [−0,001; +0,052] | — | +0,023 [−0,004; +0,052] |
+
+**Kết luận: H0 được chấp nhận trên `test`** (cả 4 vế đều đạt; hiện tượng tái lập với biên độ lớn hơn `val`).
+
+**Trạng thái `h0_test_norag_v1` và chi phí lũy kế (kiểm kê 2026-11-16).**
+- `h0_test_norag_v1` bắt đầu lúc 15:54 ngày 2026-11-14 và bị ngắt lúc 16:18 khi phiên kết thúc; hiện không còn tiến trình `py`/`python` nào đang chạy nền. Thư mục `eval/results/h0_test_norag_v1/` đang rỗng (giữ nguyên, không ghi đè; khi chạy tiếp đổi `run_id` sang `h0_test_norag_v2`).
+- Cache `data/llm_cache/gemini.jsonl` có 39.072 dòng (+19.915 dòng kể từ mốc 19.157 đầu M8): sau 13.699 (`bm25`) + 3.299 (`c1_k0`), `h0_test_norag_v1` đã lưu **2.917 / 3.287** câu gọi mới (88,7%; 1.785.322 token vào / 175.248 token ra = **0,97 USD theo token**), chỉ còn thiếu **370 lần gọi API** (≈ 0,12 USD).
+- Tổng chi phí M8 đã tiêu trong cache tới nay: **14,55 USD theo token** (8,87 + 4,71 + 0,97; 21.572.657 token vào / 3.232.246 token ra). Người dùng đã đồng ý chạy tiếp phần còn lại (`h0_test_norag_v2`, C5 một điểm, `repeat` ×4, ước thêm ≈ 1,2–1,5 USD theo token ⇒ tổng M8 ≈ 15,8–16,0 USD theo token) dù có thể vượt ngưỡng dừng 20 USD khi quy đổi billing.
+
+**Quyết định của người dùng (2026-11-16).**
+- **V30 → (c):** Xác nhận dựng cả hai ngưỡng nền cho C3 (`RollingSpanBaseline` trượt 60 phút và `dev` cố định), để quy tắc chọn trên `val` quyết định ⇒ giữ `dev` p90 cho cấu hình chính (`eval/configs/ctav_final.yaml`) và giữ baseline trượt 60 phút làm ablation bắt buộc ở M8. Điều kiện còn lại của M6 hoàn tất ⇒ **M6 chuyển từ `QUA CÓ ĐIỀU KIỆN` sang `QUA`**.
+- **V35 → (a):** Chấm thủ công context precision 50 cửa sổ trên `test` là phép đo mô tả, không gắn tiêu chí giả thuyết. Agent tự chọn 50 cửa sổ có telemetry (`seed = 42`, cân theo phương pháp), xuất file mù `eval/manual/context_precision_test_v1.csv` kèm hướng dẫn ≤ 1 trang; người dùng chấm sau, **không chặn** đóng M8 / mở M9.
+- **V29 → đóng:** Phần trao đổi với GVHD do người dùng tự giải quyết, không chặn mốc nào.
+- **Xác nhận 2 thiết kế Rescue của M7 & M8 (QĐ-033):** (i) tập cảnh báo đang hoạt động $A$ = cảnh báo của chính CTAV chốt trong khoảng nhân quả $0 \le t_w - t_a \le 300\text{ s}$, không lan truyền dây chuyền; (ii) lưu đặc trưng tại `eval/results/m7_rescue_features_<split>_v1/rescue_features.parquet` (kèm snapshot config) thay cho `data/rescue_features.parquet`.
+- **Chốt 3 lựa chọn rút ngắn đường găng M8 → M12:**
+  1. Cho phép chạy song song các làn (M8 thực nghiệm `test` / M9-A trên `val` dùng backend `mock` tới khi M8 xong phần API / viết nháp Ch1–Ch4) thay vì chờ tuần tự từng mốc.
+  2. Tính kết quả chính thức **H5 ngay ở M9-B qua harness** (trên cảnh báo CTAV của M8); sang M10 pipeline E2E phải tái lập khớp (parity) đúng tập incident đó và đo thêm độ trễ.
+  3. Áp dụng sẵn 3 ưu tiên cắt giảm theo `04` §9: cắt `propagation.py` mức 2 (LLM full call chain — ưu tiên cắt 1), chỉ làm mức 1 (1-hop ngược thuần thuật toán); màn hình `ExperimentComparison` trên Dashboard dùng bảng tĩnh sinh từ `eval/results/` (ưu tiên cắt 4); và ở M11 xuất 30 incident ngẫu nhiên để người dùng chấm tối thiểu **15 incident đầu** là đủ hợp lệ (ưu tiên cắt 3).

@@ -6,7 +6,7 @@
 
 ---
 
-## Trạng thái — 2026-11-14
+## Trạng thái — 2026-11-16
 
 | Mốc | Trạng thái | Báo cáo / quyết định |
 |---|---|---|
@@ -16,9 +16,9 @@
 | M3 | QUA (đóng 2026-10-19) | `docs/milestones/M3-graph-c1-gpaper.md`; QĐ-020, QĐ-021 |
 | M4 | QUA (đóng 2026-10-29; GVHD đồng ý V24 (b)) | `docs/milestones/M4-h0.md`; QĐ-022..027 |
 | M5 | QUA (đóng 2026-11-01; H1 giữ một phần, V28 (b)) | `docs/milestones/M5-h1.md`; QĐ-028, QĐ-029 |
-| M6 | QUA CÓ ĐIỀU KIỆN (đóng 2026-11-11; H3 bỏ C2, C4; V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032 |
+| M6 | QUA (đóng 2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032, QĐ-037 |
 | M7 | QUA (đóng 2026-11-14; H0–H5 đã đăng ký, commit `be2b985`; V33 (a), V34 (b)) | `docs/milestones/M7-rescue-dang-ky.md`; QĐ-033, QĐ-034 |
-| M8 | ĐANG LÀM — G-test, mở 2026-11-14; V27 chấm toàn bộ candidate | QĐ-034; báo cáo `docs/milestones/M8-g-test.md` (chưa viết) |
+| M8 | ĐANG LÀM — G-test, mở 2026-11-14; V27 chấm toàn bộ candidate (BM25 + C1 xong, H0 đạt; `norag_v1` dở 2.917/3.287) | QĐ-034..037; báo cáo `docs/milestones/M8-g-test.md` (chưa viết) |
 
 M7 tóm tắt (QĐ-033): Rescue Score tính offline với A = cảnh báo CTAV; 147/147 tổ hợp khả thi, hợp 1.459 cửa
 sổ chấm một lần (1,03 USD theo token). Quy tắc chọn η = (0; 0,4; 0,6), τ = 0,8 ⇒ công thức rút về 2 thành phần
@@ -54,14 +54,14 @@ commit `be2b985`). Không chỉnh tham số nào sau khi xem `test`; mọi lệc
 
 1. - [x] Tạo config `test` #1–#8 (sao từ bản `val`, chỉ đổi `split: test`, `g_test: true`, `run_id`) — `30f3f92`, `e6a71cb`, `48ee7f5`
 2. - [x] Đếm candidate `test` (detector-only, 0 USD) ⇒ ước số lần gọi và chi phí trước khi gọi API — 13.699 candidate, ước 14,8–16,4 USD (QĐ-035, `a6d044f`)
-3. - [x] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2 — `h0_test_bm25_v1` xong 15:20: 13.699 lần gọi API, 0 lỗi, **8,87 USD theo token** (ước 7,8; prompt có bằng chứng 0,00165 USD/lần thay vì 0,00121)
-4. - [ ] `h0_test_c1_k0`, `h0_test_norag`, ba bản `_b120` (100% cache) — `h0_test_c1_k0_v1` **đang chạy nền từ 15:21**
-5. - [ ] `m8_anchor_features_test`, `ctav_final_test` (replay + ablation +C2, bỏ C3, +C4, C3-trượt; 0 USD)
-6. - [ ] C5 một điểm: `m8_rescue_{features,plan}_test`, `m8_rescue_test_c1`, `m8_rescue_test` (≈ 1 USD)
-7. - [ ] `repeat` 1, 2 trên tập con 200 cửa sổ telemetry (seed 42) của BM25, C1
+3. - [x] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2 — `h0_test_bm25_v1` xong 15:20: 13.699 lần gọi API, 0 lỗi, **8,87 USD theo token** (`da2bb91`; ước 7,8; prompt có bằng chứng 0,00165 USD/lần thay vì 0,00121)
+4. - [ ] `h0_test_c1_k0`, `h0_test_norag`, ba bản `_b120` (100% cache) — `h0_test_c1_k0_v1` **xong** (`0c7689e`, 3.299 gọi mới, 0 lỗi, **4,71 USD** theo token; H0 đạt); `h0_test_norag_v1` **dừng ở 2.917/3.287** câu mới (0,97 USD trong cache, thư mục `_v1` rỗng ⇒ chạy tiếp `h0_test_norag_v2` cho 370 câu còn lại ≈ 0,12 USD); ba bản `_b120` chờ `norag_v2`
+5. - [ ] `m8_anchor_features_test`, `ctav_final_test` (replay + ablation +C2, bỏ C3, +C4, C3-trượt; 0 USD) — `m8_anchor_features_test_v1` **xong** (`cb191d5`, 0 USD); còn `ctav_final_test` và kiểm Phát hiện 11
+6. - [ ] C5 một điểm: `m8_rescue_{features,plan}_test`, `m8_rescue_test_c1`, `m8_rescue_test` (≈ 0,1–0,3 USD)
+7. - [ ] `repeat` 1, 2 trên tập con 200 cửa sổ telemetry (seed 42) của BM25, C1 (800 lần gọi ≈ 1,0 USD)
 8. - [ ] `py -m eval compare`; bảng H0–H4 có CI + McNemar; kết luận H2 viết ra dù kết quả là gì
 9. - [ ] Chấm context precision thủ công 50 cửa sổ → `eval/manual/` (V35)
-10. - [ ] Báo cáo `docs/milestones/M8-g-test.md` + tóm tắt 1 trang gửi GVHD (`04` §10)
+10. - [ ] Báo cáo `docs/milestones/M8-g-test.md` + tóm tắt 1 trang gửi GVHD (`04` §10) — đã có §5.7.1–5.7.3 trong `docs/drafts/ch5-ket-qua-test.md` (`cb191d5`) và dàn ý (`759fb2f`, `7198e2d`, `4f736aa`); còn §5.7.4–5.8, `M8-g-test.md` và mail GVHD
 
 **DoD M8:** bảng H0–H4 trên `test`; kết luận H2 viết ra **dù kết quả là gì**. Hạn 2026-12-20.
 
@@ -71,11 +71,11 @@ commit `be2b985`). Không chỉnh tham số nào sau khi xem `test`; mọi lệc
 |---|---|---|---|
 | ~~V26~~ | Billing chưa đối chiếu | Đóng (QĐ-034): người dùng báo billing đã reset, số dư ≈ 1.000.000 đ | |
 | ~~V27~~ | Phạm vi chấm `test` | Người dùng chốt **toàn bộ candidate** 2026-11-14 (QĐ-034) | |
-| ~~V29~~ | Báo GVHD V28 (b), bỏ C2/C4, kết quả C5 | Người dùng đã gửi 2026-11-14 (QĐ-034); phản hồi của GVHD ghi QĐ mới | |
+| ~~V29~~ | Báo GVHD V28 (b), bỏ C2/C4, kết quả C5 | Người dùng đã gửi 2026-11-14 (QĐ-034) và chốt tự giải quyết phần GVHD (QĐ-037); không chặn | |
 | ~~V33~~ | δ của H2 | Người dùng chốt (a) δ = 0,05 (QĐ-034) | |
 | ~~V34~~ | Vai trò C5 ở M8 | Người dùng chốt (b) chỉ ablation H3 một điểm (QĐ-034) | |
-| V30 | ~~Nguồn ngưỡng nền cho C3~~ | Agent tự quyết khi chạy tự động: dựng cả hai, quy tắc chọn `dev` p90 (QĐ-031) — **người dùng xác nhận** | Không |
-| V35 | Chấm context precision thủ công 50 cửa sổ (`04` M8) không nằm trong bản đăng ký: ai chấm, chọn mẫu thế nào | Đo mô tả, không gắn tiêu chí giả thuyết; agent chọn 50 cửa sổ có telemetry (seed 42, cân theo phương pháp), người dùng chấm | Việc 9 của M8 (không chặn bảng H0–H4) |
+| ~~V30~~ | Nguồn ngưỡng nền cho C3 | Người dùng chốt (c) 2026-11-16 (QĐ-037): dựng cả hai, quy tắc chọn `dev` p90 (QĐ-031) ⇒ M6 **QUA** | |
+| ~~V35~~ | Chấm context precision thủ công 50 cửa sổ (`04` M8) | Người dùng chốt (a) 2026-11-16 (QĐ-037): đo mô tả; agent xuất 50 cửa sổ có telemetry (`seed 42`, mù), người dùng chấm sau | Không chặn bảng H0–H4 / M9 |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
@@ -96,16 +96,18 @@ suy từ một lần đối chiếu, giá trong code và số dư credit chưa �
 | M5 (còn lại) | Xong: 753 lần gọi, 1,0093 USD **theo token** (billing thật chưa biết) | 1,5 USD | 3 USD |
 | M6 | Xong: 0 lần gọi (replay cache H0, QĐ-031) | 2 USD | 4 USD — đổi prompt judge = lập lại ngân sách trước khi chạy |
 | M7 | Xong phần Rescue: 1.459 lần gọi, 1,03 USD **theo token** (`m7_rescue_val_c1_v1`) | 4 USD | 6 USD |
-| M8 | `test` một lần, **toàn bộ candidate** (V27): BM25, C1, không-RAG (CTAV dùng lại cache) + `repeat` trên tập con + C5 một điểm (≈ 1 USD) | 18 USD | 20 USD |
+| M8 | `test` một lần, **toàn bộ candidate** (V27): đã tiêu **14,55 USD** theo token (`bm25` 8,87 + `c1_k0` 4,71 + `norag_v1` dở 0,97); còn thiếu `norag_v2` + C5 + `repeat` ước ≈ 1,2–1,5 USD theo token | 18 USD | 20 USD (người dùng đã duyệt vượt ở QĐ-037) |
 | M9 | Tóm tắt incident bằng LLM (vài trăm) | 1 USD | 2 USD |
 | M10–M12 | Demo offline từ cache; đánh giá bằng người | 0 | 1 USD |
 | Dự phòng | Chạy lại do lỗi pipeline / đổi prompt | 8 USD | — |
-| **Tổng còn phải chi (M8–M12 + dự phòng)** | | **≈ 27 USD** trên số dư ≈ 38 USD | |
+| **Tổng còn phải chi (M8–M12 + dự phòng)** | | **≈ 27 USD** trên số dư ≈ 38 USD (đã tiêu tại M8 ≈ 14,55 USD theo token) | |
 
 **Đã tiêu (ước tính theo token, không phải billing; không gồm request lỗi, retry, request bị ngắt):**
 M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`ref_flat` 1,77, `order_rev` 1,77,
 `time_0/33/67` 0,80 / 0,75 / 0,76, `near_trace` 0,84, `near_log` 0,89, `neighbor_trace` 0,876 tính từ
-`usage` trong cache), 2026-11-01 1,0093 USD (`neighbor_trace` 0,0016, `repeat` 1 0,5022, `repeat` 2 0,5056).
+`usage` trong cache), 2026-11-01 1,0093 USD (`neighbor_trace` 0,0016, `repeat` 1 0,5022, `repeat` 2 0,5056);
+M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 tới 2026-11-16 = 14,55 USD / 19.915 lần gọi mới trong cache** (`h0_test_bm25_v1`
+8,87 / 13.699; `h0_test_c1_k0_v1` 4,71 / 3.299; `h0_test_norag_v1` dở 0,97 / 2.917).
 
 **Quy tắc (áp cho mọi mốc):**
 1. Trước mỗi lần chạy có gọi API: ước số lần gọi mới (trừ phần trúng cache) × đơn giá theo **token của
@@ -117,6 +119,21 @@ M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`r
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — kiểm kê 2026-11-16 (M8 đang làm)
+
+**Trạng thái thực tế sau phiên 2026-11-14 (`da2bb91`..`4f736aa`, QĐ-037):**
+- **Đã xong:** `h0_test_bm25_v1` (8,87 USD, `da2bb91`), `h0_test_c1_k0_v1` (3.299 gọi mới, 4,71 USD, `0c7689e`), `m8_anchor_features_test_v1` (90,9 s, 0 USD, `cb191d5`), bản nháp §5.7.1–5.7.3 ở `docs/drafts/ch5-ket-qua-test.md` (**H0 đạt cả 4 vế trên `test`**), và các dàn ý luận văn (`759fb2f`, `7198e2d`, `4f736aa`).
+- **Đang dở:** `h0_test_norag_v1` bị ngắt lúc 16:18 ngày 2026-11-14; không còn tiến trình Python nào đang chạy. Thư mục `eval/results/h0_test_norag_v1/` đang rỗng (giữ nguyên, không ghi đè). Trong `data/llm_cache/gemini.jsonl` (39.072 dòng) đã lưu **2.917 / 3.287** câu mới của `norag` (0,97 USD theo token), chỉ còn **370 lần gọi API** (≈ 0,12 USD).
+- **Chưa xong phần API** (phiên song song như M9-A vẫn phải dùng backend `mock` cho tới khi xong `norag_v2`, C5 một điểm và `repeat` ×4).
+- **Quyết định người dùng chốt 2026-11-16 (QĐ-037):** V30 → (c) (M6 **QUA**); V35 → (a) (không chặn); V29 người dùng tự giải quyết; xác nhận 2 thiết kế Rescue M7/M8 ($A$ = cảnh báo CTAV không lan truyền dây chuyền, file `eval/results/m7_rescue_features_<split>_v1/rescue_features.parquet`); đồng ý 3 lựa chọn rút ngắn đường găng M8–M12 (chạy song song các làn, H5 tính ở M9-B + M10 parity, cắt `propagation` mức 2 / `ExperimentComparison` bảng tĩnh / M11 chấm tối thiểu 15/30 incident).
+- **Ngân sách:** đã tiêu tại M8 **14,55 USD theo token**; phần gọi API còn lại ước **≈ 1,2–1,5 USD theo token** (tổng ≈ 15,8–16,0 USD theo token; người dùng đã duyệt chạy tiếp dù quy đổi billing có thể vượt ngưỡng dừng 20 USD).
+- **Thứ tự chạy tiếp phiên sau (theo `P1b` trong `docs/prompts/M8-M12-prompts.md`):**
+  1. Đổi `run_id` trong `eval/configs/h0_test_norag.yaml` sang `h0_test_norag_v2` → `py -m eval run --config eval/configs/h0_test_norag.yaml` (chỉ hỏi nốt 370 câu, giữ nguyên `_v1` rỗng).
+  2. `py -m eval ctav --config eval/configs/ctav_final_test.yaml` + `py scripts/m8_finding11.py` (0 USD) + ba bản `h0_test_{bm25,c1_k0,norag}_b120.yaml` (0 USD, 100% cache sau `norag_v2`).
+  3. C5 một điểm (`m8_rescue_features_test.yaml`, `m8_rescue_plan_test.yaml`, `m8_rescue_test_c1.yaml`, `m8_anchor_features_rescue_test.yaml`, `m8_rescue_test.yaml`).
+  4. `repeat` ×4 (`h0_test_{bm25,c1_k0}_rep{1,2}.yaml`) → ghi dòng `"M8: xong phần API"` vào đây.
+  5. `py -m eval compare` + `py scripts/m8_tables.py` + `py scripts/m8_context_precision_sample.py` → hoàn tất `docs/drafts/ch5-ket-qua-test.md`, viết `docs/milestones/M8-g-test.md` và `docs/drafts/<ngày>-mail-gvhd-gtest.md`.
 
 ## Ghi chú bàn giao — phiên 2026-11-14 (đóng M7, mở M8)
 
