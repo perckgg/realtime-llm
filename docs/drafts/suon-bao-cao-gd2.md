@@ -3,6 +3,10 @@
 > Bản nháp sườn, dựng theo cấu trúc luận văn GĐ1 (`docs/Thesis_Phase1.pdf`) và template `docs/Template_LuanVan.docx`.
 > Trạng thái mốc (cập nhật 2026-11-14): M7 đã đóng, H0–H5 **đã đăng ký 2026-11-14** (QĐ-034: δ = 0,05; C5 chỉ là ablation; chấm toàn bộ candidate trên `test`); M8 đang chạy. Mọi số `test` = [CHỜ M8] trừ khi mục ghi khác. Số liệu hiện có đều trên `val`/`dev`, kèm nguồn.
 
+> **Văn phong:** mọi đoạn chuyển từ sườn này thành văn luận văn phải theo `docs/drafts/style-guide-luan-van.md`.
+> Nhãn `[TÁI SỬ DỤNG GĐ1 §x]` / `[MỚI]` dưới đây là ghi chú nguồn nội bộ; trong văn luận văn không dùng "GĐ1/GĐ2",
+> "giai đoạn", "kế thừa" (style guide §1.1).
+
 ## Quy ước
 
 - `[TÁI SỬ DỤNG GĐ1 §x]`: lấy lại và rút gọn từ luận văn GĐ1 · `[MỚI]`: nội dung GĐ2.
