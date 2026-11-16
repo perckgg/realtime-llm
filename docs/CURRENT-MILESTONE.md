@@ -18,7 +18,16 @@
 | M5 | QUA (đóng 2026-11-01; H1 giữ một phần, V28 (b)) | `docs/milestones/M5-h1.md`; QĐ-028, QĐ-029 |
 | M6 | QUA (đóng 2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032, QĐ-037 |
 | M7 | QUA (đóng 2026-11-14; H0–H5 đã đăng ký, commit `be2b985`; V33 (a), V34 (b)) | `docs/milestones/M7-rescue-dang-ky.md`; QĐ-033, QĐ-034 |
-| M8 | **QUA (chờ người dùng xem báo cáo; M8: xong phần API)** — hoàn tất 2026-11-16 (21.094 gọi mới, 0 lỗi, 15,85 USD theo token): **H0 đạt, H2 không đạt** (do 61% fault rơi vào 32 service thiếu ngưỡng `dev`; đối chứng `C3-trượt` đạt F1 0,120), **H3 & H4 đạt** | `docs/milestones/M8-g-test.md`; QĐ-034..038 |
+| M8 | **QUA (đóng 2026-11-16; người dùng đã xem báo cáo, V36 (a) — QĐ-039; M8: xong phần API)** — hoàn tất 2026-11-16 (21.094 gọi mới, 0 lỗi, 15,85 USD theo token): **H0 đạt, H2 không đạt** (do 61% fault rơi vào 32 service thiếu ngưỡng `dev`; đối chứng `C3-trượt` đạt F1 0,120), **H3 & H4 đạt** | `docs/milestones/M8-g-test.md`; QĐ-034..039 |
+| M9 | **Đang làm** (mở 2026-11-16; M9-A `val` → M9-B `test`) | QĐ-037, QĐ-039; báo cáo sẽ ở `docs/milestones/M9-rca.md` |
+
+M8 tóm tắt (QĐ-038, QĐ-039): G-test trên `test` (11.985 cửa sổ telemetry, 346 fault), 21.094 lần gọi mới, 15,85 USD
+theo token, 0 lỗi judge. **H0 chấp nhận** (C1 − BM25: ΔRecall +0,179, ΔFPR +0,0744). **H2 không được chấp nhận**:
+CTAV 14 TP / 64 FP, F1 0,066 so với BM25 0,091 (ΔF1 −0,025 [−0,067; +0,014]); đạt vế FPR, không đạt vế F1 và vế
+recall (−0,237). Nguyên nhân: 32 / 42 service (61,0% fault) không có ngưỡng `dev` p90 nên C3 hạ trọn 67 / 67 TP của
+C1 ở đó (Phát hiện 11); ablation `c3_rolling_baseline` đạt 47 TP / 391 FP, F1 0,120 — chỉ là phân tích cơ chế.
+**H3 đạt** (C3 đóng góp; xác nhận bỏ C2, C4; C5 +0 TP / +1 FP), **H4 đạt** (120 lần gọi: 0,034 so với 0,017).
+V36 (a): H5 chính thức trên 78 cảnh báo `ctav_final_test_v1`, kèm dòng độ nhạy trên 438 cảnh báo C3-trượt.
 
 M7 tóm tắt (QĐ-033): Rescue Score tính offline với A = cảnh báo CTAV; 147/147 tổ hợp khả thi, hợp 1.459 cửa
 sổ chấm một lần (1,03 USD theo token). Quy tắc chọn η = (0; 0,4; 0,6), τ = 0,8 ⇒ công thức rút về 2 thành phần
@@ -44,26 +53,50 @@ chững lại từ 67% và tác động cả recall. Không chọn đặc trưng
 
 ---
 
-## Mốc hiện tại: M8 — Cổng chặn G-test (lần đầu chạm `test`)
-## Mở 2026-11-14 (QĐ-034)
+## Mốc hiện tại: M9 — RCA Agent
+## Mở 2026-11-16 (QĐ-039)
 
-Chỉ chạy **đúng danh sách config đã đăng ký** (cuối `docs/experiment-log.md`, mục "Đăng ký giả thuyết H0–H5",
-commit `be2b985`). Không chỉnh tham số nào sau khi xem `test`; mọi lệch ghi thành QĐ mới.
+Chia hai phần theo QĐ-037 (prompt P2, P3 ở `docs/prompts/M8-M12-prompts.md`). **M9-A chỉ dùng `val`**; cấu hình RCA
+chốt ở `eval/configs/rca_final.yaml` bằng commit riêng **trước** khi chạm `test`. **M9-B chạy `test` một lần** bằng
+đúng file đó; sau khi thấy số `test` không sửa tham số, không chạy biến thể khác. M9 dùng QĐ-040..044, V40..V44.
 
-### Việc (chi tiết ở `04` M8 và danh sách config đã đăng ký)
+### Việc
 
-1. - [x] Tạo config `test` #1–#8 (sao từ bản `val`, chỉ đổi `split: test`, `g_test: true`, `run_id`) — `30f3f92`, `e6a71cb`, `48ee7f5`
-2. - [x] Đếm candidate `test` (detector-only, 0 USD) ⇒ ước số lần gọi và chi phí trước khi gọi API — 13.699 candidate, ước 14,8–16,4 USD (QĐ-035, `a6d044f`)
-3. - [x] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2 — `h0_test_bm25_v1` xong 15:20: 13.699 lần gọi API, 0 lỗi, **8,87 USD theo token** (`da2bb91`; ước 7,8; prompt có bằng chứng 0,00165 USD/lần thay vì 0,00121)
-4. - [x] `h0_test_c1_k0`, `h0_test_norag`, ba bản `_b120` (100% cache) — `h0_test_c1_k0_v1` xong (`0c7689e`, 3.299 gọi mới, 0 lỗi, **4,71 USD**); `h0_test_norag_v2` xong (370 gọi mới nối tiếp 2.917 câu cache `_v1`, 0 lỗi, tổng **1,10 USD**; giữ `_v1` rỗng); ba bản `h0_test_{bm25,c1_k0,norag}_b120_v1` xong (0 gọi mới, khớp 100% đường ngân sách)
-5. - [x] `m8_anchor_features_test`, `ctav_final_test` (replay + ablation +C2, bỏ C3, +C4, C3-trượt; 0 USD) — `m8_anchor_features_test_v1`, `ctav_final_test_v1`, `m8_finding11_{test,val}_v1` xong (0 USD, QĐ-038)
-6. - [x] C5 một điểm: `m8_rescue_{features,plan}_test_v1`, `m8_rescue_test_c1_v1` (61 gọi mới, 0 lỗi, **0,09 USD**), `m8_anchor_features_rescue_test_v1`, `m8_rescue_test_v1` (+0 TP, +1 FP)
-7. - [x] `repeat` 1, 2 trên tập con 200 cửa sổ telemetry (seed 42) của BM25, C1 — `h0_test_{bm25,c1_k0}_rep{1,2}_v1` xong (748 gọi mới, 0 lỗi, **1,08 USD**; đồng thuận 3/3 đạt 99,0% và 99,5%) — **M8: xong phần API**
-8. - [x] `py -m eval compare` (`h0_test_compare_{bm25ref,c1ref}_v1`) + `scripts/m8_tables.py` (`m8_test_tables_v1`); bảng H0–H4 có CI + McNemar; kết luận **H2 không được chấp nhận** viết trung thực kèm cơ chế Phát hiện 11 & `c3_rolling_baseline`
-9. - [x] Xuất mẫu mù context precision 50 cửa sổ → `eval/manual/context_precision_test_v1.csv` + `.key.csv` + `README-context-precision.md` (người dùng chấm sau theo V35 (a), không chặn M9)
-10. - [x] Báo cáo `docs/milestones/M8-g-test.md` + tóm tắt 1 trang gửi GVHD `docs/drafts/2026-11-16-mail-gvhd-gtest.md` + hoàn tất `docs/drafts/ch5-ket-qua-test.md` (§5.7.1–§5.8.6)
+**M9-A — trên `val`** (đầu vào: 80 cảnh báo của `ctav_final_val_v1`: 29 TP, 51 FP; replay 0 USD)
 
-**DoD M8:** bảng H0–H4 trên `test`; kết luận H2 viết ra **dù kết quả là gì**. Hạn 2026-12-20.
+1. - [ ] Harness RCA `py -m eval rca --config ...`: đọc cảnh báo CTAV của một run, gom incident, định vị root cause,
+   chấm Hit@1 / Hit@3 mức service theo nhãn root-cause (QĐ-001) có CI bootstrap; ghi `incidents` vào PostgreSQL (`03` §4)
+2. - [ ] Grouping (`services/rca_agent/grouping.py` đã có + `tests/test_grouping.py`): quét `T_group ∈ {180, 300, 600}` s;
+   Alert Reduction Ratio chung và riêng trên incident cascade / `network_delay`; quy tắc chọn `T_group` (kể cả khi hoà)
+   viết vào code trước khi xem số
+3. - [ ] `propagation.py` mức 1 (lan truyền ngược 1-hop thuần thuật toán) + baseline "service có anomaly score cao nhất
+   trong incident"; báo cả hai kèm ΔHit@1 ghép cặp có CI
+4. - [x] ~~`propagation.py` mức 2 (LLM full call chain)~~ — đã cắt theo `04` §9 ưu tiên 1 (QĐ-037); ghi vào QĐ và báo cáo M9
+5. - [ ] `summarizer.py`: JSON theo `03` §2, validator + `diagnostic_rejected`, `require_evidence`, chặn câu lệnh thực thi;
+   test bằng backend `mock` trước, rồi đo JSON valid rate bằng Gemini thật (M8 đã xong phần API; ngân sách 1 USD, ngưỡng dừng 2 USD)
+6. - [ ] Chốt `eval/configs/rca_final.yaml` (`T_group`, quy tắc xếp hạng, prompt summarizer), commit riêng
+7. - [ ] Nháp `docs/milestones/M9-rca.md` (phần `val`) + `docs/drafts/ch5-rca-val.md` (bảng + đoạn văn cho §5.9, mô tả RCA cho Ch4)
+
+**M9-B — trên `test`** (điều kiện vào: `rca_final.yaml` đã commit; M8 QUA — đã đạt, QĐ-039)
+
+8. - [ ] `rca_final_test.yaml` = `rca_final.yaml` chỉ đổi `split` / run đầu vào / `run_id`; in diff, commit trước khi chạy
+9. - [ ] Chạy một lần trên **78 cảnh báo của `ctav_final_test_v1`** (14 TP, 64 FP) — **chỉ số chính thức của H5** theo bản đăng ký
+   `be2b985`: Hit@1 ≥ 0,60; Hit@3 ≥ 0,80; cận dưới CI ΔHit@1 (RCA − baseline) > 0; Alert Reduction ≥ 30% trên incident cascade.
+   Báo kèm số fault `test` không có cảnh báo CTAV nào, tách Hit@k "trên incident có cảnh báo" và "trên mọi lần tiêm lỗi"
+10. - [ ] **Dòng độ nhạy (V36 (a), QĐ-039):** cùng `rca_final.yaml`, không đổi tham số, trên 438 cảnh báo của ablation
+    `c3_rolling_baseline` (47 TP, 391 FP); ghi nhãn "độ nhạy, ngoài bản đăng ký", không dùng cho kết luận H5
+11. - [ ] QĐ: H5 tính ở M9-B qua harness thay vì ở M10 (M10 phải tái lập đúng tập incident này); hoàn tất
+    `docs/milestones/M9-rca.md` 4 phần; thêm §5.9 vào `docs/drafts/ch5-ket-qua-test.md`; chuyển file này sang M10
+
+**DoD M9** (`04` M9, đo trên `val`): ARR ≥ 30% trên `network_delay`; có Hit@1 / Hit@3 mức 1 và baseline; JSON valid rate
+≥ 0,95; **và** bảng kiểm định H5 trên `test` (lộ trình gộp M9-B, QĐ-037). Không đạt ngưỡng nào thì báo đúng con số, nêu
+nguyên nhân từ dữ liệu, không nới định nghĩa chỉ số. Hạn 2027-01-03.
+
+**Trước khi chạy:** bật Docker Desktop + `docker compose --profile dev up -d` (ghi PostgreSQL, `tests/test_storage.py`);
+lúc mở mốc 2026-11-16 không có container nào đang chạy.
+
+**Rủi ro đã biết:** mẫu nhỏ — 80 cảnh báo trên `val`, 78 trên `test` (chỉ ở 10 service có ngưỡng `dev`, khuyết 11 / 20
+service có fault) ⇒ ít incident, CI của Hit@k rộng; dòng độ nhạy V36 (a) là đối sách, không thay chỉ số chính thức.
 
 ### Vấn đề cần chốt
 
@@ -76,7 +109,7 @@ commit `be2b985`). Không chỉnh tham số nào sau khi xem `test`; mọi lệc
 | ~~V34~~ | Vai trò C5 ở M8 | Người dùng chốt (b) chỉ ablation H3 một điểm (QĐ-034) | |
 | ~~V30~~ | Nguồn ngưỡng nền cho C3 | Người dùng chốt (c) 2026-11-16 (QĐ-037): dựng cả hai, quy tắc chọn `dev` p90 (QĐ-031) ⇒ M6 **QUA** | |
 | ~~V35~~ | Chấm context precision thủ công 50 cửa sổ (`04` M8) | Người dùng chốt (a) 2026-11-16 (QĐ-037): đã xuất `eval/manual/context_precision_test_v1.csv` (mù, 525 dòng) + hướng dẫn; người dùng chấm sau | Không chặn bảng H0–H4 / M9 |
-| **V36** | Đầu vào cảnh báo cho H5 (RCA Agent) trên `test` ở M9-B: CTAV đóng băng chỉ phát 78 cảnh báo trên 10 service có ngưỡng `dev` (khuyết 11 service có fault) | Khuyến nghị **(a)** (báo cáo M8 §3): giữ chỉ số chính H5 trên 78 cảnh báo `ctav_final_test_v1` đúng cam kết `be2b985`, **kèm** dòng độ nhạy trên 438 cảnh báo của `c3_rolling_baseline` | Không chặn M9-A (`val`); chốt trước M9-B (`test`) |
+| ~~V36~~ (chốt (a) 2026-11-16, QĐ-039) | Đầu vào cảnh báo cho H5 (RCA Agent) trên `test` ở M9-B: CTAV đóng băng chỉ phát 78 cảnh báo trên 10 service có ngưỡng `dev` (khuyết 11 service có fault) | Khuyến nghị **(a)** (báo cáo M8 §3): giữ chỉ số chính H5 trên 78 cảnh báo `ctav_final_test_v1` đúng cam kết `be2b985`, **kèm** dòng độ nhạy trên 438 cảnh báo của `c3_rolling_baseline` | Không chặn M9-A (`val`); chốt trước M9-B (`test`) |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
@@ -121,6 +154,18 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-16 (đóng M8, mở M9)
+
+**Trạng thái:** người dùng đã xem báo cáo M8 và chốt **V36 (a)** ⇒ M8 đóng, M9 mở (QĐ-039). Phiên này chỉ sửa tài
+liệu (experiment-log, báo cáo M8, file này, `04` §1, `milestones/README.md`); chưa viết code M9, 0 lần gọi API.
+Code RCA hiện có: `services/rca_agent/grouping.py` + `tests/test_grouping.py`; chưa có `propagation.py`,
+`summarizer.py`, harness `eval/harness/rca*.py`, lệnh con `py -m eval rca`.
+**Việc đầu tiên phiên sau:** bật Docker, chạy M9-A theo prompt P2 (`docs/prompts/M8-M12-prompts.md`; điều kiện
+"M8 xong phần API" đã đạt nên summarizer được gọi Gemini thật, ngân sách 1 USD). Không chạm `test` trước khi
+`eval/configs/rca_final.yaml` được commit riêng.
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12); mail GVHD
+`docs/drafts/2026-11-16-mail-gvhd-gtest.md` mới soạn, chưa ghi nhận đã gửi.
 
 ## Ghi chú bàn giao — hoàn tất M8 ngày 2026-11-16 (**M8: xong phần API**)
 

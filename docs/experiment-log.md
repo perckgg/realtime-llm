@@ -2015,3 +2015,37 @@ py scripts/m8_tables.py --split test --compare-bm25 h0_test_compare_bm25ref_v1 -
 py scripts/m8_context_precision_sample.py --bm25 h0_test_bm25_v1 --c1 h0_test_c1_k0_v1 --out eval/manual/context_precision_test_v1.csv
 ```
 
+---
+
+## QĐ-039 — Người dùng đã xem báo cáo M8; V36 (a); đóng M8, mở M9 (2026-11-16)
+
+**Người dùng chốt (2026-11-16, sau khi đọc `docs/milestones/M8-g-test.md`, ghi chú bàn giao và QĐ-033..038).**
+- **V36 → (a):** chỉ số **chính thức** của H5 ở M9-B tính trên đúng tập cảnh báo của cấu hình đóng băng
+  `ctav_final_test_v1` (78 cảnh báo: 14 TP, 64 FP), theo nguyên văn bản đăng ký `be2b985` ("Incident `test` gom
+  từ cảnh báo CTAV của M8"). Kết luận từng vế của H5 (Hit@1 ≥ 0,60; Hit@3 ≥ 0,80; cận dưới CI ΔHit@1 > 0;
+  Alert Reduction ≥ 30%) **chỉ** lấy từ tập này.
+- **Dòng độ nhạy (báo kèm, mô tả):** chạy đúng cùng cấu hình RCA đã chốt trên `val` (`rca_final.yaml`, không đổi
+  tham số nào) trên 438 cảnh báo của ablation `c3_rolling_baseline` (47 TP, 391 FP) của `ctav_final_test_v1`.
+  Dòng này không thuộc tiêu chí H5, không dùng để chọn lại `T_group` hay quy tắc xếp hạng, và phải ghi nhãn rõ
+  "độ nhạy, ngoài bản đăng ký" ở mọi bảng. Quyết định này được ghi **trước** khi M9-B chạm `test`.
+- Lý do (báo cáo M8 §3): CTAV đóng băng không phát cảnh báo nào ở 11 / 20 service có fault trên `test` (thiếu
+  ngưỡng `dev`, Phát hiện 11), nên đánh giá RCA chỉ trên 78 cảnh báo sẽ có mẫu incident nhỏ và CI rộng.
+
+**Đóng M8.** Ba điều kiện của `04` §2 đã đủ: DoD đạt (bảng H0–H4 trên `test`, kết luận H2 viết ra — QĐ-038),
+báo cáo mốc đủ 4 phần, người dùng đã xem và trả lời vấn đề chặn mốc sau (V36). Commit M8 hoàn tất: `b639e42`.
+V35 (chấm tay 525 dòng context precision) vẫn mở, hạn trước M12, không chặn M9–M11.
+
+**Mở M9 (RCA Agent).** Theo QĐ-037: M9-A trên `val` (grouping, propagation mức 1, summarizer; chốt
+`eval/configs/rca_final.yaml` bằng commit riêng) rồi M9-B trên `test` (H5, một lần). Propagation mức 2 đã cắt.
+M8 đã xong phần API nên M9 được gọi Gemini thật trong ngân sách 1 USD (ngưỡng dừng 2 USD). M9 dùng QĐ-040..044.
+
+**Ghi chú khi đọc lại M8 (không đổi kết luận nào).**
+- *Đính chính làm tròn:* F1 của C1 trên `test` (cửa sổ có telemetry) là 2·96 / (2·96 + 1.235 + 250) = 0,1145 ⇒
+  **0,114** như Bảng QĐ-038-1; Bảng QĐ-037-1 ghi 0,115 là lệch làm tròn.
+- *`c3_rolling_baseline` là phân tích cơ chế, không phải phương pháp thay thế:* trên `val` nó kém cấu hình `dev`
+  (F1 0,137 so với 0,201) nên quy tắc chọn ở M6 đã chọn đúng theo dữ liệu lúc đó; trên `test` FPR của nó xấp xỉ
+  BM25 (0,0336 so với 0,0317) và CI F1 chồng lên CI của BM25.
+- *H4 đạt trên mẫu nhỏ:* 6 TP so với 3 TP ở 120 lần gọi, hai CI chồng nhau, tiêu chí đăng ký chỉ dùng ước lượng
+  điểm; cùng ngân sách đó C1 đạt F1 0,058, cao hơn CTAV.
+- *Vế C2 của H3:* ΔFPR bằng đúng 0 vì cả 54 cửa sổ C2 hạ đều đã bị C3 hạ trước — đạt theo tiêu chí, nhưng không
+  phải bằng chứng độc lập rằng C2 vô ích khi không có C3.

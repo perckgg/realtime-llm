@@ -4,9 +4,9 @@
 |---|---|
 | Ngày hoàn tất thực nghiệm | 2026-11-16 (mở 2026-11-14 sau commit đăng ký `be2b985`) |
 | Hạn mục tiêu | 2026-12-20 (sớm 34 ngày) |
-| Kết luận | **QUA** (chờ người dùng xem báo cáo theo `04` §2; phần API hoàn tất 100%, 0 lỗi judge) |
-| Commit | `be2b985` (đăng ký H0–H5) → `da2bb91`, `0c7689e`, `cb191d5` (nửa đầu M8) → commit M8 hoàn tất |
-| Quyết định liên quan | QĐ-034, QĐ-035, QĐ-036, QĐ-037, **QĐ-038** |
+| Kết luận | **QUA** — đóng 2026-11-16: người dùng đã xem báo cáo và chốt V36 (a) (QĐ-039); phần API hoàn tất 100%, 0 lỗi judge |
+| Commit | `be2b985` (đăng ký H0–H5) → `da2bb91`, `0c7689e`, `cb191d5` (nửa đầu M8) → `b639e42` (M8 hoàn tất) |
+| Quyết định liên quan | QĐ-034, QĐ-035, QĐ-036, QĐ-037, **QĐ-038**, QĐ-039 (đóng mốc, V36 (a)) |
 
 ## 1. Kết quả hiện tại
 
@@ -62,7 +62,7 @@ Trên `test`, do split chia theo lần tiêm lỗi (QĐ-036), **32 / 42 service*
 
 | # | Vấn đề | Phương án | Khuyến nghị | Chặn mốc sau? |
 |---|---|---|---|---|
-| **V36** | Đầu vào cảnh báo cho đánh giá H5 (RCA Agent) trên `test` ở M9-B: cấu hình CTAV đóng băng (`ctav_final_test_v1`) chỉ phát 78 cảnh báo (14 TP, 64 FP) trên 10 service có ngưỡng `dev` (0 cảnh báo ở 11 service có fault thiếu ngưỡng `dev`), trong khi `c3_rolling_baseline` phát 438 cảnh báo (47 TP, 391 FP) phủ hầu hết các lần tiêm lỗi | **(a)** Giữ chỉ số chính thức của H5 trên đúng 78 cảnh báo của `ctav_final_test_v1` theo bản đăng ký `be2b985`, **và** báo kèm một dòng độ nhạy phụ trên 438 cảnh báo của `c3_rolling_baseline` (0 LLM thêm cho bước grouping/propagation 1-hop; chỉ tốn vài chục câu tóm tắt nếu chạy summarizer); **(b)** Chỉ chạy trên 78 cảnh báo của `ctav_final_test_v1` | **(a)** — tôn trọng tuyệt đối bản đăng ký `be2b985` cho kết luận H5, đồng thời tránh việc đánh giá RCA bị khuyết 11/20 service có fault trên `test` | Không chặn M9-A (trên `val`); chốt trước M9-B (`test`) |
+| ~~V36~~ (chốt (a) 2026-11-16, QĐ-039) | Đầu vào cảnh báo cho đánh giá H5 (RCA Agent) trên `test` ở M9-B: cấu hình CTAV đóng băng (`ctav_final_test_v1`) chỉ phát 78 cảnh báo (14 TP, 64 FP) trên 10 service có ngưỡng `dev` (0 cảnh báo ở 11 service có fault thiếu ngưỡng `dev`), trong khi `c3_rolling_baseline` phát 438 cảnh báo (47 TP, 391 FP) phủ hầu hết các lần tiêm lỗi | **(a)** Giữ chỉ số chính thức của H5 trên đúng 78 cảnh báo của `ctav_final_test_v1` theo bản đăng ký `be2b985`, **và** báo kèm một dòng độ nhạy phụ trên 438 cảnh báo của `c3_rolling_baseline` (0 LLM thêm cho bước grouping/propagation 1-hop; chỉ tốn vài chục câu tóm tắt nếu chạy summarizer); **(b)** Chỉ chạy trên 78 cảnh báo của `ctav_final_test_v1` | **(a)** — tôn trọng tuyệt đối bản đăng ký `be2b985` cho kết luận H5, đồng thời tránh việc đánh giá RCA bị khuyết 11/20 service có fault trên `test` | Không chặn M9-A (trên `val`); chốt trước M9-B (`test`) |
 | V35 (đã chốt (a) ở QĐ-037) | Chấm tay 525 dòng trong `eval/manual/context_precision_test_v1.csv` | Bạn điền cột `grade` (`relevant` / `irrelevant` / `unsure`), gửi lại để ghép `.key.csv` điền Bảng 5.25 (T15) | Chấm lúc thuận tiện trước M12 | Không chặn M9–M11 |
 
 ## 4. Plan cho mốc tiếp theo (M9 — RCA Agent)
