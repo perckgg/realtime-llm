@@ -428,6 +428,8 @@ flowchart LR
 
 ## 7. Thứ tự dựng
 
+Lịch theo tuần, phân công người/agent và quy tắc cắt khi trễ: **`ke-hoach-viet-bao-cao.md`**. Bảng dưới chỉ là thứ tự logic.
+
 Thứ tự viết khác thứ tự trình bày: viết trước phần đã có số và phần mà các chương khác phải trích.
 
 | Đợt | Điều kiện | Viết | Hình và bảng làm cùng |
