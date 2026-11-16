@@ -30,7 +30,7 @@ routing:
 baselines:
   bm25: h0_test_bm25_v1
   c1: h0_test_c1_k0_v1
-  norag: h0_test_norag_v1
+  norag: h0_test_norag_v2
 budgets: [120, 250, 500, 1000, 2000, 4000]
 n_boot: 1000
 seed: 42

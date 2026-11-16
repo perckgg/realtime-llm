@@ -1,0 +1,13 @@
+kind: anchor_features
+run_id: m8_anchor_features_rescue_test_v1
+runs:
+- m8_rescue_test_c1_v1
+rolling:
+  lookback_minutes: 60
+  guard_seconds: 60
+  min_spans: 30
+percentiles:
+- 90
+- 95
+- 99
+dev_baseline: data/span_baseline.parquet

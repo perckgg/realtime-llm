@@ -1,0 +1,16 @@
+{
+  "run_id": "h0_test_bm25_rep2_v1",
+  "finished_at": "2026-11-16T07:32:56.602765+00:00",
+  "wall_seconds": 331.6,
+  "detector_fit_seconds": 44.5,
+  "replay_and_retrieval_seconds": 215.3,
+  "judge_seconds": 71.6,
+  "judge_workers": 8,
+  "retrieval_workers": 6,
+  "evaluated_windows": 200,
+  "llm_calls": 200,
+  "api_calls": 200,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 0
+}

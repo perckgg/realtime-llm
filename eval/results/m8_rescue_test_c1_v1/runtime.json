@@ -1,0 +1,16 @@
+{
+  "run_id": "m8_rescue_test_c1_v1",
+  "finished_at": "2026-11-16T07:20:13.706974+00:00",
+  "wall_seconds": 663.1,
+  "detector_fit_seconds": 39.1,
+  "replay_and_retrieval_seconds": 601.6,
+  "judge_seconds": 22.3,
+  "judge_workers": 8,
+  "retrieval_workers": 6,
+  "evaluated_windows": 46849,
+  "llm_calls": 61,
+  "api_calls": 61,
+  "cache_hit_rate": 0.0,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 0
+}

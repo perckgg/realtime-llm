@@ -25,7 +25,7 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Xong** (2026-11-01; H1 giữ một phần, V28 (b), QĐ-028, QĐ-029) — `docs/milestones/M5-h1.md` |
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | **Xong** (2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a) — QĐ-031, QĐ-032, QĐ-037) — `docs/milestones/M6-ctav.md` |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | **Xong** (2026-11-14; H0–H5 đã đăng ký, V33 (a), V34 (b) — QĐ-033, QĐ-034) — `docs/milestones/M7-rescue-dang-ky.md` |
-| M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | **Đang làm** (mở 2026-11-14; V27 chấm toàn bộ candidate — QĐ-034) |
+| M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | **Xong thực nghiệm** (2026-11-16, chờ người dùng xem báo cáo — QĐ-035..038) — `docs/milestones/M8-g-test.md` |
 | M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | |
 | M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | |
 | M11 | Đánh giá bằng người + phân tích lỗi | | 2027-01-17 | |

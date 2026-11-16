@@ -1,0 +1,22 @@
+{
+  "ctav_llm_calls": 13699,
+  "max_added_calls": 6849.5,
+  "points": [
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.8",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.8,
+      "rescued": 61,
+      "rescued_in_subset": 61,
+      "feasible": true
+    }
+  ],
+  "feasible_points": 1,
+  "union_windows": 61,
+  "union_in_subset": 61,
+  "git_commit": "a5e74bd0aad7ba880d1802aebeb51aae762d915d\nmodified tracked files at run time:\n  eval/configs/ctav_final_test.yaml\n  eval/configs/h0_test_norag.yaml\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py"
+}

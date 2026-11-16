@@ -1,0 +1,16 @@
+{
+  "run_id": "h0_test_norag_b120_v1",
+  "finished_at": "2026-11-16T07:03:53.333635+00:00",
+  "wall_seconds": 673.1,
+  "detector_fit_seconds": 44.5,
+  "replay_and_retrieval_seconds": 628.4,
+  "judge_seconds": 0.0,
+  "judge_workers": 8,
+  "retrieval_workers": 1,
+  "evaluated_windows": 46849,
+  "llm_calls": 120,
+  "api_calls": 0,
+  "cache_hit_rate": 1.0,
+  "judge_backend": "gemini-2.5-flash",
+  "judge_errors": 0
+}

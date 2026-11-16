@@ -1930,3 +1930,88 @@ Bảng QĐ-037-2. Bốn vế tiêu chí H0 đã đăng ký trên `test` (C1 − 
   1. Cho phép chạy song song các làn (M8 thực nghiệm `test` / M9-A trên `val` dùng backend `mock` tới khi M8 xong phần API / viết nháp Ch1–Ch4) thay vì chờ tuần tự từng mốc.
   2. Tính kết quả chính thức **H5 ngay ở M9-B qua harness** (trên cảnh báo CTAV của M8); sang M10 pipeline E2E phải tái lập khớp (parity) đúng tập incident đó và đo thêm độ trễ.
   3. Áp dụng sẵn 3 ưu tiên cắt giảm theo `04` §9: cắt `propagation.py` mức 2 (LLM full call chain — ưu tiên cắt 1), chỉ làm mức 1 (1-hop ngược thuần thuật toán); màn hình `ExperimentComparison` trên Dashboard dùng bảng tĩnh sinh từ `eval/results/` (ưu tiên cắt 4); và ở M11 xuất 30 incident ngẫu nhiên để người dùng chấm tối thiểu **15 incident đầu** là đủ hợp lệ (ưu tiên cắt 3).
+
+---
+
+## QĐ-038 — M8 hoàn tất: kết quả G-test H0–H4 trên `test`, Phát hiện 11, C5 một điểm, phương sai `repeat` và quyết toán API (2026-11-16)
+
+**Hoàn tất toàn bộ cấu hình đã đăng ký ở `be2b985` (0 lỗi judge ở mọi run).**
+- **`h0_test_norag_v2`** (tiếp tục phần dở của `_v1`, giữ nguyên thư mục `eval/results/h0_test_norag_v1/` rỗng; cập nhật `run_id` ở `h0_test_norag.yaml` và `baselines.norag` ở `ctav_final_test.yaml`): 13.699 lần gọi LLM, **370 lần gọi API mới** (97,3% trúng cache = 10.412 câu từ BM25 + 2.917 câu từ `_v1`), 0 lỗi judge, 0,1239 USD theo token cho 370 câu mới (tổng `norag` mới `_v1 + _v2` = 3.287 câu, 2.008.165 token vào / 198.075 token ra = **1,0976 USD theo token**; tổng cả 13.699 câu gồm phần cache rỗng là 4,37 USD).
+- **Ba bản ngân sách nhỏ `_b120`** (`h0_test_{bm25,c1_k0,norag}_b120_v1`): 120 lần gọi LLM mỗi run, **0 lần gọi API mới** (100% trúng cache), 0 lỗi judge; khớp tuyệt đối (100%) với điểm `budget = 120` trên đường ngân sách của `ctav_final_test_v1/ctav.json`.
+- **Replay CTAV và kiểm định ghép cặp (0 LLM):** `ctav_final_test_v1` (`py -m eval ctav`), `m8_finding11_test_v1` và `m8_finding11_val_v1` (`scripts/m8_finding11.py`), `h0_test_compare_bm25ref_v1` và `h0_test_compare_c1ref_v1` (`py -m eval compare`), `m8_test_tables_v1` (`scripts/m8_tables.py --rescue m8_rescue_test_v1`).
+- **C5 một điểm trên `test`** (`η = (0; 0,4; 0,6), τ = 0,8`, không quét): `m8_rescue_features_test_v1` (46.849 cửa sổ, 0 LLM) → `m8_rescue_plan_test_v1` (61 cửa sổ được cứu, tất cả đều có telemetry: 3 fault, 58 normal) → `m8_rescue_test_c1_v1` (**61 lần gọi API mới**, 0 lỗi judge, 121.146 token vào / 21.336 token ra = **0,0897 USD theo token**) → `m8_anchor_features_rescue_test_v1` → `m8_rescue_test_v1`.
+- **Phương sai judge `repeat` 1, 2** trên tập con cố định 200 candidate có telemetry (`eval/samples/m8_repeat_test_v1.csv`, seed 42: 6 fault, 194 normal): chạy tuần tự 4 run `h0_test_{bm25,c1_k0}_rep{1,2}_v1`, 0 lỗi judge ở cả 4 run. Tổng cộng **748 lần gọi API mới** (`bm25_rep1` 200, `bm25_rep2` 200, `c1_k0_rep1` 174, `c1_k0_rep2` 174 — 26 cửa sổ mỗi run C1 không có bằng chứng nên trúng cache `bm25_rep1`/`rep2`), 1.448.622 token vào / 258.335 token ra = **1,0804 USD theo token**.
+- **Mẫu mù chấm tay context precision (V35 (a), 0 LLM):** `eval/manual/context_precision_test_v1.csv` (50 cửa sổ có telemetry = 25 fault + 25 normal, seed 42; 525 sự kiện bằng chứng phân biệt, ẩn phương pháp và nhãn), file khóa `.key.csv` và hướng dẫn ≤ 1 trang `eval/manual/README-context-precision.md`.
+
+**Bảng QĐ-038-1. Toàn bộ phương pháp trên `test` (cửa sổ có telemetry: 11.985 cửa sổ, 346 fault — chỉ số chính; mọi cửa sổ: 46.849).**
+
+| Phương pháp | Tập cửa sổ | TP | FP | Precision | Recall [CI95] | F1 [CI95] | FPR [CI95] |
+|---|---|---:|---:|---:|---|---|---|
+| Detector-only | có telemetry | 224 | 3.435 | 0,061 | 0,647 [0,601; 0,699] | 0,112 [0,100; 0,126] | 0,2951 [0,2870; 0,3036] |
+| LLM-không-RAG | có telemetry | 37 | 371 | 0,091 | 0,107 [0,077; 0,139] | 0,098 [0,071; 0,126] | 0,0319 [0,0288; 0,0351] |
+| BM25 | có telemetry | 34 | 369 | 0,084 | 0,098 [0,070; 0,130] | 0,091 [0,064; 0,119] | 0,0317 [0,0285; 0,0350] |
+| C1 (`k_graph = 0`) | có telemetry | 96 | 1.235 | 0,072 | 0,277 [0,230; 0,321] | 0,114 [0,093; 0,135] | 0,1061 [0,1007; 0,1118] |
+| **CTAV** (`dev` p90) | có telemetry | **14** | **64** | **0,179** | **0,040 [0,022; 0,061]** | **0,066 [0,036; 0,100]** | **0,0055 [0,0042; 0,0069]** |
+| LLM-không-RAG | mọi cửa sổ | 37 | 1.203 | 0,030 | 0,107 [0,077; 0,138] | 0,047 [0,033; 0,061] | 0,0259 [0,0244; 0,0274] |
+| CTAV (`dev` p90) | mọi cửa sổ | 14 | 64 | 0,179 | 0,040 [0,022; 0,062] | 0,066 [0,036; 0,099] | 0,0014 [0,0010; 0,0017] |
+
+*(BM25, C1 và detector-only trên mọi cửa sổ đã ghi ở Bảng QĐ-037-1; trên các cửa sổ không có telemetry, `require_evidence: false` khiến LLM-không-RAG sinh thêm 832 FP, nâng tổng từ 371 lên 1.203 FP.)*
+
+**Bảng QĐ-038-2. Kết quả kiểm định các giả thuyết H0–H4 theo đúng tiêu chí đã đăng ký (`be2b985`, cửa sổ có telemetry).**
+
+| Giả thuyết | Vế / Thành phần | Số đo trên `test` | Kết quả | Đối chiếu `val` |
+|---|---|---|---|---|
+| **H0** | Cả 4 vế (C1 − BM25) | ΔRecall +0,179 [+0,138; +0,226]; ΔFPR +0,0744 [+0,0694; +0,0798]; McNemar fault, normal p < 0,001 | **Chấp nhận** | Chấp nhận (QĐ-026) |
+| **H2** (chính) | (i) CI ΔF1(CTAV − BM25) cận dưới > 0 & McNemar p < 0,05 | ΔF1 −0,025 [−0,067; +0,014]; McNemar mọi cửa sổ p < 0,001 (fault p = 0,004 nghiêng về BM25) | **Không đạt** | Đạt (+0,098 [+0,046; +0,149]) |
+| **H2** | (ii) CI ΔFPR(CTAV − BM25) không có cận dưới > 0 | ΔFPR **−0,0262 [−0,0297; −0,0229]** (Precision +0,095 [+0,014; +0,186]) | **Đạt** | Đạt (−0,0493) |
+| **H2** | (iii) ΔRecall(CTAV − C1) ≥ −0,05 | ΔRecall **−0,237 [−0,281; −0,193]** | **Không đạt** | Không đạt (−0,124) |
+| **H2** | **Kết luận chung H2** | Đạt vế (ii), không đạt vế (i) và (iii) | **Không được chấp nhận** | Đạt một phần |
+| **H3** | C3 (`no_c3 − CTAV`: CI ΔPrecision cận trên < 0) | ΔPrecision **−0,107 [−0,197; −0,030]** (14/64 → 96/1.235) | **Đạt** (C3 đóng góp) | Đạt (−0,279) |
+| **H3** | C2 (`with_c2 − CTAV`: CI ΔFPR chứa 0 hoặc > 0) | ΔFPR **+0,0000 [+0,0000; +0,0000]** (14/64 → 14/64; 54 cửa sổ bị gating hạ đều đã bị C3 hạ) | **Đạt** (xác nhận bỏ C2) | Đạt (−0,0003 [−0,0007; 0,0000]) |
+| **H3** | C4 (`with_c4 − CTAV`: chi phí tăng & CI ΔF1 không có cận dưới > 0) | 16.985 so với 13.699 lần gọi (13,56 so với 8,16 USD); ΔF1 **−0,001 [−0,001; +0,000]** (14/68) | **Đạt** (xác nhận bỏ C4) | Đạt (−0,013; 5,14 vs 3,28 USD) |
+| **H3** | C3-trượt (`c3_rolling_baseline − CTAV`, báo mô tả) | **47 TP, 391 FP, P = 0,107, R = 0,136, F1 = 0,120 [0,090; 0,151], FPR = 0,0336**; ΔF1 **+0,054 [+0,017; +0,091]**, ΔRecall **+0,095 [+0,061; +0,133]**, ΔFPR +0,0281 [+0,0247; +0,0315] | — | 34/255, F1 0,137 (ΔF1 −0,064) |
+| **H3** | C5 một điểm (`η = (0; 0,4; 0,6), τ = 0,8`, báo mô tả) | 61 cửa sổ được cứu → **14 TP, 65 FP** (+0 TP, +1 FP); ΔRecall +0,000, ΔFPR +0,0001 [+0,0000; +0,0003], ΔF1 −0,000 [−0,001; +0,000], +61 lần gọi | — | +2 TP / +16 FP, +52 lần gọi |
+| **H4** | Ngân sách 120 lần gọi: F1(CTAV) ≥ F1(LLM-không-RAG) | CTAV **0,034 [0,011; 0,064]** (6 TP, 0 FP, P = 1,000) so với không-RAG **0,017 [0,000; 0,038]** (3 TP, 3 FP); BM25 0,017; C1 0,058 | **Chấp nhận** | Đạt (0,028 vs 0,000) |
+
+**Nguyên nhân H2 không đạt và kiểm chứng Phát hiện 11 trên `test` (`m8_finding11_test_v1` đối chiếu `m8_finding11_val_v1`).**
+- Trên phễu quyết định của 11.985 cửa sổ có telemetry (346 fault): detector giữ 3.659 candidate (224 fault, 3.435 normal) → judge với C1 trả `TRUE_ALERT` thô cho 1.418 cửa sổ (96 fault, 1.322 normal) → luật `require_evidence` hạ 87 normal (còn 96 TP, 1.235 FP; ngưỡng θ = 0,80 hạ 0) → C3 (`dev` p90) hạ tiếp 1.253 cửa sổ (**82 fault và 1.171 normal**), còn **14 TP, 64 FP**.
+- Phân tách theo độ phủ ngưỡng nền `dev` (`m8_finding11_test_v1`): trên `test`, **32 / 42 service** có telemetry (10.557 / 11.985 cửa sổ = **88,1%**; 11 / 20 service có fault với **211 / 346 fault = 61,0%**, cao hơn nhiều so với 105 / 209 = 50,2% trên `val`) **không có ngưỡng `dev` p90** trong `data/span_baseline.parquet` (gồm các service nhiều fault nhất của `test`: `checkoutservice` 35 fault / 17 C1 TP, `adservice` 21 / 9, `currencyservice` 21 / 10, `ts-food-service` 18 / 9, `productcatalogservice` 14 / 8, `ts-preserve-service` 7 / 7, `ts-basic-service` 32 / 5). Vì các service này đồng thời không phát log ERROR/WARN trong cửa sổ GĐ2, C3 với ngưỡng `dev` hạ **trọn 67 / 67 C1 TP về 0 TP** (và 1.136 C1 FP về 0 FP), làm mất **0,194 recall** trên toàn tập (so với 0,110 = 23/209 trên `val`). Ở 10 service có ngưỡng `dev` (135 fault), C1 bắt 29 TP / 99 FP và CTAV giữ 14 TP / 64 FP (recall 0,104).
+- Ngược lại, khi thay **duy nhất** nguồn ngưỡng của C3 từ `dev` tĩnh sang ngưỡng trượt 60 phút đã đăng ký trước trong H3 (`c3_rolling_baseline`, phủ 91,2% span C1 trên `test` thay vì 16,1%), hệ thống đạt **47 TP, 391 FP, F1 = 0,120 [0,090; 0,151], FPR = 0,0336**: bắt nhiều hơn BM25 **13 fault** (47 so với 34 TP, +38%), cắt **68,3% cảnh báo sai của C1** (1.235 xuống 391 FP, đưa FPR về sát BM25: 0,0336 so với 0,0317), và đạt F1 điểm cao nhất trong mọi phương pháp trên `test` (cao hơn CTAV `dev` một cách có ý nghĩa: ΔF1 +0,054 [+0,017; +0,091]). Như vậy, việc H2 bác bỏ cấu hình đóng băng đến từ **độ lệch độ phủ service của ngưỡng tĩnh `dev` dưới giao thức chia split theo lần tiêm lỗi** (Phát hiện 11 kết hợp độ lệch thành phần split QĐ-036), không phải do bản thân nguyên lý neo bằng chứng bất thường tại `s_0` thất bại. Báo cáo giữ nguyên kết luận **H2 không được chấp nhận** cho cấu hình đóng băng theo đúng cam kết tiền đăng ký, đồng thời trình bày đối chứng `c3_rolling_baseline` trong phần phân tích cơ chế (§5.8.1–5.8.2).
+- Ở C5 một điểm (`m8_rescue_test_v1`), trong 61 cửa sổ được cứu chỉ có 3 cửa sổ fault và cả 3 đều bị judge trên bằng chứng C1 trả `FALSE_POSITIVE` ngay trước C3 (0/3 thành cảnh báo), trong khi 58 cửa sổ normal sinh 19 `TRUE_ALERT` ở C1 và C3 lọc còn 1 FP (+0 TP, +1 FP) — xác nhận trọn vẹn Phát hiện 12 trên `test`.
+
+**Phương sai judge qua `repeat` 0, 1, 2 (200 cửa sổ có telemetry: 6 fault, 194 normal).**
+- **BM25:** tỉ lệ `TRUE_ALERT` thô ở `repeat` 0 / 1 / 2 là 0,120 (24) / 0,110 (22) / 0,120 (24); tỉ lệ quyết định cảnh báo cuối cùng là 0,085 (17) / 0,075 (15) / 0,085 (17). Có **198 / 200 cửa sổ (99,0%)** đồng thuận cả 3 lần; chỉ **2 / 200 (0,010 [0,000; 0,025])** đổi quyết định (0/6 fault, 2/194 normal), F1 dao động 0,0870–0,0952 (SD = 0,0048).
+- **C1:** tỉ lệ `TRUE_ALERT` thô là 0,370 (74) / 0,375 (75) / 0,375 (75); tỉ lệ cảnh báo cuối cùng là 0,335 (67) / 0,340 (68) / 0,340 (68). Có **199 / 200 cửa sổ (99,5%)** đồng thuận cả 3 lần; chỉ **1 / 200 (0,005 [0,000; 0,015])** đổi quyết định (0/6 fault, 1/194 normal), F1 dao động 0,1351–0,1370 (SD = 0,0011). Phương sai ngẫu nhiên của `gemini-2.5-flash` ở temperature 0 là không đáng kể so với mọi hiệu ứng giữa các phương pháp.
+
+**Bảng QĐ-038-3. Quyết toán API của M8 trong `data/llm_cache/gemini.jsonl` (dòng 19.157 → 40.251).**
+
+| Nhóm run | API mới (ước QĐ-035) | API mới (thực) | Token vào | Token ra | USD theo token (ước) | USD theo token (thực) |
+|---|---:|---:|---:|---:|---:|---:|
+| `h0_test_bm25_v1` | 13.699 | 13.699 | 13.304.247 | 1.952.107 | 7,80 | **8,8715** |
+| `h0_test_c1_k0_v1` | ≈ 2.700 | 3.299 | 6.483.088 | 1.104.891 | 3,00 | **4,7072** |
+| `h0_test_norag` (`_v1` 2.917 + `_v2` 370) | ≈ 2.700 | 3.287 | 2.008.165 | 198.075 | 0,90 | **1,0976** |
+| `m8_rescue_test_c1_v1` (C5 một điểm) | vài trăm | 61 | 121.146 | 21.336 | 0,30 | **0,0897** |
+| 4 run `repeat` (`bm25` 2×200, `c1` 2×174) | 800 | 748 | 1.448.622 | 258.335 | 1,00 | **1,0804** |
+| **Tổng M8** | **≈ 20.100** | **21.094** | **23.365.268** | **3.534.744** | **13,00** | **15,8464** |
+
+*(Riêng phiên 2026-11-16 tiêu 1.179 lần gọi mới = 1,2940 USD theo token; toàn bộ phần gọi API của M8 đã hoàn tất 100%, nằm gọn dưới ngân sách M8 18 USD theo token.)*
+
+**Tái lập phần chạy nốt của M8.**
+```bash
+py -m eval run --config eval/configs/h0_test_norag.yaml          # h0_test_norag_v2
+py -m eval run --config eval/configs/h0_test_bm25_b120.yaml      # + c1_k0_b120, norag_b120 (100% cache)
+py -m eval ctav --config eval/configs/ctav_final_test.yaml
+py scripts/m8_finding11.py --ctav ctav_final_test_v1 --c1 h0_test_c1_k0_v1 --out m8_finding11_test_v1
+py scripts/m8_finding11.py --ctav ctav_final_val_v1 --c1 h0_val_c1_k0_v1 --out m8_finding11_val_v1
+py scripts/build_rescue_features.py --config eval/configs/m8_rescue_features_test.yaml
+py -m eval rescue --config eval/configs/m8_rescue_plan_test.yaml
+py -m eval run --config eval/configs/m8_rescue_test_c1.yaml
+py scripts/build_anchor_features.py --config eval/configs/m8_anchor_features_rescue_test.yaml
+py -m eval rescue --config eval/configs/m8_rescue_test.yaml
+py -m eval run --config eval/configs/h0_test_bm25_rep1.yaml      # chạy tuần tự rep1, rep2 cho bm25 và c1_k0
+py -m eval compare --runs bm25=h0_test_bm25_v1,c1=h0_test_c1_k0_v1,norag=h0_test_norag_v2,ctav=ctav_final_test_v1 --detector-only h0_test_bm25_v1 --out h0_test_compare_bm25ref_v1
+py -m eval compare --runs c1=h0_test_c1_k0_v1,ctav=ctav_final_test_v1 --out h0_test_compare_c1ref_v1
+py scripts/m8_tables.py --split test --compare-bm25 h0_test_compare_bm25ref_v1 --compare-c1 h0_test_compare_c1ref_v1 --ctav ctav_final_test_v1 --rescue m8_rescue_test_v1 --out m8_test_tables_v1
+py scripts/m8_context_precision_sample.py --bm25 h0_test_bm25_v1 --c1 h0_test_c1_k0_v1 --out eval/manual/context_precision_test_v1.csv
+```
+

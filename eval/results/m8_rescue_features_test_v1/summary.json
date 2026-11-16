@@ -1,0 +1,61 @@
+{
+  "config": {
+    "kind": "rescue_features",
+    "run_id": "m8_rescue_features_test_v1",
+    "split": "test",
+    "g_test": true,
+    "windows_run": "h0_test_c1_k0_v1",
+    "alerts_run": "ctav_final_test_v1",
+    "window_seconds": 60,
+    "graph": "data/graph/service_graph.json",
+    "log": {
+      "k_log": 10,
+      "levels": [
+        "ERROR",
+        "FATAL",
+        "CRITICAL"
+      ],
+      "patterns": [
+        "\\b(?:status|code)\\D{0,5}5\\d\\d\\b",
+        "exception|panic|traceback"
+      ]
+    },
+    "time": {
+      "sigma_seconds": 300,
+      "active_seconds": 300
+    }
+  },
+  "windows": 46849,
+  "alerts_in_A": 78,
+  "log_stats": {
+    "log_lines": 4175406,
+    "error_lines": 7254,
+    "error_lines_in_window": 2969,
+    "error_lines_no_window_pod": 91
+  },
+  "nonzero": {
+    "lambda_log": 59,
+    "phi_topo": 1650,
+    "delta_time": 2037
+  },
+  "non_candidate_windows": 33150,
+  "quantiles_non_candidate": {
+    "lambda_log": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "phi_topo": [
+      0.0,
+      0.0,
+      0.3333333333333333
+    ],
+    "delta_time": [
+      0.0,
+      0.0,
+      0.9966722160545233
+    ]
+  },
+  "wall_seconds": 215.2,
+  "git_commit": "a5e74bd0aad7ba880d1802aebeb51aae762d915d\nmodified tracked files at run time:\n  eval/configs/ctav_final_test.yaml\n  eval/configs/h0_test_norag.yaml\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py"
+}
