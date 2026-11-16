@@ -16,7 +16,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class MetricPoint(BaseModel):
@@ -180,3 +180,39 @@ class Incident(BaseModel):
     start_ts: datetime
     end_ts: datetime
     grouping_reason: dict[str, Any]  # temporal_window_sec, graph_edges_used
+
+
+# --- Diagnostic report of the RCA agent (03 SS2, added at M9 with services/rca_agent/summarizer.py) ---
+
+
+class SuggestedAction(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    description: str  # a description, NOT an executable command
+    priority: Literal["high", "medium", "low"]
+
+
+class EvidenceItem(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    event_id: str
+    modality: Literal["log", "trace", "metric"]
+    service: str
+    ts: datetime
+    excerpt: str
+
+
+class DiagnosticReport(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    incident_id: str
+    run_id: str
+    root_cause_service: str
+    fault_type: str  # network_delay | cpu_contention | exception | unknown
+    confidence: float = Field(ge=0.0, le=1.0)
+    evidence: list[EvidenceItem] = Field(min_length=1)  # at least one, or the report is not published
+    propagation_path: list[str]  # services in propagation order
+    suggested_actions: list[SuggestedAction]
+    generated_at: datetime
+    llm_backend: str
+    schema_version: str = "1.0"

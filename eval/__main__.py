@@ -62,6 +62,41 @@ def _rescue(args: argparse.Namespace) -> int:
     return 0
 
 
+def _rca(args: argparse.Namespace) -> int:
+    """`py -m eval rca --config eval/configs/rca_final.yaml` (eval/harness/rca.py, M9)."""
+    from datetime import UTC, datetime
+
+    from eval.harness import rca
+
+    load_dotenv(REPO / ".env")
+    config = rca.load_rca_config(args.config)
+    out_dir = RESULTS / config["run_id"]
+    if out_dir.exists():
+        raise SystemExit(f"{out_dir} already exists: results are never overwritten, use a new run_id")
+    started_at = datetime.now(UTC)
+    config_text = args.config.read_text(encoding="utf-8")
+    to_postgres = bool((config.get("postgres") or {}).get("write", False))
+    if to_postgres:  # fail before any LLM call, not after
+        from services.rca_agent import store
+
+        with store.connect() as conn:
+            if store.run_exists(conn, config["run_id"]):
+                raise SystemExit(f"run_id {config['run_id']} is already in run_registry: use a new run_id")
+    report, located, inputs, graph = rca.evaluate(config, RESULTS)
+    summaries = None
+    if (config.get("summarizer") or {}).get("enabled", False):
+        report["summarizer"], summaries = rca.summarize(config, located, inputs, graph, RESULTS)
+    report["git_commit"] = _git_commit()
+    report["method_fingerprint"] = rca.config_fingerprint(config)
+    if to_postgres:
+        report["postgres_rows"] = rca.write_postgres(config, config_text, report["git_commit"], started_at, located, summaries)
+    rca.write(report, located, summaries, out_dir, config_text)
+    print(rca.table(report))
+    print(f"method fingerprint {report['method_fingerprint']}")
+    print(f"wrote {out_dir}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="py -m eval")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -77,6 +112,8 @@ def main() -> int:
     ctav_parser.add_argument("--config", type=Path, required=True)
     rescue_parser = sub.add_parser("rescue", help="Rescue Score (C5) plan / ablation on top of CTAV (M7)")
     rescue_parser.add_argument("--config", type=Path, required=True)
+    rca_parser = sub.add_parser("rca", help="RCA agent on the alerts of a CTAV run: incidents, Hit@k, ARR, reports (M9)")
+    rca_parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "compare":
         return _compare(args)
@@ -84,6 +121,8 @@ def main() -> int:
         return _ctav(args)
     if args.command == "rescue":
         return _rescue(args)
+    if args.command == "rca":
+        return _rca(args)
     load_dotenv(REPO / ".env")
     out_dir = run(load_config(args.config))
     metrics = json.loads((out_dir / "metrics.json").read_text(encoding="utf-8"))
