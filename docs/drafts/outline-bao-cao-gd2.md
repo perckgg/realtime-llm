@@ -16,11 +16,11 @@
 
 Toàn bộ báo cáo đi theo một sợi chỉ, mỗi chương trả lời một câu:
 
-1. **Chương 1:** bài báo trước cho thấy đưa ngữ cảnh topology vào LLM thì bắt thêm sự cố nhưng báo sai nhiều hơn. Vì sao, và sửa được không?
+1. **Chương 1:** cảnh báo từ detector metric nhiều nhưng thiếu bằng chứng; đưa ngữ cảnh topology cho judge LLM thì bắt thêm sự cố nhưng báo sai nhiều hơn. Vì sao, sửa được không, và từ cảnh báo đã thẩm định có định vị được service gốc không?
 2. **Chương 2:** cần những khái niệm nào để hiểu câu hỏi đó.
 3. **Chương 3:** người khác đã làm gì, khoảng trống ở đâu.
 4. **Chương 4:** phương pháp đề xuất (CTAV) và tác tử RCA; cả những thành phần đã thử rồi bỏ.
-5. **Chương 5:** kiểm chứng theo ba lớp: tái lập được kết quả cũ, chọn cấu hình trên `val`, kiểm định một lần trên `test`.
+5. **Chương 5:** kiểm chứng theo ba lớp: kiểm tra tính đúng của pipeline, chọn cấu hình trên `val`, kiểm định một lần trên `test`.
 6. **Chương 6:** phương pháp chạy được thành một hệ thống demo.
 7. **Chương 7:** kết quả có nghĩa gì, giới hạn ở đâu.
 8. **Chương 8:** trả lời từng câu hỏi nghiên cứu.
@@ -52,33 +52,9 @@ Chương 7 vào "Định hướng phát triển". Hỏi GVHD trước khi lắp 
 
 ## 3. Nguyên tắc viết chung
 
-**Giọng văn và cấu trúc**
-- Mỗi chương mở bằng một đoạn 4–6 câu: chương trả lời câu hỏi gì, gồm những mục nào. Kết bằng mục "Tóm tắt chương"
-  5–8 câu, không thêm ý mới.
-- Mỗi mục cấp 2 mở bằng câu chủ đề nói mục này để làm gì. Một đoạn một ý, 4–7 câu.
-- Thuật ngữ cố định cả báo cáo: "cửa sổ", "candidate", "cảnh báo", "bằng chứng", "judge", "cửa sổ có telemetry". Lần
-  đầu xuất hiện thì giải thích, sau đó không đổi cách gọi.
-- Tên thành phần viết kèm chức năng ở lần đầu trong mỗi chương: "C3 (neo bằng chứng)", không chỉ "C3".
-
-**Số liệu**
-- Mỗi con số ghi rõ split (`dev`, `val`, `test`) và tập cửa sổ. Không trộn số `val` với `test` trong một câu mà không nói rõ.
-- Số `val` là số dùng để chọn cấu hình, viết là "trên `val`", không gọi là kết quả cuối. Chỉ số `test` mới là kết quả kiểm định.
-- Hiệu giữa hai phương pháp luôn kèm khoảng tin cậy. Không viết "tốt hơn" khi khoảng tin cậy chứa 0.
-- Số mock của GĐ1 (Phase 4, 5) không dùng làm kết luận; nếu nhắc thì ghi rõ là mock.
-- Dấu phẩy thập phân; `+0,179 [+0,138; +0,226]`; `p < 0,001`.
-
-**Hình và bảng**
-- Mỗi hình, bảng được nhắc trong văn trước khi xuất hiện, và có ít nhất một câu nói người đọc cần nhìn vào đâu.
-- Caption bảng đặt trên bảng, caption hình đặt dưới hình (theo template). Caption tự đủ nghĩa: ghi split, tập cửa sổ, run.
-- Ba loại hình, làm theo ba cách:
-  - *Sơ đồ* (kiến trúc, luồng, quy trình): vẽ bằng công cụ sơ đồ, một bộ màu và kiểu khối thống nhất cả báo cáo.
-  - *Biểu đồ số liệu*: sinh từ script đọc thẳng `eval/results/`, không nhập số tay.
-  - *Ảnh chụp và ví dụ* (dashboard, prompt, một ca cụ thể): chụp từ hệ thống chạy thật.
-- Bảng dài hơn nửa trang hoặc chỉ để tra cứu (theo từng service, cấu hình đầy đủ) đưa vào phụ lục.
-
-**Chỗ chờ số**
-- Trong bản dựng, ô chưa có số ghi `[CHỜ M8]`, `[CHỜ M9]`… đúng mốc, không để trống và không điền số ước lượng.
-- Câu kết luận phụ thuộc số chưa có thì viết khung câu và đánh dấu cả câu, ví dụ: `[CHỜ M8: H2 đạt / đạt một phần / không đạt]`.
+Toàn bộ quy tắc văn phong, khuôn từng chương, kỷ luật số liệu, hình/bảng và LaTeX nằm ở
+**`docs/drafts/style-guide-luan-van.md`** (nguồn duy nhất, soạn 2026-11-16). File này không chép lại. Khi khuôn "Cách viết"
+của một chương bên dưới lệch với style guide, style guide thắng.
 
 ---
 
@@ -94,7 +70,7 @@ Cột "Hình", "Bảng" ghi số thứ tự dự kiến; danh mục đầy đủ
 | Mục | Mục đích | Viết kiểu gì | Hình | Bảng | Trang |
 |---|---|---|---|---|---:|
 | 1.1.1 Bối cảnh AIOps | Vì sao cần thẩm định cảnh báo | 2 đoạn dẫn nhập ♻️ | H1.1 | | 1 |
-| 1.1.2 Kết quả GĐ1 và bài báo | Hiện tượng làm xuất phát điểm | Kể theo thời gian: GĐ1, bài báo, hạn chế bài báo tự nhận | H1.2 | B1.1 | 1½ |
+| 1.1.2 Thẩm định cảnh báo bằng LLM và đánh đổi của topology | Hiện tượng làm xuất phát điểm | Nêu hiện tượng; trích khảo sát bước đầu của tác giả (ICAETM 2026, `paper_500`) như một nguồn, kèm giới hạn bài báo tự nhận. Không kể theo "giai đoạn" (style guide §1.1–1.2) | H1.2 | B1.1 | 1½ |
 | 1.1.3 Phát hiện làm đổi cách đặt vấn đề | Trung thực về điểm đổi hướng | 2 đoạn: hiện tượng lặp lại, cơ chế thì không | | | 1 |
 | 1.2 Mục tiêu, câu hỏi, đóng góp | Cam kết của luận văn | Liệt kê có đánh số; mỗi đóng góp kèm một câu bằng chứng | | B1.2 | 2 |
 | 1.3 Đối tượng và phạm vi | Trong và ngoài phạm vi | Hai danh sách ngắn | | | 1 |
@@ -151,7 +127,7 @@ thành phần đang dùng, nhưng không lược.
 | Mục | Mục đích | Hình | Bảng | Trang | Trạng thái |
 |---|---|---|---|---:|---|
 | 4.1 Phát biểu bài toán | Ký hiệu và mục tiêu tối ưu | H4.1 | B4.1 | 1½ | ✅ |
-| 4.2 Kiến trúc tổng thể | Bức tranh toàn hệ thống, phần nào kế thừa GĐ1 | H4.2 | B4.2 | 2 | ✅ |
+| 4.2 Kiến trúc tổng thể | Bốn khâu detector → CTAV → RCA → platform, đầu vào/đầu ra mỗi khâu | H4.2 | B4.2 | 2 | ✅ |
 | 4.3 Detector và luật tạo candidate (kèm Rescue) | Đầu vào của CTAV | H4.3 | B4.3 | 2 | ✅ |
 | 4.4.1 Tổng quan CTAV | Thiết kế ban đầu so với cấu hình chốt | H4.4 | B4.4 | 1½ | ✅ |
 | 4.4.2 BM25 và judge | Baseline và tầng 1 | | B4.5 | 1 | ✅ |
@@ -164,7 +140,7 @@ thành phần đang dùng, nhưng không lược.
 
 ### Chương 5 — Thực nghiệm và đánh giá (28 trang)
 
-**Cách viết:** ba lớp kiểm chứng theo đúng thứ tự đã làm: cổng tái lập (§5.5), chọn cấu hình trên `val` (§5.6), kiểm
+**Cách viết:** ba lớp kiểm chứng theo đúng thứ tự đã làm: kiểm tra tính đúng của pipeline (§5.5), chọn cấu hình trên `val` (§5.6), kiểm
 định trên `test` (§5.7–5.8). Mỗi thí nghiệm theo sáu bước: câu hỏi và tiêu chí, thiết lập, bảng, một câu kết luận in
 đậm, diễn giải bằng số đếm, giới hạn. Phát hiện 1–12 gắn vào đúng thí nghiệm sinh ra nó, rồi tổng hợp lại ở §5.10.
 
@@ -174,7 +150,7 @@ thành phần đang dùng, nhưng không lược.
 | 5.2 Dữ liệu và chia split | Chống rò rỉ; tập chấm chính | H5.1, H5.2 | B5.2, B5.3 | 2 | ✅ |
 | 5.3 Thiết lập | Judge, detector, ngân sách, chi phí | | B5.4 | 1½ | ✅ |
 | 5.4 Thước đo | Định nghĩa chỉ số, kiểm định | | | 1 | ✅ |
-| 5.5 Kiểm chứng tái lập (G-port, G-paper) | Pipeline mới chạy đúng như cũ | H5.3 | B5.5, B5.6 | 2 | ✅ |
+| 5.5 Kiểm tra tính đúng của pipeline (G-port, G-paper) | Pipeline tái lập đúng baseline đã công bố | H5.3 | B5.5, B5.6 | 2 | ✅ |
 | 5.6.1 H0 trên `val` | Hiện tượng lặp lại, cơ chế không | | B5.7, B5.8 | 1½ | ✅ |
 | 5.6.2 Tuning C1 | `k_graph`, trọng số Fusion | | B5.9 | 1 | ✅ |
 | 5.6.3 H1: cơ chế thiên lệch xác nhận | Bằng chứng nào làm judge xác nhận | H5.4 | B5.10 | 1½ | ✅ |
@@ -262,7 +238,7 @@ Loại: **SĐ** sơ đồ vẽ tay bằng công cụ · **BĐ** biểu đồ sin
 | H4.11 | Ví dụ đồ thị lan truyền | VD | Một incident thật, service gốc được tô | ⏳ M9 | ⏳ M9 |
 | H4.12 | Cấu trúc repo và harness | SĐ | Thư mục chính và đường đi của một run | `01` §7 | ✅ |
 | H5.1 | Chia split theo lần tiêm lỗi | SĐ | Trục thời gian, các lần tiêm, vùng đệm 600 s, gán `dev` / `val` / `test` | QĐ-004 | ✅ |
-| H5.2 | Có bằng chứng gắn với gần sự cố | BĐ | Tỉ lệ cửa sổ có bằng chứng: fault so với normal, kho GĐ1 so với kho GĐ2 | B5.3 | ✅ |
+| H5.2 | Có bằng chứng gắn với gần sự cố | BĐ | Tỉ lệ cửa sổ có bằng chứng: fault so với normal, kho bằng chứng của bài báo so với kho của luận văn | B5.3 | ✅ |
 | H5.3 | Ba cổng kiểm chứng | SĐ | G-port, G-paper, G-test trên trục các mốc; mỗi cổng kiểm gì | `04` | ✅ |
 | H5.4 | H1: tỉ lệ TRUE_ALERT theo độ gần thời gian | BĐ | Đường cho normal và fault ở 0, 33, 67, 100%, có CI | `h1_val_analysis_v2` | ✅ |
 | H5.5 | Đường θ_topo trên `val` | BĐ | Recall và FPR theo θ | `m6_ctav_select_val_v2` | ✅ |
@@ -340,7 +316,7 @@ H5.3 — Ba cổng kiểm chứng:
 
 ```mermaid
 flowchart LR
-  P1[G-port, M2<br/>pipeline mới = GĐ1] --> P2[G-paper, M3<br/>tái lập bảng của bài báo từ cache]
+  P1[G-port, M2<br/>pipeline khớp bản tham chiếu, judge mock] --> P2[G-paper, M3<br/>tái lập bảng của bài báo từ cache]
   P2 --> V[Chọn cấu hình trên val<br/>M4–M7]
   V --> REG[Đăng ký H0–H5]
   REG --> P3[G-test, M8<br/>chạy test một lần]
@@ -350,7 +326,7 @@ flowchart LR
 
 | Mã | Tên | Mục | Trạng thái |
 |---|---|---|---|
-| B1.1 | GĐ1, bài báo, GĐ2: bản chất, câu hỏi, judge, dữ liệu, đầu ra | 1.1.2 | ✅ |
+| B1.1 | Khảo sát bước đầu (bài báo) và luận văn: phạm vi, câu hỏi, judge, dữ liệu, đầu ra | 1.1.2 | ✅ |
 | B1.2 | Câu hỏi nghiên cứu, giả thuyết, chương trả lời | 1.2.3 | ✅ |
 | B2.1 | Nguồn telemetry ♻️ | 2.1 | ✅ |
 | B2.2 | Định dạng đầu ra của judge ♻️ | 2.4 | ✅ |
@@ -358,7 +334,7 @@ flowchart LR
 | B2.4 | Khái niệm, thành phần (C1–C5, RCA), giả thuyết | 2.8 | ✅ |
 | B3.1 | So sánh các công trình | 3.8 | ✅ (cần tra cứu) |
 | B4.1 | Bảng ký hiệu | 4.1 | ✅ |
-| B4.2 | Phần kế thừa GĐ1 và phần mới của GĐ2 | 4.2 | ✅ |
+| B4.2 | Bốn khâu của hệ thống: đầu vào, đầu ra, thành phần, mục trình bày | 4.2 | ✅ |
 | B4.3 | Tham số detector và Rescue | 4.3 | ✅ |
 | B4.4 | Vai trò và trạng thái C1–C5, kèm quyết định | 4.4.1 | ✅ |
 | B4.5 | Ba chiến lược truy xuất | 4.4.2 | ✅ |

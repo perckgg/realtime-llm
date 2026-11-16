@@ -103,6 +103,14 @@ Không dùng số mock (kể cả "F1 không RAG = 0.000", "F1 có Rescue = 0.78
 
 ---
 
+## Khi viết luận văn
+
+Mọi văn bản đi vào luận văn (sườn, outline, nháp chương, LaTeX) theo `docs/drafts/style-guide-luan-van.md`:
+một đề tài thống nhất (không "giai đoạn"/"kế thừa"), bài báo ICAETM chỉ là trích dẫn, kết quả âm viết thẳng,
+không "tốt hơn" khi CI chứa 0, chỗ thiếu số ghi `[CHỜ M*]`.
+
+---
+
 ## Khi không chắc chắn
 
 Dừng và hỏi người dùng. Các tình huống bắt buộc phải hỏi:
