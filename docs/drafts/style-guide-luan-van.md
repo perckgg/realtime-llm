@@ -208,6 +208,18 @@ cậy, neo bằng chứng); (4) kiểm định theo giả thuyết đăng ký tr
 ablation, ngân sách); (5) tác tử RCA và platform end-to-end tái lập được từ cache. Văn bản LaTeX đầy đủ do người dùng
 giữ trong `ch1.tex`; sửa mục tiêu thì cập nhật đoạn này.
 
+**Đối tượng và phạm vi (1.3), chốt 2026-11-16.** Ba đối tượng: dữ liệu đa phương thức và đồ thị phụ thuộc; CTAV
+(nhận candidate từ detector, **không gồm detector**); tác tử RCA và platform thực nghiệm. Phạm vi phải nêu: Nezha là
+bộ dữ liệu duy nhất, hai hệ (OnlineBoutique, TrainTicket), **năm loại lỗi** (không phải hai), cửa sổ có telemetry,
+chạy replay + cache, chưa kiểm chứng trên dữ liệu khác; một LLM `gemini-2.5-flash` (QĐ-021), không fine-tuning, không
+LLM cục bộ. Chi tiết như 56 service / 68 cạnh, vùng đệm 600 s để ở Ch2, Ch5.
+
+**Ý nghĩa (1.4), chốt 2026-11-16.** Không được viết: "thời gian thực", "streaming", "kiến trúc hai tầng giải quyết
+độ trễ" (C4 đã loại), "LLM phát hiện bất thường" (LLM là judge, không là detector), mở rộng sang IoT/trung tâm dữ liệu,
+"học sâu truyền thống" (Isolation Forest không phải học sâu), "tài liệu tham khảo có giá trị". Ý nghĩa thực tiễn: chính
+sách quyết định kiểm soát báo động giả khi thêm ngữ cảnh, chi phí theo ngân sách gọi LLM, RCA từ cảnh báo đã thẩm định,
+platform tái lập được. Ý nghĩa khoa học: cơ chế thiên lệch xác nhận, giao thức đăng ký trước, kết quả âm có kiểm chứng.
+
 **Câu hỏi nghiên cứu:** RQ1–RQ5 theo `suon-bao-cao-gd2.md` (RQ1↔H0, RQ2↔H1, RQ3↔H2+H4, RQ4↔H3, RQ5↔H5). Dùng đúng
 5 RQ ở 1.2.3 và 8.1.
 

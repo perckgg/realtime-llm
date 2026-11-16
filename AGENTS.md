@@ -38,7 +38,7 @@ Mốc hiện tại: xem `docs/CURRENT-MILESTONE.md`. Kế hoạch tổ chức th
 1. **Không hardcode tham số thí nghiệm.** Mọi tham số đến từ `eval/configs/*.yaml`.
 2. **Không chạm `test` split trước mốc M8 (G-test)** và trước khi đăng ký giả thuyết ở M7. Tuning chỉ trên `val`, debug chỉ trên `dev`.
 3. **Không ghi đè `eval/results/`.** Chạy lại với tham số khác = `run_id` mới.
-4. **Mọi lời gọi LLM đi qua cache.** Key = `sha256(prompt + model + temperature + max_tokens + repeat)`, `repeat` mặc định 0 (QĐ-013). Judge duy nhất: `gemini-2.5-flash-lite` qua API — không local-first, không fallback sang model khác.
+4. **Mọi lời gọi LLM đi qua cache.** Key = `sha256(prompt + model + temperature + max_tokens + repeat)`, `repeat` mặc định 0 (QĐ-013). Judge duy nhất: `gemini-2.5-flash` qua API, temperature 0 (QĐ-021) — không local-first, không fallback sang model khác. `gemini-2.5-flash-lite` chỉ còn trong cache của bài báo (G-paper).
 5. **Không thêm gì ngoài danh sách phạm vi** trong `docs/06-scope-guard.md` §3.
 
 ---

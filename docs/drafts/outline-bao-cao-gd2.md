@@ -83,7 +83,7 @@ Bài báo ICAETM chỉ xuất hiện ở 1.1.2, như một trích dẫn. Viết 
 | 1.2.3 Câu hỏi nghiên cứu RQ1–RQ5 | Bảng RQ → giả thuyết → chương trả lời | | B1.2 | ½ | ✅ |
 | 1.2.4 Đóng góp chính | Đánh số; mỗi đóng góp một câu bằng chứng | | | ½ | khung ✅; câu kết quả 📊, RCA ⏳ M9 |
 | 1.3.1 Đối tượng nghiên cứu | Danh sách ngắn | | | ½ | ✅ |
-| 1.3.2 Phạm vi nghiên cứu | Trong / ngoài phạm vi: Nezha (hai hệ), hai loại lỗi, một judge, replay không phải streaming thật | | | ½ | ✅ |
+| 1.3.2 Phạm vi nghiên cứu | Trong / ngoài phạm vi: Nezha (hai hệ), năm loại lỗi, một judge `gemini-2.5-flash`, replay không phải streaming thật | | | ½ | ✅ |
 | 1.4.1 Ý nghĩa thực tiễn | 1 đoạn | | | ¼ | ✅ |
 | 1.4.2 Ý nghĩa khoa học | 1 đoạn: giao thức đăng ký trước, kết quả âm có kiểm chứng | | | ¼ | ✅ |
 | 1.5 Bố cục luận văn | 1 đoạn, mỗi chương một câu, đúng số chương cuối cùng | | | ½ | ✅ (sửa lại nếu gộp về 6 chương) |
