@@ -86,7 +86,7 @@ recall của CTAV) · mục kiểm tra tính đúng của pipeline · đoạn đ
 
 | Việc | Hạn | Chặn gì |
 |---|---|---|
-| Push M8 (kết quả + `M8-g-test.md`) | 22/11 | Ch5 5.7–5.8, Ch1 1.2.4, Ch7, Ch8 |
+| Push M8 (kết quả + `M8-g-test.md`) | 22/11 | Ch5 5.7–5.8, Ch1 1.2.3, Ch7, Ch8 |
 | Commit `docs/Thesis_Phase1.pdf`, `docs/Template_LuanVan.docx` (hoặc template LaTeX của khoa) | 22/11 | Khung LaTeX, đối chiếu để không trùng câu |
 | Xác nhận hạn nộp thật và số chương bắt buộc (6 hay 8) | 22/11 | Toàn bộ lịch §2; mục 1.5 Bố cục |
 | Xác nhận trạng thái bài ICAETM 2026 (đã nộp / được nhận / đã đăng) | 13/12 | Mục Công bố khoa học |

@@ -40,7 +40,7 @@ Hai điểm phải giữ xuyên suốt, vì đây là điểm mạnh của luậ
 | Phần | Nội dung | Trang | Hình | Bảng | Viết được ngay |
 |---|---|---:|---:|---:|---|
 | Phần đầu | Bìa, cam đoan, cảm ơn, tóm tắt, abstract, mục lục, danh sách hình/bảng, từ viết tắt | 10 | — | — | khung ✅; tóm tắt, abstract viết cuối cùng |
-| Chương 1 | Giới thiệu đề tài | 8 | 2 | 1 | ✅ trừ câu số ở 1.2.4 (📊, ⏳ M9) |
+| Chương 1 | Giới thiệu đề tài | 8 | 1 | 0 | ✅ trừ câu số ở 1.2.3 Đóng góp (📊, ⏳ M9) |
 | Chương 2 | Cơ sở lý thuyết | 14 | 9 | 4 | ✅ toàn chương |
 | Chương 3 | Công trình liên quan | 12 | 1 | 1 | ✅ (cần tra cứu trích dẫn) |
 | Chương 4 | Phương pháp đề xuất: CTAV và tác tử RCA | 18 | 12 | 10 | ✅ trừ 4.5 chi tiết (⏳ M9) |
@@ -76,17 +76,16 @@ Bài báo ICAETM chỉ xuất hiện ở 1.1.2, như một trích dẫn. Viết 
 | Mục | Viết kiểu gì | Hình | Bảng | Trang | Trạng thái |
 |---|---|---|---|---:|---|
 | 1.1.1 Vận hành AIOps trên microservice và quá tải cảnh báo | 2 đoạn: telemetry nhiều, detector báo nhiều, cảnh báo thiếu bằng chứng | H1.1 (`thesis/figures/ch1/fig-tong-quan.tex`) | | 1 | ✅ |
-| 1.1.2 Khảo sát bước đầu về giám sát lai và đánh đổi ngữ cảnh đồ thị | Nêu hiện tượng bằng lời, không số; cơ chế "nhiễu lân cận" viết là giải thích ban đầu; trích bài báo kèm giới hạn nó tự nhận | H1.2 (`fig-danh-doi.tex`) | | 1½ | ✅ |
+| 1.1.2 Khảo sát bước đầu về giám sát lai và đánh đổi ngữ cảnh đồ thị | Nêu hiện tượng bằng lời, không số, 2 đoạn; cơ chế "nhiễu lân cận" viết là giải thích ban đầu; trích bài báo kèm giới hạn nó tự nhận; một câu trỏ sang hình ở 4.4.3; định nghĩa 2-hop đưa xuống footnote | | | 1½ | ✅ |
 | 1.1.3 Những thách thức cho giải pháp tổng thể | 3–4 thách thức: giảm cảnh báo sai mà giữ độ phủ; cơ chế chưa rõ (hiện tượng lặp lại, cơ chế thì không); ngân sách LLM; từ cảnh báo tới service gốc | | | 1 | ✅ |
 | 1.2.1 Mục tiêu tổng quát | 1 đoạn | | | ½ | ✅ |
 | 1.2.2 Mục tiêu cụ thể | 5 gạch đầu dòng, mỗi dòng 1–2 câu (bản đã chốt 2026-11-16) | | | ½ | ✅ |
-| 1.2.3 Câu hỏi nghiên cứu RQ1–RQ5 | Bảng RQ → giả thuyết → chương trả lời | | B1.2 | ½ | ✅ |
-| 1.2.4 Đóng góp chính | Đánh số; mỗi đóng góp một câu bằng chứng | | | ½ | khung ✅; câu kết quả 📊, RCA ⏳ M9 |
+| 1.2.3 Đóng góp chính | 4 ý, mỗi ý 1–2 dòng, không số thập phân. Cuối 1.2.2 thêm một câu trỏ sang 5.1 (RQ và giả thuyết) | | | ½ | khung ✅; câu kết quả 📊, RCA ⏳ M9 |
 | 1.3.1 Đối tượng nghiên cứu | Danh sách ngắn | | | ½ | ✅ |
 | 1.3.2 Phạm vi nghiên cứu | Trong / ngoài phạm vi: Nezha (hai hệ), năm loại lỗi, một judge `gemini-2.5-flash`, replay không phải streaming thật | | | ½ | ✅ |
 | 1.4.1 Ý nghĩa thực tiễn | 1 đoạn | | | ¼ | ✅ |
 | 1.4.2 Ý nghĩa khoa học | 1 đoạn: giao thức đăng ký trước, kết quả âm có kiểm chứng | | | ¼ | ✅ |
-| 1.5 Bố cục luận văn | 1 đoạn, mỗi chương một câu, đúng số chương cuối cùng | | | ½ | ✅ (sửa lại nếu gộp về 6 chương) |
+| 1.5 Bố cục luận văn | 1 đoạn khoảng 5 dòng, mỗi chương một câu, đúng số chương cuối cùng | | | ½ | ✅ (sửa lại nếu gộp về 6 chương) |
 | Tóm tắt chương | 5–8 câu | | | ¼ | ✅ |
 
 ### Chương 2 — Cơ sở lý thuyết (14 trang) ✅
@@ -148,7 +147,7 @@ thành phần đang dùng, nhưng không lược.
 | 4.3 Isolation Forest và cổng Rescue (C5) | Đầu vào của CTAV; C5 chỉ là ablation | H4.3 | B4.3 | 2 | ✅ |
 | 4.4.1 Tổng quan CTAV | Thiết kế ban đầu so với cấu hình chốt | H4.4 | B4.4 | 1½ | ✅ |
 | 4.4.2 BM25 và judge | Baseline và tầng 1 | | B4.5 | 1 | ✅ |
-| 4.4.3 Truy xuất topology C1 | Fusion Score, mở rộng 2-hop | H4.5 | B4.6 | 2 | ✅ |
+| 4.4.3 Truy xuất topology C1 | Fusion Score, mở rộng 2-hop; kết đoạn bằng hình đánh đổi để dẫn sang 4.4.4 | H4.5, H4.13 | B4.6 | 2 | ✅ |
 | 4.4.4 Chính sách quyết định: neo bằng chứng (C3) và ngưỡng bất đối xứng (C2, đã loại) | Đóng góp chính | H4.6, H4.7 | B4.7 | 2½ | ✅ |
 | 4.4.5 Định tuyến hai tầng thích nghi (C4, đã loại) | Thiết kế đã kiểm và loại | | | ½ | ✅ |
 | 4.4.6 Judge: prompt, đầu ra, cache | Tái lập được | H4.8, H4.9 | B4.8 | 1½ | ✅ |
@@ -165,7 +164,7 @@ thành phần đang dùng, nhưng không lược.
 
 | Mục | Mục đích | Hình | Bảng | Trang | Trạng thái |
 |---|---|---|---|---:|---|
-| 5.1 Mục tiêu và giả thuyết H0–H5 | Cái gì được kiểm, tiêu chí nào | | B5.1 | 1½ | ✅ |
+| 5.1 Câu hỏi nghiên cứu RQ1–RQ5 và giả thuyết H0–H5 | RQ đặt ở đây (chuyển từ Ch1); mỗi RQ ngay trước giả thuyết kiểm định nó | | B5.1 | 1½ | ✅ |
 | 5.2 Dữ liệu và chia split | Chống rò rỉ; tập chấm chính | H5.1, H5.2 | B5.2, B5.3 | 2 | ✅ |
 | 5.3 Thiết lập | Judge, detector, ngân sách, chi phí | | B5.4 | 1½ | ✅ |
 | 5.4 Thước đo | Định nghĩa chỉ số, kiểm định | | | 1 | ✅ |
@@ -263,7 +262,6 @@ Loại: **SĐ** sơ đồ vẽ tay bằng công cụ · **BĐ** biểu đồ sin
 | Mã | Tên | Loại | Nội dung cần thể hiện | Nguồn | Trạng thái |
 |---|---|---|---|---|---|
 | H1.1 | Tổng quan hệ thống và khoảng trống ngữ nghĩa | SĐ | Telemetry → detector → CTAV (truy xuất, judge, chính sách) → tác tử RCA → dashboard; dưới mỗi khối một câu hỏi của người vận hành; ngoặc "khoảng trống ngữ nghĩa" giữa detector và CTAV. Gộp H1.1 cũ và H1.3 | `thesis/figures/ch1/fig-tong-quan.tex` | ✅ đã vẽ |
-| H1.2 | Đánh đổi của ngữ cảnh topology | SĐ | Khái niệm, không số: (a) BM25 cục bộ, (b) mở rộng 2-hop; mỗi bên một hàng cửa sổ có sự cố và một hàng cửa sổ bình thường. Biểu đồ số TP/FP chuyển sang 5.5.2 (G-paper) | `thesis/figures/ch1/fig-danh-doi.tex` | ✅ đã vẽ |
 | H2.1 | Cửa sổ trượt và nhãn | SĐ | Cửa sổ 60 s, khoảng nhãn quanh thời điểm tiêm lỗi | ♻️ GĐ1 hình 1, sửa 120 s thành 60 s | ✅ |
 | H2.2 | Metric, log, trace của một request | SĐ | Cây span cha–con, log gắn theo pod | mới | ✅ |
 | H2.3 | Khoảng trống ngữ nghĩa | SĐ | Điểm bất thường cao không cho biết có sự cố hay không | ♻️ GĐ1 hình 2 | ✅ |
@@ -285,6 +283,7 @@ Loại: **SĐ** sơ đồ vẽ tay bằng công cụ · **BĐ** biểu đồ sin
 | H4.9 | Ví dụ prompt và JSON trả về | VD | Một prompt rút gọn và verdict | cache | ✅ |
 | H4.10 | Ba bước của tác tử RCA | SĐ | Gom, lan truyền, tóm tắt | `01` §6.5 | ✅ |
 | H4.11 | Ví dụ đồ thị lan truyền | VD | Một incident thật, service gốc được tô | ⏳ M9 | ⏳ M9 |
+| H4.13 | Đánh đổi của mở rộng ngữ cảnh theo đồ thị | SĐ | (a) BM25 cục bộ, (b) mở rộng 2-hop; cửa sổ có sự cố và cửa sổ bình thường; dẫn sang chính sách quyết định 4.4.4. Chuyển từ Ch1 (H1.2 cũ) | `thesis/figures/ch4/fig-danh-doi.tex` | ✅ đã vẽ |
 | H4.12 | Cấu trúc repo và harness | SĐ | Thư mục chính và đường đi của một run | `01` §7 | ✅ |
 | H5.1 | Chia split theo lần tiêm lỗi | SĐ | Trục thời gian, các lần tiêm, vùng đệm 600 s, gán `dev` / `val` / `test` | QĐ-004 | ✅ |
 | H5.2 | Có bằng chứng gắn với gần sự cố | BĐ | Tỉ lệ cửa sổ có bằng chứng: fault so với normal, kho bằng chứng của bài báo so với kho của luận văn | B5.3 | ✅ |
@@ -376,7 +375,6 @@ flowchart LR
 
 | Mã | Tên | Mục | Trạng thái |
 |---|---|---|---|
-| B1.2 | Câu hỏi nghiên cứu, giả thuyết, chương trả lời | 1.2.3 | ✅ |
 | B2.1 | Nguồn telemetry ♻️ | 2.1 | ✅ |
 | B2.2 | Định dạng đầu ra của judge ♻️ | 2.4 | ✅ |
 | B2.3 | Chỉ số đánh giá và công thức | 2.6 | ✅ |
@@ -392,7 +390,7 @@ flowchart LR
 | B4.8 | Cấu hình judge và cache | 4.4.6 | ✅ |
 | B4.9 | Schema báo cáo chẩn đoán | 4.5 | ✅; rà ⏳ M9 |
 | B4.10 | Công nghệ, đầu ra của một run, lệnh chính | 4.6 | ✅ |
-| B5.1 | Giả thuyết H0–H5 và tiêu chí đã đăng ký | 5.1 | ✅ |
+| B5.1 | RQ1–RQ5, giả thuyết H0–H5 và tiêu chí đã đăng ký | 5.1 | ✅ |
 | B5.2 | Kích thước split, tỉ lệ có telemetry | 5.2 | ✅ |
 | B5.3 | Có bằng chứng gắn với gần sự cố | 5.2 | ✅ |
 | B5.4 | Chi phí API theo mốc | 5.3 | ✅; dòng M8 ⏳ |
@@ -435,8 +433,8 @@ Thứ tự viết khác thứ tự trình bày: viết trước phần đã có 
 | 1 | Ngay bây giờ | Ch4 (trừ 4.5 chi tiết) · Ch5 5.1–5.6, 5.7.1–5.7.4 | H4.1–H4.10, H4.12; H5.1–H5.8; B4.x, B5.1–B5.17, B5.29, B5.30 |
 | 2 | Song song đợt 1 | Ch2 · Ch3 | H2.1–H2.9, H3.1; B2.x, B3.1 |
 | 3 | Ngay khi bạn có số M8 trên máy (hoặc push để agent điền) | 5.7.5–5.8.5 · 5.10 · Ch7 7.1, 7.2 | H5.9–H5.13, H5.16; B5.18–B5.27, B7.1 |
-| 4 | Sau đợt 1, 3 | Ch1 (viết sau Ch4, Ch5) · Ch7 7.3, 7.4, 7.6 · Công bố khoa học · Kế hoạch | H1.1, H1.2, HK.1; B1.2, B7.2, B7.4, BK.1 |
-| 5 | M9 đóng | 4.5 chi tiết · 5.9 · câu RCA ở 1.2.4 | H4.11, H5.14, H5.15; B5.31, B5.32 |
+| 4 | Sau đợt 1, 3 | Ch1 (viết sau Ch4, Ch5) · Ch7 7.3, 7.4, 7.6 · Công bố khoa học · Kế hoạch | H1.1, HK.1; B7.2, B7.4, BK.1 |
+| 5 | M9 đóng | 4.5 chi tiết · 5.9 · câu RCA ở 1.2.3 | H4.11, H5.14, H5.15; B5.31, B5.32 |
 | 6 | M10 đóng | Ch6 | H6.1–H6.7; B6.x |
 | 7 | M11 đóng (bạn chấm tay) | 5.8.6 · 7.5 | H7.1; B5.28, B5.33, B7.3 |
 | 8 | Cuối cùng | Ch8 · tóm tắt, abstract · danh sách hình/bảng · phụ lục · rà chéo số | B8.x |

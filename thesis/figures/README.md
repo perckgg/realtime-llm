@@ -13,7 +13,12 @@ Mỗi hình có ba file cùng tên:
 | Hình | File | Đặt ở | Label đề xuất |
 |---|---|---|---|
 | 1.1 Tổng quan hệ thống và khoảng trống ngữ nghĩa | `ch1/fig-tong-quan` | cuối 1.1.1 | `fig:ch1-tong-quan` |
-| 1.2 Đánh đổi của ngữ cảnh topology | `ch1/fig-danh-doi` | 1.1.2 | `fig:ch1-danh-doi` |
+
+## Chương 4
+
+| Hình | File | Đặt ở | Label đề xuất |
+|---|---|---|---|
+| Đánh đổi của mở rộng ngữ cảnh theo đồ thị | `ch4/fig-danh-doi` | 4.4.3, trước 4.4.4 | `fig:ch4-danh-doi` |
 
 Cách 1 — dùng PDF:
 
@@ -28,11 +33,11 @@ Cách 1 — dùng PDF:
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\linewidth]{figures/ch1/fig-danh-doi.pdf}
+  \includegraphics[width=0.85\linewidth]{figures/ch4/fig-danh-doi.pdf}
   \caption{Đánh đổi khi mở rộng ngữ cảnh theo đồ thị phụ thuộc: (a) truy xuất cục bộ dễ bỏ sót
            sự cố lan truyền; (b) mở rộng 2-hop bắt thêm sự cố nhưng làm judge dễ xác nhận nhầm
            cửa sổ bình thường.}
-  \label{fig:ch1-danh-doi}
+  \label{fig:ch4-danh-doi}
 \end{figure}
 ```
 
@@ -48,8 +53,9 @@ rồi thay `\includegraphics[...]{...pdf}` bằng `\resizebox{\linewidth}{!}{\in
 ## Dựng lại PDF sau khi sửa `.tex`
 
 ```bash
-cd thesis/figures/ch1
+# chạy trong thư mục chứa file .tex (ch1 hoặc ch4)
 for f in tong-quan danh-doi; do
+  [ -f fig-$f.tex ] || continue
   printf '%s\n' '\documentclass[border=3pt]{standalone}' '\usepackage{fontspec}\setmainfont{Latin Modern Roman}' \
     '\usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc,decorations.pathreplacing}' \
     "\\begin{document}\\input{fig-$f}\\end{document}" > _build-$f.tex

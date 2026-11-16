@@ -221,7 +221,9 @@ sách quyết định kiểm soát báo động giả khi thêm ngữ cảnh, ch
 platform tái lập được. Ý nghĩa khoa học: cơ chế thiên lệch xác nhận, giao thức đăng ký trước, kết quả âm có kiểm chứng.
 
 **Câu hỏi nghiên cứu:** RQ1–RQ5 theo `suon-bao-cao-gd2.md` (RQ1↔H0, RQ2↔H1, RQ3↔H2+H4, RQ4↔H3, RQ5↔H5). Dùng đúng
-5 RQ ở 1.2.3 và 8.1.
+5 RQ ở 5.1 và 8.1. Chương 1 không có mục RQ riêng (chốt 2026-11-16): mục 1.2 = "Mục tiêu và đóng góp"
+(1.2.1 tổng quát, 1.2.2 cụ thể, 1.2.3 đóng góp); cuối 1.2.2 một câu trỏ sang 5.1. Hình 1.1 (tổng quan) ở Ch1; hình đánh
+đổi topology ở 4.4.3.
 
 ---
 
