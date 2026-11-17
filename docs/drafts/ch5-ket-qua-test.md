@@ -469,3 +469,99 @@ khóa để tính context precision tách riêng cho cửa sổ fault và normal
 
 *Nguồn: `eval/manual/context_precision_test_v1.csv` ghép với `eval/manual/context_precision_test_v1.key.csv` (chờ điền sau bước chấm tay theo V35 (a)).*
 
+
+## 5.9 H5 — Tác tử RCA trên `test`
+
+> Nguồn: `eval/results/rca_final_test_v1/` (con số đăng ký), `eval/results/rca_sens_test_c3rolling_v1/` (độ nhạy, ngoài
+> bản đăng ký), `eval/results/rca_final_val_v1/` (`val`); QĐ-040..042. Phương pháp và cách chọn tham số trên `val`:
+> `docs/drafts/ch5-rca-val.md`. CI95: bootstrap percentile, 1.000 mẫu, `seed = 42`.
+
+### 5.9.1 Thiết lập
+
+Tác tử RCA chạy trên đúng tập cảnh báo mà CTAV đóng băng phát ra trên `test` ở §5.7 (78 cảnh báo: 14 TP, 64 FP mức cửa
+sổ), với cấu hình đã chốt trên `val` trước khi chạm `test` ($T_{group}$ = 180 s; lan truyền ngược một bước; cascade =
+lần tiêm lỗi có cảnh báo ở ít nhất hai service). Cấu hình `test` chỉ khác cấu hình `val` ở split, run đầu vào và
+`run_id`; harness in cùng một dấu vân tay phương pháp cho cả hai. Mỗi cấu hình chạy đúng một lần. Theo V36 (a), một
+dòng **độ nhạy** được báo kèm: cùng phương pháp trên 438 cảnh báo của ablation `c3_rolling_baseline`; dòng này nằm
+ngoài bản đăng ký và không dùng để kết luận H5.
+
+### 5.9.2 Kết quả kiểm định H5
+
+**Bảng 5.26. Kiểm định H5 trên `test` theo bản đăng ký (78 cảnh báo → 38 sự cố, 17 sự cố có nhãn).**
+
+| Vế của H5 | Số đo trên `test` | CI95 | Kết luận |
+|---|---|---|---|
+| Hit@1 ≥ 0,60 | 8 / 17 = 0,471 | [0,235; 0,706] | Không đạt |
+| Hit@3 ≥ 0,80 | 8 / 17 = 0,471 | [0,235; 0,706] | Không đạt |
+| Cận dưới CI95 của ΔHit@1 (RCA − baseline) > 0 | 0,000 (baseline 8 / 17; 0 cặp lệch) | [0,000; 0,000] | Không đạt |
+| Alert Reduction ≥ 30% trên sự cố cascade | không tính được: 0 / 50 lần tiêm lỗi là cascade | — | Không đạt |
+
+**H5 không được chấp nhận.** Để tham chiếu, Alert Reduction Ratio trên mọi cảnh báo là 0,513 [0,362; 0,626] và trên
+cảnh báo nằm trong lỗi là 0,556 [0,382; 0,674]; hai con số này không phải tiêu chí đăng ký.
+
+**Bảng 5.27. Tác tử RCA trên `val`, trên `test` (đăng ký) và dòng độ nhạy.**
+
+| | `val` | `test` — đăng ký | `test` — độ nhạy (ngoài bản đăng ký) |
+|---|---|---|---|
+| Cảnh báo đầu vào / service có cảnh báo | 80 / 8 | 78 / 5 | 438 / 22 |
+| Lần tiêm lỗi: tổng / có sự cố có nhãn / không có cảnh báo | 30 / 10 / 18 | 50 / 17 / 29 | 50 / 34 / 1 |
+| Sự cố: tổng / có nhãn / mơ hồ / không ứng với lỗi | 26 / 11 / 1 / 14 | 38 / 17 / 3 / 18 | 114 / 48 / 14 / 52 |
+| Sự cố nhiều service | 1 | 0 | 39 |
+| Cảnh báo mỗi sự cố (trung vị / lớn nhất) | 3 / 6 | 1 / 9 | 2 / 31 |
+| Hit@1 | 0,636 [0,364; 0,909] | 0,471 [0,235; 0,706] | 0,208 [0,104; 0,333] |
+| Hit@3 | 0,636 [0,364; 0,909] | 0,471 [0,235; 0,706] | 0,313 [0,188; 0,458] |
+| Hit@1 baseline | 0,636 | 0,471 | 0,229 [0,125; 0,354] |
+| ΔHit@1 (RCA − baseline) | 0,000 [0,000; 0,000] | 0,000 [0,000; 0,000] | −0,021 [−0,063; 0,000] |
+| Hit@1 trên mọi lần tiêm lỗi | 0,200 [0,067; 0,333] | 0,160 [0,060; 0,280] | 0,200 [0,100; 0,320] |
+| ARR mọi cảnh báo | 0,675 [0,600; 0,730] | 0,513 [0,362; 0,626] | 0,740 [0,654; 0,796] |
+| ARR cascade (số lần tiêm lỗi cascade) | 0,667 (1) | — (0) | 0,704 [0,591; 0,777] (41) |
+| JSON valid rate | 26 / 26 | 38 / 38 | 114 / 114 |
+
+**Bảng 5.28. Định vị theo loại lỗi trên `test` (tập đăng ký).**
+
+| Loại lỗi | Lần tiêm lỗi | Không có cảnh báo | Chỉ trong sự cố mơ hồ | Có sự cố có nhãn | Trúng hạng 1 |
+|---|---:|---:|---:|---:|---:|
+| `network_delay` | 15 | 5 | 2 | 8 | 2 |
+| `cpu_contention` | 11 | 5 | 1 | 5 | 3 |
+| `exception` | 10 | 7 | 0 | 3 | 3 |
+| `return` | 9 | 8 | 0 | 1 | 0 |
+| `cpu_consumed` | 5 | 4 | 1 | 0 | — |
+| **Tổng** | **50** | **29** | **4** | **17** | **8** |
+
+### 5.9.3 Vì sao H5 không đạt
+
+Cả bốn vế cùng quy về một nguyên nhân: **cảnh báo đầu vào hiếm khi rơi vào service gốc**. Trên tập đăng ký, 78 cảnh báo
+chỉ nằm ở 5 service, vì CTAV đóng băng chỉ phát cảnh báo ở các service có ngưỡng `dev` (Phát hiện 11, §5.8.2). Hệ quả
+thứ nhất: 29 trong 50 lần tiêm lỗi không có cảnh báo nào, nên không thể định vị; tính trên mọi lần tiêm lỗi, service
+gốc chỉ được chỉ đúng ở 8 lần (0,160). Hệ quả thứ hai: cả 38 sự cố đều chỉ có một service. Khi đó lan truyền ngược một
+bước không có service lân cận bất thường nào để chuyển trách nhiệm sang và trả về đúng service có cảnh báo — cũng là
+câu trả lời của baseline; vì vậy ΔHit@1 bằng đúng 0, Hit@3 trùng Hit@1, và không có lỗi cascade nào để đo mức giảm cảnh
+báo. Chín sự cố trượt có cùng một dạng: cảnh báo nổ ở service phía gọi (`frontend`, `ts-travel-service`), còn lỗi được
+tiêm ở một service phía sau nó (`checkoutservice`, `currencyservice`, `paymentservice`, `ts-basic-service`,
+`ts-route-service`, `ts-security-service`) — service không có cảnh báo nào. Tám sự cố trúng đều là lỗi tiêm ngay tại
+service có cảnh báo.
+
+Dòng độ nhạy cho thấy nguyên nhân này không biến mất khi có nhiều cảnh báo hơn. Với 438 cảnh báo ở 22 service, 49
+trong 50 lần tiêm lỗi có cảnh báo và 39 sự cố có nhiều service, nhưng Hit@1 chỉ 0,208 — thấp hơn baseline 0,021 (một
+cặp lệch). Trong 48 sự cố có nhãn, service gốc thật nằm trong số service có cảnh báo ở đúng 15 sự cố, bằng số trúng
+Hit@3: 0,313 là trần của mọi cách xếp hạng chỉ dựa trên service có cảnh báo. Thứ được cải thiện là gom cảnh báo: Alert
+Reduction Ratio trên lỗi cascade đạt 0,704 [0,591; 0,777]. Dòng này là mô tả, không thay kết luận ở Bảng 5.26.
+
+So với `val`, `test` có số cảnh báo gần bằng (78 so với 80) nhưng nhiều sự cố hơn và sự cố nhỏ hơn (trung vị 1 cảnh
+báo so với 3), nên mức giảm cảnh báo chung thấp hơn (0,513 so với 0,675). Khác biệt này được báo như nó là; $T_{group}$
+và quy tắc xếp hạng không được chọn lại.
+
+### 5.9.4 Báo cáo chẩn đoán
+
+Cả 38 báo cáo trên tập đăng ký (và 114 báo cáo của dòng độ nhạy) đều qua kiểm tra lược đồ, không báo cáo nào bị loại;
+ở 1 (và 4) báo cáo LLM có nêu một id bằng chứng không có trong ngữ cảnh, id đó bị bỏ và báo cáo vẫn còn bằng chứng hợp
+lệ. Như trên `val`, trường loại lỗi không mang thông tin phân biệt: 35 / 38 báo cáo ghi `cpu_contention`. Chất lượng
+nội dung được đánh giá bằng người ở chương sau.
+
+### 5.9.5 Hạn chế
+
+- Mẫu nhỏ: 17 sự cố có nhãn; CI của Hit@1 rộng gần 0,5.
+- Nhãn mức service, không phải mức pod.
+- Vế Alert Reduction của H5 không đo được trên tập đăng ký vì không có lỗi cascade theo định nghĩa đã chốt trước; con
+  số 0,704 chỉ có ở dòng độ nhạy.
+- Mức 2 (LLM lập luận trên toàn chuỗi gọi) đã bị cắt khỏi phạm vi nên không có số so sánh.

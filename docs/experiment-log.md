@@ -2201,3 +2201,96 @@ py -m eval rca --config eval/configs/rca_mock_val.yaml     # summarizer mock + P
 py -m eval rca --config eval/configs/rca_final.yaml        # 100% cache sau lần chạy đầu
 py -m pytest tests/test_rca_propagation.py tests/test_rca_summarizer.py tests/test_rca_harness.py tests/test_grouping.py -q
 ```
+
+---
+
+## QĐ-042 — M9-B: H5 trên `test` không được chấp nhận; H5 tính qua harness ở M9 thay vì ở M10 (2026-11-17)
+
+**Người dùng chốt (2026-11-17).** Sau khi xem kết quả M9-A, người dùng cho chạy tiếp M9-B dù DoD "ARR ≥ 30% trên
+`network_delay`" không đạt trên `val` (V44). V40 (cascade = lần tiêm lỗi có cảnh báo ở ≥ 2 service) chưa được trả lời
+riêng; định nghĩa đó đã nằm trong `rca_final.yaml` (`77786ec`) từ trước khi chạm `test` và được giữ nguyên.
+
+**Lệch `04` M10 (theo QĐ-037).** Kết quả chính thức của H5 được tính **ở M9-B qua harness** `py -m eval rca`, không
+phải bằng lần chạy end-to-end của M10. M10 phải **tái lập đúng tập incident này** (38 incident của `rca_final_test_v1`,
+`incident_id` là hàm băm của `run_id` + danh sách cảnh báo nên so khớp theo danh sách `alert_ids`) và chỉ đo thêm độ trễ.
+
+**Chạy (mỗi config đúng một lần, không có biến thể nào khác trên `test`).** Commit `7ebe57a` chứa hai config trước khi
+chạy: `rca_final_test.yaml` và `rca_sens_test.yaml`, đều là `rca_final.yaml` chỉ đổi `split`, `h5_test`, `input`, `run_id`.
+Cả hai lần chạy in dấu vân tay phương pháp **`b0c54fa68ef65535`**, trùng bản `val`. `rca_final.yaml` không bị sửa.
+
+**Bảng QĐ-042-1. H5 trên `test` — con số đăng ký (`rca_final_test_v1`: 78 cảnh báo của `ctav_final_test_v1`; CI95
+bootstrap 1.000 mẫu, seed 42; Hit@k theo 17 incident có nhãn, ARR theo 37 cụm thời gian).**
+
+| Vế của H5 (bản đăng ký `be2b985`) | Số đo trên `test` | CI95 | Đạt? |
+|---|---|---|---|
+| Hit@1 ≥ 0,60 | 8 / 17 = **0,471** | [0,235; 0,706] | **Không** |
+| Hit@3 ≥ 0,80 | 8 / 17 = **0,471** | [0,235; 0,706] | **Không** |
+| Cận dưới CI ΔHit@1 (RCA − baseline) > 0 | ΔHit@1 = **0,000** (baseline cũng 8 / 17; 0 cặp lệch) | [0,000; 0,000] | **Không** |
+| Alert Reduction ≥ 30% trên incident cascade | **Không tính được**: 0 / 50 lần tiêm lỗi có cảnh báo ở ≥ 2 service (0 incident nhiều service) | — | **Không** (không có đối tượng để đo) |
+
+**Kết luận: H5 không được chấp nhận trên `test`** — không vế nào đạt.
+
+**Bảng QĐ-042-2. `val` cạnh `test`, và dòng độ nhạy (ngoài bản đăng ký).**
+
+| | `val` (`rca_final_val_v1`) | **`test` — đăng ký** (`rca_final_test_v1`) | `test` — **độ nhạy, ngoài bản đăng ký** (`rca_sens_test_c3rolling_v1`) |
+|---|---|---|---|
+| Cảnh báo đầu vào / số service có cảnh báo | 80 / 8 | 78 / 5 | 438 / 22 |
+| Cảnh báo giao thời gian với một lần tiêm lỗi | 36 | 45 | 203 |
+| Lần tiêm lỗi: tổng / có incident có nhãn / chỉ trong incident `ambiguous` / không có cảnh báo | 30 / 10 / 2 / 18 | 50 / 17 / 4 / **29** | 50 / 34 / 15 / 1 |
+| Incident: tổng / có nhãn / `ambiguous` / không ứng với lỗi | 26 / 11 / 1 / 14 | 38 / 17 / 3 / 18 | 114 / 48 / 14 / 52 |
+| Incident nhiều service | 1 | 0 | 39 |
+| Cảnh báo mỗi incident: trung vị / lớn nhất; số incident 1 cảnh báo | 3 / 6; 7 | 1 / 9; 21 | 2 / 31; 46 |
+| Hit@1 mức 1 | 7 / 11 = 0,636 [0,364; 0,909] | 8 / 17 = 0,471 [0,235; 0,706] | 10 / 48 = 0,208 [0,104; 0,333] |
+| Hit@3 mức 1 | 0,636 [0,364; 0,909] | 0,471 [0,235; 0,706] | 15 / 48 = 0,313 [0,188; 0,458] |
+| Hit@1 / Hit@3 baseline | 0,636 / 0,636 | 0,471 / 0,471 | 11 / 48 = 0,229 [0,125; 0,354] / 0,313 |
+| ΔHit@1 ghép cặp | 0,000 [0,000; 0,000] | 0,000 [0,000; 0,000] | −0,021 [−0,063; 0,000] |
+| Hit@1 trên mọi lần tiêm lỗi | 6 / 30 = 0,200 [0,067; 0,333] | 8 / 50 = 0,160 [0,060; 0,280] | 10 / 50 = 0,200 [0,100; 0,320] |
+| Hit@3 trên mọi lần tiêm lỗi | 0,200 | 0,160 | 14 / 50 = 0,280 [0,160; 0,400] |
+| ARR mọi cảnh báo | 0,675 [0,600; 0,730] | 0,513 [0,362; 0,626] | 0,740 [0,654; 0,796] |
+| ARR cảnh báo trong lỗi | 0,667 [0,565; 0,725] | 0,556 [0,382; 0,674] | 0,695 [0,587; 0,762] |
+| ARR cascade (số lần tiêm lỗi cascade) | 0,667 (1) | không tính được (0) | 0,704 [0,591; 0,777] (41) |
+| ARR `network_delay` | 0,250 [0,000; 0,500] | 0,545 [0,273; 0,703] | 0,720 [0,422; 0,835] |
+| JSON valid rate | 26 / 26 | 38 / 38 | 114 / 114 |
+| Lần gọi LLM mới / USD theo token | 26 / 0,0436 | 38 / 0,0495 | 114 / 0,1841 |
+
+**Nguyên nhân từ dữ liệu (tập đăng ký).**
+- *Không có incident nhiều service.* 78 cảnh báo chỉ nằm ở 5 service (CTAV đóng băng chỉ phát cảnh báo ở service có
+  ngưỡng `dev`, Phát hiện 11). Cả 38 incident đều một service ⇒ mức 1 và baseline cho cùng một câu trả lời ở mọi
+  incident (ΔHit@1 = 0, Hit@3 = Hit@1) và không lần tiêm lỗi nào là cascade.
+- *9 / 17 incident có nhãn trượt, tất cả cùng một dạng:* cảnh báo chỉ nổ ở service phía gọi, service gốc không có
+  cảnh báo nào. `frontend` thay cho `checkoutservice` (2), `currencyservice` (2), `paymentservice` (1);
+  `ts-travel-service` thay cho `ts-basic-service` (2), `ts-route-service` (1), `ts-security-service` (1). 8 incident
+  trúng đều là lỗi tiêm ngay tại service có cảnh báo.
+- *29 / 50 lần tiêm lỗi không có cảnh báo CTAV nào* (8 / 9 `return`, 4 / 5 `cpu_consumed`, 7 / 10 `exception`, 5 / 11
+  `cpu_contention`, 5 / 15 `network_delay`), thêm 4 lần chỉ nằm trong incident `ambiguous` ⇒ Hit@1 trên mọi lần tiêm
+  lỗi chỉ 0,160.
+- *So với `val`:* số cảnh báo gần bằng nhau (78 so với 80) nhưng `test` có nhiều incident hơn (38 so với 26) và incident
+  nhỏ hơn (trung vị 1 cảnh báo so với 3; 21 incident chỉ có 1 cảnh báo) ⇒ ARR chung thấp hơn (0,513 so với 0,675). Đây
+  là mô tả; không tham số nào được chọn lại.
+
+**Dòng độ nhạy đọc thế nào (không dùng cho kết luận H5).** Với 438 cảnh báo của `c3_rolling_baseline` ở 22 service,
+gần như mọi lần tiêm lỗi có cảnh báo (49 / 50) và 39 incident có nhiều service, nhưng định vị **không** tốt hơn:
+Hit@1 0,208, thấp hơn baseline 0,021 (1 cặp lệch, baseline đúng). Trong 48 incident có nhãn, service gốc thật chỉ nằm
+trong số service có cảnh báo ở 15 incident — đúng bằng số trúng Hit@3 — nên trần của mọi cách xếp hạng trên tập
+service có cảnh báo là 0,313. Trên 16 incident có nhãn nhiều service: mức 1 trúng 3, baseline trúng 4. Dòng này cho
+thấy H5 không đạt **không** chỉ do tập cảnh báo đăng ký quá hẹp: khi có nhiều cảnh báo hơn, cảnh báo vẫn ít khi rơi
+vào service gốc, và bước lan truyền một bước không bù được. ARR cascade ở đây là 0,704 (41 lần tiêm lỗi cascade).
+
+**Summarizer trên `test`.** 38 / 38 và 114 / 114 báo cáo qua validation, 0 bị loại, 0 `suspicious`. Số báo cáo LLM có
+trích id bằng chứng không có trong ngữ cảnh (id bị bỏ, báo cáo vẫn còn bằng chứng hợp lệ): 1 và 4. Loại lỗi LLM ghi:
+35 `cpu_contention`, 2 `network_delay`, 1 `unknown` (tập đăng ký); 96 / 14 / 3 và 1 `exception` (độ nhạy) — vẫn không
+phân biệt được như trên `val`.
+
+**PostgreSQL.** `rca_final_test_v1`: 38 `incidents`, 38 `diagnostic_reports`, 0 `diagnostic_rejected`;
+`rca_sens_test_c3rolling_v1`: 114 / 114 / 0.
+
+**Chi phí API M9 (toàn mốc).** 178 lần gọi mới = **0,2772 USD theo token** (`val` 0,0436 + `test` đăng ký 0,0495:
+74.151 token vào / 10.887 ra + độ nhạy 0,1841: 290.535 / 38.789); ngân sách 1 USD, ngưỡng dừng 2 USD. Cache
+`data/llm_cache/gemini.jsonl`: 40.277 → 40.429 dòng.
+
+Lệnh tái lập (đã chạy; chạy lại phải đổi `run_id`, summarizer sẽ đọc 100% từ cache):
+
+```bash
+py -m eval rca --config eval/configs/rca_final_test.yaml
+py -m eval rca --config eval/configs/rca_sens_test.yaml
+```

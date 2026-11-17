@@ -1,16 +1,69 @@
-# M9 — RCA Agent (BẢN NHÁP — mới xong M9-A trên `val`)
+# M9 — RCA Agent
 
 | | |
 |---|---|
-| Ngày | 2026-11-16 (M9-A xong; M9-B trên `test` chưa chạy) |
-| Hạn mục tiêu | 2027-01-03 |
-| Kết luận | **CHƯA QUA** — M9-A xong, đã đo đủ ba chỉ số DoD trên `val`: JSON valid rate đạt (1,000), Hit@1 / Hit@3 có số (0,636 / 0,636, bằng baseline), **ARR trên `network_delay` không đạt** (0,25 < 0,30); còn M9-B (bảng H5 trên `test`) |
-| Commit | `e455004` (code + quy tắc chọn, trước khi có số `val`) → `77786ec` (**chỉ** `eval/configs/rca_final.yaml`) → commit kết quả và tài liệu M9-A |
-| Quyết định liên quan | QĐ-037 (cắt mức 2, chia M9-A / M9-B), QĐ-039 (V36 (a)), **QĐ-040**, **QĐ-041** |
+| Ngày hoàn tất thực nghiệm | 2026-11-17 (M9-A trên `val` 2026-11-16; M9-B trên `test` 2026-11-17) |
+| Hạn mục tiêu | 2027-01-03 (sớm 47 ngày) |
+| Kết luận | **CHỜ NGƯỜI DÙNG XEM** — mọi việc 1–11 đã làm. **H5 không được chấp nhận trên `test`** (Hit@1 0,471; Hit@3 0,471; ΔHit@1 = 0; không có lỗi cascade để đo ARR). DoD trên `val`: JSON valid rate đạt, Hit@k có số, **ARR `network_delay` không đạt** (0,25 < 0,30) |
+| Commit | `e455004` (code + quy tắc chọn, trước số `val`) → `77786ec` (**chỉ** `rca_final.yaml`) → `2b215cf` (kết quả `val`) → `7ebe57a` (hai config `test`, trước khi chạy) → commit kết quả `test` và tài liệu |
+| Quyết định liên quan | QĐ-037, QĐ-039, **QĐ-040**, **QĐ-041**, **QĐ-042** |
 
-Mọi con số dưới đây thuộc **`val`**. Phiên M9-A không đọc, không chạy, không tạo gì thuộc `test`.
+Mục 1 chia hai phần: **1B trên `test`** (H5, chạy một lần) và **1A trên `val`** (chọn tham số, DoD). Phiên M9-A không
+đọc gì thuộc `test`; `test` chỉ được chạm sau commit `77786ec` và `7ebe57a`.
 
 ## 1. Kết quả hiện tại
+
+### 1B. H5 trên `test` (QĐ-042)
+
+**Bảng 4. Kiểm định H5 theo bản đăng ký `be2b985`** (`rca_final_test_v1`: 78 cảnh báo của `ctav_final_test_v1` → 38
+incident, 17 có nhãn; CI95 bootstrap 1.000 mẫu, seed 42).
+
+| Vế của H5 | Số đo trên `test` | CI95 | Đạt? |
+|---|---|---|---|
+| Hit@1 ≥ 0,60 | 8 / 17 = **0,471** | [0,235; 0,706] | **Không** |
+| Hit@3 ≥ 0,80 | 8 / 17 = **0,471** | [0,235; 0,706] | **Không** |
+| Cận dưới CI ΔHit@1 (RCA − baseline) > 0 | **0,000** (baseline 8 / 17, 0 cặp lệch) | [0,000; 0,000] | **Không** |
+| Alert Reduction ≥ 30% trên incident cascade | **không tính được** — 0 / 50 lần tiêm lỗi là cascade | — | **Không** |
+
+**Bảng 5. `val` cạnh `test` và dòng độ nhạy V36 (a).**
+
+| | `val` | **`test` — đăng ký** | `test` — độ nhạy, **ngoài bản đăng ký** (`c3_rolling_baseline`) |
+|---|---|---|---|
+| Cảnh báo / service có cảnh báo | 80 / 8 | 78 / 5 | 438 / 22 |
+| Lần tiêm lỗi: tổng / có incident có nhãn / chỉ trong `ambiguous` / không có cảnh báo | 30 / 10 / 2 / 18 | 50 / 17 / 4 / **29** | 50 / 34 / 15 / 1 |
+| Incident: tổng / có nhãn / `ambiguous` / không ứng với lỗi | 26 / 11 / 1 / 14 | 38 / 17 / 3 / 18 | 114 / 48 / 14 / 52 |
+| Incident nhiều service | 1 | **0** | 39 |
+| Cảnh báo mỗi incident: trung vị / lớn nhất | 3 / 6 | 1 / 9 | 2 / 31 |
+| Hit@1 mức 1 — **trên incident có cảnh báo (con số đăng ký)** | 0,636 [0,364; 0,909] | **0,471 [0,235; 0,706]** | 0,208 [0,104; 0,333] |
+| Hit@3 mức 1 | 0,636 | **0,471 [0,235; 0,706]** | 0,313 [0,188; 0,458] |
+| Hit@1 / Hit@3 baseline | 0,636 / 0,636 | 0,471 / 0,471 | 0,229 / 0,313 |
+| ΔHit@1 ghép cặp | 0,000 [0; 0] | **0,000 [0; 0]** | −0,021 [−0,063; 0,000] |
+| Hit@1 / Hit@3 **trên mọi lần tiêm lỗi** (không phải con số đăng ký) | 0,200 / 0,200 | 0,160 [0,060; 0,280] / 0,160 | 0,200 / 0,280 |
+| ARR mọi cảnh báo | 0,675 [0,600; 0,730] | 0,513 [0,362; 0,626] | 0,740 [0,654; 0,796] |
+| ARR cảnh báo trong lỗi | 0,667 | 0,556 [0,382; 0,674] | 0,695 [0,587; 0,762] |
+| ARR cascade (số lần tiêm lỗi cascade) | 0,667 (1) | — (0) | 0,704 [0,591; 0,777] (41) |
+| ARR `network_delay` | 0,250 | 0,545 [0,273; 0,703] | 0,720 [0,422; 0,835] |
+| JSON valid rate | 26 / 26 | 38 / 38 | 114 / 114 |
+| Lần gọi LLM / USD theo token | 26 / 0,0436 | 38 / 0,0495 | 114 / 0,1841 |
+
+**Nguyên nhân, đọc từ dữ liệu `test`.**
+1. 78 cảnh báo chỉ nằm ở 5 service (Phát hiện 11) ⇒ cả 38 incident đều một service ⇒ mức 1 = baseline ở mọi incident,
+   Hit@3 = Hit@1, không có lỗi cascade nào.
+2. 9 / 17 incident trượt cùng một dạng: cảnh báo ở service phía gọi (`frontend` ×5, `ts-travel-service` ×4), lỗi tiêm ở
+   service phía sau không có cảnh báo nào. 8 incident trúng đều là lỗi tiêm ngay tại service có cảnh báo.
+3. 29 / 50 lần tiêm lỗi không có cảnh báo CTAV nào (8 / 9 `return`, 4 / 5 `cpu_consumed`, 7 / 10 `exception`, 5 / 11
+   `cpu_contention`, 5 / 15 `network_delay`): **không thể định vị**.
+4. Dòng độ nhạy: có cảnh báo ở 49 / 50 lần tiêm lỗi và 39 incident nhiều service, nhưng Hit@1 chỉ 0,208 và thấp hơn
+   baseline 0,021. Service gốc thật chỉ nằm trong số service có cảnh báo ở 15 / 48 incident có nhãn (= số trúng Hit@3),
+   nên trần là 0,313. H5 không đạt không chỉ vì tập đăng ký hẹp.
+5. `test` có incident nhỏ hơn `val` (trung vị 1 cảnh báo so với 3) nên ARR chung thấp hơn; không chọn lại tham số nào.
+
+Chi phí API cả mốc M9: 178 lần gọi, **0,2772 USD theo token** (ngân sách 1 USD). PostgreSQL: 38 + 114 `incidents`,
+38 + 114 `diagnostic_reports`, 0 `diagnostic_rejected` cho hai run `test`. Cả hai run in dấu vân tay `b0c54fa68ef65535`.
+
+### 1A. Trên `val` (QĐ-040, QĐ-041)
+
+Mọi con số dưới đây thuộc **`val`**. Phiên M9-A không đọc, không chạy, không tạo gì thuộc `test`.
 
 | Việc / DoD | Đạt? | Bằng chứng (số liệu / lệnh tái lập / file) |
 |---|---|---|
@@ -23,7 +76,8 @@ Mọi con số dưới đây thuộc **`val`**. Phiên M9-A không đọc, khôn
 | **DoD: ARR ≥ 30% trên `network_delay`** | **Không** | **0,250 [0,000; 0,500]** (4 cảnh báo → 3 incident); nguyên nhân ở dưới |
 | **DoD: có Hit@1 / Hit@3 mức 1 và baseline** | Có | Mức 1: 0,636 / 0,636; baseline: 0,636 / 0,636 (n = 11) |
 | **DoD: JSON valid rate ≥ 0,95** | **Có** | 26 / 26 = 1,000 |
-| DoD: bảng H5 trên `test` | Chưa | M9-B |
+| 8–11. Config `test` commit trước khi chạy; H5 một lần; dòng độ nhạy; QĐ | Có | `7ebe57a`; `rca_final_test_v1`, `rca_sens_test_c3rolling_v1`; QĐ-042; mục 1B |
+| **DoD: bảng kiểm định H5 trên `test`** | **Có bảng — H5 không được chấp nhận** | Bảng 4 |
 | `pytest`, `mypy`, `ruff` | Sạch | 239 test qua (gồm `tests/test_storage.py` và test ghi PostgreSQL thật); `mypy packages services` sạch; `ruff` chỉ còn E402 cũ ở `scripts/` |
 
 ### Đầu vào
@@ -124,22 +178,21 @@ py -m eval rca --config eval/configs/rca_final.yaml        # Gemini (đã cache:
 
 | # | Vấn đề | Phương án | Khuyến nghị | Chặn mốc sau? |
 |---|---|---|---|---|
-| V40 | Định nghĩa "incident cascade" của H5 — agent tự quyết, chờ xác nhận | (a) lần tiêm lỗi có cảnh báo chạm ≥ 2 service; (b) ≥ 2 cảnh báo | **(a)**, đã ghi trong `rca_final.yaml` trước khi chạm `test`. Trên `val` chỉ 1 lần tiêm lỗi thoả (a) | Nên xác nhận trước M9-B; đổi sau khi thấy số `test` là không được |
+| V40 | Định nghĩa "incident cascade" của H5 — agent tự quyết, chờ xác nhận | (a) lần tiêm lỗi có cảnh báo chạm ≥ 2 service; (b) ≥ 2 cảnh báo | **(a)**, đã ghi trong `rca_final.yaml` trước khi chạm `test`. Trên `val` chỉ 1 lần tiêm lỗi thoả (a) | Không còn đổi được: `test` đã chạy với (a). Theo (a) `test` có 0 lần tiêm lỗi cascade nên vế ARR của H5 không đo được |
 | V41 | Incident gộp hai lần tiêm lỗi liền nhau **cùng service gốc** vẫn tính `ambiguous` — agent tự quyết | (a) giữ nguyên văn `02` §4.3; (b) coi là `labelled` khi cùng service gốc | **(a)**: không nới định nghĩa sau khi thấy rằng (b) có lợi cho mức 1 | Không |
 | V42 | `store.py` nằm ở `services/rca_agent/` thay vì `packages/storage/` — agent tự quyết | (a) để nguyên; (b) M10 chuyển sang `packages/storage/postgres.py` | (a) cho tới M10 | Không |
 | V43 | Ba file sửa ngoài vùng P2, đều chỉ thêm: `packages/schemas/models.py` (model báo cáo `03` §2), `tests/test_harness.py` (loại config `rca`), `eval/__main__.py` (lệnh con `rca`) — agent tự quyết | (a) giữ; (b) chuyển chỗ | (a): model dùng chung phải ở `packages/schemas` (quy tắc R-B2) | Không |
-| V44 | DoD "ARR ≥ 30% trên `network_delay`" không đạt trên `val` (0,25) | (a) ghi nhận không đạt, sang M9-B; (b) dừng M9 | **(a)**: nguyên nhân là recall của CTAV trên `network_delay` (3 / 9 lần có cảnh báo), nằm ngoài RCA; không có tham số RCA nào sửa được mà không đổi phương pháp đã đóng băng | Cần bạn đồng ý để M9-B chạy |
-| — | Triển vọng H5 (không phải việc cần quyết, chỉ để biết trước) | | Trên `val`: Hit@3 0,636 < 0,80 và ΔHit@1 = 0. Nếu incident trên `test` cũng chủ yếu một service thì hai vế đó của H5 sẽ không đạt | Không |
+| ~~V44~~ (đã chốt (a) 2026-11-17: người dùng cho sang M9-B) | DoD "ARR ≥ 30% trên `network_delay`" không đạt trên `val` (0,25) | (a) ghi nhận không đạt, sang M9-B; (b) dừng M9 | **(a)**: nguyên nhân là recall của CTAV trên `network_delay` (3 / 9 lần có cảnh báo), nằm ngoài RCA; không có tham số RCA nào sửa được mà không đổi phương pháp đã đóng băng | Cần bạn đồng ý để M9-B chạy |
+| V45 | **H5 không được chấp nhận** — cách trình bày trong luận văn | (a) báo đúng như Bảng 4, kèm dòng độ nhạy và phân tích nguyên nhân (cảnh báo không rơi vào service gốc); (b) như (a) và nêu rõ ở chương thảo luận rằng nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ | **(b)** | Không chặn M10; cần trước khi viết chương kết luận |
+| V46 | Đóng M9 | DoD của `04` có một dòng không đạt (ARR `network_delay` trên `val`) và H5 không đạt; bảng kiểm định thì đã có | Đóng M9 với kết luận "QUA — H5 không được chấp nhận", theo tiền lệ M8 (H2 không đạt vẫn đóng mốc vì DoD là *có bảng kiểm định*) | **Có** — cần bạn xem báo cáo này để mở M10 |
 
-## 4. Plan cho mốc tiếp theo (M9-B, rồi M10)
+## 4. Plan cho mốc tiếp theo (M10 — Platform end-to-end + dashboard)
 
-- `eval/configs/rca_final_test.yaml` = `rca_final.yaml`, chỉ đổi `split: test`, thêm `h5_test: true`, `input.alerts_run`
-  và `input.evidence_run` sang run `test` tương ứng, `run_id`; in `git diff --no-index` hai file, commit trước khi chạy.
-- Chạy một lần; kiểm dòng `method fingerprint b0c54fa68ef65535` in ra trùng bản `val`.
-- Dòng độ nhạy V36 (a): cùng tham số, `input: {ctav_config: <config CTAV test>, variant: c3_rolling_baseline,
-  evidence_run: <run C1 test>}`, `run_id` riêng, ghi nhãn "độ nhạy, ngoài bản đăng ký".
-- Ước chi phí trước khi chạy (harness tự in và dừng nếu vượt 1 USD): `val` tốn 0,0017 USD / incident.
-- Bảng H5 lấy từ `rca.json`: `main.hit.level1_hit1`, `level1_hit3`, `d_hit1_ci95`, `main.reduction.cascade`,
-  `main.per_injection` (tách "trên incident có cảnh báo" và "trên mọi lần tiêm lỗi").
-- QĐ-042..: kết quả H5; hoàn tất báo cáo này; §5.9 vào bản nháp chương kết quả `test`; chuyển `CURRENT-MILESTONE.md` sang M10.
-- DoD M9: như trên + bảng kiểm định H5 trên `test`.
+- `services/rca_agent/pipeline.py` điều phối CTAV → grouping → propagation → summary, dùng lại đúng các hàm của M9.
+- **Parity với M9-B (QĐ-042):** chạy end-to-end trên `test` phải cho đúng 38 incident của `rca_final_test_v1` (so theo
+  danh sách `alert_ids`) và đọc summarizer 100% từ cache; M10 chỉ đo thêm E2E latency, token, cache hit.
+- `services/api` (FastAPI) đọc ClickHouse / PostgreSQL (`incidents`, `diagnostic_reports` đã có dữ liệu của 4 run).
+- Nối 4 màn hình dashboard sang API thật; chế độ demo offline từ cache.
+- DoD M10 (`04`): `docker compose --profile dev up -d` + replay → 4 màn hình có dữ liệu thật, chạy được khi rút mạng,
+  kịch bản demo `08` §6 chạy trọn.
+- Ngân sách API M10–M12: 0 (ngưỡng dừng 1 USD).
