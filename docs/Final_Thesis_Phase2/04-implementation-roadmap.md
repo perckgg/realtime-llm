@@ -26,8 +26,8 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | **Xong** (2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a) — QĐ-031, QĐ-032, QĐ-037) — `docs/milestones/M6-ctav.md` |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | **Xong** (2026-11-14; H0–H5 đã đăng ký, V33 (a), V34 (b) — QĐ-033, QĐ-034) — `docs/milestones/M7-rescue-dang-ky.md` |
 | M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | **Xong** (2026-11-16; H0, H3, H4 đạt, H2 không được chấp nhận; V36 (a) — QĐ-035..039) — `docs/milestones/M8-g-test.md` |
-| M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | **Xong mọi việc 2026-11-17, chờ người dùng xem** (mở 2026-11-16, QĐ-039; M9-A trên `val` → M9-B trên `test`, propagation mức 2 đã cắt — QĐ-037; H5 không được chấp nhận — QĐ-042) |
-| M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | |
+| M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | **QUA — H5 không được chấp nhận** (đóng 2026-11-17, QĐ-043; mở 2026-11-16, QĐ-039; M9-A trên `val` → M9-B trên `test`, propagation mức 2 đã cắt — QĐ-037; H5 không được chấp nhận — QĐ-042) |
+| M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | **Đang làm** (mở 2026-11-17, QĐ-043; parity với 38 incident của M9-B — QĐ-042) |
 | M11 | Đánh giá bằng người + phân tích lỗi | | 2027-01-17 | |
 | M12 | Đóng gói: số liệu, luận văn, repo, bảo vệ | | Bảo vệ tuần 2027-02-08 | |
 

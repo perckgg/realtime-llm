@@ -4,9 +4,9 @@
 |---|---|
 | Ngày hoàn tất thực nghiệm | 2026-11-17 (M9-A trên `val` 2026-11-16; M9-B trên `test` 2026-11-17) |
 | Hạn mục tiêu | 2027-01-03 (sớm 47 ngày) |
-| Kết luận | **CHỜ NGƯỜI DÙNG XEM** — mọi việc 1–11 đã làm. **H5 không được chấp nhận trên `test`** (Hit@1 0,471; Hit@3 0,471; ΔHit@1 = 0; không có lỗi cascade để đo ARR). DoD trên `val`: JSON valid rate đạt, Hit@k có số, **ARR `network_delay` không đạt** (0,25 < 0,30) |
-| Commit | `e455004` (code + quy tắc chọn, trước số `val`) → `77786ec` (**chỉ** `rca_final.yaml`) → `2b215cf` (kết quả `val`) → `7ebe57a` (hai config `test`, trước khi chạy) → commit kết quả `test` và tài liệu |
-| Quyết định liên quan | QĐ-037, QĐ-039, **QĐ-040**, **QĐ-041**, **QĐ-042** |
+| Kết luận | **QUA — H5 không được chấp nhận** (đóng 2026-11-17, người dùng đã xem — QĐ-043). `test`: Hit@1 0,471; Hit@3 0,471; ΔHit@1 = 0; không có lỗi cascade để đo ARR. `val`: JSON valid rate đạt, Hit@k có số, **ARR `network_delay` không đạt** (0,25 < 0,30) |
+| Commit | `e455004` (code + quy tắc chọn, trước số `val`) → `77786ec` (**chỉ** `rca_final.yaml`) → `2b215cf` (kết quả `val`) → `7ebe57a` (hai config `test`, trước khi chạy) → `27164e7` (kết quả `test` và tài liệu) |
+| Quyết định liên quan | QĐ-037, QĐ-039, **QĐ-040**, **QĐ-041**, **QĐ-042**, QĐ-043 (đóng mốc) |
 
 Mục 1 chia hai phần: **1B trên `test`** (H5, chạy một lần) và **1A trên `val`** (chọn tham số, DoD). Phiên M9-A không
 đọc gì thuộc `test`; `test` chỉ được chạm sau commit `77786ec` và `7ebe57a`.
@@ -184,7 +184,7 @@ py -m eval rca --config eval/configs/rca_final.yaml        # Gemini (đã cache:
 | V43 | Ba file sửa ngoài vùng P2, đều chỉ thêm: `packages/schemas/models.py` (model báo cáo `03` §2), `tests/test_harness.py` (loại config `rca`), `eval/__main__.py` (lệnh con `rca`) — agent tự quyết | (a) giữ; (b) chuyển chỗ | (a): model dùng chung phải ở `packages/schemas` (quy tắc R-B2) | Không |
 | ~~V44~~ (đã chốt (a) 2026-11-17: người dùng cho sang M9-B) | DoD "ARR ≥ 30% trên `network_delay`" không đạt trên `val` (0,25) | (a) ghi nhận không đạt, sang M9-B; (b) dừng M9 | **(a)**: nguyên nhân là recall của CTAV trên `network_delay` (3 / 9 lần có cảnh báo), nằm ngoài RCA; không có tham số RCA nào sửa được mà không đổi phương pháp đã đóng băng | Cần bạn đồng ý để M9-B chạy |
 | V45 | **H5 không được chấp nhận** — cách trình bày trong luận văn | (a) báo đúng như Bảng 4, kèm dòng độ nhạy và phân tích nguyên nhân (cảnh báo không rơi vào service gốc); (b) như (a) và nêu rõ ở chương thảo luận rằng nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ | **(b)** | Không chặn M10; cần trước khi viết chương kết luận |
-| V46 | Đóng M9 | DoD của `04` có một dòng không đạt (ARR `network_delay` trên `val`) và H5 không đạt; bảng kiểm định thì đã có | Đóng M9 với kết luận "QUA — H5 không được chấp nhận", theo tiền lệ M8 (H2 không đạt vẫn đóng mốc vì DoD là *có bảng kiểm định*) | **Có** — cần bạn xem báo cáo này để mở M10 |
+| ~~V46~~ (đã chốt 2026-11-17, QĐ-043: đóng M9) | Đóng M9 | DoD của `04` có một dòng không đạt (ARR `network_delay` trên `val`) và H5 không đạt; bảng kiểm định thì đã có | Đóng M9 với kết luận "QUA — H5 không được chấp nhận", theo tiền lệ M8 (H2 không đạt vẫn đóng mốc vì DoD là *có bảng kiểm định*) | **Có** — cần bạn xem báo cáo này để mở M10 |
 
 ## 4. Plan cho mốc tiếp theo (M10 — Platform end-to-end + dashboard)
 

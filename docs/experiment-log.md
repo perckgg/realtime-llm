@@ -2294,3 +2294,25 @@ Lệnh tái lập (đã chạy; chạy lại phải đổi `run_id`, summarizer 
 py -m eval rca --config eval/configs/rca_final_test.yaml
 py -m eval rca --config eval/configs/rca_sens_test.yaml
 ```
+
+---
+
+## QĐ-043 — Người dùng đã xem kết quả M9; đóng M9, mở M10 (2026-11-17)
+
+**Người dùng chốt (2026-11-17, sau khi nhận kết quả M9-B và bảng kiểm định H5).**
+- **V46 → đóng M9** với kết luận **"QUA — H5 không được chấp nhận"**, theo tiền lệ M8 (H2 không đạt vẫn đóng mốc: DoD là
+  *có bảng kiểm định, báo đúng kết quả*). Ghi nhận rõ hai chỗ không đạt: DoD "ARR ≥ 30% trên `network_delay`" trên `val`
+  (0,250; V44 đã cho đi tiếp) và cả bốn vế của H5 trên `test` (QĐ-042).
+- **V45 còn mở** (cách trình bày H5 không đạt trong luận văn; khuyến nghị (b) ở báo cáo M9 §3): không chặn M10, cần trước
+  khi viết chương thảo luận / kết luận.
+- V40–V43 (agent tự quyết ở M9-A) không bị phản đối và đã thành một phần của kết quả `test`; coi như giữ nguyên.
+
+**Đóng M9.** Ba điều kiện của `04` §2: bảng kiểm định H5 đã có và kết luận viết ra; báo cáo `docs/milestones/M9-rca.md`
+đủ 4 phần; người dùng đã xem và cho mở mốc sau. Commit M9: `e455004`, `77786ec`, `2b215cf`, `7ebe57a`, `27164e7`.
+Chi phí API cả mốc: 178 lần gọi, 0,2772 USD theo token.
+
+**Mở M10 (Platform end-to-end + dashboard dữ liệu thật)**, prompt P4 ở `docs/prompts/M8-M12-prompts.md`. Ràng buộc từ M9:
+`pipeline.py` chạy trên `test` phải tái lập đúng 38 incident và thứ hạng service gốc của `rca_final_test_v1` (QĐ-042) —
+lệch là bug pipeline, sửa pipeline, không sửa số đã báo cáo; summarizer đọc 100% từ cache. `ExperimentComparison` là bảng
+tĩnh (QĐ-037). **Đánh số:** M9 đã dùng V45, V46 (ngoài dải V40..V44 của mình) ⇒ M10 dùng **V47..V49** và QĐ-045..049
+(QĐ-044 bỏ trống).

@@ -6,7 +6,7 @@
 
 ---
 
-## Trạng thái — 2026-11-16
+## Trạng thái — 2026-11-17
 
 | Mốc | Trạng thái | Báo cáo / quyết định |
 |---|---|---|
@@ -19,7 +19,15 @@
 | M6 | QUA (đóng 2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032, QĐ-037 |
 | M7 | QUA (đóng 2026-11-14; H0–H5 đã đăng ký, commit `be2b985`; V33 (a), V34 (b)) | `docs/milestones/M7-rescue-dang-ky.md`; QĐ-033, QĐ-034 |
 | M8 | **QUA (đóng 2026-11-16; người dùng đã xem báo cáo, V36 (a) — QĐ-039; M8: xong phần API)** — hoàn tất 2026-11-16 (21.094 gọi mới, 0 lỗi, 15,85 USD theo token): **H0 đạt, H2 không đạt** (do 61% fault rơi vào 32 service thiếu ngưỡng `dev`; đối chứng `C3-trượt` đạt F1 0,120), **H3 & H4 đạt** | `docs/milestones/M8-g-test.md`; QĐ-034..039 |
-| M9 | **Xong mọi việc 2026-11-17, chờ người dùng xem báo cáo (V46)** — M9-A `val` (2026-11-16) + M9-B `test` (2026-11-17): **H5 không được chấp nhận** (Hit@1 0,471; Hit@3 0,471; ΔHit@1 = 0; 0 lỗi cascade); 0,2772 USD theo token | `docs/milestones/M9-rca.md`; QĐ-037, QĐ-039..042 |
+| M9 | **QUA — H5 không được chấp nhận** (đóng 2026-11-17, người dùng đã xem — QĐ-043): `test` Hit@1 = Hit@3 = 0,471 = baseline, ΔHit@1 = 0, 0 lỗi cascade; `val` ARR `network_delay` 0,25 < 0,30; 0,2772 USD theo token | `docs/milestones/M9-rca.md`; QĐ-037, QĐ-039..043 |
+| M10 | **Đang làm** (mở 2026-11-17) | QĐ-043; báo cáo sẽ ở `docs/milestones/M10-platform.md` |
+
+M9 tóm tắt (QĐ-040..043): RCA Agent = grouping (`T_group` 180 s) + lan truyền ngược 1 bước (mức 1, dấu hiệu `alert`) +
+summarizer `gemini-2.5-flash`; mức 2 đã cắt. Cấu hình chốt `eval/configs/rca_final.yaml` (`77786ec`, dấu vân tay
+`b0c54fa68ef65535`). **H5 không được chấp nhận trên `test`** (`rca_final_test_v1`: 78 cảnh báo ở 5 service → 38 incident,
+17 có nhãn): Hit@1 = Hit@3 = 0,471 [0,235; 0,706] = baseline, ΔHit@1 0, không có lỗi cascade để đo ARR; 29 / 50 lần tiêm
+lỗi không có cảnh báo CTAV nào. Độ nhạy V36 (a) (438 cảnh báo, ngoài bản đăng ký): Hit@1 0,208 so với baseline 0,229, ARR
+cascade 0,704. `val`: Hit@1 0,636, ARR `network_delay` 0,25 (DoD ≥ 0,30 không đạt), JSON valid rate 26 / 26 (`test` 38 / 38).
 
 M8 tóm tắt (QĐ-038, QĐ-039): G-test trên `test` (11.985 cửa sổ telemetry, 346 fault), 21.094 lần gọi mới, 15,85 USD
 theo token, 0 lỗi judge. **H0 chấp nhận** (C1 − BM25: ΔRecall +0,179, ΔFPR +0,0744). **H2 không được chấp nhận**:
@@ -53,61 +61,43 @@ chững lại từ 67% và tác động cả recall. Không chọn đặc trưng
 
 ---
 
-## Mốc hiện tại: M9 — RCA Agent
-## Mở 2026-11-16 (QĐ-039)
+## Mốc hiện tại: M10 — Platform end-to-end + dashboard dữ liệu thật
+## Mở 2026-11-17 (QĐ-043)
 
-Chia hai phần theo QĐ-037 (prompt P2, P3 ở `docs/prompts/M8-M12-prompts.md`). **M9-A chỉ dùng `val`**; cấu hình RCA
-chốt ở `eval/configs/rca_final.yaml` bằng commit riêng **trước** khi chạm `test`. **M9-B chạy `test` một lần** bằng
-đúng file đó; sau khi thấy số `test` không sửa tham số, không chạy biến thể khác. M9 dùng QĐ-040..044, V40..V44.
+Prompt P4 ở `docs/prompts/M8-M12-prompts.md`. Đọc thêm: `01` §6.5–6.7, §8; `03` §3–4; `08` §6 (kịch bản demo);
+`services/web/src/api/types.ts` và 4 màn hình trong `services/web/src/screens/`. M10 dùng QĐ-045..049, **V47..V49**
+(V45, V46 đã dùng ở M9 — QĐ-043). Vùng file: `services/api/`, `services/web/`, `services/rca_agent/pipeline.py`,
+`docker-compose.yml`, `docs/milestones/M10-*`, `docs/drafts/ch6-demo-platform.md`.
 
 ### Việc
 
-**M9-A — trên `val`** (đầu vào: 80 cảnh báo của `ctav_final_val_v1`: 29 TP, 51 FP; replay 0 USD)
+1. - [ ] `services/rca_agent/pipeline.py`: CTAV → grouping → propagation → summary, dùng `eval/configs/rca_final.yaml`, ghi
+   ClickHouse / PostgreSQL. Dựng và debug trên run `val`. Rồi chạy trên `test` và kiểm **parity với M9-B (QĐ-042)**: đúng 38
+   incident của `rca_final_test_v1` (so theo danh sách `alert_ids`) và đúng thứ hạng service gốc; lệch là bug pipeline —
+   sửa pipeline, không sửa số đã báo cáo. Summarizer đọc 100% từ cache. Ghi `runtime.json`: E2E latency, token, cache hit
+2. - [ ] `services/api` (FastAPI): endpoint khớp đúng `types.ts`; chỉ đọc; không authentication
+3. - [ ] Nối Timeline, AlertDetail, IncidentDetail sang API thật: hiện nguồn gốc bằng chứng, lý do policy (θ, C3), có
+   loading / empty / error state. `ExperimentComparison`: bảng tĩnh sinh từ script đọc `eval/results` (cắt theo `04` §9
+   ưu tiên 4, QĐ-037) — ghi QĐ
+4. - [ ] Chế độ demo offline: toàn bộ kịch bản chạy từ cache, không cần mạng, không cần `GEMINI_API_KEY`
+5. - [ ] Tự kiểm bằng trình duyệt thật: `docker compose --profile dev up -d`, replay, mở đủ 4 màn hình, đi hết kịch bản
+   `08` §6, lặp lại khi đã tắt mạng; chụp ảnh từng màn hình vào `docs/drafts/figures/`. Cái gì chưa mở lên xem được thì
+   ghi là chưa kiểm
+6. - [ ] `docs/milestones/M10-platform.md` (4 phần) + `docs/drafts/ch6-demo-platform.md` (§6.1–6.5, kèm ảnh, lệnh chạy,
+   bảng độ trễ / token) + danh sách lỗi demo còn lại xếp theo mức nghiêm trọng
 
-1. - [x] Harness RCA `py -m eval rca --config ...`: đọc cảnh báo CTAV của một run, gom incident, định vị root cause,
-   chấm Hit@1 / Hit@3 mức service theo nhãn root-cause (QĐ-001) có CI bootstrap; ghi `incidents` vào PostgreSQL (`03` §4)
-2. - [x] Grouping (`services/rca_agent/grouping.py` đã có + `tests/test_grouping.py`): quét `T_group ∈ {180, 300, 600}` s;
-   Alert Reduction Ratio chung và riêng trên incident cascade / `network_delay`; quy tắc chọn `T_group` (kể cả khi hoà)
-   viết vào code trước khi xem số
-3. - [x] `propagation.py` mức 1 (lan truyền ngược 1-hop thuần thuật toán) + baseline "service có anomaly score cao nhất
-   trong incident"; báo cả hai kèm ΔHit@1 ghép cặp có CI
-4. - [x] ~~`propagation.py` mức 2 (LLM full call chain)~~ — đã cắt theo `04` §9 ưu tiên 1 (QĐ-037); ghi vào QĐ và báo cáo M9
-5. - [x] `summarizer.py`: JSON theo `03` §2, validator + `diagnostic_rejected`, `require_evidence`, chặn câu lệnh thực thi;
-   test bằng backend `mock` trước, rồi đo JSON valid rate bằng Gemini thật (M8 đã xong phần API; ngân sách 1 USD, ngưỡng dừng 2 USD)
-6. - [x] Chốt `eval/configs/rca_final.yaml` (`T_group`, quy tắc xếp hạng, prompt summarizer), commit riêng
-7. - [x] Nháp `docs/milestones/M9-rca.md` (phần `val`) + `docs/drafts/ch5-rca-val.md` (bảng + đoạn văn cho §5.9, mô tả RCA cho Ch4)
+**DoD M10** (`04` M10): `docker compose --profile dev up -d` + replay → 4 màn hình hiển thị dữ liệu thật, có loading / empty
+state; chạy được khi rút mạng; kịch bản demo `08` §6 chạy trọn. Hạn 2027-01-10.
 
-Kết quả M9-A trên `val` (QĐ-041, `rca_final_val_v1`): `T_group` 180 s, mức 1 dấu hiệu `alert`; 80 cảnh báo → 26 incident
-(11 có nhãn, 1 `ambiguous`, 14 không ứng với lỗi); Hit@1 = Hit@3 = 0,636 [0,364; 0,909] = baseline (ΔHit@1 0,000);
-ARR 0,675 chung, **0,250 trên `network_delay` (DoD ≥ 0,30 không đạt)**; JSON valid rate 26 / 26. Chờ người dùng: V40, V44.
+**Không làm:** Kubernetes, auth, notification, màn hình thứ 5, thư viện UI mới.
 
-**M9-B — trên `test`** (điều kiện vào: `rca_final.yaml` đã commit; M8 QUA — đã đạt, QĐ-039)
+**Có sẵn từ M9:** `services/rca_agent/{grouping,propagation,summarizer,store}.py`, harness `eval/harness/rca.py`; PostgreSQL
+đang giữ 4 run RCA (`rca_mock_val_v1`, `rca_final_val_v1`, `rca_final_test_v1`, `rca_sens_test_c3rolling_v1`) với `incidents`
+và `diagnostic_reports`. `packages/storage/README.md` vẫn ghi "PostgreSQL client chưa có" — code ghi ở
+`services/rca_agent/store.py` (V42); M10 quyết định có chuyển sang `packages/storage/` hay không.
 
-8. - [x] `rca_final_test.yaml` = `rca_final.yaml` chỉ đổi `split` / run đầu vào / `run_id`; in diff, commit trước khi chạy
-9. - [x] Chạy một lần trên **78 cảnh báo của `ctav_final_test_v1`** (14 TP, 64 FP) — **chỉ số chính thức của H5** theo bản đăng ký
-   `be2b985`: Hit@1 ≥ 0,60; Hit@3 ≥ 0,80; cận dưới CI ΔHit@1 (RCA − baseline) > 0; Alert Reduction ≥ 30% trên incident cascade.
-   Báo kèm số fault `test` không có cảnh báo CTAV nào, tách Hit@k "trên incident có cảnh báo" và "trên mọi lần tiêm lỗi"
-10. - [x] **Dòng độ nhạy (V36 (a), QĐ-039):** cùng `rca_final.yaml`, không đổi tham số, trên 438 cảnh báo của ablation
-    `c3_rolling_baseline` (47 TP, 391 FP); ghi nhãn "độ nhạy, ngoài bản đăng ký", không dùng cho kết luận H5
-11. - [x] QĐ: H5 tính ở M9-B qua harness thay vì ở M10 (M10 phải tái lập đúng tập incident này); hoàn tất
-    `docs/milestones/M9-rca.md` 4 phần; thêm §5.9 vào `docs/drafts/ch5-ket-qua-test.md`; chuyển file này sang M10
-
-Kết quả M9-B trên `test` (QĐ-042, `rca_final_test_v1`, chạy một lần, dấu vân tay `b0c54fa68ef65535`): 78 cảnh báo ở 5
-service → 38 incident (17 có nhãn, 3 `ambiguous`, 18 không ứng với lỗi; 0 incident nhiều service). **H5 không được chấp
-nhận:** Hit@1 = Hit@3 = 8 / 17 = 0,471 [0,235; 0,706] = baseline; ΔHit@1 0,000 [0,000; 0,000]; ARR cascade không tính
-được (0 / 50 lần tiêm lỗi là cascade); 29 / 50 lần tiêm lỗi không có cảnh báo CTAV nào. Độ nhạy (ngoài bản đăng ký, 438
-cảnh báo): Hit@1 0,208 so với baseline 0,229; ARR cascade 0,704. JSON valid rate 38 / 38 và 114 / 114.
-**Mục "chuyển file này sang M10" của việc 11 chưa làm:** đóng mốc cần người dùng xem báo cáo (`04` §2) — V46.
-
-**DoD M9** (`04` M9, đo trên `val`): ARR ≥ 30% trên `network_delay`; có Hit@1 / Hit@3 mức 1 và baseline; JSON valid rate
-≥ 0,95; **và** bảng kiểm định H5 trên `test` (lộ trình gộp M9-B, QĐ-037). Không đạt ngưỡng nào thì báo đúng con số, nêu
-nguyên nhân từ dữ liệu, không nới định nghĩa chỉ số. Hạn 2027-01-03.
-
-**Trước khi chạy:** bật Docker Desktop + `docker compose --profile dev up -d` (ghi PostgreSQL, `tests/test_storage.py`);
-lúc mở mốc 2026-11-16 không có container nào đang chạy.
-
-**Rủi ro đã biết:** mẫu nhỏ — 80 cảnh báo trên `val`, 78 trên `test` (chỉ ở 10 service có ngưỡng `dev`, khuyết 11 / 20
-service có fault) ⇒ ít incident, CI của Hit@k rộng; dòng độ nhạy V36 (a) là đối sách, không thay chỉ số chính thức.
+**Rủi ro đã biết:** dữ liệu demo của nhánh B yếu — trên `test` mọi incident chỉ có một service, H5 không đạt; kịch bản
+demo bước "đồ thị lan truyền chỉ đúng root cause" (`08` §6) cần chọn incident minh hoạ từ dữ liệu thật và nói rõ giới hạn.
 
 ### Vấn đề cần chốt
 
@@ -121,6 +111,10 @@ service có fault) ⇒ ít incident, CI của Hit@k rộng; dòng độ nhạy V
 | ~~V30~~ | Nguồn ngưỡng nền cho C3 | Người dùng chốt (c) 2026-11-16 (QĐ-037): dựng cả hai, quy tắc chọn `dev` p90 (QĐ-031) ⇒ M6 **QUA** | |
 | ~~V35~~ | Chấm context precision thủ công 50 cửa sổ (`04` M8) | Người dùng chốt (a) 2026-11-16 (QĐ-037): đã xuất `eval/manual/context_precision_test_v1.csv` (mù, 525 dòng) + hướng dẫn; người dùng chấm sau | Không chặn bảng H0–H4 / M9 |
 | ~~V36~~ (chốt (a) 2026-11-16, QĐ-039) | Đầu vào cảnh báo cho H5 (RCA Agent) trên `test` ở M9-B: CTAV đóng băng chỉ phát 78 cảnh báo trên 10 service có ngưỡng `dev` (khuyết 11 service có fault) | Khuyến nghị **(a)** (báo cáo M8 §3): giữ chỉ số chính H5 trên 78 cảnh báo `ctav_final_test_v1` đúng cam kết `be2b985`, **kèm** dòng độ nhạy trên 438 cảnh báo của `c3_rolling_baseline` | Không chặn M9-A (`val`); chốt trước M9-B (`test`) |
+| ~~V40~~–~~V43~~ | M9-A, agent tự quyết: cascade = cảnh báo ở ≥ 2 service; `ambiguous` giữ nguyên văn `02` §4.3; `store.py` ở `services/rca_agent/`; ba file sửa ngoài vùng P2 | Giữ nguyên (QĐ-043) | |
+| ~~V44~~ | DoD ARR `network_delay` không đạt trên `val` | Người dùng cho sang M9-B 2026-11-17 (QĐ-042) | |
+| V45 | **H5 không được chấp nhận** — cách trình bày trong luận văn | Khuyến nghị (b) (báo cáo M9 §3): báo đúng bảng kiểm định, kèm dòng độ nhạy và nguyên nhân, nêu rõ nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ | Không chặn M10; cần trước chương thảo luận / kết luận |
+| ~~V46~~ | Đóng M9 | Người dùng chốt đóng 2026-11-17 (QĐ-043) | |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
@@ -166,6 +160,14 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-17 (đóng M9, mở M10)
+
+**Trạng thái:** người dùng đã xem kết quả M9 và chốt đóng mốc (QĐ-043): M9 **QUA — H5 không được chấp nhận**. M10 mở; phiên
+này chỉ sửa tài liệu để đóng / mở mốc, chưa viết code M10, 0 lần gọi API.
+**Việc đầu tiên phiên sau:** M10 việc 1 theo prompt P4 — `services/rca_agent/pipeline.py`, dựng trên `val`, rồi kiểm parity
+với 38 incident của `rca_final_test_v1`. Bật Docker trước (`docker compose --profile dev up -d`).
+**Còn chờ người dùng:** V45 (trình bày H5 không đạt); V35 (chấm 525 dòng context precision, hạn trước M12).
 
 ## Ghi chú bàn giao — 2026-11-17 (M9-B xong, M9 chờ người dùng xem)
 
