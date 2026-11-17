@@ -75,7 +75,7 @@ mỗi mốc con một phiên:
 | Mốc con | Nội dung | Cổng chặn | QĐ | Hạn đề xuất |
 |---|---|---|---|---|
 | - [x] M10-A | `pipeline.py` + nạp verdict CTAV `val` / `test` vào ClickHouse (5.677 / 13.699 dòng, 7.716 / 19.794 trace) + parity | **Đạt (2026-11-17):** 26 / 26 (`val`), 38 / 38 (`test`), 0 lần gọi API, `b0c54fa68ef65535` | QĐ-045 | 2026-11-24 |
-| - [ ] M10-B | API FastAPI chỉ đọc, 7 endpoint; thêm trường policy CTAV vào `types.ts` | 7 endpoint 200 trên run thật; test hợp đồng | QĐ-046 | 2026-12-01 |
+| - [x] M10-B | API FastAPI chỉ đọc, 7 endpoint; thêm trường policy CTAV vào `types.ts` | **Đạt (2026-11-17):** 7 endpoint 200 trên `pipeline_{val,test}_v1` & Docker `api` healthy; `/alerts` `test` 0,561 s; test hợp đồng `types.ts` qua | QĐ-046 | 2026-12-01 |
 | - [ ] M10-C | 4 màn hình trên API thật; `ExperimentComparison` bảng tĩnh; service `web` trong compose | loading / empty / error; `npm run check` sạch | QĐ-047 | 2026-12-12 |
 | - [ ] M10-D | Chọn ca demo bằng quy tắc; demo offline; tự kiểm trình duyệt + ảnh | Kịch bản `08` §6 chạy trọn, kể cả không mạng | QĐ-048 | 2026-12-22 |
 | - [ ] M10-E | Báo cáo `M10-platform.md`, `ch6-demo-platform.md`, tóm tắt gửi GVHD | Người dùng đã xem | QĐ-049 | 2026-12-29 |
@@ -87,7 +87,7 @@ Vấn đề M10 đã chốt đầu phiên 2026-11-17 (QĐ-045): **V47 → (a)** 
 1. - [x] `services/rca_agent/pipeline.py`: CTAV → grouping → propagation → summary, dùng `eval/configs/rca_final.yaml`, ghi
    ClickHouse / PostgreSQL. Đã chạy `val` (`pipeline_val_v1`) và `test` (`pipeline_test_v1`) với **parity 26/26 và 38/38**
    so với M9 (QĐ-042, QĐ-045); summarizer đọc 100% từ cache; `runtime.json` đã ghi E2E latency, token, cache hit (`0` gọi API)
-2. - [ ] `services/api` (FastAPI): endpoint khớp đúng `types.ts`; chỉ đọc; không authentication
+2. - [x] `services/api` (FastAPI): 7 endpoint chỉ đọc khớp `types.ts`, thêm 6 trường policy CTAV vào `types.ts`/`fixtures.ts`, `infra/Dockerfile.api`, bật `api` trong `docker-compose.yml`, test hợp đồng `tests/test_api.py` qua (QĐ-046)
 3. - [ ] Nối Timeline, AlertDetail, IncidentDetail sang API thật: hiện nguồn gốc bằng chứng, lý do policy (θ, C3), có
    loading / empty / error state. `ExperimentComparison`: bảng tĩnh sinh từ script đọc `eval/results` (cắt theo `04` §9
    ưu tiên 4, QĐ-037) — ghi QĐ
@@ -173,6 +173,17 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-B, chờ M10-C)
+
+**Trạng thái:** M10-B hoàn tất (QĐ-046, 0 lần gọi API).
+**Đã làm:**
+- Thêm 6 trường policy CTAV (`raw_verdict`, `routing_tier`, `evidence_origin`, `threshold_applied`, `downgraded_by_gating`, `downgraded_by_anchoring`) vào `services/web/src/api/types.ts` + cập nhật `services/web/src/mock/fixtures.ts`; `npm run check` sạch.
+- Viết `services/api/{main,readers,schemas}.py` phục vụ 7 endpoint chỉ đọc tại `/` và `/api`. Thời gian thực đo `GET /alerts?run_id=pipeline_test_v1` (13.699 dòng): `0,561 s` (`<= 1,0 s`) ⇒ giữ mặc định `limit = None`, vẫn có `limit`/`offset` tuỳ chọn.
+- Tạo `infra/Dockerfile.api`, bật service `api` trong `docker-compose.yml`; container `internship1-api-1` đang `healthy` ở cổng `8000` (cùng `clickhouse` và `postgres`), probe HTTP trực tiếp cả 7 endpoint đều `200 OK`.
+- Viết `tests/test_api.py`: kiểm tra ca thật (`pipeline_val_v1`, `pipeline_test_v1`), ca `404`, ca run rỗng (`200 []`) và test hợp đồng khoá JSON ⊇ interface `types.ts`.
+**Việc đầu tiên phiên sau:** làm **M10-C** theo prompt P4-C trong `docs/prompts/M10-handoff.md` §6 (`VITE_DATA_SOURCE=http` trên 4 màn hình, hiện nguồn gốc bằng chứng & lý do policy ở `AlertDetail`, loading/empty/error, bảng tĩnh `ExperimentComparison` từ `scripts/m10_experiment_table.py`, bật service `web` trong `docker-compose.yml`).
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12).
 
 ## Ghi chú bàn giao — 2026-11-17 (xong M10-A, chờ M10-B)
 

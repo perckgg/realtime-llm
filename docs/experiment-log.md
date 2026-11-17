@@ -2359,3 +2359,21 @@ docker compose --profile dev up -d
 py -m services.rca_agent.pipeline --config eval/configs/rca_final.yaml
 py -m services.rca_agent.pipeline --config eval/configs/rca_final_test.yaml
 ```
+
+---
+
+## QĐ-046 — M10-B: API FastAPI chỉ đọc (7 endpoint), hợp đồng `types.ts` và Docker `api` (2026-11-17)
+
+**Thực hiện M10-B (`services/api/{main,readers,schemas}.py`, `infra/Dockerfile.api`, `docker-compose.yml`, `tests/test_api.py`):**
+- **7 endpoint chỉ đọc, không auth** khớp `services/web/src/api/client.ts` (đăng ký ở cả `/` và `/api`):
+  - `GET /health`
+  - `GET /runs` (đọc `run_registry` PostgreSQL, sắp xếp ưu tiên `pipeline_*` lên đầu để UI mặc định chọn run có đủ ClickHouse + PostgreSQL)
+  - `GET /runs/{run_id}/metrics` (đọc `eval/results/<run_id>/{rca,ctav,metrics}.json` + `runtime.json`)
+  - `GET /alerts?run_id=&verdict=&limit=&offset=` (đọc `fact_alert_evaluation` ClickHouse; trả 404 nếu `run_id` chưa tồn tại, `200 []` nếu run rỗng)
+  - `GET /alerts/{alert_id}` (đọc `fact_alert_evaluation` + `fact_retrieval_trace` ClickHouse, `reasoning` + `evidence_event_ids` từ `judged.jsonl`, chuỗi `metric_series` từ `per_window.csv` kèm fallback `NezhaReplaySource`)
+  - `GET /incidents?run_id=` (đọc `incidents` + `diagnostic_reports` PostgreSQL; `graph_edges_used` chuẩn hoá thành số nguyên khớp `types.ts`)
+  - `GET /incidents/{incident_id}` (đọc `incidents` + `diagnostic_reports` + `diagnostic_rejected` PostgreSQL, alerts từ ClickHouse, dựng `nodes` + `edges` từ `data/graph/service_graph.json`, `error_rate = 0.0`)
+- **Cập nhật hợp đồng (`services/web/src/api/types.ts`, `services/web/src/mock/fixtures.ts`):** chỉ thêm 6 trường policy CTAV vào `Alert`: `raw_verdict`, `routing_tier`, `evidence_origin`, `threshold_applied`, `downgraded_by_gating`, `downgraded_by_anchoring`.
+- **Đo thời gian thực tế `GET /alerts?run_id=pipeline_test_v1` (13.699 dòng):** `0,561 s` (`<= 1,0 s`) ⇒ giữ mặc định `limit = None` (trả toàn bộ 13.699 dòng), vẫn hỗ trợ `limit` / `offset` tuỳ chọn.
+- **Docker:** `infra/Dockerfile.api` (`python:3.12-slim`), bật service `api` trong `docker-compose.yml` profile `dev` / `full`, `docker compose --profile dev up -d --build api` dựng thành công container `internship1-api-1` ở trạng thái `healthy`; kiểm tra cả 7 endpoint qua HTTP `http://127.0.0.1:8000` trả `200 OK` trên dữ liệu thật.
+- **Kiểm thử hợp đồng (`tests/test_api.py`):** đọc trực tiếp `services/web/src/api/types.ts` và xác nhận mọi khoá JSON trả về của API thực tế trên `pipeline_val_v1` và `pipeline_test_v1` phủ đủ tập khoá của từng interface TypeScript (`Run`, `RunMetrics`, `MetricWithCI`, `Alert`, `WindowLabel`, `AlertDetail`, `ContextEvent`, `Incident`, `IncidentDetail`, `GraphNode`, `GraphEdge`, `DiagnosticReport`, `EvidenceItem`, `SuggestedAction`), cùng các ca `404` và ca run rỗng (`200 []`).

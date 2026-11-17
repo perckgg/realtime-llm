@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Trạng thái | Đang làm (xong **M10-A**; còn M10-B..E) |
+| Trạng thái | Đang làm (xong **M10-A**, **M10-B**; còn M10-C..E) |
 | Ngày mở mốc | 2026-11-17 (QĐ-043) |
 | Hạn mục tiêu | 2027-01-10 |
-| Commit | *(cập nhật qua từng mốc con)* |
-| Quyết định liên quan | QĐ-043, QĐ-045 |
+| Commit | `45c75c6` (M10-A); *(cập nhật tiếp qua M10-B..E)* |
+| Quyết định liên quan | QĐ-043, QĐ-045, QĐ-046 |
 
 ---
 
@@ -17,7 +17,7 @@ Theo dõi DoD theo 5 mốc con (`docs/prompts/M10-handoff.md` §2):
 | Mốc con / DoD | Đạt? | Bằng chứng (số liệu / lệnh tái lập / file) |
 |---|---|---|
 | **M10-A:** `pipeline.py` + nạp verdict CTAV vào ClickHouse + grouping/propagation/summary (chỉ đọc cache) + PostgreSQL + parity 26/26 (`val`) & 38/38 (`test`) + `runtime.json` | **Đạt** (2026-11-17) | `services/rca_agent/pipeline.py`, `tests/test_pipeline.py`, `eval/results/pipeline_val_v1/runtime.json`, `eval/results/pipeline_test_v1/runtime.json`; 0 lần gọi API, `method fingerprint b0c54fa68ef65535`; QĐ-045 |
-| **M10-B:** `services/api` (FastAPI chỉ đọc, 7 endpoint) + `types.ts` trường policy CTAV + `infra/Dockerfile.api` + `tests/test_api.py` | Chưa làm | — |
+| **M10-B:** `services/api` (FastAPI chỉ đọc, 7 endpoint) + `types.ts` trường policy CTAV + `infra/Dockerfile.api` + `tests/test_api.py` | **Đạt** (2026-11-17) | `services/api/{main,readers,schemas}.py`, `services/web/src/api/types.ts`, `infra/Dockerfile.api`, `docker-compose.yml`, `tests/test_api.py`; 7 endpoint `200 OK` trên `pipeline_{val,test}_v1` (cả qua `TestClient` và container `internship1-api-1`); `/alerts?run_id=pipeline_test_v1` (13.699 dòng) đo thực tế `0,561 s`; QĐ-046 |
 | **M10-C:** Nối 4 màn hình sang `VITE_DATA_SOURCE=http` + `ExperimentComparison` bảng tĩnh + service `web` trong compose + `npm run check` sạch | Chưa làm | — |
 | **M10-D:** `m10_pick_demo_cases.py` + `DEMO_OFFLINE` + tự kiểm trình duyệt thật + ảnh `docs/drafts/figures/m10-*.png` | Chưa làm | — |
 | **M10-E:** Hoàn tất `M10-platform.md`, `ch6-demo-platform.md`, bản tóm tắt GVHD, đóng M10 | Chưa làm | — |
@@ -86,5 +86,5 @@ py -m services.rca_agent.pipeline --config eval/configs/rca_final_test.yaml
 
 ## 4. Plan cho mốc tiếp theo
 
-- **Tiếp theo trong M10:** làm tuần tự **M10-B** (`services/api` FastAPI chỉ đọc 7 endpoint + `types.ts`/`fixtures.ts` + `infra/Dockerfile.api` + `tests/test_api.py`) → **M10-C** (nối 4 màn hình `VITE_DATA_SOURCE=http` + `ExperimentComparison` bảng tĩnh + `web` trong `docker-compose.yml`) → **M10-D** (chọn ca demo bằng quy tắc, `DEMO_OFFLINE`, tự kiểm trình duyệt thật + chụp ảnh) → **M10-E** (hoàn tất báo cáo này, `ch6-demo-platform.md`, mail GVHD, đóng M10).
-- **Rủi ro cho M10-B:** endpoint `GET /alerts` có thể trả tới 13.699 dòng trên `pipeline_test_v1`; cần đo độ trễ thực tế và đặt `limit` mặc định 2.000 nếu > 1 s (`M10-handoff.md` §2 M10-B).
+- **Tiếp theo trong M10:** **M10-C** (nối 4 màn hình `VITE_DATA_SOURCE=http` + hiện nguồn gốc bằng chứng & lý do policy ở `AlertDetail` + loading/empty/error state + `ExperimentComparison` bảng tĩnh từ `scripts/m10_experiment_table.py` + service `web` trong `docker-compose.yml`) → **M10-D** (chọn ca demo bằng quy tắc, `DEMO_OFFLINE`, tự kiểm trình duyệt thật + chụp ảnh) → **M10-E** (hoàn tất báo cáo này, `ch6-demo-platform.md`, mail GVHD, đóng M10).
+- **Ghi chú M10-B (đã đo):** `GET /alerts?run_id=pipeline_test_v1` (13.699 dòng) mất `0,561 s` (`<= 1,0 s`), nên mặc định trả toàn bộ và vẫn giữ `limit` / `offset` tuỳ chọn. Container `internship1-api-1` đang chạy `healthy` ở cổng `8000`.

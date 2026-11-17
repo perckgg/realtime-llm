@@ -378,6 +378,12 @@ function buildAlerts(strategy: RetrievalStrategy): AlertSeed[] {
         llm_latency_ms: round(spec.llat * (0.5 + r()), 1),
         cache_hit: r() < 0.38,
         downgraded_by_evidence_rule: verdict === "UNCERTAIN" && r() < 0.3,
+        raw_verdict: verdict,
+        routing_tier: strategy === "bm25_hybrid" ? 1 : 2,
+        evidence_origin: strategy === "bm25_hybrid" ? "local" : "graph",
+        threshold_applied: 0.8,
+        downgraded_by_gating: false,
+        downgraded_by_anchoring: verdict === "UNCERTAIN" && !isFault,
         label: {
           is_fault: isFault,
           fault_type: isFault ? faultType : null,

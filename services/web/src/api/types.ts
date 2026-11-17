@@ -92,6 +92,12 @@ export interface Alert {
   llm_latency_ms: number;
   cache_hit: boolean;
   downgraded_by_evidence_rule: boolean;
+  raw_verdict: Verdict;
+  routing_tier: number;
+  evidence_origin: "local" | "graph" | "mixed" | "none";
+  threshold_applied: number | null;
+  downgraded_by_gating: boolean;
+  downgraded_by_anchoring: boolean;
 
   label: WindowLabel;
 }
