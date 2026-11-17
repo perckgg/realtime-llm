@@ -2434,3 +2434,18 @@ Nội dung QĐ-047 gốc không sửa. Sau review M10-C (`55228a7`), thực hi�
 - **Soạn nháp Chương 6 (`docs/drafts/ch6-demo-platform.md`):** đủ §6.1–6.5 theo `suon-bao-cao-gd2.md` và `style-guide-luan-van.md`, Bảng 6.1 số đo từ `runtime.json` (`pipeline_val_v2`, `pipeline_test_v2`, `pipeline_sens_test_v1`), 5 hình chụp, Bảng 6.2 kịch bản 5 phút và 3 khiếm khuyết demo mức thấp/thẩm mỹ còn lại.
 
 **Kiểm tra sau sửa cuối:** `npm.cmd --prefix services/web run check` (exit `0`, `26/26` `ok`), `py -m mypy packages services` (`Success: no issues found in 43 source files`), `py -m ruff check services scripts/m10_experiment_table.py scripts/m10_pick_demo_cases.py tests` (`All checks passed!`), `py -m pytest tests/ -q` (**`253 passed in 30.37s`**, `0` skipped, đã gồm `tests/test_demo_cases.py` kiểm `DEMO_OFFLINE=1` và DB thật `pipeline_sens_test_v1`).
+
+
+---
+
+## QĐ-049 — Đóng M10 (M10-E: Hoàn tất báo cáo M10, nháp Chương 6, bản tóm tắt gửi GVHD) và mở M11 (2026-11-17)
+
+**Hoàn tất M10-E:**
+- Hoàn thiện 4 phần + Phụ lục trong `docs/milestones/M10-platform.md` (kết luận **QUA**, đóng sớm 54 ngày so với hạn `2027-01-10`; ghi nhận đủ DoD M10-A..E, bảng parity & E2E/token của `_v1`/`_v2`/`pipeline_sens_test_v1`, 3 khiếm khuyết UX/build mức thấp và nguyên liệu Chương 6).
+- Kiểm hoàn chỉnh bản nháp `docs/drafts/ch6-demo-platform.md` (§6.1–6.5 theo `suon-bao-cao-gd2.md` và `style-guide-luan-van.md`, kèm 5 ảnh chụp màn hình tiếng Anh `docs/drafts/figures/m10-*.png`).
+- Soạn bản tóm tắt gửi GVHD (`docs/drafts/2026-11-17-mail-gvhd-platform.md`, tác giả Nguyễn Văn Hoàng Khang, quy tắc `04` §10 sau M10; chờ người dùng gửi).
+- Cập nhật `docs/milestones/README.md`, bảng `docs/Final_Thesis_Phase2/04-implementation-roadmap.md` §1 và chuyển `docs/CURRENT-MILESTONE.md` sang **M11**.
+
+**Đóng M10:** Ba điều kiện của `04` §2 đều đạt (toàn bộ DoD M10 qua và người dùng đã duyệt chốt trong phiên `2026-11-17`, báo cáo `docs/milestones/M10-platform.md` đủ 4 phần + Phụ lục). Commit M10: `45c75c6` (M10-A), `8f2ba70` (M10-B), `55228a7` (M10-C), `2d933b1` (M10-C.1), `fa80590` (M10-D), cùng commit đóng M10-E và push lên `origin/master`. Chi phí API mới cả mốc M10: **0 lần gọi, 0,0000 USD**.
+
+**Mở M11 (Đánh giá bằng người + phân tích ca sai)** theo prompt `P5` (`docs/prompts/M8-M12-prompts.md`): lấy mẫu 30 incident tập `test` (`seed = 42`, `eval/manual/diagnostic_quality.csv`) cho người dùng chấm mù tối thiểu 15 incident đầu, phân loại lỗi FP/FN của CTAV & ca RCA sai cho Chương 7, và tổng duyệt demo lần 1 theo `08` §6. Dải số dành riêng cho M11: **QĐ-050..052**, **V50..V52**.

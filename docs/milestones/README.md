@@ -18,6 +18,7 @@ nằm ở `docs/experiment-log.md`; báo cáo mốc tổng hợp lại và dẫn
 | M7 | [M7-rescue-dang-ky.md](M7-rescue-dang-ky.md) | 2026-11-14 | QUA — Rescue (QĐ-033): 2 thành phần, +2 TP / +16 FP, không có ý nghĩa; H0–H5 đã đăng ký trước G-test, δ = 0,05, C5 chỉ là ablation (QĐ-034) |
 | M8 | [M8-g-test.md](M8-g-test.md) | 2026-11-16 | QUA (đóng 2026-11-16, V36 (a) — QĐ-039) — G-test hoàn tất (0 lỗi judge, 15,85 USD theo token): H0 chấp nhận, H2 không đạt trên cấu hình tĩnh `dev` (giải thích trọn vẹn bởi Phát hiện 11 & đối chứng `C3-trượt` F1 0,120), H3 & H4 đạt (QĐ-035..038) |
 | M9 | [M9-rca.md](M9-rca.md) | 2026-11-17 | QUA (đóng 2026-11-17 — QĐ-043) — **H5 không được chấp nhận trên `test`**: Hit@1 = Hit@3 = 0,471 [0,235; 0,706] = baseline, ΔHit@1 = 0, không có lỗi cascade để đo ARR (QĐ-042); `val`: Hit@1 0,636, ARR `network_delay` 0,25 < 0,30, JSON valid rate 1,000 (QĐ-040, QĐ-041); 0,2772 USD theo token |
+| M10 | [M10-platform.md](M10-platform.md) | 2026-11-17 | QUA (đóng 2026-11-17 — QĐ-049) — Platform end-to-end & dashboard 4 màn hình tiếng Anh + `DEMO_OFFLINE=1` (`0` USD API mới): `pipeline_test_v2` parity 38/38 (`4.242,424 ms`), `pipeline_val_v2` 26/26, `pipeline_sens_test_v1` 114/114 (V48 b'+a'); `demo_cases.json` (`seed=42`), 5 ảnh chụp verified, nháp `ch6-demo-platform.md`, `253/253` pytest qua (QĐ-045..049) |
 
 ## Mẫu
 
