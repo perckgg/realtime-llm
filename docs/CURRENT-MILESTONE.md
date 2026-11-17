@@ -76,7 +76,7 @@ mỗi mốc con một phiên:
 |---|---|---|---|---|
 | - [x] M10-A | `pipeline.py` + nạp verdict CTAV `val` / `test` vào ClickHouse (5.677 / 13.699 dòng, 7.716 / 19.794 trace) + parity | **Đạt (2026-11-17):** 26 / 26 (`val`), 38 / 38 (`test`), 0 lần gọi API, `b0c54fa68ef65535` | QĐ-045 | 2026-11-24 |
 | - [x] M10-B | API FastAPI chỉ đọc, 7 endpoint; thêm trường policy CTAV vào `types.ts` | **Đạt (2026-11-17):** 7 endpoint 200 trên `pipeline_{val,test}_v1` & Docker `api` healthy; `/alerts` `test` 0,561 s; test hợp đồng `types.ts` qua | QĐ-046 | 2026-12-01 |
-| - [ ] M10-C | 4 màn hình trên API thật; `ExperimentComparison` bảng tĩnh; service `web` trong compose | loading / empty / error; `npm run check` sạch | QĐ-047 | 2026-12-12 |
+| - [x] M10-C | 4 màn hình trên API thật; `ExperimentComparison` bảng tĩnh; service `web` trong compose | **Đạt (2026-11-17):** `experiment_table.json` parity; 4 container `healthy` (cổng `5173` proxy `/api`); `npm.cmd run check` sạch; `248` pytest qua | QĐ-047 | 2026-12-12 |
 | - [ ] M10-D | Chọn ca demo bằng quy tắc; demo offline; tự kiểm trình duyệt + ảnh | Kịch bản `08` §6 chạy trọn, kể cả không mạng | QĐ-048 | 2026-12-22 |
 | - [ ] M10-E | Báo cáo `M10-platform.md`, `ch6-demo-platform.md`, tóm tắt gửi GVHD | Người dùng đã xem | QĐ-049 | 2026-12-29 |
 
@@ -88,9 +88,7 @@ Vấn đề M10 đã chốt đầu phiên 2026-11-17 (QĐ-045): **V47 → (a)** 
    ClickHouse / PostgreSQL. Đã chạy `val` (`pipeline_val_v1`) và `test` (`pipeline_test_v1`) với **parity 26/26 và 38/38**
    so với M9 (QĐ-042, QĐ-045); summarizer đọc 100% từ cache; `runtime.json` đã ghi E2E latency, token, cache hit (`0` gọi API)
 2. - [x] `services/api` (FastAPI): 7 endpoint chỉ đọc khớp `types.ts`, thêm 6 trường policy CTAV vào `types.ts`/`fixtures.ts`, `infra/Dockerfile.api`, bật `api` trong `docker-compose.yml`, test hợp đồng `tests/test_api.py` qua (QĐ-046)
-3. - [ ] Nối Timeline, AlertDetail, IncidentDetail sang API thật: hiện nguồn gốc bằng chứng, lý do policy (θ, C3), có
-   loading / empty / error state. `ExperimentComparison`: bảng tĩnh sinh từ script đọc `eval/results` (cắt theo `04` §9
-   ưu tiên 4, QĐ-037) — ghi QĐ
+3. - [x] Nối Timeline, AlertDetail, IncidentDetail sang API thật (`VITE_DATA_SOURCE=http`): hiện tầng/nguồn gốc bằng chứng, lý do policy (θ, C3, C2), phân trang 200 dòng/trang, xử lý `ground_truth_service === null` và loading/empty/error state. `ExperimentComparison`: bảng tĩnh sinh từ `scripts/m10_experiment_table.py` đọc `eval/results/` (cắt theo `04` §9 ưu tiên 4, QĐ-037); bật service `web` trong `docker-compose.yml` (QĐ-047)
 4. - [ ] Chế độ demo offline: toàn bộ kịch bản chạy từ cache, không cần mạng, không cần `GEMINI_API_KEY`
 5. - [ ] Tự kiểm bằng trình duyệt thật: `docker compose --profile dev up -d`, replay, mở đủ 4 màn hình, đi hết kịch bản
    `08` §6, lặp lại khi đã tắt mạng; chụp ảnh từng màn hình vào `docs/drafts/figures/`. Cái gì chưa mở lên xem được thì
@@ -173,6 +171,17 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-C, chờ M10-D)
+
+**Trạng thái:** M10-C hoàn tất (QĐ-047, 0 lần gọi API).
+**Đã làm:**
+- Viết `scripts/m10_experiment_table.py` sinh bảng thực nghiệm tĩnh `eval/results/m10_experiment_table_v1/experiment_table.json` và `services/web/src/data/experiment_table.json` (`52.004` B) từ 13 file JSON kết quả thật trong `eval/results/`, kiểm parity tự động với `tables.md` và `ch5-ket-qua-test.md`; thêm `tests/test_experiment_table.py`.
+- Cập nhật frontend `services/web/`: `client.ts` mặc định dùng `httpSource` (`globalThis.__USE_MOCK__ = true` cho SSR smoke), `vite.config.ts` cấu hình proxy `/api` cho cả `server` và `preview`, `App.tsx`/`runContext.ts` giữ shell & hiện đúng `split`/`seed`, `Timeline.tsx` thêm tier/nguồn gốc/lý do policy C3 + phân trang 200/trang, `AlertDetail.tsx` thêm thẻ chính sách CTAV & badge `origin`/`d_G`/`Δt`/`duration_ms`, `IncidentDetail.tsx` xử lý `ground_truth_service === null` và `<Empty>`, `ExperimentComparison.tsx` hiển thị bảng tĩnh H0–H5, 5 phương pháp, H3+C5, đường cong ngân sách H4 và H5 RCA (`val`/`test`/`C3-trượt`).
+- Tạo `infra/Dockerfile.web` và bật service `web` trong `docker-compose.yml` profile `dev`/`full` (cổng `5173`); cả 4 container (`web`, `api`, `clickhouse`, `postgres`) chạy `healthy`; probe `http://127.0.0.1:5173/`, `/api/health`, `/api/runs`, `/api/alerts/{id}`, `/api/incidents/{id}` đều `200 OK`.
+- Kiểm chứng sau sửa code: `npm.cmd --prefix services/web run check` (exit 0), `npm.cmd --prefix services/web run build` (exit 0), `py -m mypy packages services` (43 file sạch), `py -m ruff check services scripts/m10_experiment_table.py tests` (sạch), `py -m pytest tests/ -q` (`248 passed in 22.92s`, `0` skipped).
+**Việc đầu tiên phiên sau:** làm **M10-D** theo prompt P4-D trong `docs/prompts/M10-handoff.md` §6 (`scripts/m10_pick_demo_cases.py`, kiểm chứng chế độ offline `DEMO_OFFLINE` khi rút mạng, mở trình duyệt thật kiểm tra 4 màn hình & kịch bản `08` §6, chụp ảnh vào `docs/drafts/figures/`).
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12).
 
 ## Ghi chú bàn giao — 2026-11-17 (xong M10-B, chờ M10-C)
 

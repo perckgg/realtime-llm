@@ -23,13 +23,19 @@ const BUCKET_MINUTES = 10;
 type VerdictFilter = Verdict | "ALL";
 
 export default function Timeline() {
-  const { runId } = useRuns();
+  const { runId, runsLoading, runsError } = useRuns();
   const [verdict, setVerdict] = useState<VerdictFilter>("ALL");
   const [service, setService] = useState("ALL");
   const [tab, setTab] = useState<"alerts" | "incidents">("alerts");
 
-  const alertsQ = useAsync(() => api.listAlerts({ runId }), [runId]);
-  const incidentsQ = useAsync(() => api.listIncidents(runId), [runId]);
+  const alertsQ = useAsync(
+    () => (runId ? api.listAlerts({ runId }) : Promise.resolve<Alert[]>([])),
+    [runId],
+  );
+  const incidentsQ = useAsync(
+    () => (runId ? api.listIncidents(runId) : Promise.resolve<Incident[]>([])),
+    [runId],
+  );
 
   const alerts = alertsQ.data ?? [];
 
@@ -51,7 +57,10 @@ export default function Timeline() {
   const buckets = useMemo(() => bucketise(filtered), [filtered]);
   const stats = useMemo(() => summarise(filtered), [filtered]);
 
-  if (alertsQ.loading) return <Loading />;
+  if (runsLoading) return <Loading label="Đang tải danh sách run…" />;
+  if (runsError) return <ErrorBox message={runsError} />;
+  if (!runId) return <Empty>Chưa có run nào được nạp trong cơ sở dữ liệu.</Empty>;
+  if (alertsQ.loading) return <Loading label={`Đang tải cảnh báo của ${runId}…`} />;
   if (alertsQ.error) return <ErrorBox message={alertsQ.error} />;
 
   return (
@@ -105,9 +114,9 @@ export default function Timeline() {
           hint="TRUE_ALERT khớp nhãn Nezha"
         />
         <StatTile
-          label="Từ Rescue Score"
-          value={String(stats.rescue)}
-          hint="cảnh báo được promote dù dưới ngưỡng"
+          label="Hạ bởi CTAV (C3)"
+          value={String(stats.anchored)}
+          hint={`chính sách hạ tổng ${stats.policyDowngraded} · Rescue ${stats.rescue}`}
           accent={status.warning}
         />
       </div>
@@ -212,9 +221,11 @@ export default function Timeline() {
         className="overflow-hidden"
       >
         {tab === "alerts" ? (
-          <AlertTable alerts={filtered} />
+          <AlertTable key={`${verdict}-${service}-${filtered.length}`} alerts={filtered} />
         ) : incidentsQ.loading ? (
           <Loading />
+        ) : incidentsQ.error ? (
+          <ErrorBox message={incidentsQ.error} />
         ) : (
           <IncidentTable incidents={incidentsQ.data ?? []} />
         )}
@@ -223,66 +234,129 @@ export default function Timeline() {
   );
 }
 
+const ALERT_PAGE_SIZE = 200;
+
 function AlertTable({ alerts }: { alerts: Alert[] }) {
+  const [page, setPage] = useState(0);
   if (!alerts.length) return <Empty>Không có cảnh báo nào khớp bộ lọc.</Empty>;
+  const totalPages = Math.max(1, Math.ceil(alerts.length / ALERT_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const start = safePage * ALERT_PAGE_SIZE;
+  const visible = alerts.slice(start, start + ALERT_PAGE_SIZE);
+
   return (
-    <div className="max-h-[460px] overflow-auto">
-      <table className="w-full border-collapse text-[12px]">
-        <thead className="sticky top-0 bg-surface">
-          <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
-            <th className="py-2 pr-3 font-medium">Thời điểm (UTC)</th>
-            <th className="py-2 pr-3 font-medium">Service</th>
-            <th className="py-2 pr-3 font-medium">Verdict</th>
-            <th className="py-2 pr-3 text-right font-medium">Anomaly</th>
-            <th className="py-2 pr-3 text-right font-medium">Confidence</th>
-            <th className="py-2 pr-3 font-medium">Nhãn</th>
-            <th className="py-2 pr-3 text-right font-medium">Retrieval</th>
-            <th className="py-2 pr-3 text-right font-medium">LLM</th>
-            <th className="py-2 font-medium">Nguồn</th>
-          </tr>
-        </thead>
-        <tbody>
-          {alerts.map((a) => (
-            <tr
-              key={a.alert_id}
-              className="border-b border-[color:var(--color-hairline)] last:border-0 hover:bg-[color:var(--color-plane)]"
+    <div>
+      {totalPages > 1 && (
+        <div className="mb-2 flex items-center justify-between text-[11px] text-ink-muted">
+          <span>
+            Đang hiển thị {start + 1}–{Math.min(start + ALERT_PAGE_SIZE, alerts.length)} /{" "}
+            {alerts.length} cảnh báo
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              disabled={safePage === 0}
+              onClick={() => setPage(Math.max(0, safePage - 1))}
+              className="rounded border border-[color:var(--color-hairline)] px-2 py-0.5 text-ink disabled:opacity-40"
             >
-              <td className="py-1.5 pr-3 tabular-nums whitespace-nowrap">
-                <Link to={`/alerts/${a.alert_id}`} className="hover:underline">
-                  {stampUTC(a.ts)}
-                </Link>
-              </td>
-              <td className="py-1.5 pr-3 font-mono text-[11px]">{a.service}</td>
-              <td className="py-1.5 pr-3">
-                <VerdictBadge verdict={a.verdict} />
-              </td>
-              <td className="py-1.5 pr-3 text-right tabular-nums">{num(a.anomaly_score, 2)}</td>
-              <td className="py-1.5 pr-3 text-right tabular-nums">{num(a.confidence, 2)}</td>
-              <td className="py-1.5 pr-3">
-                {a.label.is_fault ? (
-                  <span className="text-[11px]" style={{ color: status.critical }}>
-                    ✱ {a.label.fault_type}
-                  </span>
-                ) : (
-                  <span className="text-[11px] text-ink-muted">bình thường</span>
-                )}
-              </td>
-              <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
-                {ms(a.retrieval_latency_ms)}
-              </td>
-              <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
-                {ms(a.llm_latency_ms)}
-                {a.cache_hit && <span className="ml-1 text-ink-muted">·cache</span>}
-              </td>
-              <td className="py-1.5">
-                <Pill tone={a.candidate_source === "rescue" ? "warn" : "neutral"}>
-                  {a.candidate_source}
-                </Pill>
-              </td>
+              Trước
+            </button>
+            <span className="tabular-nums">
+              Trang {safePage + 1}/{totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={safePage >= totalPages - 1}
+              onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
+              className="rounded border border-[color:var(--color-hairline)] px-2 py-0.5 text-ink disabled:opacity-40"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="max-h-[460px] overflow-auto">
+        <table className="w-full border-collapse text-[12px]">
+          <thead className="sticky top-0 bg-surface">
+            <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
+              <th className="py-2 pr-3 font-medium">Thời điểm (UTC)</th>
+              <th className="py-2 pr-3 font-medium">Service</th>
+              <th className="py-2 pr-3 font-medium">Verdict</th>
+              <th className="py-2 pr-3 font-medium">CTAV (tầng · nguồn)</th>
+              <th className="py-2 pr-3 text-right font-medium">Anomaly</th>
+              <th className="py-2 pr-3 text-right font-medium">Confidence</th>
+              <th className="py-2 pr-3 font-medium">Nhãn</th>
+              <th className="py-2 pr-3 text-right font-medium">Retrieval</th>
+              <th className="py-2 pr-3 text-right font-medium">LLM</th>
+              <th className="py-2 font-medium">Ứng viên</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {visible.map((a) => {
+              const policyReasons: string[] = [];
+              if (a.downgraded_by_anchoring) policyReasons.push("C3 neo");
+              if (a.downgraded_by_gating) policyReasons.push("C2 gate");
+              if (a.downgraded_by_evidence_rule) policyReasons.push("thiếu chứng cứ");
+              return (
+                <tr
+                  key={a.alert_id}
+                  className="border-b border-[color:var(--color-hairline)] last:border-0 hover:bg-[color:var(--color-plane)]"
+                >
+                  <td className="py-1.5 pr-3 tabular-nums whitespace-nowrap">
+                    <Link to={`/alerts/${a.alert_id}`} className="hover:underline">
+                      {stampUTC(a.ts)}
+                    </Link>
+                  </td>
+                  <td className="py-1.5 pr-3 font-mono text-[11px]">{a.service}</td>
+                  <td className="py-1.5 pr-3">
+                    <VerdictBadge verdict={a.verdict} />
+                    {a.raw_verdict && a.raw_verdict !== a.verdict && (
+                      <div className="mt-0.5 text-[10px] text-ink-muted">
+                        thô: {verdictLabel[a.raw_verdict] ?? a.raw_verdict}
+                      </div>
+                    )}
+                  </td>
+                  <td className="py-1.5 pr-3 text-[11px] text-ink-2">
+                    <div>
+                      T{a.routing_tier ?? "—"} · {a.evidence_origin ?? "—"}
+                    </div>
+                    {policyReasons.length > 0 && (
+                      <Pill tone="warn">{policyReasons.join(" + ")}</Pill>
+                    )}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                    {num(a.anomaly_score, 2)}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                    {num(a.confidence, 2)}
+                  </td>
+                  <td className="py-1.5 pr-3">
+                    {a.label.is_fault ? (
+                      <span className="text-[11px]" style={{ color: status.critical }}>
+                        ✱ {a.label.fault_type}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-ink-muted">bình thường</span>
+                    )}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
+                    {ms(a.retrieval_latency_ms)}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
+                    {ms(a.llm_latency_ms)}
+                    {a.cache_hit && <span className="ml-1 text-ink-muted">·cache</span>}
+                  </td>
+                  <td className="py-1.5">
+                    <Pill tone={a.candidate_source === "rescue" ? "warn" : "neutral"}>
+                      {a.candidate_source}
+                    </Pill>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -292,7 +366,23 @@ function IncidentTable({ incidents }: { incidents: Incident[] }) {
   return (
     <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       {incidents.map((i) => {
-        const correct = i.root_cause_service === i.ground_truth_service;
+        const hasGt =
+          i.ground_truth_service !== null && i.ground_truth_service !== undefined;
+        const correct = hasGt && i.root_cause_service === i.ground_truth_service;
+        const badgeColor = !hasGt
+          ? ink.muted
+          : i.root_cause_service
+            ? correct
+              ? status.good
+              : status.critical
+            : status.warning;
+        const badgeLabel = !hasGt
+          ? "— không nhãn"
+          : i.root_cause_service
+            ? correct
+              ? "✓ đúng gốc"
+              : "✗ sai gốc"
+            : "⚠ bị từ chối";
         return (
           <li key={i.incident_id}>
             <Link
@@ -301,17 +391,14 @@ function IncidentTable({ incidents }: { incidents: Incident[] }) {
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="font-mono text-[11px] text-ink-muted">{i.incident_id}</span>
-                <span
-                  className="text-[11px] font-medium"
-                  style={{ color: i.root_cause_service ? (correct ? status.good : status.critical) : status.warning }}
-                >
-                  {i.root_cause_service ? (correct ? "✓ đúng gốc" : "✗ sai gốc") : "⚠ bị từ chối"}
+                <span className="text-[11px] font-medium" style={{ color: badgeColor }}>
+                  {badgeLabel}
                 </span>
               </div>
               <div className="mt-2 text-[13px] font-semibold text-ink">
                 {i.root_cause_service ?? "—"}
                 <span className="ml-2 text-[11px] font-normal text-ink-muted">
-                  nhãn: {i.ground_truth_service}
+                  nhãn: {i.ground_truth_service ?? "không có (no_fault / mơ hồ)"}
                 </span>
               </div>
               <div className="mt-1.5 text-[11px] text-ink-2">
@@ -394,9 +481,22 @@ function summarise(alerts: Alert[]) {
   let tp = 0;
   let fp = 0;
   let rescue = 0;
+  let anchored = 0;
+  let policyDowngraded = 0;
   for (const a of alerts) {
     if (a.verdict === "TRUE_ALERT") (a.label.is_fault ? tp++ : fp++);
     if (a.candidate_source === "rescue") rescue++;
+    if (a.downgraded_by_anchoring) anchored++;
+    if (a.downgraded_by_anchoring || a.downgraded_by_gating || a.downgraded_by_evidence_rule) {
+      policyDowngraded++;
+    }
   }
-  return { tp, fp, rescue, coverage: alerts.length ? pct(tp / alerts.length) : "—" };
+  return {
+    tp,
+    fp,
+    rescue,
+    anchored,
+    policyDowngraded,
+    coverage: alerts.length ? pct(tp / alerts.length) : "—",
+  };
 }

@@ -14,9 +14,9 @@ import {
 import { api } from "@/api/client";
 import type { ContextEvent } from "@/api/types";
 import { TooltipRow, TooltipShell, axisProps } from "@/components/charts";
-import { Card, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
+import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, ms, num, stampUTC, useAsync } from "@/lib/util";
-import { ink, sequential, series, status, strategyLabel } from "@/theme/tokens";
+import { ink, sequential, series, status, strategyLabel, verdictLabel } from "@/theme/tokens";
 
 const MODALITY_GLYPH: Record<ContextEvent["modality"], string> = {
   log: "▤",
@@ -42,9 +42,15 @@ export default function AlertDetail() {
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-[19px] font-semibold tracking-tight text-ink">{a.service}</h1>
             <VerdictBadge verdict={a.verdict} />
+            {a.downgraded_by_anchoring && (
+              <Pill tone="warn">⚠ hạ bởi neo C3</Pill>
+            )}
+            {a.downgraded_by_gating && (
+              <Pill tone="warn">⚠ hạ bởi gate C2</Pill>
+            )}
             {a.downgraded_by_evidence_rule && (
               <span className="text-[11px]" style={{ color: status.serious }}>
                 ⚠ bị hạ cấp vì thiếu bằng chứng
@@ -172,6 +178,58 @@ export default function AlertDetail() {
             </Card>
           )}
 
+          <Card title="Chính sách quyết định CTAV & Nguồn gốc bằng chứng">
+            <dl className="divide-y divide-[color:var(--color-hairline)]">
+              <KV
+                k="Verdict gốc → cuối"
+                v={
+                  <span className="font-mono">
+                    {a.raw_verdict ? (verdictLabel[a.raw_verdict] ?? a.raw_verdict) : "—"} →{" "}
+                    {verdictLabel[a.verdict] ?? a.verdict}
+                  </span>
+                }
+              />
+              <KV
+                k="Tầng định tuyến"
+                v={
+                  a.routing_tier === 1
+                    ? "Tầng 1 (BM25 cục bộ)"
+                    : a.routing_tier === 2
+                      ? "Tầng 2 (C1 đồ thị topology)"
+                      : "—"
+                }
+              />
+              <KV
+                k="Nguồn gốc bằng chứng"
+                v={<Pill>{a.evidence_origin ?? "—"}</Pill>}
+              />
+              <KV
+                k="Ngưỡng áp dụng"
+                v={
+                  a.threshold_applied !== null && a.threshold_applied !== undefined
+                    ? num(a.threshold_applied, 2)
+                    : "—"
+                }
+              />
+              <KV
+                k="C3 neo bằng chứng"
+                v={
+                  <Pill tone={a.downgraded_by_anchoring ? "warn" : "neutral"}>
+                    {a.downgraded_by_anchoring ? "đã hạ verdict" : "đạt ngưỡng neo"}
+                  </Pill>
+                }
+              />
+              <KV
+                k="C2 gating"
+                v={a.downgraded_by_gating ? "đã hạ verdict" : "không kích hoạt"}
+              />
+              <KV
+                k="Luật thiếu bằng chứng"
+                v={a.downgraded_by_evidence_rule ? "đã hạ verdict" : "không kích hoạt"}
+              />
+            </dl>
+          </Card>
+
           <Card title="Siêu dữ liệu">
             <dl className="divide-y divide-[color:var(--color-hairline)]">
               <KV k="candidate_id" v={<span className="font-mono">{a.candidate_id}</span>} />
@@ -189,11 +247,15 @@ export default function AlertDetail() {
         title={`Bằng chứng RAG đã truy xuất (${a.context_events.length})`}
         subtitle="Sắp theo điểm retrieval giảm dần. Ô debug là dữ liệu để chấm context precision — mỗi strategy ghi những trường đặc thù của nó (03 §1.3)."
       >
-        <ol className="space-y-2">
-          {a.context_events.map((e, i) => (
-            <EventRow key={e.event_id} e={e} rank={i + 1} cited={evidence.has(e.event_id)} />
-          ))}
-        </ol>
+        {a.context_events.length === 0 ? (
+          <Empty>Không có sự kiện ngữ cảnh nào trong cửa sổ truy xuất.</Empty>
+        ) : (
+          <ol className="space-y-2">
+            {a.context_events.map((e, i) => (
+              <EventRow key={e.event_id} e={e} rank={i + 1} cited={evidence.has(e.event_id)} />
+            ))}
+          </ol>
+        )}
       </Card>
     </div>
   );
@@ -201,6 +263,20 @@ export default function AlertDetail() {
 
 function EventRow({ e, rank, cited }: { e: ContextEvent; rank: number; cited: boolean }) {
   const [open, setOpen] = useState(false);
+  const origin = e.debug.origin ? String(e.debug.origin) : null;
+  const graphDist =
+    e.debug.graph_distance !== undefined && e.debug.graph_distance !== null
+      ? Number(e.debug.graph_distance)
+      : null;
+  const timeDistSec =
+    e.debug.time_distance_sec !== undefined && e.debug.time_distance_sec !== null
+      ? Number(e.debug.time_distance_sec)
+      : null;
+  const durationMs =
+    e.debug.duration_ms !== undefined && e.debug.duration_ms !== null
+      ? Number(e.debug.duration_ms)
+      : null;
+
   return (
     <li
       className={cx(
@@ -219,6 +295,22 @@ function EventRow({ e, rank, cited }: { e: ContextEvent; rank: number; cited: bo
         </Pill>
         <span className="font-mono text-[11px] text-ink-2">{e.service}</span>
         <span className="text-[11px] text-ink-muted">{clockUTC(e.ts)}</span>
+        {origin && (
+          <Pill tone={origin === "graph" ? "warn" : "neutral"}>
+            origin: {origin}
+          </Pill>
+        )}
+        {graphDist !== null && !Number.isNaN(graphDist) && (
+          <span className="font-mono text-[10.5px] text-ink-muted">d_G={graphDist}</span>
+        )}
+        {timeDistSec !== null && !Number.isNaN(timeDistSec) && (
+          <span className="font-mono text-[10.5px] text-ink-muted">
+            Δt={num(timeDistSec, 1)}s
+          </span>
+        )}
+        {durationMs !== null && !Number.isNaN(durationMs) && (
+          <span className="font-mono text-[10.5px] text-ink-muted">{ms(durationMs)}</span>
+        )}
         {cited && (
           <span className="text-[11px] font-medium" style={{ color: series[0] }}>
             ● LLM viện dẫn

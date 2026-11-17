@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Trạng thái | Đang làm (xong **M10-A**, **M10-B**; còn M10-C..E) |
+| Trạng thái | Đang làm (xong **M10-A**, **M10-B**, **M10-C**; còn M10-D..E) |
 | Ngày mở mốc | 2026-11-17 (QĐ-043) |
 | Hạn mục tiêu | 2027-01-10 |
-| Commit | `45c75c6` (M10-A); *(cập nhật tiếp qua M10-B..E)* |
-| Quyết định liên quan | QĐ-043, QĐ-045, QĐ-046 |
+| Commit | `45c75c6` (M10-A), `8f2ba70` (M10-B); *(cập nhật tiếp qua M10-C..E)* |
+| Quyết định liên quan | QĐ-043, QĐ-045, QĐ-046, QĐ-047 |
 
 ---
 
@@ -18,7 +18,7 @@ Theo dõi DoD theo 5 mốc con (`docs/prompts/M10-handoff.md` §2):
 |---|---|---|
 | **M10-A:** `pipeline.py` + nạp verdict CTAV vào ClickHouse + grouping/propagation/summary (chỉ đọc cache) + PostgreSQL + parity 26/26 (`val`) & 38/38 (`test`) + `runtime.json` | **Đạt** (2026-11-17) | `services/rca_agent/pipeline.py`, `tests/test_pipeline.py`, `eval/results/pipeline_val_v1/runtime.json`, `eval/results/pipeline_test_v1/runtime.json`; 0 lần gọi API, `method fingerprint b0c54fa68ef65535`; QĐ-045 |
 | **M10-B:** `services/api` (FastAPI chỉ đọc, 7 endpoint) + `types.ts` trường policy CTAV + `infra/Dockerfile.api` + `tests/test_api.py` | **Đạt** (2026-11-17) | `services/api/{main,readers,schemas}.py`, `services/web/src/api/types.ts`, `infra/Dockerfile.api`, `docker-compose.yml`, `tests/test_api.py`; 7 endpoint `200 OK` trên `pipeline_{val,test}_v1` (cả qua `TestClient` và container `internship1-api-1`); `/alerts?run_id=pipeline_test_v1` (13.699 dòng) đo thực tế `0,561 s`; QĐ-046 |
-| **M10-C:** Nối 4 màn hình sang `VITE_DATA_SOURCE=http` + `ExperimentComparison` bảng tĩnh + service `web` trong compose + `npm run check` sạch | Chưa làm | — |
+| **M10-C:** Nối 4 màn hình sang `VITE_DATA_SOURCE=http` + `ExperimentComparison` bảng tĩnh + service `web` trong compose + `npm run check` sạch | **Đạt** (2026-11-17) | `scripts/m10_experiment_table.py`, `services/web/src/data/experiment_table.json` (`52.004` B), `services/web/src/{App.tsx,api/client.ts,screens/*}`, `services/web/scripts/smoke.tsx`, `infra/Dockerfile.web`, `docker-compose.yml`, `tests/test_experiment_table.py`; 4 container (`web`, `api`, `clickhouse`, `postgres`) `healthy`; `http://127.0.0.1:5173/` & `/api/{health,runs,alerts,incidents}` `200 OK`; `npm.cmd run check` (exit 0), `pytest` `248 passed`; QĐ-047 |
 | **M10-D:** `m10_pick_demo_cases.py` + `DEMO_OFFLINE` + tự kiểm trình duyệt thật + ảnh `docs/drafts/figures/m10-*.png` | Chưa làm | — |
 | **M10-E:** Hoàn tất `M10-platform.md`, `ch6-demo-platform.md`, bản tóm tắt GVHD, đóng M10 | Chưa làm | — |
 
@@ -86,5 +86,5 @@ py -m services.rca_agent.pipeline --config eval/configs/rca_final_test.yaml
 
 ## 4. Plan cho mốc tiếp theo
 
-- **Tiếp theo trong M10:** **M10-C** (nối 4 màn hình `VITE_DATA_SOURCE=http` + hiện nguồn gốc bằng chứng & lý do policy ở `AlertDetail` + loading/empty/error state + `ExperimentComparison` bảng tĩnh từ `scripts/m10_experiment_table.py` + service `web` trong `docker-compose.yml`) → **M10-D** (chọn ca demo bằng quy tắc, `DEMO_OFFLINE`, tự kiểm trình duyệt thật + chụp ảnh) → **M10-E** (hoàn tất báo cáo này, `ch6-demo-platform.md`, mail GVHD, đóng M10).
-- **Ghi chú M10-B (đã đo):** `GET /alerts?run_id=pipeline_test_v1` (13.699 dòng) mất `0,561 s` (`<= 1,0 s`), nên mặc định trả toàn bộ và vẫn giữ `limit` / `offset` tuỳ chọn. Container `internship1-api-1` đang chạy `healthy` ở cổng `8000`.
+- **Tiếp theo trong M10:** **M10-D** (`scripts/m10_pick_demo_cases.py` chọn ca demo bằng quy tắc trên dữ liệu thật gồm ca cascade `val` / `rca_sens_test_c3rolling_v1` theo V48, kiểm tra chạy offline `DEMO_OFFLINE` khi tắt mạng và không dùng `GEMINI_API_KEY`, tự kiểm trình duyệt thật đủ 4 màn hình & chụp ảnh `docs/drafts/figures/m10-*.png`) → **M10-E** (hoàn tất báo cáo này, `ch6-demo-platform.md`, mail GVHD, đóng M10).
+- **Ghi chú M10-C (đã đo):** Bốn container compose (`web`, `api`, `clickhouse`, `postgres`) chạy `healthy`; `http://127.0.0.1:5173` proxy `/api` sang `http://api:8000` trả dữ liệu ClickHouse + PostgreSQL thật cho `Timeline`, `AlertDetail`, `IncidentDetail`, còn `ExperimentComparison` đọc hoàn toàn `experiment_table.json` trích từ `eval/results/`.

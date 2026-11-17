@@ -38,6 +38,7 @@ g.getComputedStyle = dom.window.getComputedStyle;
 g.requestAnimationFrame = (cb: FrameRequestCallback) => dom.window.setTimeout(() => cb(0), 0);
 g.cancelAnimationFrame = (id: number) => dom.window.clearTimeout(id);
 g.IS_REACT_ACT_ENVIRONMENT = true;
+g.__USE_MOCK__ = true;
 
 const BOX = { width: 880, height: 320 };
 
@@ -131,6 +132,7 @@ const CASES: {
     expect: [
       ["có biểu đồ vùng", (h) => h.includes("recharts-area-area")],
       ["có ngưỡng detector", (h) => h.includes("ngưỡng 0.85")],
+      ["có thẻ chính sách CTAV", (h) => h.includes("Chính sách quyết định CTAV")],
       ["có đủ 6 sự kiện ngữ cảnh", (h) => countOf(h, "debug") >= 6],
       ["không kẹt ở trạng thái tải", (h) => !h.includes("Đang tải")],
     ],
@@ -153,10 +155,12 @@ const CASES: {
     routePath: "/compare",
     element: <ExperimentComparison />,
     expect: [
-      ["có 6 panel chỉ số", (h) => countOf(h, "recharts-bar-rectangle") >= 30],
-      ["có thanh sai số CI", (h) => countOf(h, "recharts-errorBar") >= 30],
-      ["có vạch baseline", (h) => h.includes("baseline")],
-      ["bảng đủ 5 biến thể", (h) => countOf(h, "hybrid") >= 2],
+      ["có biểu đồ cột 5 phương pháp", (h) => countOf(h, "recharts-bar-rectangle") >= 20],
+      ["có thanh sai số CI", (h) => countOf(h, "recharts-errorBar") >= 15],
+      ["có đường cong ngân sách H4", (h) => countOf(h, "recharts-line-curve") >= 4],
+      ["có đủ giả thuyết H0–H5", (h) => ["H0", "H1", "H2", "H3", "H4", "H5"].every((k) => h.includes(k))],
+      ["có số đo CTAV test thật (0.066)", (h) => h.includes("0.066")],
+      ["có bảng H5 RCA", (h) => h.includes("C3-trượt (test — độ nhạy)")],
     ],
   },
 ];

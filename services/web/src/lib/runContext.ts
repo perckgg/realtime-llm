@@ -11,6 +11,8 @@ export interface RunCtx {
   runs: Run[];
   runId: string;
   setRunId: (id: string) => void;
+  runsLoading?: boolean;
+  runsError?: string | null;
 }
 
 export const RunContext = createContext<RunCtx | null>(null);

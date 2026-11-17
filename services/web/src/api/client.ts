@@ -80,7 +80,11 @@ const httpSource: DataSource = {
   getIncident: (incidentId) => get(`/incidents/${encodeURIComponent(incidentId)}`),
 };
 
-export const api: DataSource =
-  import.meta.env.VITE_DATA_SOURCE === "http" ? httpSource : mockSource;
+const useMock =
+  (globalThis as { __USE_MOCK__?: boolean }).__USE_MOCK__ === true ||
+  (import.meta as { env?: Record<string, string | undefined> }).env
+    ?.VITE_DATA_SOURCE === "mock";
+
+export const api: DataSource = useMock ? mockSource : httpSource;
 
 export const USING_FIXTURES = api.kind === "mock";

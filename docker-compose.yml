@@ -72,10 +72,25 @@ services:
       clickhouse: { condition: service_healthy }
       postgres:   { condition: service_healthy }
 
-  # --- Uncomment once services/web exists (Week 18). ---
-  # web:
-  #   profiles: ["dev", "full"]
-  #   ...
+  web:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.web
+      args:
+        VITE_DATA_SOURCE: http
+    profiles: ["dev", "full"]
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_DATA_SOURCE: http
+      VITE_API_TARGET: http://api:8000
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5173/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      api: { condition: service_healthy }
 
   # --- Only needed for stream-mode demo / Phase 3. ---
   # redpanda:

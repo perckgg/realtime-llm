@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { api } from "@/api/client";
-import { FixtureBanner, Loading } from "@/components/ui";
+import { FixtureBanner, Loading, ErrorBox } from "@/components/ui";
 import { RunContext, type RunCtx } from "@/lib/runContext";
 import { useAsync } from "@/lib/util";
 import { strategyLabel } from "@/theme/tokens";
@@ -16,16 +16,21 @@ const NAV = [
 ];
 
 export default function App() {
-  const { data: runs, loading } = useAsync(() => api.listRuns(), []);
+  const { data: runs, loading, error } = useAsync(() => api.listRuns(), []);
   const [runId, setRunId] = useState<string | null>(null);
 
   const effectiveRunId = runId ?? runs?.[0]?.run_id ?? "";
+  const activeRun = runs?.find((r) => r.run_id === effectiveRunId) ?? runs?.[0];
   const ctx = useMemo<RunCtx>(
-    () => ({ runs: runs ?? [], runId: effectiveRunId, setRunId }),
-    [runs, effectiveRunId],
+    () => ({
+      runs: runs ?? [],
+      runId: effectiveRunId,
+      setRunId,
+      runsLoading: loading,
+      runsError: error,
+    }),
+    [runs, effectiveRunId, loading, error],
   );
-
-  if (loading || !runs) return <Loading label="Đang tải danh sách run…" />;
 
   return (
     <RunContext.Provider value={ctx}>
@@ -38,7 +43,9 @@ export default function App() {
                 AIOps RCA — bảng điều khiển thực nghiệm
               </div>
               <div className="text-[11px] text-ink-muted">
-                Nezha · split dev · seed 42 · chỉ đọc
+                {activeRun
+                  ? `Nezha · split ${activeRun.split} · seed ${activeRun.seed} · chỉ đọc`
+                  : "Nezha · kết nối API · chỉ đọc"}
               </div>
             </div>
             <nav className="flex items-center gap-1">
@@ -65,12 +72,18 @@ export default function App() {
             Run
             <select
               value={effectiveRunId}
+              disabled={loading || !runs?.length}
               onChange={(e) => setRunId(e.target.value)}
-              className="rounded-md border border-[color:var(--color-hairline)] bg-surface px-2 py-1.5 text-[12px] text-ink"
+              className="rounded-md border border-[color:var(--color-hairline)] bg-surface px-2 py-1.5 text-[12px] text-ink disabled:opacity-60"
             >
-              {runs.map((r) => (
+              {loading && <option value="">Đang tải danh sách run…</option>}
+              {!loading && (!runs || runs.length === 0) && (
+                <option value="">{error ? "Lỗi tải run" : "Chưa có run"}</option>
+              )}
+              {(runs ?? []).map((r) => (
                 <option key={r.run_id} value={r.run_id}>
-                  {strategyLabel[r.retrieval_strategy]} — {r.run_id}
+                  {strategyLabel[r.retrieval_strategy] ?? r.retrieval_strategy} — {r.run_id} (
+                  {r.split})
                 </option>
               ))}
             </select>
@@ -78,14 +91,29 @@ export default function App() {
         </header>
 
         <main className="mx-auto w-full max-w-[1400px] flex-1 px-5 py-5">
-          <Routes>
-            <Route path="/" element={<Navigate to="/timeline" replace />} />
-            <Route path="/timeline" element={<Timeline />} />
-            <Route path="/alerts/:alertId" element={<AlertDetail />} />
-            <Route path="/incidents/:incidentId" element={<IncidentDetail />} />
-            <Route path="/compare" element={<ExperimentComparison />} />
-            <Route path="*" element={<Navigate to="/timeline" replace />} />
-          </Routes>
+          {error ? (
+            <Routes>
+              <Route path="/compare" element={<ExperimentComparison />} />
+              <Route
+                path="*"
+                element={<ErrorBox message={`Không tải được danh sách run từ API: ${error}`} />}
+              />
+            </Routes>
+          ) : loading && !runs ? (
+            <Routes>
+              <Route path="/compare" element={<ExperimentComparison />} />
+              <Route path="*" element={<Loading label="Đang tải danh sách run…" />} />
+            </Routes>
+          ) : (
+            <Routes>
+              <Route path="/" element={<Navigate to="/timeline" replace />} />
+              <Route path="/timeline" element={<Timeline />} />
+              <Route path="/alerts/:alertId" element={<AlertDetail />} />
+              <Route path="/incidents/:incidentId" element={<IncidentDetail />} />
+              <Route path="/compare" element={<ExperimentComparison />} />
+              <Route path="*" element={<Navigate to="/timeline" replace />} />
+            </Routes>
+          )}
         </main>
 
         <footer className="border-t border-[color:var(--color-hairline)] px-5 py-3 text-[11px] text-ink-muted">

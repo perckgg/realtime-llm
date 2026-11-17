@@ -14,7 +14,7 @@ import {
 } from "@xyflow/react";
 import { api } from "@/api/client";
 import type { GraphNode, IncidentDetail as IncidentDetailT } from "@/api/types";
-import { Card, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
+import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, num, stampUTC, useAsync } from "@/lib/util";
 import { ink, series, status } from "@/theme/tokens";
 
@@ -159,8 +159,24 @@ export default function IncidentDetail() {
   if (loading) return <Loading />;
   if (error || !data || !graph) return <ErrorBox message={error ?? "Không tìm thấy sự cố"} />;
 
-  const correct = data.root_cause_service === data.ground_truth_service;
+  const hasGt =
+    data.ground_truth_service !== null && data.ground_truth_service !== undefined;
+  const correct = hasGt && data.root_cause_service === data.ground_truth_service;
   const report = data.report;
+  const badgeColor = !report
+    ? status.warning
+    : !hasGt
+      ? ink.muted
+      : correct
+        ? status.good
+        : status.critical;
+  const badgeLabel = !report
+    ? "Báo cáo bị từ chối"
+    : !hasGt
+      ? "Không có nhãn Nezha (ngoài lỗi / mơ hồ)"
+      : correct
+        ? "Khớp nhãn Nezha"
+        : `Sai — nhãn là ${data.ground_truth_service}`;
 
   return (
     <div className="space-y-4">
@@ -176,17 +192,10 @@ export default function IncidentDetail() {
             </h1>
             <span
               className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium"
-              style={{
-                borderColor: report ? (correct ? status.good : status.critical) : status.warning,
-                color: report ? (correct ? status.good : status.critical) : status.warning,
-              }}
+              style={{ borderColor: badgeColor, color: badgeColor }}
             >
-              <span aria-hidden>{report ? (correct ? "✓" : "✗") : "⚠"}</span>
-              {report
-                ? correct
-                  ? "Khớp nhãn Nezha"
-                  : `Sai — nhãn là ${data.ground_truth_service}`
-                : "Báo cáo bị từ chối"}
+              <span aria-hidden>{!report ? "⚠" : !hasGt ? "—" : correct ? "✓" : "✗"}</span>
+              {badgeLabel}
             </span>
           </div>
           <p className="mt-1 font-mono text-[11px] text-ink-muted">
@@ -227,23 +236,27 @@ export default function IncidentDetail() {
             </ul>
           }
         >
-          <div className="h-[420px] rounded-md border border-[color:var(--color-hairline)]">
-            <ReactFlow
-              nodes={graph.nodes}
-              edges={graph.edges}
-              nodeTypes={nodeTypes}
-              fitView
-              fitViewOptions={{ padding: 0.18 }}
-              proOptions={{ hideAttribution: true }}
-              minZoom={0.4}
-              maxZoom={1.6}
-              nodesConnectable={false}
-              elementsSelectable={false}
-            >
-              <Background variant={BackgroundVariant.Dots} gap={18} size={1} color={ink.grid} />
-              <Controls showInteractive={false} />
-            </ReactFlow>
-          </div>
+          {graph.nodes.length === 0 ? (
+            <Empty>Không có node đồ thị nào.</Empty>
+          ) : (
+            <div className="h-[420px] rounded-md border border-[color:var(--color-hairline)]">
+              <ReactFlow
+                nodes={graph.nodes}
+                edges={graph.edges}
+                nodeTypes={nodeTypes}
+                fitView
+                fitViewOptions={{ padding: 0.18 }}
+                proOptions={{ hideAttribution: true }}
+                minZoom={0.4}
+                maxZoom={1.6}
+                nodesConnectable={false}
+                elementsSelectable={false}
+              >
+                <Background variant={BackgroundVariant.Dots} gap={18} size={1} color={ink.grid} />
+                <Controls showInteractive={false} />
+              </ReactFlow>
+            </div>
+          )}
 
           {/* Bảng thay thế cho đồ thị — bắt buộc, để thông tin không chỉ nằm ở hình. */}
           <details className="mt-3">
@@ -389,22 +402,26 @@ export default function IncidentDetail() {
           )}
 
           <Card title={`Alert trong sự cố (${data.alerts.length})`}>
-            <ul className="space-y-1.5">
-              {data.alerts.map((a) => (
-                <li key={a.alert_id}>
-                  <Link
-                    to={`/alerts/${a.alert_id}`}
-                    className="flex items-center gap-2 rounded px-1.5 py-1 text-[11.5px] hover:bg-[color:var(--color-plane)]"
-                  >
-                    <span className="tabular-nums text-ink-muted">{clockUTC(a.ts)}</span>
-                    <span className="font-mono text-ink-2">{a.service}</span>
-                    <span className="ml-auto">
-                      <VerdictBadge verdict={a.verdict} compact />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {data.alerts.length === 0 ? (
+              <Empty>Không có cảnh báo trong sự cố này.</Empty>
+            ) : (
+              <ul className="space-y-1.5">
+                {data.alerts.map((a) => (
+                  <li key={a.alert_id}>
+                    <Link
+                      to={`/alerts/${a.alert_id}`}
+                      className="flex items-center gap-2 rounded px-1.5 py-1 text-[11.5px] hover:bg-[color:var(--color-plane)]"
+                    >
+                      <span className="tabular-nums text-ink-muted">{clockUTC(a.ts)}</span>
+                      <span className="font-mono text-ink-2">{a.service}</span>
+                      <span className="ml-auto">
+                        <VerdictBadge verdict={a.verdict} compact />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Card>
         </div>
       </div>
