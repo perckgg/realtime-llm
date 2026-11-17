@@ -123,16 +123,16 @@ export function FixtureBanner() {
     >
       <span aria-hidden>⚠</span>
       <span>
-        <strong className="font-semibold">Dữ liệu giả.</strong> Pipeline chưa chạy — mọi con số
-        trên màn hình là fixture sinh từ seed cố định, không phải kết quả thực nghiệm. Đặt{" "}
-        <code className="font-mono">VITE_DATA_SOURCE=http</code> để đọc từ{" "}
+        <strong className="font-semibold">Synthetic fixture data.</strong> Pipeline has not run —
+        all numbers on screen are deterministic seed fixtures, not experiment results. Set{" "}
+        <code className="font-mono">VITE_DATA_SOURCE=http</code> to read from{" "}
         <code className="font-mono">services/api</code>.
       </span>
     </div>
   );
 }
 
-export function Loading({ label = "Đang tải…" }: { label?: string }) {
+export function Loading({ label = "Loading…" }: { label?: string }) {
   return <div className="py-10 text-center text-[12px] text-ink-muted">{label}</div>;
 }
 

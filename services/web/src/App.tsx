@@ -11,8 +11,8 @@ import IncidentDetail from "@/screens/IncidentDetail";
 import ExperimentComparison from "@/screens/ExperimentComparison";
 
 const NAV = [
-  { to: "/timeline", label: "Timeline", hint: "Cảnh báo và sự cố theo thời gian" },
-  { to: "/compare", label: "So sánh thực nghiệm", hint: "Năm biến thể RAG" },
+  { to: "/timeline", label: "Timeline", hint: "Alerts and incidents over time" },
+  { to: "/compare", label: "Experiment Comparison", hint: "H0–H5 evaluation & RAG variants" },
 ];
 
 export default function App() {
@@ -21,6 +21,8 @@ export default function App() {
 
   const effectiveRunId = runId ?? runs?.[0]?.run_id ?? "";
   const activeRun = runs?.find((r) => r.run_id === effectiveRunId) ?? runs?.[0];
+  const isSensitivityRun =
+    effectiveRunId.includes("sens") || effectiveRunId.includes("c3rolling");
   const ctx = useMemo<RunCtx>(
     () => ({
       runs: runs ?? [],
@@ -40,12 +42,12 @@ export default function App() {
           <div className="flex items-baseline gap-6">
             <div>
               <div className="text-[13px] font-semibold tracking-tight text-ink">
-                AIOps RCA — bảng điều khiển thực nghiệm
+                AIOps RCA — Experiment Dashboard
               </div>
               <div className="text-[11px] text-ink-muted">
                 {activeRun
-                  ? `Nezha · split ${activeRun.split} · seed ${activeRun.seed} · chỉ đọc`
-                  : "Nezha · kết nối API · chỉ đọc"}
+                  ? `Nezha · split ${activeRun.split} · seed ${activeRun.seed} · read-only`
+                  : "Nezha · API connected · read-only"}
               </div>
             </div>
             <nav className="flex items-center gap-1">
@@ -76,24 +78,24 @@ export default function App() {
               onChange={(e) => setRunId(e.target.value)}
               className="rounded-md border border-[color:var(--color-hairline)] bg-surface px-2 py-1.5 text-[12px] text-ink disabled:opacity-60"
             >
-              {loading && <option value="">Đang tải danh sách run…</option>}
+              {loading && <option value="">Loading runs…</option>}
               {!loading && (!runs || runs.length === 0) && (
-                <option value="">{error ? "Lỗi tải run" : "Chưa có run"}</option>
+                <option value="">{error ? "Failed to load runs" : "No runs"}</option>
               )}
               {(runs ?? []).some((r) => r.alert_count > 0) && (
-                <optgroup label="Có cảnh báo">
+                <optgroup label="With Alerts (ClickHouse + PostgreSQL)">
                   {(runs ?? [])
                     .filter((r) => r.alert_count > 0)
                     .map((r) => (
                       <option key={r.run_id} value={r.run_id}>
                         {strategyLabel[r.retrieval_strategy] ?? r.retrieval_strategy} — {r.run_id} (
-                        {r.split} · {r.alert_count.toLocaleString("vi-VN")} alert)
+                        {r.split} · {r.alert_count.toLocaleString("en-US")} alerts)
                       </option>
                     ))}
                 </optgroup>
               )}
               {(runs ?? []).some((r) => r.alert_count === 0) && (
-                <optgroup label="Chỉ có incident (RCA M9)">
+                <optgroup label="Incidents Only (M9 RCA)">
                   {(runs ?? [])
                     .filter((r) => r.alert_count === 0)
                     .map((r) => (
@@ -108,19 +110,34 @@ export default function App() {
           </label>
         </header>
 
+        {isSensitivityRun && (
+          <div
+            className="border-b px-5 py-1.5 text-[11.5px]"
+            style={{
+              borderColor: "var(--color-hairline)",
+              background: "color-mix(in srgb, var(--color-warning) 14%, var(--color-surface))",
+              color: "var(--color-ink-2)",
+            }}
+            role="status"
+          >
+            <strong>Sensitivity line (c3_rolling_baseline):</strong> Outside pre-registered H5
+            evaluation; shown for cascade demonstration &amp; mechanism analysis only, not an H5 result.
+          </div>
+        )}
+
         <main className="mx-auto w-full max-w-[1400px] flex-1 px-5 py-5">
           {error ? (
             <Routes>
               <Route path="/compare" element={<ExperimentComparison />} />
               <Route
                 path="*"
-                element={<ErrorBox message={`Không tải được danh sách run từ API: ${error}`} />}
+                element={<ErrorBox message={`Failed to load runs from API: ${error}`} />}
               />
             </Routes>
           ) : loading && !runs ? (
             <Routes>
               <Route path="/compare" element={<ExperimentComparison />} />
-              <Route path="*" element={<Loading label="Đang tải danh sách run…" />} />
+              <Route path="*" element={<Loading label="Loading runs…" />} />
             </Routes>
           ) : (
             <Routes>
@@ -135,9 +152,9 @@ export default function App() {
         </main>
 
         <footer className="border-t border-[color:var(--color-hairline)] px-5 py-3 text-[11px] text-ink-muted">
-          Bốn màn hình theo <code className="font-mono">01-architecture-design.md</code> §6.7 —
-          Timeline · Alert detail · Incident detail · Experiment comparison. Không thêm màn hình
-          nào khác (xem <code className="font-mono">06-scope-guard.md</code> §6.4).
+          Four-screen read-only dashboard per <code className="font-mono">01-architecture-design.md</code>{" "}
+          §6.7 — Timeline · Alert Detail · Incident Detail · Experiment Comparison (see{" "}
+          <code className="font-mono">06-scope-guard.md</code> §6.4).
         </footer>
       </div>
     </RunContext.Provider>

@@ -119,10 +119,10 @@ const CASES: {
     routePath: "/timeline",
     element: <Timeline />,
     expect: [
-      ["có biểu đồ cột", (h) => countOf(h, "recharts-bar-rectangle") > 10],
-      ["có đường nhãn ground truth", (h) => h.includes("recharts-line-curve")],
-      ["có bảng cảnh báo", (h) => countOf(h, "<tr") > 20],
-      ["không kẹt ở trạng thái tải", (h) => !h.includes("Đang tải")],
+      ["renders stacked bar chart", (h) => countOf(h, "recharts-bar-rectangle") > 10],
+      ["renders ground-truth curve", (h) => h.includes("recharts-line-curve")],
+      ["renders alert rows", (h) => countOf(h, "<tr") > 20],
+      ["not stuck loading", (h) => !h.includes("Loading")],
     ],
   },
   {
@@ -131,11 +131,11 @@ const CASES: {
     routePath: "/alerts/:alertId",
     element: <AlertDetail />,
     expect: [
-      ["có biểu đồ vùng", (h) => h.includes("recharts-area-area")],
-      ["có ngưỡng detector", (h) => h.includes("ngưỡng 0.85")],
-      ["có thẻ chính sách CTAV", (h) => h.includes("Chính sách quyết định CTAV")],
-      ["có đủ 6 sự kiện ngữ cảnh", (h) => countOf(h, "debug") >= 6],
-      ["không kẹt ở trạng thái tải", (h) => !h.includes("Đang tải")],
+      ["renders metric area chart", (h) => h.includes("recharts-area-area")],
+      ["renders detector threshold", (h) => h.includes("threshold 0.85")],
+      ["renders CTAV policy card", (h) => h.includes("CTAV Decision Policy")],
+      ["renders 6 context events", (h) => countOf(h, "debug") >= 6],
+      ["not stuck loading", (h) => !h.includes("Loading")],
     ],
   },
   {
@@ -144,10 +144,10 @@ const CASES: {
     routePath: "/incidents/:incidentId",
     element: <IncidentDetail />,
     expect: [
-      ["có node đồ thị", (h) => countOf(h, "react-flow__node") >= 3],
-      ["có cạnh đồ thị", (h) => h.includes("react-flow__edge")],
-      ["có báo cáo chẩn đoán", (h) => h.includes("root_cause_service")],
-      ["có bảng thay thế cho đồ thị", (h) => h.includes("Xem dạng bảng")],
+      ["renders graph nodes", (h) => countOf(h, "react-flow__node") >= 3],
+      ["renders graph edges", (h) => h.includes("react-flow__edge")],
+      ["renders diagnostic report", (h) => h.includes("root_cause_service")],
+      ["renders table fallback", (h) => h.includes("View as table")],
     ],
   },
   {
@@ -156,14 +156,14 @@ const CASES: {
     routePath: "/compare",
     element: <ExperimentComparison />,
     expect: [
-      ["có biểu đồ cột 5 phương pháp", (h) => countOf(h, "recharts-bar-rectangle") >= 20],
-      ["có thanh sai số CI", (h) => countOf(h, "recharts-errorBar") >= 15],
-      ["có đường cong ngân sách H4", (h) => countOf(h, "recharts-line-curve") >= 4],
-      ["có đủ giả thuyết H0–H5", (h) => ["H0", "H1", "H2", "H3", "H4", "H5"].every((k) => h.includes(k))],
-      ["có dòng H1 Giữ một phần", (h) => h.includes("Giữ một phần")],
-      ["có H5 0/4 vế đúng chuẩn Bảng 5.26", (h) => h.includes("Không được chấp nhận (0 / 4 vế)") && h.includes("Alert Reduction ≥ 30% trên sự cố cascade")],
-      ["có số đo CTAV test thật (0.066)", (h) => h.includes("0.066")],
-      ["có bảng H5 RCA", (h) => h.includes("C3-trượt (test — độ nhạy)")],
+      ["renders 5-method bar chart", (h) => countOf(h, "recharts-bar-rectangle") >= 20],
+      ["renders 95% CI error bars", (h) => countOf(h, "recharts-errorBar") >= 15],
+      ["renders H4 budget curve", (h) => countOf(h, "recharts-line-curve") >= 4],
+      ["renders H0–H5 hypotheses", (h) => ["H0", "H1", "H2", "H3", "H4", "H5"].every((k) => h.includes(k))],
+      ["renders H1 partially retained", (h) => h.includes("Partially retained")],
+      ["renders H5 0/4 criteria", (h) => h.includes("Rejected (0/4 criteria)") && h.includes("Alert Reduction ≥ 30% on cascade incidents")],
+      ["renders real CTAV test F1 (0.066)", (h) => h.includes("0.066")],
+      ["renders H5 RCA table", (h) => h.includes("C3-rolling (test — sensitivity)")],
     ],
   },
 ];
@@ -175,10 +175,10 @@ for (const c of CASES) {
     html = await render(c.path, c.routePath, c.element);
   } catch (e) {
     failed += 1;
-    console.error(`  FAIL  ${c.name} — ném lỗi khi render\n        ${e instanceof Error ? e.stack : e}`);
+    console.error(`  FAIL  ${c.name} — error during render\n        ${e instanceof Error ? e.stack : e}`);
     continue;
   }
-  if (process.env.SMOKE_DEBUG) console.error(`--- ${c.name} (${html.length} ký tự)\n${html.slice(0, 800)}\n`);
+  if (process.env.SMOKE_DEBUG) console.error(`--- ${c.name} (${html.length} chars)\n${html.slice(0, 800)}\n`);
   for (const [what, check] of c.expect) {
     if (check(html)) {
       console.log(`  ok    ${c.name.padEnd(22)} ${what}`);
@@ -189,7 +189,7 @@ for (const c of CASES) {
   }
 }
 
-// Kiểm tra 4 ca hàm thuần `policySteps` theo thứ tự `services/judge/policy.py::decide`.
+// Verify 4 cases of pure `policySteps` matching `services/judge/policy.py::decide`.
 const policyCases: [string, Parameters<typeof policySteps>[0], string][] = [
   [
     "raw FALSE_POSITIVE",
@@ -200,10 +200,10 @@ const policyCases: [string, Parameters<typeof policySteps>[0], string][] = [
       downgraded_by_gating: false,
       downgraded_by_anchoring: false,
     },
-    "không áp dụng (dừng ở raw_verdict ≠ TRUE_ALERT)",
+    "N/A (stopped at raw_verdict ≠ TRUE_ALERT)",
   ],
   [
-    "luật thiếu bằng chứng",
+    "evidence rule downgrade",
     {
       raw_verdict: "TRUE_ALERT",
       verdict: "UNCERTAIN",
@@ -211,10 +211,10 @@ const policyCases: [string, Parameters<typeof policySteps>[0], string][] = [
       downgraded_by_gating: false,
       downgraded_by_anchoring: false,
     },
-    "không áp dụng (dừng ở luật bằng chứng)",
+    "N/A (stopped at evidence rule)",
   ],
   [
-    "C3 neo hạ verdict",
+    "C3 anchoring downgrade",
     {
       raw_verdict: "TRUE_ALERT",
       verdict: "UNCERTAIN",
@@ -222,10 +222,10 @@ const policyCases: [string, Parameters<typeof policySteps>[0], string][] = [
       downgraded_by_gating: false,
       downgraded_by_anchoring: true,
     },
-    "đã hạ verdict",
+    "downgraded",
   ],
   [
-    "TRUE_ALERT cuối",
+    "final TRUE_ALERT",
     {
       raw_verdict: "TRUE_ALERT",
       verdict: "TRUE_ALERT",
@@ -233,7 +233,7 @@ const policyCases: [string, Parameters<typeof policySteps>[0], string][] = [
       downgraded_by_gating: false,
       downgraded_by_anchoring: false,
     },
-    "đạt ngưỡng neo",
+    "anchored",
   ],
 ];
 for (const [label, input, expectedAnchoring] of policyCases) {

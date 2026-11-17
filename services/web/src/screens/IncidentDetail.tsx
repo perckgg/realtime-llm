@@ -24,10 +24,10 @@ import { ink, series, status } from "@/theme/tokens";
  * kênh thông tin duy nhất.
  */
 const ROLE: Record<GraphNode["role"], { color: string; glyph: string; label: string }> = {
-  root_cause: { color: status.critical, glyph: "◉", label: "Nguyên nhân gốc (dự đoán)" },
-  ground_truth: { color: status.good, glyph: "✓", label: "Nhãn Nezha" },
-  affected: { color: status.serious, glyph: "◐", label: "Bị ảnh hưởng" },
-  healthy: { color: ink.muted, glyph: "○", label: "Bình thường" },
+  root_cause: { color: status.critical, glyph: "◉", label: "Predicted root cause" },
+  ground_truth: { color: status.good, glyph: "✓", label: "Nezha ground truth" },
+  affected: { color: status.serious, glyph: "◐", label: "Affected" },
+  healthy: { color: ink.muted, glyph: "○", label: "Healthy" },
 };
 
 type ServiceNodeData = {
@@ -141,7 +141,7 @@ function layout(detail: IncidentDetailT): { nodes: Node<ServiceNodeData>[]; edge
       width: 14,
       height: 14,
     },
-    label: e.on_path ? `${(e.error_rate * 100).toFixed(0)}% lỗi` : undefined,
+    label: e.on_path ? `${(e.error_rate * 100).toFixed(0)}% error` : undefined,
     labelStyle: { fill: status.critical, fontSize: 10 },
     labelBgStyle: { fill: ink.surface },
   }));
@@ -157,7 +157,7 @@ export default function IncidentDetail() {
   const graph = useMemo(() => (data ? layout(data) : null), [data]);
 
   if (loading) return <Loading />;
-  if (error || !data || !graph) return <ErrorBox message={error ?? "Không tìm thấy sự cố"} />;
+  if (error || !data || !graph) return <ErrorBox message={error ?? "Incident not found"} />;
 
   const hasGt =
     data.ground_truth_service !== null && data.ground_truth_service !== undefined;
@@ -171,12 +171,12 @@ export default function IncidentDetail() {
         ? status.good
         : status.critical;
   const badgeLabel = !report
-    ? "Báo cáo bị từ chối"
+    ? "Report rejected"
     : !hasGt
-      ? "Không có nhãn Nezha (ngoài lỗi / mơ hồ)"
+      ? "Unlabelled in Nezha (no_fault / ambiguous)"
       : correct
-        ? "Khớp nhãn Nezha"
-        : `Sai — nhãn là ${data.ground_truth_service}`;
+        ? "Matches Nezha label"
+        : `Mismatch — ground truth is ${data.ground_truth_service}`;
 
   return (
     <div className="space-y-4">
@@ -188,7 +188,7 @@ export default function IncidentDetail() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-[19px] font-semibold tracking-tight text-ink">
-              {data.root_cause_service ?? "Không kết luận được"}
+              {data.root_cause_service ?? "Inconclusive"}
             </h1>
             <span
               className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium"
@@ -199,30 +199,45 @@ export default function IncidentDetail() {
             </span>
           </div>
           <p className="mt-1 font-mono text-[11px] text-ink-muted">
-            {data.incident_id} · {stampUTC(data.start_ts)} → {clockUTC(data.end_ts)}
+            {data.incident_id} · {data.run_id} · {stampUTC(data.start_ts)} → {clockUTC(data.end_ts)}
           </p>
         </div>
       </div>
 
+      {(data.run_id.includes("sens") || data.run_id.includes("c3rolling")) && (
+        <div
+          className="rounded-md border px-3 py-2 text-[11.5px]"
+          style={{
+            borderColor: "var(--color-hairline)",
+            background: "color-mix(in srgb, var(--color-warning) 14%, var(--color-surface))",
+            color: "var(--color-ink-2)",
+          }}
+        >
+          <strong>Sensitivity line (c3_rolling_baseline):</strong> This multi-service cascade incident
+          comes from the out-of-registration sensitivity run (QĐ-039 / V48 (b&apos;)) for demo and
+          mechanism analysis; it is not part of the pre-registered H5 test verdict.
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile label="Loại lỗi" value={data.fault_type ?? "—"} hint="theo nhãn Nezha" />
+        <StatTile label="Fault type" value={data.fault_type ?? "—"} hint="Nezha fault label" />
         <StatTile
           label="Confidence"
           value={report ? num(report.confidence, 2) : "—"}
-          hint={report?.llm_backend ?? "không có báo cáo"}
+          hint={report?.llm_backend ?? "no report"}
         />
-        <StatTile label="Alert gom vào" value={String(data.alert_ids.length)} hint={`cửa sổ gom ${data.grouping_reason.temporal_window_sec}s`} />
+        <StatTile label="Grouped alerts" value={String(data.alert_ids.length)} hint={`grouping window ${data.grouping_reason.temporal_window_sec}s`} />
         <StatTile
-          label="Cạnh đồ thị dùng"
+          label="Graph edges used"
           value={String(data.grouping_reason.graph_edges_used)}
-          hint="cạnh trace nối các alert trong nhóm"
+          hint="trace edges linking grouped alerts"
         />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.7fr_1fr]">
         <Card
-          title="Đồ thị lan truyền"
-          subtitle="Mũi tên đỏ chỉ chiều lỗi lan đi (ngược chiều lời gọi). Node xám là hàng xóm không bị ảnh hưởng, giữ lại để thấy lỗi đã KHÔNG lan tới đâu. Kéo để sắp lại, cuộn để phóng to."
+          title="Propagation Graph"
+          subtitle="Red arrows follow fault propagation direction (reverse of call direction). Grey nodes are healthy neighbors kept for contrast. Drag to rearrange or scroll to zoom."
           right={
             <ul className="flex flex-wrap gap-x-3 gap-y-1">
               {(Object.keys(ROLE) as GraphNode["role"][]).map((r) => (
@@ -237,7 +252,7 @@ export default function IncidentDetail() {
           }
         >
           {graph.nodes.length === 0 ? (
-            <Empty>Không có node đồ thị nào.</Empty>
+            <Empty>No graph nodes available.</Empty>
           ) : (
             <div className="h-[420px] rounded-md border border-[color:var(--color-hairline)]">
               <ReactFlow
@@ -258,19 +273,18 @@ export default function IncidentDetail() {
             </div>
           )}
 
-          {/* Bảng thay thế cho đồ thị — bắt buộc, để thông tin không chỉ nằm ở hình. */}
           <details className="mt-3">
             <summary className="cursor-pointer text-[11px] text-ink-muted hover:text-ink-2">
-              Xem dạng bảng
+              View as table
             </summary>
             <table className="mt-2 w-full border-collapse text-[11.5px]">
               <thead>
                 <tr className="border-b border-[color:var(--color-hairline)] text-left text-[10.5px] text-ink-muted">
-                  <th className="py-1 pr-3 font-medium">Từ</th>
-                  <th className="py-1 pr-3 font-medium">Tới</th>
-                  <th className="py-1 pr-3 text-right font-medium">Lời gọi</th>
-                  <th className="py-1 pr-3 text-right font-medium">Tỉ lệ lỗi</th>
-                  <th className="py-1 font-medium">Trên đường lan</th>
+                  <th className="py-1 pr-3 font-medium">From</th>
+                  <th className="py-1 pr-3 font-medium">To</th>
+                  <th className="py-1 pr-3 text-right font-medium">Calls</th>
+                  <th className="py-1 pr-3 text-right font-medium">Error rate</th>
+                  <th className="py-1 font-medium">On path</th>
                 </tr>
               </thead>
               <tbody>
@@ -280,7 +294,7 @@ export default function IncidentDetail() {
                     <td className="py-1 pr-3 font-mono">{e.target}</td>
                     <td className="py-1 pr-3 text-right tabular-nums">{e.call_count}</td>
                     <td className="py-1 pr-3 text-right tabular-nums">{(e.error_rate * 100).toFixed(1)}%</td>
-                    <td className="py-1">{e.on_path ? "có" : "—"}</td>
+                    <td className="py-1">{e.on_path ? "yes" : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -292,7 +306,7 @@ export default function IncidentDetail() {
           {report ? (
             <>
               <Card
-                title="Báo cáo chẩn đoán"
+                title="Diagnostic Report"
                 subtitle={`schema ${report.schema_version} · ${report.llm_backend} · ${stampUTC(report.generated_at)}`}
                 right={
                   <button
@@ -300,7 +314,7 @@ export default function IncidentDetail() {
                     onClick={() => setRawJson((v) => !v)}
                     className="rounded border border-[color:var(--color-hairline)] px-2 py-1 text-[11px] text-ink-muted hover:text-ink-2"
                   >
-                    {rawJson ? "Dạng đọc" : "JSON thô"}
+                    {rawJson ? "Readable" : "Raw JSON"}
                   </button>
                 }
               >
@@ -317,7 +331,7 @@ export default function IncidentDetail() {
                     </dl>
 
                     <div>
-                      <div className="mb-1.5 text-[11px] text-ink-muted">Đường lan truyền</div>
+                      <div className="mb-1.5 text-[11px] text-ink-muted">Propagation path</div>
                       <div className="flex flex-wrap items-center gap-1.5">
                         {report.propagation_path.map((s, i) => (
                           <span key={s} className="flex items-center gap-1.5">
@@ -338,7 +352,7 @@ export default function IncidentDetail() {
 
                     <div>
                       <div className="mb-1.5 text-[11px] text-ink-muted">
-                        Bằng chứng ({report.evidence.length}) — bắt buộc ≥ 1
+                        Evidence ({report.evidence.length}) — ≥ 1 required
                       </div>
                       <ul className="space-y-1.5">
                         {report.evidence.map((ev) => (
@@ -361,7 +375,7 @@ export default function IncidentDetail() {
 
                     <div>
                       <div className="mb-1.5 text-[11px] text-ink-muted">
-                        Hành động gợi ý — chỉ mô tả, không sinh câu lệnh (03 §2.1)
+                        Suggested actions — descriptive only, no executable commands (03 §2.1)
                       </div>
                       <ul className="space-y-1.5">
                         {report.suggested_actions.map((s) => (
@@ -396,14 +410,14 @@ export default function IncidentDetail() {
               </Card>
             </>
           ) : (
-            <Card title="Báo cáo bị từ chối" subtitle="Ghi vào bảng diagnostic_rejected, không nuốt lỗi im lặng (03 §4).">
+            <Card title="Report Rejected" subtitle="Recorded in `diagnostic_rejected` table; never silently dropped (03 §4).">
               <p className="text-[12.5px] text-ink-2">{data.rejected_reason}</p>
             </Card>
           )}
 
-          <Card title={`Alert trong sự cố (${data.alerts.length})`}>
+          <Card title={`Alerts in Incident (${data.alerts.length})`}>
             {data.alerts.length === 0 ? (
-              <Empty>Không có cảnh báo trong sự cố này.</Empty>
+              <Empty>No alerts in this incident.</Empty>
             ) : (
               <ul className="space-y-1.5">
                 {data.alerts.map((a) => (

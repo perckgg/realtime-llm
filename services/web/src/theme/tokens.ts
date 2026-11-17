@@ -60,9 +60,9 @@ export const verdictGlyph: Record<Verdict, string> = {
 };
 
 export const verdictLabel: Record<Verdict, string> = {
-  TRUE_ALERT: "Đúng cảnh báo",
-  FALSE_POSITIVE: "Dương tính giả",
-  UNCERTAIN: "Không chắc",
+  TRUE_ALERT: "True Alert",
+  FALSE_POSITIVE: "False Positive",
+  UNCERTAIN: "Uncertain",
 };
 
 /** Thứ tự cố định — dùng cho legend, cột stack, và mọi bảng. */

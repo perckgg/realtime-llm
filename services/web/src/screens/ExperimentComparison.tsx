@@ -154,9 +154,79 @@ const METRIC_COLORS = {
 const BUDGET_SERIES = [
   { key: "ctav" as const, label: "CTAV", color: METRIC_COLORS.precision, glyph: "●" },
   { key: "c1" as const, label: "C1 (Topology)", color: METRIC_COLORS.f1, glyph: "▲" },
-  { key: "norag" as const, label: "LLM-không-RAG", color: METRIC_COLORS.fpr, glyph: "◆" },
+  { key: "norag" as const, label: "LLM-no-RAG", color: METRIC_COLORS.fpr, glyph: "◆" },
   { key: "bm25" as const, label: "BM25", color: METRIC_COLORS.recall, glyph: "■" },
 ];
+
+const METHOD_LABEL_EN: Record<string, string> = {
+  bm25: "BM25",
+  c1: "C1 (Topology)",
+  norag: "LLM-no-RAG",
+  ctav: "CTAV",
+  detector_only: "Detector-only",
+};
+
+const HYPOTHESIS_META_EN: Record<string, { title: string; statusLabel: string }> = {
+  H0: { title: "Uncalibrated Topology (C1) vs BM25", statusLabel: "Accepted (4/4 criteria)" },
+  H1: {
+    title: "Mechanism Experiment on Controlled Samples",
+    statusLabel: "Partially retained (val, M5 — QD-028); not re-run on test",
+  },
+  H2: { title: "CTAV vs BM25 & C1 (Main Hypothesis)", statusLabel: "Rejected (1/3 criteria)" },
+  H3: { title: "Component Ablation (C2, C3, C4, C5)", statusLabel: "Accepted (C3 contributes; C2 & C4 dropped)" },
+  H4: { title: "Small Budget (120 LLM calls)", statusLabel: "Accepted (point estimate)" },
+  H5: { title: "RCA Agent on CTAV-grouped Incidents", statusLabel: "Rejected (0/4 criteria)" },
+};
+
+const PHRASE_EN: [string, string][] = [
+  ["Độ lợi C1 trên fault đến từ metric/span gần nhất theo thời gian:", "C1 fault gain comes from temporally closest metric/span evidence:"],
+  ["Tham chiếu (không phải tiêu chí đăng ký): ARR mọi cảnh báo", "Reference (non-registered): ARR all alerts"],
+  ["ARR cảnh báo trong lỗi", "ARR fault alerts"],
+  ["lần tiêm lỗi là cascade", "fault injections are cascade"],
+  ["Nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ (JSON hợp lệ", "Branch B succeeded only on alert grouping and schema-valid report synthesis (valid JSON"],
+  ["Cận dưới CI95 của ΔHit@1 (RCA − baseline) > 0", "Lower CI95 bound of ΔHit@1 (RCA − baseline) > 0"],
+  ["Alert Reduction ≥ 30% trên sự cố cascade", "Alert Reduction ≥ 30% on cascade incidents"],
+  ["CI ΔRecall(C1 − BM25) có cận dưới > 0", "CI ΔRecall(C1 − BM25) lower bound > 0"],
+  ["CI ΔFPR(C1 − BM25) có cận dưới > 0", "CI ΔFPR(C1 − BM25) lower bound > 0"],
+  ["(i) CI ΔF1(CTAV − BM25) cận dưới > 0 và McNemar p < 0,05", "(i) CI ΔF1(CTAV − BM25) lower bound > 0 and McNemar p < 0.05"],
+  ["(ii) CI ΔFPR(CTAV − BM25) không có cận dưới > 0", "(ii) CI ΔFPR(CTAV − BM25) lower bound ≤ 0"],
+  ["(iii) ΔRecall(CTAV − C1) ≥ −0,05 (ước lượng điểm)", "(iii) ΔRecall(CTAV − C1) ≥ −0.05 (point estimate)"],
+  ["bỏ C3 ⇒ CI ΔPrecision cận trên < 0 (C3 đóng góp)", "remove C3 ⇒ CI ΔPrecision upper bound < 0 (C3 contributes)"],
+  ["thêm C2 (θ_topo 0,85): xác nhận bỏ nếu CI ΔFPR chứa 0 hoặc > 0", "add C2 (θ_topo 0.85): confirm removal if CI ΔFPR includes 0 or > 0"],
+  ["thêm C4: xác nhận bỏ nếu chi phí tăng và CI ΔF1 không có cận dưới > 0", "add C4: confirm removal if cost rises and CI ΔF1 lower bound ≤ 0"],
+  ["báo ΔF1, ΔFPR (không có tiêu chí đạt / không đạt)", "report ΔF1, ΔFPR (observational)"],
+  ["báo ΔRecall, ΔFPR, +lần gọi (không có tiêu chí đạt / không đạt)", "report ΔRecall, ΔFPR, +calls (observational)"],
+  ["F1(CTAV) ≥ F1(LLM-không-RAG) ở ngân sách 120 lần gọi (ước lượng điểm)", "F1(CTAV) ≥ F1(LLM-no-RAG) at 120 LLM call budget (point estimate)"],
+  ["không tính được:", "N/A:"],
+  ["cặp lệch", "discordant pairs"],
+  ["lần gọi", "calls"],
+  ["điểm", "point"],
+  ["không-RAG", "no-RAG"],
+  ["LLM-không-RAG", "LLM-no-RAG"],
+  ["so với", "vs"],
+  ["chi phí", "cost"],
+  ["CTAV (baseline hiệu chỉnh)", "CTAV (calibrated baseline)"],
+  ["with_c2 (bật θ_topo=0,85)", "with_c2 (enable θ_topo=0.85)"],
+  ["no_c2 (bỏ C2 gating)", "no_c2 (disable C2 gating)"],
+  ["no_c3 (bỏ neo bằng chứng)", "no_c3 (disable C3 anchoring)"],
+  ["with_c4 (bật định tuyến C4)", "with_c4 (enable C4 routing)"],
+  ["c3_rolling_baseline (C3-trượt)", "c3_rolling_baseline (C3-rolling)"],
+  ["CTAV (test — H5 chính)", "CTAV (test — registered H5)"],
+  ["C3-trượt (test — độ nhạy)", "C3-rolling (test — sensitivity)"],
+  ["1 cascade (ARR=0,667); chạy lại ở M10-A bằng pipeline_val_v1", "1 cascade (ARR=0.667); replayed in M10-A/C.1 via pipeline_val_v1/_v2"],
+  ["0 multi-service vì C3 ngưỡng dev lọc hết; ARR=0,513; JSON hợp lệ 38/38", "0 multi-service (filtered by frozen dev C3 threshold); ARR=0.513; valid JSON 38/38"],
+  ["41 cascade / 39 multi-service; ARR cascade=0,704; Hit@1=0,208", "41 cascade / 39 multi-service; cascade ARR=0.704; Hit@1=0.208"],
+  ["C3-trượt", "C3-rolling"],
+  ["Đủ", "Full"],
+];
+
+function toEn(text: string): string {
+  let out = text;
+  for (const [vi, en] of PHRASE_EN) {
+    out = out.split(vi).join(en);
+  }
+  return out.replace(/(\d),(\d)/g, "$1.$2").replace(/; /g, ", ");
+}
 
 function ciSpan(val: number, ci: CiPair): [number, number] {
   return [Math.max(0, val - ci[0]), Math.max(0, ci[1] - val)];
@@ -171,11 +241,11 @@ function fmtSigned(v: number, decimals = 3): string {
 
 function fmtCi(ci: CiPair, decimals = 3, signed = false): string {
   const f = signed ? (x: number) => fmtSigned(x, decimals) : (x: number) => num(x, decimals);
-  return `[${f(ci[0])}; ${f(ci[1])}]`;
+  return `[${f(ci[0])}, ${f(ci[1])}]`;
 }
 
 function fmtP(p: number): string {
-  if (p < 0.001) return "< 0,001";
+  if (p < 0.001) return "< 0.001";
   return num(p, 3);
 }
 
@@ -196,13 +266,16 @@ export default function ExperimentComparison() {
 
   const methodBlock = DATA?.methods?.[split];
   const ablationBlock = DATA?.ablation?.[split];
-  const budgetRows = DATA?.budget_curve?.[split] ?? [];
+  const budgetRows = useMemo(
+    () => (DATA?.budget_curve?.[split] ?? []).map((b) => ({ ...b, budget: toEn(b.budget) })),
+    [split],
+  );
   const rcaRows = DATA?.rca ?? [];
 
   const barData = useMemo(() => {
     if (!methodBlock) return [];
     return methodBlock.methods.map((m) => ({
-      name: m.label,
+      name: METHOD_LABEL_EN[m.key] ?? toEn(m.label),
       precision: m.precision,
       precision_ci: ciSpan(m.precision, m.precision_ci95),
       recall: m.recall,
@@ -217,8 +290,8 @@ export default function ExperimentComparison() {
   if (!hasData || !methodBlock || !ablationBlock) {
     return (
       <Empty>
-        Chưa có bảng thực nghiệm tĩnh (<code className="font-mono">src/data/experiment_table.json</code>).
-        Chạy <code className="font-mono">py scripts/m10_experiment_table.py</code> để sinh từ{" "}
+        Static experiment table not found (<code className="font-mono">src/data/experiment_table.json</code>).
+        Run <code className="font-mono">py scripts/m10_experiment_table.py</code> to generate from{" "}
         <code className="font-mono">eval/results/</code>.
       </Empty>
     );
@@ -234,11 +307,11 @@ export default function ExperimentComparison() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-[18px] font-semibold tracking-tight text-ink">
-            So sánh thực nghiệm CTAV &amp; RCA ({split === "test" ? "split test — G-test" : "split val"})
+            CTAV &amp; RCA Experiment Comparison ({split === "test" ? "test split — G-test" : "val split"})
           </h1>
           <p className="text-[11.5px] text-ink-muted">
-            Bảng tĩnh trích từ <code className="font-mono">eval/results/m10_experiment_table_v2/experiment_table.json</code>{" "}
-            (QĐ-037 · 0 số giả lập · bootstrap n=1.000, McNemar ghép cặp)
+            Static verified table from <code className="font-mono">eval/results/m10_experiment_table_v2/experiment_table.json</code>{" "}
+            (QD-037 · 0 fabricated numbers · bootstrap n=1,000, paired McNemar)
           </p>
         </div>
         <div className="flex items-center gap-1 rounded-md border border-[color:var(--color-hairline)] bg-surface p-0.5 text-[11.5px]">
@@ -252,7 +325,7 @@ export default function ExperimentComparison() {
                 split === k ? "bg-[color:var(--color-plane)] font-medium text-ink" : "text-ink-muted hover:text-ink-2",
               )}
             >
-              {k === "test" ? "Split test (chính thức)" : "Split val (tham chiếu)"}
+              {k === "test" ? "Test split (official)" : "Val split (reference)"}
             </button>
           ))}
         </div>
@@ -268,80 +341,83 @@ export default function ExperimentComparison() {
         <StatTile
           label={`CTAV FPR (${split})`}
           value={ctavM ? num(ctavM.fpr, 4) : "—"}
-          hint={bm25M ? `so với BM25 ${num(bm25M.fpr, 4)}` : undefined}
+          hint={bm25M ? `vs BM25 ${num(bm25M.fpr, 4)}` : undefined}
           accent={METRIC_COLORS.precision}
         />
         <StatTile
-          label={`H4 @ 120 lần gọi (${split})`}
+          label={`H4 @ 120 calls (${split})`}
           value={b120 ? num(b120.ctav, 3) : "—"}
-          hint={b120 ? `so với không-RAG ${num(b120.norag, 3)}` : undefined}
+          hint={b120 ? `vs LLM-no-RAG ${num(b120.norag, 3)}` : undefined}
         />
         <StatTile
           label={`RCA Hit@1 (${rcaPrimary?.split ?? split})`}
           value={rcaPrimary ? `${rcaPrimary.hit1_count}/${rcaPrimary.labelled} (${num(rcaPrimary.hit1, 3)})` : "—"}
           hint={
             rcaPrimary
-              ? `ARR ${num(rcaPrimary.arr_all, 3)} · JSON ${num(rcaPrimary.json_valid_rate * 100, 0)}%`
+              ? `ARR ${num(rcaPrimary.arr_all, 3)} · valid JSON ${num(rcaPrimary.json_valid_rate * 100, 0)}%`
               : undefined
           }
         />
       </div>
 
       <Card
-        title="Tổng hợp kiểm định giả thuyết H0–H5"
-        subtitle="Theo tiêu chí đăng ký trước G-test (be2b985) và quyết định báo cáo H5 (V45 / QĐ-045)."
+        title="Hypothesis Verification Summary (H0–H5)"
+        subtitle="Pre-registered G-test acceptance criteria (be2b985) and V45 honest H5 reporting (QD-045)."
       >
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-[12px]">
             <thead>
               <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
-                <th className="py-2 pr-3 font-medium">Giả thuyết</th>
+                <th className="py-2 pr-3 font-medium">Hypothesis</th>
                 <th className="py-2 pr-3 font-medium">Split</th>
-                <th className="py-2 pr-3 font-medium">Kết luận</th>
-                <th className="py-2 font-medium">Số đo kiểm định</th>
+                <th className="py-2 pr-3 font-medium">Verdict</th>
+                <th className="py-2 font-medium">Measured Evidence</th>
               </tr>
             </thead>
             <tbody>
-              {DATA.verdicts.map((h) => (
-                <tr key={h.id} className="border-b border-[color:var(--color-hairline)] last:border-0 align-top">
-                  <td className="py-2 pr-3 font-medium text-ink">
-                    <span className="font-mono">{h.id}</span> · {h.title}
-                  </td>
-                  <td className="py-2 pr-3 font-mono text-[11px] text-ink-muted">{h.split}</td>
-                  <td className="py-2 pr-3 whitespace-nowrap">
-                    <span
-                      className="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium"
-                      style={{ borderColor: statusColor(h.status), color: statusColor(h.status) }}
-                    >
-                      {h.status_label}
-                    </span>
-                  </td>
-                  <td className="py-2 text-[11.5px] text-ink-2">
-                    <div>{h.summary}</div>
-                    {h.note && <div className="mt-1 text-[11px] italic text-ink-muted">{h.note}</div>}
-                    {h.clauses.length > 0 && (
-                      <ul className="mt-1 space-y-0.5 text-[11px] text-ink-muted">
-                        {h.clauses.map((c) => (
-                          <li key={c.clause}>
-                            <span className="font-mono">
-                              {c.met === true ? "✓" : c.met === false ? "✗" : "•"}
-                            </span>{" "}
-                            {c.clause}: <span className="text-ink-2">{c.detail}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {DATA.verdicts.map((h) => {
+                const meta = HYPOTHESIS_META_EN[h.id];
+                return (
+                  <tr key={h.id} className="border-b border-[color:var(--color-hairline)] last:border-0 align-top">
+                    <td className="py-2 pr-3 font-medium text-ink">
+                      <span className="font-mono">{h.id}</span> · {meta?.title ?? toEn(h.title)}
+                    </td>
+                    <td className="py-2 pr-3 font-mono text-[11px] text-ink-muted">{h.split}</td>
+                    <td className="py-2 pr-3 whitespace-nowrap">
+                      <span
+                        className="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium"
+                        style={{ borderColor: statusColor(h.status), color: statusColor(h.status) }}
+                      >
+                        {meta?.statusLabel ?? toEn(h.status_label)}
+                      </span>
+                    </td>
+                    <td className="py-2 text-[11.5px] text-ink-2">
+                      <div>{toEn(h.summary)}</div>
+                      {h.note && <div className="mt-1 text-[11px] italic text-ink-muted">{toEn(h.note)}</div>}
+                      {h.clauses.length > 0 && (
+                        <ul className="mt-1 space-y-0.5 text-[11px] text-ink-muted">
+                          {h.clauses.map((c) => (
+                            <li key={c.clause}>
+                              <span className="font-mono">
+                                {c.met === true ? "✓" : c.met === false ? "✗" : "•"}
+                              </span>{" "}
+                              {toEn(c.clause)}: <span className="text-ink-2">{toEn(c.detail)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </Card>
 
       <Card
-        title={`Năm phương pháp phân loại cảnh báo (${split} — ${methodBlock.windows.toLocaleString("vi-VN")} cửa sổ telemetry, ${methodBlock.fault_windows} fault)`}
-        subtitle="Râu biểu đồ là khoảng tin cậy bootstrap 95% (n=1.000). Chỉ số đầy đủ nằm ở bảng bên dưới."
+        title={`Five Alert Validation Methods (${split} — ${methodBlock.windows.toLocaleString("en-US")} telemetry windows, ${methodBlock.fault_windows} fault)`}
+        subtitle="Error bars show 95% bootstrap confidence intervals (n=1,000). Full table below."
         right={
           <Legend
             items={[
@@ -396,7 +472,7 @@ export default function ExperimentComparison() {
           <table className="w-full border-collapse text-[12px]">
             <thead>
               <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
-                <th className="py-2 pr-3 font-medium">Phương pháp</th>
+                <th className="py-2 pr-3 font-medium">Method</th>
                 <th className="py-2 pr-3 text-right font-medium">TP</th>
                 <th className="py-2 pr-3 text-right font-medium">FP</th>
                 <th className="py-2 pr-3 text-right font-medium">Precision</th>
@@ -408,7 +484,9 @@ export default function ExperimentComparison() {
             <tbody>
               {methodBlock.methods.map((m) => (
                 <tr key={m.key} className="border-b border-[color:var(--color-hairline)] last:border-0">
-                  <td className="py-1.5 pr-3 font-medium text-ink">{m.label}</td>
+                  <td className="py-1.5 pr-3 font-medium text-ink">
+                    {METHOD_LABEL_EN[m.key] ?? toEn(m.label)}
+                  </td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">{m.tp}</td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">{m.fp}</td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">{num(m.precision, 3)}</td>
@@ -430,23 +508,25 @@ export default function ExperimentComparison() {
           </table>
         </div>
 
-        <h3 className="mt-5 mb-2 text-[12px] font-semibold text-ink">Hiệu ghép cặp (paired bootstrap CI95 &amp; McNemar)</h3>
+        <h3 className="mt-5 mb-2 text-[12px] font-semibold text-ink">
+          Paired Differences (paired bootstrap CI95 &amp; McNemar)
+        </h3>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-[11.5px]">
             <thead>
               <tr className="border-b border-[color:var(--color-hairline)] text-left text-[10.5px] text-ink-muted">
-                <th className="py-1.5 pr-3 font-medium">Hiệu</th>
+                <th className="py-1.5 pr-3 font-medium">Comparison</th>
                 <th className="py-1.5 pr-3 font-medium">ΔRecall [CI95]</th>
                 <th className="py-1.5 pr-3 font-medium">ΔFPR [CI95]</th>
                 <th className="py-1.5 pr-3 font-medium">ΔF1 [CI95]</th>
                 <th className="py-1.5 pr-3 font-medium">ΔPrecision [CI95]</th>
-                <th className="py-1.5 font-medium">McNemar p (mọi / fault / normal)</th>
+                <th className="py-1.5 font-medium">McNemar p (all / fault / normal)</th>
               </tr>
             </thead>
             <tbody>
               {methodBlock.pairs.map((p) => (
                 <tr key={p.label} className="border-b border-[color:var(--color-hairline)] last:border-0">
-                  <td className="py-1.5 pr-3 font-medium text-ink">{p.label}</td>
+                  <td className="py-1.5 pr-3 font-medium text-ink">{toEn(p.label)}</td>
                   <td className="py-1.5 pr-3 tabular-nums">
                     {fmtSigned(p.d_recall)} <span className="text-ink-muted">{fmtCi(p.d_recall_ci95, 3, true)}</span>
                   </td>
@@ -470,28 +550,28 @@ export default function ExperimentComparison() {
       </Card>
 
       <Card
-        title={`H3 — Ablation thành phần CTAV & C5 Rescue (${split})`}
-        subtitle={`C5 Rescue quét vùng dưới ngưỡng (${ablationBlock.rescue.judged_rescue_windows} cửa sổ, ${ablationBlock.rescue.judged_rescue_alerts} alert được judge; best point ${ablationBlock.rescue.best_point_name}, chọn ${ablationBlock.rescue.selected_name}).`}
+        title={`H3 — Component Ablation & C5 Rescue (${split})`}
+        subtitle={`C5 Rescue sweeps below-threshold windows (${ablationBlock.rescue.judged_rescue_windows} windows, ${ablationBlock.rescue.judged_rescue_alerts} alerts judged; best point ${ablationBlock.rescue.best_point_name}, selected ${ablationBlock.rescue.selected_name}).`}
       >
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-[12px]">
             <thead>
               <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
-                <th className="py-2 pr-3 font-medium">Biến thể</th>
+                <th className="py-2 pr-3 font-medium">Variant</th>
                 <th className="py-2 pr-3 text-right font-medium">TP</th>
                 <th className="py-2 pr-3 text-right font-medium">FP</th>
                 <th className="py-2 pr-3 text-right font-medium">Precision</th>
                 <th className="py-2 pr-3 text-right font-medium">Recall</th>
                 <th className="py-2 pr-3 font-medium">F1 [CI95]</th>
                 <th className="py-2 pr-3 text-right font-medium">FPR</th>
-                <th className="py-2 pr-3 text-right font-medium">Lần gọi LLM</th>
+                <th className="py-2 pr-3 text-right font-medium">LLM calls</th>
                 <th className="py-2 text-right font-medium">USD</th>
               </tr>
             </thead>
             <tbody>
               {ablationBlock.variants.map((v) => (
                 <tr key={v.key} className="border-b border-[color:var(--color-hairline)] last:border-0">
-                  <td className="py-1.5 pr-3 font-medium text-ink">{v.label}</td>
+                  <td className="py-1.5 pr-3 font-medium text-ink">{toEn(v.label)}</td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">{v.tp}</td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">{v.fp}</td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">{num(v.precision, 3)}</td>
@@ -502,7 +582,7 @@ export default function ExperimentComparison() {
                   </td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">{num(v.fpr, 4)}</td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">
-                    {v.llm_calls !== null ? v.llm_calls.toLocaleString("vi-VN") : "—"}
+                    {v.llm_calls !== null ? v.llm_calls.toLocaleString("en-US") : "—"}
                   </td>
                   <td className="py-1.5 text-right tabular-nums">
                     {v.estimated_cost_usd !== null ? `$${num(v.estimated_cost_usd, 2)}` : "—"}
@@ -513,23 +593,23 @@ export default function ExperimentComparison() {
           </table>
         </div>
 
-        <h3 className="mt-4 mb-2 text-[12px] font-semibold text-ink">Hiệu ghép cặp so với CTAV</h3>
+        <h3 className="mt-4 mb-2 text-[12px] font-semibold text-ink">Paired Differences vs CTAV</h3>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-[11.5px]">
             <thead>
               <tr className="border-b border-[color:var(--color-hairline)] text-left text-[10.5px] text-ink-muted">
-                <th className="py-1.5 pr-3 font-medium">Biến thể − CTAV</th>
+                <th className="py-1.5 pr-3 font-medium">Variant − CTAV</th>
                 <th className="py-1.5 pr-3 font-medium">ΔRecall [CI95]</th>
                 <th className="py-1.5 pr-3 font-medium">ΔFPR [CI95]</th>
                 <th className="py-1.5 pr-3 font-medium">ΔF1 [CI95]</th>
                 <th className="py-1.5 pr-3 font-medium">ΔPrecision [CI95]</th>
-                <th className="py-1.5 font-medium">McNemar p (mọi / fault / normal)</th>
+                <th className="py-1.5 font-medium">McNemar p (all / fault / normal)</th>
               </tr>
             </thead>
             <tbody>
               {ablationBlock.pairs.map((p) => (
                 <tr key={p.label} className="border-b border-[color:var(--color-hairline)] last:border-0">
-                  <td className="py-1.5 pr-3 font-medium text-ink">{p.label}</td>
+                  <td className="py-1.5 pr-3 font-medium text-ink">{toEn(p.label)}</td>
                   <td className="py-1.5 pr-3 tabular-nums">
                     {fmtSigned(p.d_recall)} <span className="text-ink-muted">{fmtCi(p.d_recall_ci95, 3, true)}</span>
                   </td>
@@ -553,8 +633,8 @@ export default function ExperimentComparison() {
       </Card>
 
       <Card
-        title={`H4 — Đường cong F1 theo ngân sách lần gọi LLM (${split})`}
-        subtitle="Candidate xếp theo thứ tự thời gian; H4 kiểm định ở mốc đầu 120 lần gọi."
+        title={`H4 — F1 Curve by LLM Call Budget (${split})`}
+        subtitle="Candidates processed in chronological order; H4 is evaluated at the 120-call checkpoint."
         right={
           <Legend items={BUDGET_SERIES.map((s) => ({ key: s.key, label: s.label, color: s.color, glyph: s.glyph }))} />
         }
@@ -568,7 +648,7 @@ export default function ExperimentComparison() {
               <Tooltip
                 content={({ active, payload, label }) =>
                   active && payload?.length ? (
-                    <TooltipShell title={`Ngân sách: ${label}`}>
+                    <TooltipShell title={`Budget: ${label}`}>
                       {payload.map((entry) => (
                         <TooltipRow
                           key={String(entry.dataKey)}
@@ -601,7 +681,7 @@ export default function ExperimentComparison() {
           <table className="w-full border-collapse text-[12px]">
             <thead>
               <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
-                <th className="py-1.5 pr-3 font-medium">Phương pháp</th>
+                <th className="py-1.5 pr-3 font-medium">Method</th>
                 {budgetRows.map((b) => (
                   <th key={b.budget} className="py-1.5 px-2 text-right font-medium tabular-nums">
                     {b.budget}
@@ -626,31 +706,31 @@ export default function ExperimentComparison() {
       </Card>
 
       <Card
-        title="H5 — Đánh giá tác tử RCA (Nhánh A: định vị gốc · Nhánh B: gom &amp; tóm tắt) + Độ nhạy C3-trượt"
-        subtitle="Không đạt ngưỡng đăng ký trước trên test (Hit@1=0,471 < 0,60; Hit@3=0,471 < 0,80 vì C3 ngưỡng dev lọc hết ca đa dịch vụ). Nhánh B đạt trên cả 2 split."
+        title="H5 — RCA Agent Evaluation (Branch A: Root Cause Localization · Branch B: Grouping &amp; Summary) + C3-rolling Sensitivity"
+        subtitle="Fails pre-registered test thresholds (Hit@1=0.471 < 0.60, Hit@3=0.471 < 0.80 because frozen dev C3 filters out multi-service incidents). Branch B achieves valid JSON across all splits."
       >
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-[11.5px]">
             <thead>
               <tr className="border-b border-[color:var(--color-hairline)] text-left text-[10.5px] text-ink-muted">
-                <th className="py-2 pr-3 font-medium">Cấu hình</th>
-                <th className="py-2 pr-3 text-right font-medium">Alert</th>
-                <th className="py-2 pr-3 text-right font-medium">Sự cố (có nhãn / multi)</th>
+                <th className="py-2 pr-3 font-medium">Configuration</th>
+                <th className="py-2 pr-3 text-right font-medium">Alerts</th>
+                <th className="py-2 pr-3 text-right font-medium">Incidents (labelled / multi)</th>
                 <th className="py-2 pr-3 font-medium">Hit@1 [CI95]</th>
                 <th className="py-2 pr-3 font-medium">Hit@3 [CI95]</th>
                 <th className="py-2 pr-3 text-right font-medium">Baseline Hit@1</th>
-                <th className="py-2 pr-3 text-right font-medium">Hit@1 / tiêm lỗi</th>
-                <th className="py-2 pr-3 font-medium">ARR mọi cảnh báo [CI95]</th>
+                <th className="py-2 pr-3 text-right font-medium">Hit@1 / injection</th>
+                <th className="py-2 pr-3 font-medium">ARR all alerts [CI95]</th>
                 <th className="py-2 pr-3 text-right font-medium">ARR cascade</th>
-                <th className="py-2 font-medium">JSON hợp lệ</th>
+                <th className="py-2 font-medium">Valid JSON</th>
               </tr>
             </thead>
             <tbody>
               {rcaRows.map((r) => (
                 <tr key={r.run_id} className="border-b border-[color:var(--color-hairline)] last:border-0">
                   <td className="py-2 pr-3">
-                    <div className="font-medium text-ink">{r.label}</div>
-                    <div className="text-[10.5px] text-ink-muted">{r.note}</div>
+                    <div className="font-medium text-ink">{toEn(r.label)}</div>
+                    <div className="text-[10.5px] text-ink-muted">{toEn(r.note)}</div>
                   </td>
                   <td className="py-2 pr-3 text-right tabular-nums">{r.alerts}</td>
                   <td className="py-2 pr-3 text-right tabular-nums">

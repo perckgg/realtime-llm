@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Trạng thái | Đang làm (xong **M10-A**, **M10-B**, **M10-C**, **M10-C.1**; còn M10-D..E) |
+| Trạng thái | Đang làm (xong **M10-A**, **M10-B**, **M10-C**, **M10-C.1**, **M10-D**; còn M10-E) |
 | Ngày mở mốc | 2026-11-17 (QĐ-043) |
 | Hạn mục tiêu | 2027-01-10 |
-| Commit | `45c75c6` (M10-A), `8f2ba70` (M10-B), `55228a7` (M10-C); *(cập nhật tiếp qua M10-C.1..E)* |
-| Quyết định liên quan | QĐ-043, QĐ-045, QĐ-046, QĐ-047 (+ bổ sung M10-C.1) |
+| Commit | `45c75c6` (M10-A), `8f2ba70` (M10-B), `55228a7` (M10-C), `2d933b1` (M10-C.1); *(M10-D cập nhật sau commit)* |
+| Quyết định liên quan | QĐ-043, QĐ-045, QĐ-046, QĐ-047 (+ bổ sung M10-C.1), QĐ-048 |
 
 ---
 
@@ -20,8 +20,8 @@ Theo dõi DoD theo 5 mốc con (`docs/prompts/M10-handoff.md` §2):
 | **M10-B:** `services/api` (FastAPI chỉ đọc, 7 endpoint) + `types.ts` trường policy CTAV + `infra/Dockerfile.api` + `tests/test_api.py` | **Đạt** (2026-11-17) | `services/api/{main,readers,schemas}.py`, `services/web/src/api/types.ts`, `infra/Dockerfile.api`, `docker-compose.yml`, `tests/test_api.py`; 7 endpoint `200 OK` trên `pipeline_{val,test}_v1` (cả qua `TestClient` và container `internship1-api-1`); `/alerts?run_id=pipeline_test_v1` (13.699 dòng) đo thực tế `0,561 s`; QĐ-046 |
 | **M10-C:** Nối 4 màn hình sang `VITE_DATA_SOURCE=http` + `ExperimentComparison` bảng tĩnh + service `web` trong compose + `npm run check` sạch | **Đạt** (2026-11-17) | `scripts/m10_experiment_table.py`, `services/web/src/data/experiment_table.json` (`52.004` B), `services/web/src/{App.tsx,api/client.ts,screens/*}`, `services/web/scripts/smoke.tsx`, `infra/Dockerfile.web`, `docker-compose.yml`, `tests/test_experiment_table.py`; 4 container (`web`, `api`, `clickhouse`, `postgres`) `healthy`; `http://127.0.0.1:5173/` & `/api/{health,runs,alerts,incidents}` `200 OK`; `npm.cmd run check` (exit 0), `pytest` `248 passed`; QĐ-047 |
 | **M10-C.1:** Sửa lỗi sau review M10-C (F1..F10): chuẩn hoá H1 / H5 khớp Ch5, `policySteps()`, `cache_hit` thật (`_v2`), `run_id` & `alert_count` | **Đạt** (2026-11-17) | `eval/results/m10_experiment_table_v2/experiment_table.json` (`52.379` B), `pipeline_val_v2` (26 / 26 parity, E2E `5.764,165 ms`), `pipeline_test_v2` (38 / 38 parity, E2E `4.242,424 ms`), `npm.cmd run check` sạch, `pytest` `249 passed in 28.75s`, probe proxy `:5173` & `docker compose stop/start api` qua *(Chromium tương tác chưa kiểm do người dùng huỷ subagent)*; bổ sung QĐ-047 |
-| **M10-D:** `m10_pick_demo_cases.py` + `DEMO_OFFLINE` + tự kiểm trình duyệt thật + ảnh `docs/drafts/figures/m10-*.png` | Chưa làm | — |
-| **M10-E:** Hoàn tất `M10-platform.md`, `ch6-demo-platform.md`, bản tóm tắt GVHD, đóng M10 | Chưa làm | — |
+| **M10-D:** Giao diện 100% tiếng Anh + `pipeline_sens_test_v1` (V48 b'+a') + `m10_pick_demo_cases.py` + `DEMO_OFFLINE=1` + tự kiểm trình duyệt + ảnh + nháp `ch6-demo-platform.md` | **Đạt** (2026-11-17) | `services/web/`, `services/rca_agent/pipeline.py`, `scripts/m10_pick_demo_cases.py`, `eval/results/m10_demo_cases_v1/demo_cases.json`, `tests/test_demo_cases.py`, `eval/results/pipeline_sens_test_v1/runtime.json` (`114/114` parity, `13.699` / `19.794` / `114`, `0` gọi API), 5 ảnh `docs/drafts/figures/m10-*.png`, `docs/drafts/ch6-demo-platform.md`; `npm run check` (`26/26`), `mypy` (43 file), `ruff`, `pytest` **`253 passed`** (`0` skipped); QĐ-048 |
+| **M10-E:** Rà soát `M10-platform.md`, `ch6-demo-platform.md`, bản tóm tắt GVHD, đóng M10 | Chưa làm | — |
 
 ### Số liệu M10-A (thực đo 2026-11-17, QĐ-045)
 
@@ -87,5 +87,19 @@ py -m services.rca_agent.pipeline --config eval/configs/rca_final_test.yaml
 
 ## 4. Plan cho mốc tiếp theo
 
-- **Tiếp theo trong M10:** **M10-D** (`scripts/m10_pick_demo_cases.py` trên `pipeline_{val,test}_v2` + triển khai **V48 (b')** nạp `pipeline_sens_test_v1` từ `rca_sens_test_c3rolling_v1` kèm ghi chú rõ *"dòng độ nhạy, không phải kết quả H5"* và **(a')** trong Ch6, kiểm `DEMO_OFFLINE` khi tắt mạng và không dùng `GEMINI_API_KEY`, tự kiểm trình duyệt thật đủ 4 màn hình & chụp ảnh `docs/drafts/figures/m10-*.png`) → **M10-E** (hoàn tất báo cáo này, `ch6-demo-platform.md`, mail GVHD, đóng M10).
-- **Ghi chú M10-C.1 (đã đo):** Chạy `pipeline_val_v2` (E2E `5.764,165 ms`, `0` gọi API) và `pipeline_test_v2` (E2E `4.242,424 ms`, `0` gọi API) với `cache_hit` thật từ `judged.jsonl`; giữ nguyên `_v1`. Cả 4 container compose chạy `healthy`.
+- **Tiếp theo trong M10:** **M10-E** (rà soát báo cáo `docs/milestones/M10-platform.md` đủ 4 phần theo `docs/milestones/README.md`, rà lại `docs/drafts/ch6-demo-platform.md`, soạn bản tóm tắt gửi GVHD nếu cần, chờ người dùng xem và đóng M10).
+
+### Số liệu M10-D & danh sách lỗi demo còn lại (thực đo 2026-11-17, QĐ-048)
+
+- **Nạp `pipeline_sens_test_v1` (V48 `(b')`, nhạy `c3_rolling_baseline` ngoài đăng ký H5):** `13.699` dòng `fact_alert_evaluation` (`438` `TRUE_ALERT`), `19.794` dòng `fact_retrieval_trace`, `114` incidents / `114` diagnostic reports / `0` rejected trong PostgreSQL, parity **`114 / 114`** với `rca_sens_test_c3rolling_v1`, `0` gọi API mới, E2E wall `10.646,898 ms`, cache hit `100%` (`eval/results/pipeline_sens_test_v1/runtime.json`).
+- **Bộ ca demo chọn tự động (`py scripts/m10_pick_demo_cases.py --seed 42`):**
+  - Bước 1 (`Timeline`): `pipeline_test_v2` → `docs/drafts/figures/m10-timeline.png` (`13.699` candidate, `78` confirmed alerts, `38` incidents, `1.253` ca C3 downgrade).
+  - Bước 2 (`C3 downgrade`, pool `1.171` normal): `cand-ad327c0b162f6198:hybrid_bm25_graph:r0` (`productcatalogservice`, `pipeline_test_v2`) → `docs/drafts/figures/m10-alert-c3-downgrade.png`.
+  - Bước 3 (`network_delay` BM25 bỏ sót / CTAV xác nhận, pool `2` trên `test`): `cand-fa85e82f02f08574:hybrid_bm25_graph:r0` (`cartservice`, `pipeline_test_v2`) → `docs/drafts/figures/m10-alert-topo-rescue.png`.
+  - Bước 4 (`Cascade`, V48 `(b')` pool `3` + V48 `(a')`): `inc-46289ea526eaa3f3` (`pipeline_sens_test_v1`, `ts-basic-service → ts-preserve-service`) kèm ca tách `val` `2023-01-30#009` (`pipeline_val_v2`) → `docs/drafts/figures/m10-incident-cascade.png`.
+  - Bước 5 (`Experiment Comparison`): `/compare` (`test` G-test + chuyển đổi `val`) → `docs/drafts/figures/m10-experiment-comparison.png`.
+- **Kiểm tra sau sửa cuối:** `npm.cmd --prefix services/web run check` (exit `0`, `26/26` SSR smoke ok), `py -m mypy packages services` (43 file sạch), `py -m ruff check services scripts/m10_experiment_table.py scripts/m10_pick_demo_cases.py tests` sạch, `py -m pytest tests/ -q` **`253 passed in 30.37s`** (`0` skipped).
+- **Danh sách lỗi demo còn lại xếp theo mức độ nghiêm trọng:**
+  1. **Thấp (`UX`):** `GET /runs` xếp nhóm `pipeline_%` theo `started_at DESC`, nên sau khi nạp `pipeline_sens_test_v1` thì mở `/` không kèm `?run_id=` sẽ mặc định chọn `pipeline_sens_test_v1` trước `pipeline_test_v2` (đã giảm thiểu bằng băng cảnh báo sensitivity ở đầu trang và truyền `?run_id=` tường minh trong kịch bản).
+  2. **Thấp (`UX`):** Trục X của biểu đồ Timeline chỉ gắn nhãn ngày `dd/MM` ở cột đầu tiên (`bucket 0`) thay vì nhắc lại ở mỗi lần chuyển ngày qua nửa đêm trên các tập nhiều ngày.
+  3. **Thẩm mỹ (`Build`):** Bundle JS của Vite (`dist/assets/index-*.js`, `915,84 kB`) vượt mức cảnh báo 500 kB mặc định do chưa tách chunk động theo route.

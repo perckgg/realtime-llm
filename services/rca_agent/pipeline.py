@@ -14,6 +14,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import time
 from collections import Counter
 from collections.abc import Mapping, Sequence
@@ -137,35 +138,27 @@ def _build_eval_row(
     }
 
 
-def load_alerts(
-    alerts_run: str,
+def _build_loaded_alerts(
+    per_window_rows: list[dict[str, str]],
+    judged_alerts: Sequence[JudgedAlert],
+    wanted_alert_windows: set[str],
+    source_label: str,
     evidence_run: str,
     run_id: str,
     results_root: Path = RESULTS,
 ) -> LoadedAlerts:
-    """Load CTAV judged candidates and retrieval evidence for ClickHouse ingestion and grouping."""
-    alerts_dir = results_root / alerts_run
-    evidence_dir = results_root / evidence_run
-
-    with (alerts_dir / "per_window.csv").open(encoding="utf-8", newline="") as handle:
-        per_window_rows = list(csv.DictReader(handle))
+    """Build ClickHouse rows and grouped inputs from judged alerts and retrieval evidence."""
     by_window = {row["window_id"]: row for row in per_window_rows}
-    wanted_alert_windows = {row["window_id"] for row in per_window_rows if row["decision"] == "alert"}
-
-    judged_alerts: list[JudgedAlert] = []
-    with (alerts_dir / "judged.jsonl").open(encoding="utf-8") as handle:
-        for line in handle:
-            judged_alerts.append(JudgedAlert.model_validate_json(line))
     judged_by_window = {alert.window_id: alert for alert in judged_alerts}
-
     confirmed_alerts = [
         alert for alert in judged_alerts if alert.window_id in wanted_alert_windows
     ]
     if {alert.window_id for alert in confirmed_alerts} != wanted_alert_windows:
         raise ValueError(
-            f"{alerts_dir}: judged.jsonl does not hold every alert of per_window.csv"
+            f"{source_label}: judged alerts do not hold every confirmed alert window"
         )
 
+    evidence_dir = results_root / evidence_run
     retrieval_by_window: dict[str, dict[str, Any]] = {}
     with (evidence_dir / "retrieval.jsonl").open(encoding="utf-8") as handle:
         for line in handle:
@@ -224,7 +217,7 @@ def load_alerts(
     inputs = rca.Inputs(
         rows=per_window_rows,
         alerts=confirmed_alerts,
-        source=f"{alerts_run} (decision == alert)",
+        source=source_label,
     )
     return LoadedAlerts(
         inputs=inputs,
@@ -234,6 +227,74 @@ def load_alerts(
         ctav_prompt_tokens=ctav_prompt_tokens,
         ctav_completion_tokens=ctav_completion_tokens,
     )
+
+
+def load_alerts(
+    alerts_run: str,
+    evidence_run: str,
+    run_id: str,
+    results_root: Path = RESULTS,
+) -> LoadedAlerts:
+    """Load CTAV judged candidates and retrieval evidence for ClickHouse ingestion and grouping."""
+    alerts_dir = results_root / alerts_run
+    with (alerts_dir / "per_window.csv").open(encoding="utf-8", newline="") as handle:
+        per_window_rows = list(csv.DictReader(handle))
+    wanted_alert_windows = {row["window_id"] for row in per_window_rows if row["decision"] == "alert"}
+
+    judged_alerts: list[JudgedAlert] = []
+    with (alerts_dir / "judged.jsonl").open(encoding="utf-8") as handle:
+        for line in handle:
+            judged_alerts.append(JudgedAlert.model_validate_json(line))
+
+    return _build_loaded_alerts(
+        per_window_rows=per_window_rows,
+        judged_alerts=judged_alerts,
+        wanted_alert_windows=wanted_alert_windows,
+        source_label=f"{alerts_run} (decision == alert)",
+        evidence_run=evidence_run,
+        run_id=run_id,
+        results_root=results_root,
+    )
+
+
+def load_alerts_from_ctav_variant(
+    source_cfg: Mapping[str, Any],
+    expected_split: str,
+    evidence_run: str,
+    run_id: str,
+    results_root: Path = RESULTS,
+) -> tuple[LoadedAlerts, str, str]:
+    """Replay a CTAV config/variant offline from cached Tier-1/Tier-2/anchor artifacts."""
+    from eval.harness import ctav
+
+    ctav_rel = str(source_cfg["ctav_config"])
+    ctav_cfg = ctav.load_ctav_config(REPO / ctav_rel)
+    if str(ctav_cfg["split"]) != expected_split:
+        raise ValueError("input.ctav_config is on another split than this RCA config")
+    tiers = ctav_cfg["tiers"]
+    replay = ctav.Replay(
+        ctav.load_tier_run(results_root, tiers["local"]),
+        ctav.load_tier_run(results_root, tiers["topology"]),
+        ctav.load_facts(results_root, ctav_cfg["anchor_features"]),
+    )
+    variants = {v.name: v for v in ctav.ablations(ctav.variant_from_config(ctav_cfg))}
+    variant_name = str(source_cfg.get("variant", "ctav"))
+    if variant_name not in variants:
+        raise ValueError(f"input.variant {variant_name!r} is not one of {sorted(variants)}")
+    outcome = replay.run(variants[variant_name])
+    judged_alerts = [outcome.alerts[w] for w in replay.ids if w in outcome.alerts]
+    wanted_alert_windows = {w for i, w in enumerate(replay.ids) if outcome.predicted[i]}
+    alerts_run = str(ctav_cfg["run_id"])
+    loaded = _build_loaded_alerts(
+        per_window_rows=replay.rows,
+        judged_alerts=judged_alerts,
+        wanted_alert_windows=wanted_alert_windows,
+        source_label=f"{ctav_rel} variant {variant_name}",
+        evidence_run=evidence_run,
+        run_id=run_id,
+        results_root=results_root,
+    )
+    return loaded, alerts_run, variant_name
 
 
 def normalized_report_hash(report_dict: Mapping[str, Any]) -> str:
@@ -276,7 +337,16 @@ def check_parity(
             f"got {len(summaries)}, expected {len(ref_reports)}"
         )
 
-    for idx, (item, ref_inc) in enumerate(zip(located, ref_incidents, strict=True)):
+    # Align equal-start_ts ties by recomputing incident_id under reference_dir.name.
+    paired = sorted(
+        zip(located, summaries, strict=True),
+        key=lambda pair: (
+            pair[0].labelled.incident.start_ts,
+            _incident_id(reference_dir.name, pair[0].labelled.incident.alert_ids),
+        ),
+    )
+
+    for idx, ((item, _), ref_inc) in enumerate(zip(paired, ref_incidents, strict=True)):
         got_record = rca.incident_record(item)
         if got_record["alert_ids"] != ref_inc["alert_ids"]:
             raise ValueError(
@@ -294,7 +364,7 @@ def check_parity(
                 f"{got_record['baseline']} != {ref_inc['baseline']}"
             )
 
-    for idx, (res, ref_rep) in enumerate(zip(summaries, ref_reports, strict=True)):
+    for idx, ((_, res), ref_rep) in enumerate(zip(paired, ref_reports, strict=True)):
         ref_payload = ref_rep.get("report")
         if (res.report is None) != (ref_payload is None):
             raise ValueError(f"Parity mismatch at report #{idx}: presence differs")
@@ -531,6 +601,11 @@ def run_pipeline(
 ) -> Path:
     """Execute the full M10-A pipeline and write outputs + runtime.json."""
     load_dotenv(REPO / ".env")
+    offline_mode = os.environ.get("DEMO_OFFLINE", "").strip().lower() in ("1", "true", "yes")
+    if offline_mode:
+        # Guarantee zero outbound credentials exist during offline defense replays.
+        os.environ.pop("GEMINI_API_KEY", None)
+        os.environ.pop("GOOGLE_API_KEY", None)
     wall_start = time.perf_counter()
     started_at = datetime.now(UTC)
 
@@ -558,12 +633,23 @@ def run_pipeline(
             if store.run_exists(conn, effective_run_id):
                 raise SystemExit(f"run_id {effective_run_id!r} already exists in PostgreSQL")
 
-    alerts_run = str(config["input"]["alerts_run"])
-    evidence_run = str(config["input"]["evidence_run"])
+    source_cfg = config["input"]
+    evidence_run = str(source_cfg["evidence_run"])
 
     # Stage 1a: load CTAV judged candidates and retrieval evidence.
     t_load = time.perf_counter()
-    loaded = load_alerts(alerts_run, evidence_run, effective_run_id, results_root=results_root)
+    ctav_variant: str | None = None
+    if "alerts_run" in source_cfg:
+        alerts_run = str(source_cfg["alerts_run"])
+        loaded = load_alerts(alerts_run, evidence_run, effective_run_id, results_root=results_root)
+    else:
+        loaded, alerts_run, ctav_variant = load_alerts_from_ctav_variant(
+            source_cfg,
+            expected_split=str(config["split"]),
+            evidence_run=evidence_run,
+            run_id=effective_run_id,
+            results_root=results_root,
+        )
     load_alerts_ms = (time.perf_counter() - t_load) * 1000.0
 
     # Stage 2 & 3: grouping + level-1 propagation.
@@ -600,6 +686,7 @@ def run_pipeline(
     report["git_commit"] = git_commit
     report["method_fingerprint"] = fp
     report["ctav_run"] = alerts_run
+    report["ctav_variant"] = ctav_variant
     report["evidence_run"] = evidence_run
     report["reference_run_id"] = reference_run_id
     report["parity"] = parity
@@ -621,6 +708,11 @@ def run_pipeline(
             f"{config_text}"
         )
         with store.connect() as conn:
+            note = (
+                f"py -m services.rca_agent.pipeline (replay from {alerts_run}, variant {ctav_variant}, ref {reference_run_id})"
+                if ctav_variant
+                else f"py -m services.rca_agent.pipeline (replay from {alerts_run}, ref {reference_run_id})"
+            )
             store.register_run(
                 conn,
                 effective_run_id,
@@ -629,7 +721,7 @@ def run_pipeline(
                 str(config["split"]),
                 int(config.get("seed", 42)),
                 started_at,
-                notes=f"py -m services.rca_agent.pipeline (replay from {alerts_run}, ref {reference_run_id})",
+                notes=note,
             )
             store.insert_incidents(conn, [item.labelled.incident for item in located])
             for result in summaries:
@@ -665,7 +757,9 @@ def run_pipeline(
         "split": config["split"],
         "reference_run_id": reference_run_id,
         "alerts_run": alerts_run,
+        "ctav_variant": ctav_variant,
         "evidence_run": evidence_run,
+        "offline_mode": offline_mode,
         "method_fingerprint": fp,
         "finished_at": datetime.now(UTC).isoformat(),
         "latency_note": (

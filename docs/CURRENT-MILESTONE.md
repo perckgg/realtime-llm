@@ -78,7 +78,7 @@ mỗi mốc con một phiên:
 | - [x] M10-B | API FastAPI chỉ đọc, 7 endpoint; thêm trường policy CTAV vào `types.ts` | **Đạt (2026-11-17):** 7 endpoint 200 trên `pipeline_{val,test}_v1` & Docker `api` healthy; `/alerts` `test` 0,561 s; test hợp đồng `types.ts` qua | QĐ-046 | 2026-12-01 |
 | - [x] M10-C | 4 màn hình trên API thật; `ExperimentComparison` bảng tĩnh; service `web` trong compose | **Đạt (2026-11-17):** `experiment_table.json` parity; 4 container `healthy` (cổng `5173` proxy `/api`); `npm.cmd run check` sạch; `248` pytest qua | QĐ-047 | 2026-12-12 |
 | - [x] M10-C.1 | Sửa lỗi sau review M10-C (F1..F6, `M10-handoff.md` §7): bảng H1 / H5 sai so với đăng ký, thẻ C3 AlertDetail, `cache_hit`, `run_id` ở AlertDetail, run không có cảnh báo | **Đạt (2026-11-17):** F1..F10 xong (`m10_experiment_table_v2` khớp Bảng 5.18 / 5.26); parity `pipeline_{val,test}_v2` 26 / 26 & 38 / 38; `pytest` 249 qua; `npm run check` sạch; proxy & `stop/start api` đã kiểm *(Chromium tương tác bị người dùng huỷ)* | Bổ sung QĐ-047 | 2026-11-24 |
-| - [ ] M10-D | Chọn ca demo bằng quy tắc; demo offline; tự kiểm trình duyệt + ảnh | Kịch bản `08` §6 chạy trọn, kể cả không mạng | QĐ-048 | 2026-12-22 |
+| - [x] M10-D | Giao diện tiếng Anh; chọn ca demo `seed=42`; `pipeline_sens_test_v1` (V48 b'+a'); `DEMO_OFFLINE=1`; tự kiểm trình duyệt + ảnh; nháp Ch6 | **Đạt (2026-11-17):** UI 100% tiếng Anh; `pipeline_sens_test_v1` parity `114/114` (`13.699`/`19.794`/`114`, `0` API); `demo_cases.json` (`seed=42`); 5 ảnh `docs/drafts/figures/m10-*.png` verified (`0` lỗi console, `0` request ngoài localhost); `ch6-demo-platform.md` nháp xong; `pytest` **`253 passed`** (`0` skipped) | QĐ-048 | 2026-12-22 |
 | - [ ] M10-E | Báo cáo `M10-platform.md`, `ch6-demo-platform.md`, tóm tắt gửi GVHD | Người dùng đã xem | QĐ-049 | 2026-12-29 |
 
 Vấn đề M10 đã chốt đầu phiên 2026-11-17 (QĐ-045): **V47 → (a)** (`store.py` giữ nguyên, API đọc riêng), **V48 → (a) kèm (b) dự phòng** (ca cascade từ `val`, dự phòng `rca_sens_test_c3rolling_v1`, ghi rõ nguồn), **V49 → (a)** (bật `web` trong `docker-compose.yml`), và **V45 → (b)** (cách trình bày H5 không đạt ở Ch7/Ch8).
@@ -90,12 +90,9 @@ Vấn đề M10 đã chốt đầu phiên 2026-11-17 (QĐ-045): **V47 → (a)** 
    so với M9 (QĐ-042, QĐ-045); summarizer đọc 100% từ cache; `runtime.json` đã ghi E2E latency, token, cache hit (`0` gọi API)
 2. - [x] `services/api` (FastAPI): 7 endpoint chỉ đọc khớp `types.ts`, thêm 6 trường policy CTAV vào `types.ts`/`fixtures.ts`, `infra/Dockerfile.api`, bật `api` trong `docker-compose.yml`, test hợp đồng `tests/test_api.py` qua (QĐ-046)
 3. - [x] Nối Timeline, AlertDetail, IncidentDetail sang API thật (`VITE_DATA_SOURCE=http`): hiện tầng/nguồn gốc bằng chứng, lý do policy (θ, C3, C2), phân trang 200 dòng/trang, xử lý `ground_truth_service === null` và loading/empty/error state. `ExperimentComparison`: bảng tĩnh sinh từ `scripts/m10_experiment_table.py` đọc `eval/results/` (cắt theo `04` §9 ưu tiên 4, QĐ-037); bật service `web` trong `docker-compose.yml` (QĐ-047)
-4. - [ ] Chế độ demo offline: toàn bộ kịch bản chạy từ cache, không cần mạng, không cần `GEMINI_API_KEY`
-5. - [ ] Tự kiểm bằng trình duyệt thật: `docker compose --profile dev up -d`, replay, mở đủ 4 màn hình, đi hết kịch bản
-   `08` §6, lặp lại khi đã tắt mạng; chụp ảnh từng màn hình vào `docs/drafts/figures/`. Cái gì chưa mở lên xem được thì
-   ghi là chưa kiểm
-6. - [ ] `docs/milestones/M10-platform.md` (4 phần) + `docs/drafts/ch6-demo-platform.md` (§6.1–6.5, kèm ảnh, lệnh chạy,
-   bảng độ trễ / token) + danh sách lỗi demo còn lại xếp theo mức nghiêm trọng
+4. - [x] Chế độ demo offline: `DEMO_OFFLINE=1` xoá `GEMINI_API_KEY`/`GOOGLE_API_KEY`, toàn bộ kịch bản chạy 100% từ cache, không cần mạng (QĐ-048)
+5. - [x] Tự kiểm bằng trình duyệt thật: `docker compose --profile dev up -d --build api web`, đi hết 5 bước kịch bản `08` §6 bằng tiếng Anh tại `http://localhost:5173`, `0` lỗi console / `0` URL ngoài `localhost`; chụp 5 ảnh lưu tại `docs/drafts/figures/m10-*.png` (QĐ-048)
+6. - [ ] `docs/milestones/M10-platform.md` (4 phần — đã thêm số liệu M10-A..D + danh sách lỗi demo còn lại) + `docs/drafts/ch6-demo-platform.md` (đã viết xong §6.1–6.5 ở M10-D; rà soát chốt & tóm tắt GVHD ở M10-E)
 
 **DoD M10** (`04` M10): `docker compose --profile dev up -d` + replay → 4 màn hình hiển thị dữ liệu thật, có loading / empty
 state; chạy được khi rút mạng; kịch bản demo `08` §6 chạy trọn. Hạn 2027-01-10.

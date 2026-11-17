@@ -61,22 +61,21 @@ export default function Timeline() {
   const buckets = useMemo(() => bucketise(filtered), [filtered]);
   const stats = useMemo(() => summarise(filtered), [filtered]);
 
-  if (runsLoading) return <Loading label="Đang tải danh sách run…" />;
+  if (runsLoading) return <Loading label="Loading runs…" />;
   if (runsError) return <ErrorBox message={runsError} />;
-  if (!runId) return <Empty>Chưa có run nào được nạp trong cơ sở dữ liệu.</Empty>;
-  if (alertsQ.loading) return <Loading label={`Đang tải cảnh báo của ${runId}…`} />;
+  if (!runId) return <Empty>No runs have been ingested into the database yet.</Empty>;
+  if (alertsQ.loading) return <Loading label={`Loading alerts for ${runId}…`} />;
   if (alertsQ.error) return <ErrorBox message={alertsQ.error} />;
 
   return (
     <div className="space-y-4">
-      {/* Bộ lọc nằm trên một hàng, ngay phía trên biểu đồ nó điều khiển. */}
       <div className="flex flex-wrap items-end gap-3">
         <Segmented
           label="Verdict"
           value={verdict}
           onChange={(v) => setVerdict(v as VerdictFilter)}
           options={[
-            { value: "ALL", label: "Tất cả" },
+            { value: "ALL", label: "All" },
             ...VERDICT_ORDER.map((v) => ({
               value: v,
               label: verdictLabel[v],
@@ -94,40 +93,40 @@ export default function Timeline() {
           >
             {services.map((s) => (
               <option key={s} value={s}>
-                {s === "ALL" ? "Tất cả service" : s}
+                {s === "ALL" ? "All services" : s}
               </option>
             ))}
           </select>
         </label>
         <div className="ml-auto text-[11px] text-ink-muted">
-          {filtered.length} / {alerts.length} cảnh báo · gộp {BUCKET_MINUTES} phút
+          {filtered.length} / {alerts.length} alerts · {BUCKET_MINUTES}m buckets
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile label="Cảnh báo" value={String(filtered.length)} hint={`trên ${alerts.length} của run`} />
+        <StatTile label="Alerts" value={String(filtered.length)} hint={`of ${alerts.length} in run`} />
         <StatTile
-          label="Xác nhận cảnh báo"
+          label="Confirmed Alerts"
           value={String(stats.tp + stats.fp)}
-          hint={`${stats.tp} khớp nhãn · ${stats.fp} sai`}
+          hint={`${stats.tp} matched label · ${stats.fp} FP`}
           accent={verdictColor.TRUE_ALERT}
         />
         <StatTile
           label="Precision"
           value={stats.tp + stats.fp ? num(stats.tp / (stats.tp + stats.fp), 3) : "—"}
-          hint="TRUE_ALERT khớp nhãn Nezha"
+          hint="TRUE_ALERT matching Nezha fault label"
         />
         <StatTile
-          label="Hạ bởi CTAV (C3)"
+          label="Downgraded by CTAV (C3)"
           value={String(stats.anchored)}
-          hint={`chính sách hạ tổng ${stats.policyDowngraded} · Rescue ${stats.rescue}`}
+          hint={`total policy downgrades ${stats.policyDowngraded} · Rescue ${stats.rescue}`}
           accent={status.warning}
         />
       </div>
 
       <Card
-        title="Cảnh báo theo thời gian, tách theo verdict"
-        subtitle={`Cột xếp chồng: số cảnh báo mỗi ${BUCKET_MINUTES} phút. Đường liền: số cửa sổ thực sự là lỗi theo nhãn Nezha. Cùng một đơn vị — số cửa sổ — nên dùng chung một trục.`}
+        title="Alerts over time by verdict"
+        subtitle={`Stacked bars: alerts per ${BUCKET_MINUTES}-minute bucket. Solid line: ground-truth fault windows in Nezha (same unit — window count — shared axis).`}
         right={
           <Legend
             items={[
@@ -137,7 +136,7 @@ export default function Timeline() {
                 color: verdictColor[v],
                 glyph: verdictGlyph[v],
               })),
-              { key: "gt", label: "Lỗi theo nhãn", color: ink.secondary, glyph: "▬" },
+              { key: "gt", label: "Ground-truth faults", color: ink.secondary, glyph: "▬" },
             ]}
           />
         }
@@ -171,7 +170,7 @@ export default function Timeline() {
                         <TooltipRow
                           color={ink.secondary}
                           glyph="▬"
-                          label="Lỗi theo nhãn"
+                          label="Ground-truth faults"
                           value={String(
                             (payload.find((p) => p.dataKey === "ground_truth_faults")
                               ?.value as number) ?? 0,
@@ -188,7 +187,6 @@ export default function Timeline() {
                   dataKey={v}
                   stackId="verdict"
                   fill={verdictColor[v]}
-                  // Viền màu bề mặt tạo khe 2px giữa các đoạn xếp chồng.
                   stroke={ink.surface}
                   strokeWidth={2}
                   maxBarSize={18}
@@ -209,19 +207,19 @@ export default function Timeline() {
       </Card>
 
       <Card
-        title={tab === "alerts" ? "Danh sách cảnh báo" : "Sự cố đã gom nhóm"}
+        title={tab === "alerts" ? "Alert list" : "Grouped incidents"}
         subtitle={
           tab === "alerts"
-            ? "Bảng số liệu đi kèm biểu đồ ở trên. Bấm một dòng để mở màn hình chi tiết."
-            : "Alert được gom theo cửa sổ thời gian và cạnh đồ thị phụ thuộc. Bấm để xem đồ thị lan truyền."
+            ? "Alert-level table backing the chart above. Click a timestamp to inspect Alert Detail."
+            : "Alerts grouped by temporal window and trace dependency edges. Click to open Incident Detail."
         }
         right={
           <Segmented
             value={tab}
             onChange={(v) => setTab(v as "alerts" | "incidents")}
             options={[
-              { value: "alerts", label: `Cảnh báo (${filtered.length})` },
-              { value: "incidents", label: `Sự cố (${incidentsQ.data?.length ?? 0})` },
+              { value: "alerts", label: `Alerts (${filtered.length})` },
+              { value: "incidents", label: `Incidents (${incidentsQ.data?.length ?? 0})` },
             ]}
           />
         }
@@ -231,8 +229,8 @@ export default function Timeline() {
           rcaOnlyRun ? (
             <div className="space-y-3 rounded-lg border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)] p-4 text-[12.5px] text-ink-2">
               <p>
-                Run <span className="font-mono font-medium text-ink">{runId}</span> là kết quả RCA từ M9
-                (0 cảnh báo trong ClickHouse; chỉ có {incidentsQ.data?.length ?? 0} sự cố trong PostgreSQL).
+                Run <span className="font-mono font-medium text-ink">{runId}</span> is an M9 RCA-only
+                run (0 alerts in ClickHouse; {incidentsQ.data?.length ?? 0} incidents in PostgreSQL).
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -240,7 +238,7 @@ export default function Timeline() {
                   onClick={() => setTab("incidents")}
                   className="rounded border border-[color:var(--color-hairline)] bg-surface px-3 py-1 text-[11.5px] font-medium text-ink hover:bg-[color:var(--color-plane)]"
                 >
-                  Xem tab Sự cố ({incidentsQ.data?.length ?? 0})
+                  View Incidents tab ({incidentsQ.data?.length ?? 0})
                 </button>
                 {defaultPipelineRun && (
                   <button
@@ -248,7 +246,7 @@ export default function Timeline() {
                     onClick={() => setRunId(defaultPipelineRun.run_id)}
                     className="rounded border border-[color:var(--color-hairline)] bg-surface px-3 py-1 text-[11.5px] text-ink-2 hover:text-ink"
                   >
-                    Chuyển sang {defaultPipelineRun.run_id}
+                    Switch to {defaultPipelineRun.run_id}
                   </button>
                 )}
               </div>
@@ -276,7 +274,7 @@ const ALERT_PAGE_SIZE = 200;
 
 function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
   const [page, setPage] = useState(0);
-  if (!alerts.length) return <Empty>Không có cảnh báo nào khớp bộ lọc.</Empty>;
+  if (!alerts.length) return <Empty>No alerts match the current filter.</Empty>;
   const totalPages = Math.max(1, Math.ceil(alerts.length / ALERT_PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const start = safePage * ALERT_PAGE_SIZE;
@@ -287,8 +285,8 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
       {totalPages > 1 && (
         <div className="mb-2 flex items-center justify-between text-[11px] text-ink-muted">
           <span>
-            Đang hiển thị {start + 1}–{Math.min(start + ALERT_PAGE_SIZE, alerts.length)} /{" "}
-            {alerts.length} cảnh báo
+            Showing {start + 1}–{Math.min(start + ALERT_PAGE_SIZE, alerts.length)} of{" "}
+            {alerts.length} alerts
           </span>
           <div className="flex items-center gap-1.5">
             <button
@@ -297,10 +295,10 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
               onClick={() => setPage(Math.max(0, safePage - 1))}
               className="rounded border border-[color:var(--color-hairline)] px-2 py-0.5 text-ink disabled:opacity-40"
             >
-              Trước
+              Prev
             </button>
             <span className="tabular-nums">
-              Trang {safePage + 1}/{totalPages}
+              Page {safePage + 1}/{totalPages}
             </span>
             <button
               type="button"
@@ -308,7 +306,7 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
               onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
               className="rounded border border-[color:var(--color-hairline)] px-2 py-0.5 text-ink disabled:opacity-40"
             >
-              Sau
+              Next
             </button>
           </div>
         </div>
@@ -317,16 +315,16 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
         <table className="w-full border-collapse text-[12px]">
           <thead className="sticky top-0 bg-surface">
             <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
-              <th className="py-2 pr-3 font-medium">Thời điểm (UTC)</th>
+              <th className="py-2 pr-3 font-medium">Timestamp (UTC)</th>
               <th className="py-2 pr-3 font-medium">Service</th>
               <th className="py-2 pr-3 font-medium">Verdict</th>
-              <th className="py-2 pr-3 font-medium">CTAV (tầng · nguồn)</th>
+              <th className="py-2 pr-3 font-medium">CTAV (tier · origin)</th>
               <th className="py-2 pr-3 text-right font-medium">Anomaly</th>
               <th className="py-2 pr-3 text-right font-medium">Confidence</th>
-              <th className="py-2 pr-3 font-medium">Nhãn</th>
+              <th className="py-2 pr-3 font-medium">Label</th>
               <th className="py-2 pr-3 text-right font-medium">Retrieval</th>
               <th className="py-2 pr-3 text-right font-medium">LLM</th>
-              <th className="py-2 font-medium">Ứng viên</th>
+              <th className="py-2 font-medium">Source</th>
             </tr>
           </thead>
           <tbody>
@@ -351,7 +349,7 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
                     <VerdictBadge verdict={a.verdict} />
                     {a.raw_verdict && a.raw_verdict !== a.verdict && (
                       <div className="mt-0.5 text-[10px] text-ink-muted">
-                        thô: {verdictLabel[a.raw_verdict] ?? a.raw_verdict}
+                        raw: {verdictLabel[a.raw_verdict] ?? a.raw_verdict}
                       </div>
                     )}
                   </td>
@@ -373,7 +371,7 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
                         ✱ {a.label.fault_type}
                       </span>
                     ) : (
-                      <span className="text-[11px] text-ink-muted">bình thường</span>
+                      <span className="text-[11px] text-ink-muted">normal</span>
                     )}
                   </td>
                   <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
@@ -399,7 +397,7 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
 }
 
 function IncidentTable({ incidents }: { incidents: Incident[] }) {
-  if (!incidents.length) return <Empty>Run này chưa gom được sự cố nào.</Empty>;
+  if (!incidents.length) return <Empty>No grouped incidents in this run.</Empty>;
   return (
     <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       {incidents.map((i) => {
@@ -414,12 +412,12 @@ function IncidentTable({ incidents }: { incidents: Incident[] }) {
               : status.critical
             : status.warning;
         const badgeLabel = !hasGt
-          ? "— không nhãn"
+          ? "— unlabelled"
           : i.root_cause_service
             ? correct
-              ? "✓ đúng gốc"
-              : "✗ sai gốc"
-            : "⚠ bị từ chối";
+              ? "✓ root match"
+              : "✗ wrong root"
+            : "⚠ rejected";
         return (
           <li key={i.incident_id}>
             <Link
@@ -435,16 +433,16 @@ function IncidentTable({ incidents }: { incidents: Incident[] }) {
               <div className="mt-2 text-[13px] font-semibold text-ink">
                 {i.root_cause_service ?? "—"}
                 <span className="ml-2 text-[11px] font-normal text-ink-muted">
-                  nhãn: {i.ground_truth_service ?? "không có (no_fault / mơ hồ)"}
+                  label: {i.ground_truth_service ?? "none (no_fault / ambiguous)"}
                 </span>
               </div>
               <div className="mt-1.5 text-[11px] text-ink-2">
                 {i.services.join("  →  ")}
               </div>
               <dl className="mt-2 border-t border-[color:var(--color-hairline)] pt-1.5">
-                <KV k="Loại lỗi" v={i.fault_type ?? "—"} />
-                <KV k="Khoảng" v={`${clockUTC(i.start_ts)} – ${clockUTC(i.end_ts)}`} />
-                <KV k="Số alert" v={i.alert_ids.length} />
+                <KV k="Fault type" v={i.fault_type ?? "—"} />
+                <KV k="Window" v={`${clockUTC(i.start_ts)} – ${clockUTC(i.end_ts)}`} />
+                <KV k="Alerts" v={i.alert_ids.length} />
               </dl>
             </Link>
           </li>

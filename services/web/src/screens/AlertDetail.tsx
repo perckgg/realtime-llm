@@ -36,15 +36,15 @@ export default function AlertDetail() {
   );
 
   if (loading) return <Loading />;
-  if (error || !a) return <ErrorBox message={error ?? "Không tìm thấy cảnh báo"} />;
+  if (error || !a) return <ErrorBox message={error ?? "Alert not found"} />;
 
   const evidence = new Set(a.evidence_event_ids);
   const alertTime = clockUTC(a.ts).slice(0, 5);
   const steps = policySteps(a);
   const isPipelineReplay = a.run_id.startsWith("pipeline_");
   const llmSubtitle = `${a.judge_backend} · ${ms(a.llm_latency_ms)} · ${
-    a.cache_hit ? "judge M8: trúng cache" : "judge M8: gọi trực tiếp"
-  }${isPipelineReplay ? " · replay từ judged.jsonl" : ""}`;
+    a.cache_hit ? "judge M8: cache hit" : "judge M8: direct call"
+  }${isPipelineReplay ? " · replayed from judged.jsonl" : ""}`;
 
   return (
     <div className="space-y-4">
@@ -58,14 +58,14 @@ export default function AlertDetail() {
             <h1 className="text-[19px] font-semibold tracking-tight text-ink">{a.service}</h1>
             <VerdictBadge verdict={a.verdict} />
             {a.downgraded_by_anchoring && (
-              <Pill tone="warn">⚠ hạ bởi neo C3</Pill>
+              <Pill tone="warn">⚠ downgraded by C3 anchoring</Pill>
             )}
             {a.downgraded_by_gating && (
-              <Pill tone="warn">⚠ hạ bởi gate C2</Pill>
+              <Pill tone="warn">⚠ downgraded by C2 gating</Pill>
             )}
             {a.downgraded_by_evidence_rule && (
               <span className="text-[11px]" style={{ color: status.serious }}>
-                ⚠ bị hạ cấp vì thiếu bằng chứng
+                ⚠ downgraded by evidence rule
               </span>
             )}
           </div>
@@ -80,13 +80,13 @@ export default function AlertDetail() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile label="Anomaly score" value={num(a.anomaly_score, 2)} hint={`ngưỡng ${a.detector_threshold}`} />
+        <StatTile label="Anomaly score" value={num(a.anomaly_score, 2)} hint={`threshold ${a.detector_threshold}`} />
         <StatTile label="Confidence" value={num(a.confidence, 2)} hint={a.judge_backend} />
-        <StatTile label="Ngữ cảnh" value={`${a.context_event_count}`} hint={`${a.context_tokens.toLocaleString("vi-VN")} token${a.retrieval_truncated ? " · đã cắt" : ""}`} />
+        <StatTile label="Context" value={`${a.context_event_count}`} hint={`${a.context_tokens.toLocaleString("en-US")} tokens${a.retrieval_truncated ? " · truncated" : ""}`} />
         <StatTile
-          label="Nhãn Nezha"
-          value={a.label.is_fault ? "Lỗi" : "Bình thường"}
-          hint={a.label.is_fault ? `${a.label.fault_type} @ ${a.label.root_cause_service}` : "không có tiêm lỗi"}
+          label="Nezha label"
+          value={a.label.is_fault ? "Fault" : "Normal"}
+          hint={a.label.is_fault ? `${a.label.fault_type} @ ${a.label.root_cause_service}` : "no fault injection"}
           accent={a.label.is_fault ? status.critical : undefined}
         />
       </div>
@@ -94,7 +94,7 @@ export default function AlertDetail() {
       <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
         <Card
           title={a.metric_name}
-          subtitle="Một chuỗi duy nhất quanh cửa sổ cảnh báo. Đường ngang là ngưỡng detector; vùng tô đậm là cửa sổ đã sinh ra cảnh báo này."
+          subtitle="Anomaly score series around the alert window. Horizontal dashed line shows detector threshold; highlighted region marks the alerted window."
         >
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -117,7 +117,7 @@ export default function AlertDetail() {
                   stroke={status.critical}
                   strokeDasharray="4 4"
                   label={{
-                    value: `ngưỡng ${a.detector_threshold}`,
+                    value: `threshold ${a.detector_threshold}`,
                     position: "insideTopRight",
                     fill: status.critical,
                     fontSize: 10,
@@ -151,19 +151,20 @@ export default function AlertDetail() {
         </Card>
 
         <div className="space-y-4">
-          <Card title="Lý do LLM ra verdict" subtitle={llmSubtitle}>
+          <Card title="LLM Verdict Reasoning" subtitle={llmSubtitle}>
             <p className="text-[12.5px] leading-relaxed text-ink-2">{a.reasoning}</p>
             <div className="mt-3 border-t border-[color:var(--color-hairline)] pt-2 text-[11px] text-ink-muted">
-              Bằng chứng LLM viện dẫn: {a.evidence_event_ids.length
+              Cited evidence:{" "}
+              {a.evidence_event_ids.length
                 ? a.evidence_event_ids.map((id) => <Pill key={id}>{id}</Pill>)
-                : "không có — quy tắc bằng chứng sẽ hạ verdict xuống UNCERTAIN"}
+                : "none — evidence rule downgrades verdict to UNCERTAIN"}
             </div>
           </Card>
 
           {a.candidate_source === "rescue" && a.rescue_components && (
             <Card
               title="Rescue Score"
-              subtitle={`Cảnh báo này dưới ngưỡng detector nhưng được promote với điểm ${num(a.rescue_score ?? 0, 2)}.`}
+              subtitle={`Below detector threshold; promoted by Rescue Score ${num(a.rescue_score ?? 0, 2)}.`}
             >
               <div className="space-y-2">
                 {(
@@ -190,10 +191,10 @@ export default function AlertDetail() {
             </Card>
           )}
 
-          <Card title="Chính sách quyết định CTAV & Nguồn gốc bằng chứng">
+          <Card title="CTAV Decision Policy & Evidence Origin">
             <dl className="divide-y divide-[color:var(--color-hairline)]">
               <KV
-                k="Verdict gốc → cuối"
+                k="Raw → Final verdict"
                 v={
                   <span className="font-mono">
                     {a.raw_verdict ? (verdictLabel[a.raw_verdict] ?? a.raw_verdict) : "—"} →{" "}
@@ -202,21 +203,21 @@ export default function AlertDetail() {
                 }
               />
               <KV
-                k="Tầng định tuyến"
+                k="Routing tier"
                 v={
                   a.routing_tier === 1
-                    ? "Tầng 1 (BM25 cục bộ)"
+                    ? "Tier 1 (Local BM25)"
                     : a.routing_tier === 2
-                      ? "Tầng 2 (C1 đồ thị topology)"
+                      ? "Tier 2 (C1 Topology Graph)"
                       : "—"
                 }
               />
               <KV
-                k="Nguồn gốc bằng chứng"
+                k="Evidence origin"
                 v={<Pill>{a.evidence_origin ?? "—"}</Pill>}
               />
               <KV
-                k="Ngưỡng áp dụng"
+                k="Applied threshold"
                 v={
                   a.threshold_applied !== null && a.threshold_applied !== undefined
                     ? num(a.threshold_applied, 2)
@@ -224,7 +225,7 @@ export default function AlertDetail() {
                 }
               />
               <KV
-                k="C3 neo bằng chứng"
+                k="C3 evidence anchoring"
                 v={
                   <Pill tone={steps.anchoring.status === "downgraded" ? "warn" : "neutral"}>
                     {steps.anchoring.label}
@@ -232,7 +233,7 @@ export default function AlertDetail() {
                 }
               />
               <KV
-                k="C2 gating"
+                k="C2 confidence gating"
                 v={
                   <Pill tone={steps.gating.status === "downgraded" ? "warn" : "neutral"}>
                     {steps.gating.label}
@@ -240,7 +241,7 @@ export default function AlertDetail() {
                 }
               />
               <KV
-                k="Luật thiếu bằng chứng"
+                k="Require-evidence rule"
                 v={
                   <Pill tone={steps.evidenceRule.status === "downgraded" ? "warn" : "neutral"}>
                     {steps.evidenceRule.label}
@@ -250,32 +251,32 @@ export default function AlertDetail() {
             </dl>
           </Card>
 
-          <Card title="Siêu dữ liệu">
+          <Card title="Metadata">
             <dl className="divide-y divide-[color:var(--color-hairline)]">
               <KV k="candidate_id" v={<span className="font-mono">{a.candidate_id}</span>} />
-              <KV k="Nguồn ứng viên" v={a.candidate_source} />
-              <KV k="Độ trễ retrieval" v={ms(a.retrieval_latency_ms)} />
-              <KV k="Độ trễ LLM" v={ms(a.llm_latency_ms)} />
+              <KV k="Candidate source" v={a.candidate_source} />
+              <KV k="Retrieval latency" v={ms(a.retrieval_latency_ms)} />
+              <KV k="LLM latency" v={ms(a.llm_latency_ms)} />
               <KV
-                k="Cache judge gốc"
+                k="Original judge cache"
                 v={
                   a.cache_hit
-                    ? "hit (trúng cache)"
-                    : `miss (gọi trực tiếp${isPipelineReplay ? " ở M8" : ""})`
+                    ? "hit (cached)"
+                    : `miss (direct API call${isPipelineReplay ? " in M8" : ""})`
                 }
               />
-              <KV k="Truncated" v={a.retrieval_truncated ? "có" : "không"} />
+              <KV k="Truncated" v={a.retrieval_truncated ? "yes" : "no"} />
             </dl>
           </Card>
         </div>
       </div>
 
       <Card
-        title={`Bằng chứng RAG đã truy xuất (${a.context_events.length})`}
-        subtitle="Sắp theo điểm retrieval giảm dần. Ô debug là dữ liệu để chấm context precision — mỗi strategy ghi những trường đặc thù của nó (03 §1.3)."
+        title={`Retrieved RAG Evidence (${a.context_events.length})`}
+        subtitle="Sorted by descending retrieval score. Debug panel holds retrieval provenance & timing fields for context precision inspection (03 §1.3)."
       >
         {a.context_events.length === 0 ? (
-          <Empty>Không có sự kiện ngữ cảnh nào trong cửa sổ truy xuất.</Empty>
+          <Empty>No context events retrieved in this window.</Empty>
         ) : (
           <ol className="space-y-2">
             {a.context_events.map((e, i) => (
@@ -340,7 +341,7 @@ function EventRow({ e, rank, cited }: { e: ContextEvent; rank: number; cited: bo
         )}
         {cited && (
           <span className="text-[11px] font-medium" style={{ color: series[0] }}>
-            ● LLM viện dẫn
+            ● cited by LLM
           </span>
         )}
         <span className="ml-auto flex items-center gap-2">

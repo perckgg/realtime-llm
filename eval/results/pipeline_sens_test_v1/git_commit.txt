@@ -1,0 +1,19 @@
+2d933b1f764f84d5ddddc68bb243cfda6bda886e
+modified tracked files at run time:
+  docs/ideas.md
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  services/rca_agent/pipeline.py
+  services/web/index.html
+  services/web/scripts/smoke.tsx
+  services/web/src/App.tsx
+  services/web/src/api/client.ts
+  services/web/src/components/ui.tsx
+  services/web/src/lib/util.ts
+  services/web/src/screens/AlertDetail.tsx
+  services/web/src/screens/ExperimentComparison.tsx
+  services/web/src/screens/IncidentDetail.tsx
+  services/web/src/screens/Timeline.tsx
+  services/web/src/theme/tokens.ts

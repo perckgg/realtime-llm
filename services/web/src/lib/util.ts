@@ -84,14 +84,14 @@ export function policySteps(
 ): PolicyEvaluation {
   const raw = a.raw_verdict ?? a.verdict;
   if (raw !== "TRUE_ALERT") {
-    const na = { status: "na" as const, label: "không áp dụng (dừng ở raw_verdict ≠ TRUE_ALERT)" };
+    const na = { status: "na" as const, label: "N/A (stopped at raw_verdict ≠ TRUE_ALERT)" };
     return { shortReason: null, evidenceRule: na, gating: na, anchoring: na };
   }
   if (a.downgraded_by_evidence_rule) {
-    const na = { status: "na" as const, label: "không áp dụng (dừng ở luật bằng chứng)" };
+    const na = { status: "na" as const, label: "N/A (stopped at evidence rule)" };
     return {
-      shortReason: "thiếu chứng cứ",
-      evidenceRule: { status: "downgraded", label: "đã hạ verdict" },
+      shortReason: "no evidence",
+      evidenceRule: { status: "downgraded", label: "downgraded" },
       gating: na,
       anchoring: na,
     };
@@ -99,32 +99,32 @@ export function policySteps(
   if (a.downgraded_by_gating) {
     return {
       shortReason: "C2 gate",
-      evidenceRule: { status: "passed", label: "đạt (có bằng chứng)" },
-      gating: { status: "downgraded", label: "đã hạ verdict" },
-      anchoring: { status: "na", label: "không áp dụng (dừng ở C2 gating)" },
+      evidenceRule: { status: "passed", label: "passed (cited)" },
+      gating: { status: "downgraded", label: "downgraded" },
+      anchoring: { status: "na", label: "N/A (stopped at C2 gating)" },
     };
   }
   if (a.verdict !== "TRUE_ALERT" && !a.downgraded_by_anchoring) {
-    const na = { status: "na" as const, label: "không áp dụng (dừng ở ngưỡng θ)" };
+    const na = { status: "na" as const, label: "N/A (stopped at θ threshold)" };
     return {
-      shortReason: "dưới ngưỡng θ",
-      evidenceRule: { status: "passed", label: "đạt (có bằng chứng)" },
+      shortReason: "below θ",
+      evidenceRule: { status: "passed", label: "passed (cited)" },
       gating: na,
       anchoring: na,
     };
   }
   if (a.downgraded_by_anchoring) {
     return {
-      shortReason: "C3 neo",
-      evidenceRule: { status: "passed", label: "đạt (có bằng chứng)" },
-      gating: { status: "passed", label: "qua ngưỡng" },
-      anchoring: { status: "downgraded", label: "đã hạ verdict" },
+      shortReason: "C3 anchor",
+      evidenceRule: { status: "passed", label: "passed (cited)" },
+      gating: { status: "passed", label: "passed threshold" },
+      anchoring: { status: "downgraded", label: "downgraded" },
     };
   }
   return {
     shortReason: null,
-    evidenceRule: { status: "passed", label: "đạt (có bằng chứng)" },
-    gating: { status: "passed", label: "qua ngưỡng" },
-    anchoring: { status: "passed", label: "đạt ngưỡng neo" },
+    evidenceRule: { status: "passed", label: "passed (cited)" },
+    gating: { status: "passed", label: "passed threshold" },
+    anchoring: { status: "passed", label: "anchored" },
   };
 }
