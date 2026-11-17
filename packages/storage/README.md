@@ -7,5 +7,6 @@ from the `CLICKHOUSE_*` environment variables (`.env.example`), matching `docker
 builds a row for a run where retrieval/judge haven't executed yet (`verdict="NONE"`), used by
 `scripts/replay_smoke.py` for the Week 2 DoD.
 
-PostgreSQL client (for `run_registry`/`incidents`/`diagnostic_reports`, §4) is not implemented yet
-— no Week 2 service writes to Postgres. `infra/postgres/init.sql` already creates the tables.
+Phần ghi PostgreSQL (`run_registry`, `incidents`, `diagnostic_reports`, `diagnostic_rejected`, §4)
+nằm ở `services/rca_agent/store.py` (V42, chốt giữ nguyên theo V47 (a) ở M10 — QĐ-045); phần đọc cho
+dashboard đặt riêng trong `services/api/`. `infra/postgres/init.sql` tạo sẵn các bảng.

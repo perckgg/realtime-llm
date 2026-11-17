@@ -1,0 +1,42 @@
+# pipeline_run_id: pipeline_val_v1
+# reference_run_id: rca_final_val_v1
+# RCA agent, final method (M9-A, QD-041). Frozen by its own commit BEFORE any test run:
+# M9-B copies this file and changes only `split`, `input`, `run_id` (+ `h5_test: true`).
+# `py -m eval rca` prints a method fingerprint over grouping / propagation / labels / summarizer /
+# n_boot / seed; the test run must print the same value as this val run.
+#
+# Selection on val (rca_select_val_v1, rules written in eval/harness/rca.py before the run):
+#   T_group 180 s -- 1 ambiguous incident against 2 at 300 s and 600 s (rule step 1-2);
+#   sign `alert`  -- `candidate` gains +0.091 Hit@1, CI95 [0.000; 0.273], lower bound not > 0.
+kind: rca
+run_id: rca_final_val_v1
+split: val
+input:
+  alerts_run: ctav_final_val_v1  # 80 CTAV alerts (29 TP, 51 FP), QD-031
+  evidence_run: h0_val_c1_k0_v1  # retrieval.jsonl holding the text of the cited evidence
+grouping:
+  t_group_seconds: 180
+propagation:
+  level: 1  # backward 1-hop, pure algorithm; level 2 was cut (QD-037)
+  sign: alert  # only CTAV-confirmed services count as abnormal
+  sign_pad_seconds: 60
+labels:
+  window_seconds: 60  # QD-003
+  cascade_min_services: 2  # a cascade fault = its alerts touch at least 2 services
+summarizer:
+  enabled: true
+  backend: gemini
+  model: gemini-2.5-flash  # the judge model (QD-021); temperature 0, thinking budget 0
+  max_output_tokens: 1024
+  max_calls_per_minute: 60
+  require_evidence: true
+  max_evidence: 12
+  excerpt_chars: 240
+  prompt_version: rca-summary-v1  # services/rca_agent/summarizer.py
+  prompt_fingerprint: 8c1d50e6ba757ee6  # the run stops if the prompt in code differs
+  budget_usd: 1.0  # M9 budget (CURRENT-MILESTONE.md); worst-case estimate must stay below
+  stop_usd: 2.0  # M9 stop threshold
+postgres:
+  write: true  # run_registry, incidents, diagnostic_reports, diagnostic_rejected (03 SS4)
+n_boot: 1000
+seed: 42

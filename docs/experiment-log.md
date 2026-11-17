@@ -2316,3 +2316,46 @@ Chi phí API cả mốc: 178 lần gọi, 0,2772 USD theo token.
 lệch là bug pipeline, sửa pipeline, không sửa số đã báo cáo; summarizer đọc 100% từ cache. `ExperimentComparison` là bảng
 tĩnh (QĐ-037). **Đánh số:** M9 đã dùng V45, V46 (ngoài dải V40..V44 của mình) ⇒ M10 dùng **V47..V49** và QĐ-045..049
 (QĐ-044 bỏ trống).
+
+---
+
+## QĐ-045 — M10-A: `pipeline.py` end-to-end, nạp ClickHouse / PostgreSQL và parity 26/26, 38/38 (2026-11-17)
+
+**Quyết định người dùng chốt đầu phiên M10 (2026-11-17):**
+- **V48 → (a) kèm (b) dự phòng:** bước 4 kịch bản demo dùng lần tiêm cascade duy nhất của `val` (`rca_final_val_v1` / `pipeline_val_v1`, ARR 0,667), kèm một incident nhiều service từ `rca_sens_test_c3rolling_v1` làm dự phòng; ghi rõ nguồn trên màn hình, slide và Ch6, không trình bày như kết quả H5.
+- **V47 → (a):** giữ `services/rca_agent/store.py` ở `services/rca_agent/`; phần đọc cho API tách riêng trong `services/api/`; cập nhật `packages/storage/README.md`.
+- **V49 → (a):** bật service `web` trong `docker-compose.yml` (profile `dev`) để một lệnh `docker compose --profile dev up -d` dựng đủ `api` và `web`.
+- **V45 → (b):** trình bày H5 không đạt đúng bảng kiểm định, kèm dòng độ nhạy và phân tích nguyên nhân, và nêu rõ ở chương thảo luận rằng nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ.
+
+**Thực hiện M10-A (`services/rca_agent/pipeline.py`, `tests/test_pipeline.py`):**
+- Điều phối `load_alerts` (đọc mọi candidate từ `judged.jsonl` của `ctav_final_{val,test}_v1` + bằng chứng từ `evidence_run` `h0_{val,test}_c1_k0_v1`) → `grouping` (`T_group = 180 s`) → `propagation` mức 1 (`sign = alert`) → `summarizer` (`CacheOnlyGeminiSummaryBackend`, chỉ đọc `data/llm_cache/gemini.jsonl`, cache miss ném `RuntimeError`) → kiểm parity trước khi ghi DB → ClickHouse (`fact_alert_evaluation`, `fact_retrieval_trace`) + PostgreSQL (`run_registry`, `incidents`, `diagnostic_reports`, `diagnostic_rejected`) → `eval/results/pipeline_{val,test}_v1/` + `runtime.json`.
+- **Kỹ thuật giữ cache hit 100% không trùng khoá chính PostgreSQL:** `grouping._incident_id` băm `(run_id, alert_ids)` và `compose_prompt` đưa `incident_id` vào chuỗi prompt; trong khi PostgreSQL dùng `incident_id` làm khoá chính toàn bảng `incidents`. Pipeline giữ `incident_id` theo `pipeline_{val,test}_v1` khi lưu DB, còn khi tạo prompt gửi `CacheOnlyGeminiSummaryBackend` thì tạm truyền `incident_id` của run M9 gốc (`rca_final_{val,test}_v1`) rồi ánh xạ lại `incident_id` / `run_id` vào `DiagnosticReport` — cho 100% cache hit mà không gọi API và không sửa bảng M9.
+- `fact_retrieval_trace`: lưu thêm `content` vào `debug_json` để M10-B API đọc trực tiếp từ ClickHouse mà không đổi DDL.
+- Kiểm phương pháp: cả hai lượt đều in `method fingerprint b0c54fa68ef65535` và khớp `main` + `reduction` với `rca.json` của M9.
+
+**Kết quả thực chạy (0 lần gọi API, 0,0000 USD, cache hit summarizer 100%):**
+
+| Chỉ số | `pipeline_val_v1` (`val`) | `pipeline_test_v1` (`test`) |
+|---|---|---|
+| Nguồn CTAV / bằng chứng | `ctav_final_val_v1` / `h0_val_c1_k0_v1` | `ctav_final_test_v1` / `h0_test_c1_k0_v1` |
+| Run M9 đối chiếu parity | `rca_final_val_v1` | `rca_final_test_v1` |
+| Candidate nạp ClickHouse (`fact_alert_evaluation`) | 5.677 (80 `TRUE_ALERT`) | 13.699 (78 `TRUE_ALERT`) |
+| Dòng bằng chứng (`fact_retrieval_trace`) | 7.716 | 19.794 |
+| Incident / Report PostgreSQL | 26 / 26 (0 rejected) | 38 / 38 (0 rejected) |
+| Parity (`alert_ids` / `level1` & `baseline` / hash báo cáo JSON) | **26 / 26** (khớp 100%) | **38 / 38** (khớp 100%) |
+| `load_alerts_ms` | 605,644 ms | 1.238,991 ms |
+| `clickhouse_write_ms` | 2.561,603 ms | 1.339,031 ms |
+| `grouping_ms` / `propagation_ms` | 3,166 / 1,355 ms | 3,588 / 2,080 ms |
+| `summarizer_ms` (cache-only) | 374,643 ms | 465,857 ms |
+| `postgres_write_ms` | 340,412 ms | 185,270 ms |
+| **Tổng E2E (`e2e_wall_ms`, replay từ cache)** | **5.031,030 ms** | **4.313,077 ms** |
+| Token CTAV trong cache (prompt / completion) | 5.173.670 / 691.941 | 12.736.820 / 1.734.808 |
+| Token Summarizer trong cache (prompt / completion) | 66.080 / 9.528 | 74.151 / 10.887 |
+
+*Lưu ý:* độ trễ trên là độ trễ **replay từ cache / đĩa**, không phải độ trễ gọi API LLM trực tiếp (tất cả `llm_latency_ms` từng candidate CTAV vẫn lưu nguyên trong `fact_alert_evaluation`).
+
+```bash
+docker compose --profile dev up -d
+py -m services.rca_agent.pipeline --config eval/configs/rca_final.yaml
+py -m services.rca_agent.pipeline --config eval/configs/rca_final_test.yaml
+```

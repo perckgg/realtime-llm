@@ -69,12 +69,24 @@ Prompt P4 ở `docs/prompts/M8-M12-prompts.md`. Đọc thêm: `01` §6.5–6.7, 
 (V45, V46 đã dùng ở M9 — QĐ-043). Vùng file: `services/api/`, `services/web/`, `services/rca_agent/pipeline.py`,
 `docker-compose.yml`, `docs/milestones/M10-*`, `docs/drafts/ch6-demo-platform.md`.
 
-### Việc
+**Bàn giao chi tiết + prompt từng mốc con: `docs/prompts/M10-handoff.md` (2026-11-17).** M10 chia 5 mốc con, làm tuần tự,
+mỗi mốc con một phiên:
 
-1. - [ ] `services/rca_agent/pipeline.py`: CTAV → grouping → propagation → summary, dùng `eval/configs/rca_final.yaml`, ghi
-   ClickHouse / PostgreSQL. Dựng và debug trên run `val`. Rồi chạy trên `test` và kiểm **parity với M9-B (QĐ-042)**: đúng 38
-   incident của `rca_final_test_v1` (so theo danh sách `alert_ids`) và đúng thứ hạng service gốc; lệch là bug pipeline —
-   sửa pipeline, không sửa số đã báo cáo. Summarizer đọc 100% từ cache. Ghi `runtime.json`: E2E latency, token, cache hit
+| Mốc con | Nội dung | Cổng chặn | QĐ | Hạn đề xuất |
+|---|---|---|---|---|
+| - [x] M10-A | `pipeline.py` + nạp verdict CTAV `val` / `test` vào ClickHouse (5.677 / 13.699 dòng, 7.716 / 19.794 trace) + parity | **Đạt (2026-11-17):** 26 / 26 (`val`), 38 / 38 (`test`), 0 lần gọi API, `b0c54fa68ef65535` | QĐ-045 | 2026-11-24 |
+| - [ ] M10-B | API FastAPI chỉ đọc, 7 endpoint; thêm trường policy CTAV vào `types.ts` | 7 endpoint 200 trên run thật; test hợp đồng | QĐ-046 | 2026-12-01 |
+| - [ ] M10-C | 4 màn hình trên API thật; `ExperimentComparison` bảng tĩnh; service `web` trong compose | loading / empty / error; `npm run check` sạch | QĐ-047 | 2026-12-12 |
+| - [ ] M10-D | Chọn ca demo bằng quy tắc; demo offline; tự kiểm trình duyệt + ảnh | Kịch bản `08` §6 chạy trọn, kể cả không mạng | QĐ-048 | 2026-12-22 |
+| - [ ] M10-E | Báo cáo `M10-platform.md`, `ch6-demo-platform.md`, tóm tắt gửi GVHD | Người dùng đã xem | QĐ-049 | 2026-12-29 |
+
+Vấn đề M10 đã chốt đầu phiên 2026-11-17 (QĐ-045): **V47 → (a)** (`store.py` giữ nguyên, API đọc riêng), **V48 → (a) kèm (b) dự phòng** (ca cascade từ `val`, dự phòng `rca_sens_test_c3rolling_v1`, ghi rõ nguồn), **V49 → (a)** (bật `web` trong `docker-compose.yml`), và **V45 → (b)** (cách trình bày H5 không đạt ở Ch7/Ch8).
+
+### Việc (danh sách gốc của P4, đã chia vào các mốc con ở trên)
+
+1. - [x] `services/rca_agent/pipeline.py`: CTAV → grouping → propagation → summary, dùng `eval/configs/rca_final.yaml`, ghi
+   ClickHouse / PostgreSQL. Đã chạy `val` (`pipeline_val_v1`) và `test` (`pipeline_test_v1`) với **parity 26/26 và 38/38**
+   so với M9 (QĐ-042, QĐ-045); summarizer đọc 100% từ cache; `runtime.json` đã ghi E2E latency, token, cache hit (`0` gọi API)
 2. - [ ] `services/api` (FastAPI): endpoint khớp đúng `types.ts`; chỉ đọc; không authentication
 3. - [ ] Nối Timeline, AlertDetail, IncidentDetail sang API thật: hiện nguồn gốc bằng chứng, lý do policy (θ, C3), có
    loading / empty / error state. `ExperimentComparison`: bảng tĩnh sinh từ script đọc `eval/results` (cắt theo `04` §9
@@ -113,8 +125,9 @@ demo bước "đồ thị lan truyền chỉ đúng root cause" (`08` §6) cần
 | ~~V36~~ (chốt (a) 2026-11-16, QĐ-039) | Đầu vào cảnh báo cho H5 (RCA Agent) trên `test` ở M9-B: CTAV đóng băng chỉ phát 78 cảnh báo trên 10 service có ngưỡng `dev` (khuyết 11 service có fault) | Khuyến nghị **(a)** (báo cáo M8 §3): giữ chỉ số chính H5 trên 78 cảnh báo `ctav_final_test_v1` đúng cam kết `be2b985`, **kèm** dòng độ nhạy trên 438 cảnh báo của `c3_rolling_baseline` | Không chặn M9-A (`val`); chốt trước M9-B (`test`) |
 | ~~V40~~–~~V43~~ | M9-A, agent tự quyết: cascade = cảnh báo ở ≥ 2 service; `ambiguous` giữ nguyên văn `02` §4.3; `store.py` ở `services/rca_agent/`; ba file sửa ngoài vùng P2 | Giữ nguyên (QĐ-043) | |
 | ~~V44~~ | DoD ARR `network_delay` không đạt trên `val` | Người dùng cho sang M9-B 2026-11-17 (QĐ-042) | |
-| V45 | **H5 không được chấp nhận** — cách trình bày trong luận văn | Khuyến nghị (b) (báo cáo M9 §3): báo đúng bảng kiểm định, kèm dòng độ nhạy và nguyên nhân, nêu rõ nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ | Không chặn M10; cần trước chương thảo luận / kết luận |
+| ~~V45~~ | **H5 không được chấp nhận** — cách trình bày trong luận văn | Người dùng chốt **(b) 2026-11-17 (QĐ-045):** báo đúng bảng kiểm định + dòng độ nhạy + nguyên nhân, nêu rõ nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ | |
 | ~~V46~~ | Đóng M9 | Người dùng chốt đóng 2026-11-17 (QĐ-043) | |
+| ~~V47~~–~~V49~~ | M10: vị trí `store.py`, ca demo cascade bước 4, service `web` | Người dùng chốt **2026-11-17 (QĐ-045):** V47 → (a), V48 → (a) kèm (b) dự phòng, V49 → (a) | |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
@@ -160,6 +173,28 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-A, chờ M10-B)
+
+**Trạng thái:** M10-A hoàn tất (QĐ-045, 0 lần gọi API). Người dùng đã chốt V45 → (b), V47 → (a), V48 → (a) kèm (b) dự phòng, V49 → (a).
+**Đã làm:** viết `services/rca_agent/pipeline.py` và `tests/test_pipeline.py`; chạy `pipeline_val_v1` (`val`) và `pipeline_test_v1` (`test`) với dấu vân tay `b0c54fa68ef65535`:
+- ClickHouse `fact_alert_evaluation`: `5.677` (`val`, 80 `TRUE_ALERT`) và `13.699` (`test`, 78 `TRUE_ALERT`); `fact_retrieval_trace`: `7.716` (`val`) và `19.794` (`test`, lưu thêm `content` trong `debug_json`).
+- PostgreSQL: `26` incident + `26` report (`pipeline_val_v1`) và `38` incident + `38` report (`pipeline_test_v1`), 0 rejected.
+- Parity so với `rca_final_{val,test}_v1`: **26/26** (`val`) và **38/38** (`test`) ở `alert_ids`, thứ hạng `level1`/`baseline` và hash JSON `DiagnosticReport`.
+- Độ trễ replay từ cache (`runtime.json`): E2E `5.031,03 ms` (`val`), `4.313,077 ms` (`test`); `100%` cache hit (`26/26`, `38/38`), `0` gọi API.
+**Việc đầu tiên phiên sau:** làm **M10-B** theo prompt P4-B trong `docs/prompts/M10-handoff.md` §6 (`services/api`, `types.ts`/`fixtures.ts`, `infra/Dockerfile.api`, `docker-compose.yml`, `tests/test_api.py`).
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12).
+
+## Ghi chú bàn giao — 2026-11-17 (bàn giao M10, chia mốc con)
+
+**Trạng thái:** M10 đã chia thành 5 mốc con M10-A..E, mỗi mốc con có cổng chặn, QĐ dành sẵn và prompt dán được
+(`docs/prompts/M10-handoff.md`). Phiên này chỉ đọc repo, kiểm DB, viết tài liệu; chưa viết code M10, 0 lần gọi API.
+**Kiểm thực tế:** Docker `clickhouse`, `postgres` đang chạy; PostgreSQL có 4 run RCA (26 / 38 / 26 / 114 incident, đủ báo cáo);
+ClickHouse `fact_alert_evaluation` **chỉ có 3 run smoke** — verdict CTAV `val` / `test` mới nằm ở
+`eval/results/ctav_final_{val,test}_v1/judged.jsonl` (5.677 / 13.699 candidate, đã có trường policy). `types.ts` thiếu trường
+policy CTAV; `services/api` chưa có code; `services/web` chuyển sang API thật bằng `VITE_DATA_SOURCE=http`.
+**Việc đầu tiên phiên sau:** prompt P4-A trong `docs/prompts/M10-handoff.md` §6.
+**Còn chờ người dùng:** V48 (trước M10-D); V45; V35.
 
 ## Ghi chú bàn giao — 2026-11-17 (đóng M9, mở M10)
 
