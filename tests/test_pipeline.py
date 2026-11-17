@@ -160,6 +160,8 @@ def test_pipeline_db_records_when_docker_running() -> None:
         for run_id, expected_eval, expected_trace, expected_inc in [
             ("pipeline_val_v1", 5677, 7716, 26),
             ("pipeline_test_v1", 13699, 19794, 38),
+            ("pipeline_val_v2", 5677, 7716, 26),
+            ("pipeline_test_v2", 13699, 19794, 38),
         ]:
             ev_count = int(
                 ch.query(
@@ -183,3 +185,42 @@ def test_pipeline_db_records_when_docker_running() -> None:
     finally:
         ch.close()
         conn.close()
+
+
+def test_build_eval_row_preserves_cache_hit() -> None:
+    """F4: `_build_eval_row` preserves JudgedAlert.cache_hit (both True and False)."""
+    from datetime import UTC, datetime
+
+    from packages.schemas.models import JudgedAlert
+    from services.rca_agent.pipeline import _build_eval_row
+
+    base_pw = {
+        "anomaly_score": 0.91,
+        "label_is_fault": "1",
+        "label_fault_type": "network_delay",
+        "label_root_cause": "cartservice",
+    }
+    ret = {"latency_ms": 12.5, "token_estimate": 200, "truncated": False, "events": []}
+
+    for expected_flag, hit in [(0, False), (1, True)]:
+        judged = JudgedAlert(
+            alert_id="cand-w1:hybrid_bm25_graph:r0",
+            candidate_id="cand-w1:hybrid_bm25_graph:r0",
+            window_id="w1",
+            ts=datetime(2023, 1, 30, 0, 0, tzinfo=UTC),
+            service="cartservice",
+            verdict="UNCERTAIN",
+            raw_verdict="TRUE_ALERT",
+            routing_tier=2,
+            evidence_origin="local",
+            threshold_applied=0.80,
+            confidence=0.92,
+            reasoning="reason",
+            evidence_event_ids=["ev1"],
+            judge_backend="gemini-2.5-flash",
+            llm_latency_ms=1234.0,
+            cache_hit=hit,
+            downgraded_by_anchoring=True,
+        )
+        row = _build_eval_row("pipeline_test_v2", judged, base_pw, ret, "hybrid_bm25_graph")
+        assert row["cache_hit"] == expected_flag

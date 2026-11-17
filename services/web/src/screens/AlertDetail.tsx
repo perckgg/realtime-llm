@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   Area,
   AreaChart,
@@ -15,7 +15,8 @@ import { api } from "@/api/client";
 import type { ContextEvent } from "@/api/types";
 import { TooltipRow, TooltipShell, axisProps } from "@/components/charts";
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
-import { clockUTC, cx, ms, num, stampUTC, useAsync } from "@/lib/util";
+import { clockUTC, cx, ms, num, policySteps, stampUTC, useAsync } from "@/lib/util";
+import { useRuns } from "@/lib/runContext";
 import { ink, sequential, series, status, strategyLabel, verdictLabel } from "@/theme/tokens";
 
 const MODALITY_GLYPH: Record<ContextEvent["modality"], string> = {
@@ -26,13 +27,24 @@ const MODALITY_GLYPH: Record<ContextEvent["modality"], string> = {
 
 export default function AlertDetail() {
   const { alertId = "" } = useParams();
-  const { data: a, loading, error } = useAsync(() => api.getAlert(alertId), [alertId]);
+  const [searchParams] = useSearchParams();
+  const { runId: contextRunId } = useRuns();
+  const requestedRunId = searchParams.get("run_id") ?? (contextRunId || undefined);
+  const { data: a, loading, error } = useAsync(
+    () => api.getAlert(alertId, requestedRunId),
+    [alertId, requestedRunId],
+  );
 
   if (loading) return <Loading />;
   if (error || !a) return <ErrorBox message={error ?? "Không tìm thấy cảnh báo"} />;
 
   const evidence = new Set(a.evidence_event_ids);
   const alertTime = clockUTC(a.ts).slice(0, 5);
+  const steps = policySteps(a);
+  const isPipelineReplay = a.run_id.startsWith("pipeline_");
+  const llmSubtitle = `${a.judge_backend} · ${ms(a.llm_latency_ms)} · ${
+    a.cache_hit ? "judge M8: trúng cache" : "judge M8: gọi trực tiếp"
+  }${isPipelineReplay ? " · replay từ judged.jsonl" : ""}`;
 
   return (
     <div className="space-y-4">
@@ -139,7 +151,7 @@ export default function AlertDetail() {
         </Card>
 
         <div className="space-y-4">
-          <Card title="Lý do LLM ra verdict" subtitle={`${a.judge_backend} · ${ms(a.llm_latency_ms)}${a.cache_hit ? " · lấy từ cache" : ""}`}>
+          <Card title="Lý do LLM ra verdict" subtitle={llmSubtitle}>
             <p className="text-[12.5px] leading-relaxed text-ink-2">{a.reasoning}</p>
             <div className="mt-3 border-t border-[color:var(--color-hairline)] pt-2 text-[11px] text-ink-muted">
               Bằng chứng LLM viện dẫn: {a.evidence_event_ids.length
@@ -214,18 +226,26 @@ export default function AlertDetail() {
               <KV
                 k="C3 neo bằng chứng"
                 v={
-                  <Pill tone={a.downgraded_by_anchoring ? "warn" : "neutral"}>
-                    {a.downgraded_by_anchoring ? "đã hạ verdict" : "đạt ngưỡng neo"}
+                  <Pill tone={steps.anchoring.status === "downgraded" ? "warn" : "neutral"}>
+                    {steps.anchoring.label}
                   </Pill>
                 }
               />
               <KV
                 k="C2 gating"
-                v={a.downgraded_by_gating ? "đã hạ verdict" : "không kích hoạt"}
+                v={
+                  <Pill tone={steps.gating.status === "downgraded" ? "warn" : "neutral"}>
+                    {steps.gating.label}
+                  </Pill>
+                }
               />
               <KV
                 k="Luật thiếu bằng chứng"
-                v={a.downgraded_by_evidence_rule ? "đã hạ verdict" : "không kích hoạt"}
+                v={
+                  <Pill tone={steps.evidenceRule.status === "downgraded" ? "warn" : "neutral"}>
+                    {steps.evidenceRule.label}
+                  </Pill>
+                }
               />
             </dl>
           </Card>
@@ -236,7 +256,14 @@ export default function AlertDetail() {
               <KV k="Nguồn ứng viên" v={a.candidate_source} />
               <KV k="Độ trễ retrieval" v={ms(a.retrieval_latency_ms)} />
               <KV k="Độ trễ LLM" v={ms(a.llm_latency_ms)} />
-              <KV k="Cache" v={a.cache_hit ? "hit" : "miss"} />
+              <KV
+                k="Cache judge gốc"
+                v={
+                  a.cache_hit
+                    ? "hit (trúng cache)"
+                    : `miss (gọi trực tiếp${isPipelineReplay ? " ở M8" : ""})`
+                }
+              />
               <KV k="Truncated" v={a.retrieval_truncated ? "có" : "không"} />
             </dl>
           </Card>

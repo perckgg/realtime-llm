@@ -67,6 +67,7 @@ interface HypothesisRow {
   status: string;
   status_label: string;
   summary: string;
+  note?: string;
   clauses: HypothesisClause[];
 }
 
@@ -181,7 +182,7 @@ function fmtP(p: number): string {
 function statusColor(st: string): string {
   if (st === "accepted") return status.good;
   if (st === "rejected") return status.critical;
-  if (st === "falsified") return status.warning;
+  if (st === "partial") return status.warning;
   return ink.muted;
 }
 
@@ -236,7 +237,7 @@ export default function ExperimentComparison() {
             So sánh thực nghiệm CTAV &amp; RCA ({split === "test" ? "split test — G-test" : "split val"})
           </h1>
           <p className="text-[11.5px] text-ink-muted">
-            Bảng tĩnh trích từ <code className="font-mono">eval/results/m10_experiment_table_v1/experiment_table.json</code>{" "}
+            Bảng tĩnh trích từ <code className="font-mono">eval/results/m10_experiment_table_v2/experiment_table.json</code>{" "}
             (QĐ-037 · 0 số giả lập · bootstrap n=1.000, McNemar ghép cặp)
           </p>
         </div>
@@ -317,6 +318,7 @@ export default function ExperimentComparison() {
                   </td>
                   <td className="py-2 text-[11.5px] text-ink-2">
                     <div>{h.summary}</div>
+                    {h.note && <div className="mt-1 text-[11px] italic text-ink-muted">{h.note}</div>}
                     {h.clauses.length > 0 && (
                       <ul className="mt-1 space-y-0.5 text-[11px] text-ink-muted">
                         {h.clauses.map((c) => (

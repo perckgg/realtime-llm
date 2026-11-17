@@ -1,8 +1,9 @@
-"""Regression tests for M10-C static experiment table generation."""
+"""Regression tests for M10-C / M10-C.1 static experiment table generation."""
 
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from scripts.m10_experiment_table import OUT_EVAL, OUT_WEB, build_experiment_table
@@ -11,6 +12,7 @@ from scripts.m10_experiment_table import OUT_EVAL, OUT_WEB, build_experiment_tab
 def test_experiment_table_matches_committed_json() -> None:
     """Generated web/eval JSON must match live builder output (excluding timestamp)."""
     built = build_experiment_table()
+    assert OUT_EVAL.parent.name == "m10_experiment_table_v2"
     web_data = json.loads(Path(OUT_WEB).read_text(encoding="utf-8"))
     eval_data = json.loads(Path(OUT_EVAL).read_text(encoding="utf-8"))
 
@@ -26,8 +28,30 @@ def test_experiment_table_real_metrics_and_h5_honesty() -> None:
     verdicts = {h["id"]: h for h in data["verdicts"]}
     assert set(verdicts) == {"H0", "H1", "H2", "H3", "H4", "H5"}
     assert verdicts["H0"]["status"] == "accepted"
+    assert verdicts["H1"]["status"] == "partial"
+    assert "Giữ một phần" in verdicts["H1"]["status_label"]
     assert verdicts["H2"]["status"] == "rejected"
     assert verdicts["H5"]["status"] == "rejected"
+    assert verdicts["H5"]["status_label"] == "Không được chấp nhận (0 / 4 vế)"
+    assert "đạt nhánh B" not in verdicts["H5"]["status_label"]
+    assert "JSON hợp lệ 38 / 38" in verdicts["H5"]["note"]
+    assert len(verdicts["H5"]["clauses"]) == 4
+    assert [c["clause"] for c in verdicts["H5"]["clauses"]] == [
+        "Hit@1 ≥ 0,60",
+        "Hit@3 ≥ 0,80",
+        "Cận dưới CI95 của ΔHit@1 (RCA − baseline) > 0",
+        "Alert Reduction ≥ 30% trên sự cố cascade",
+    ]
+    assert all(c["met"] is False for c in verdicts["H5"]["clauses"])
+
+    dot_decimal = re.compile(r"\d\.\d")
+    for h in data["verdicts"]:
+        assert not dot_decimal.search(h["summary"]), f"Decimal dot in {h['id']} summary: {h['summary']}"
+        assert not dot_decimal.search(h.get("note") or ""), f"Decimal dot in {h['id']} note"
+        for c in h["clauses"]:
+            assert not dot_decimal.search(c["detail"]), (
+                f"Decimal dot in {h['id']} clause detail: {c['detail']}"
+            )
 
     test_methods = {m["key"]: m for m in data["methods"]["test"]["methods"]}
     assert test_methods["ctav"]["tp"] == 14

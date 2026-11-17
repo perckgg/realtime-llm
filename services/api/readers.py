@@ -208,10 +208,42 @@ def _cached_graph() -> ServiceGraph:
 
 
 @lru_cache(maxsize=1)
+def _discover_ctav_runs() -> tuple[str, ...]:
+    """Discover CTAV source run IDs from eval/results artifacts without hardcoding."""
+    discovered: list[str] = []
+    if RESULTS_DIR.is_dir():
+        for entry in sorted(RESULTS_DIR.iterdir()):
+            if not entry.is_dir():
+                continue
+            rt = entry / "runtime.json"
+            if rt.is_file():
+                try:
+                    data = json.loads(rt.read_text(encoding="utf-8"))
+                    ar = data.get("alerts_run")
+                    if ar and ar not in discovered:
+                        discovered.append(str(ar))
+                except json.JSONDecodeError:
+                    pass
+            rca_p = entry / "rca.json"
+            if rca_p.is_file():
+                try:
+                    data = json.loads(rca_p.read_text(encoding="utf-8"))
+                    ar = ((data.get("config") or {}).get("input") or {}).get("alerts_run")
+                    if ar and ar not in discovered:
+                        discovered.append(str(ar))
+                except json.JSONDecodeError:
+                    pass
+    for fallback in ("ctav_final_val_v1", "ctav_final_test_v1"):
+        if fallback not in discovered and (RESULTS_DIR / fallback).is_dir():
+            discovered.append(fallback)
+    return tuple(discovered)
+
+
+@lru_cache(maxsize=1)
 def _judged_details_index() -> dict[str, tuple[str, list[str]]]:
     """window_id -> (reasoning, evidence_event_ids) from CTAV judged.jsonl files."""
     index: dict[str, tuple[str, list[str]]] = {}
-    for run_name in ("ctav_final_val_v1", "ctav_final_test_v1"):
+    for run_name in _discover_ctav_runs():
         path = RESULTS_DIR / run_name / "judged.jsonl"
         if not path.exists():
             continue
@@ -232,7 +264,7 @@ def _per_window_series_index() -> tuple[dict[str, tuple[str, str]], dict[str, li
     """(window_id -> (service, pod), pod -> sorted [(ts, anomaly_score)]) from per_window.csv."""
     win_meta: dict[str, tuple[str, str]] = {}
     by_pod: dict[str, list[tuple[datetime, float]]] = {}
-    for run_name in ("ctav_final_val_v1", "ctav_final_test_v1"):
+    for run_name in _discover_ctav_runs():
         path = RESULTS_DIR / run_name / "per_window.csv"
         if not path.exists():
             continue
@@ -269,14 +301,32 @@ def _incident_labels_for_run(run_id: str) -> dict[str, tuple[str | None, str | N
     return out
 
 
+def _alert_counts_by_run() -> dict[str, int]:
+    ch = clickhouse.get_client()
+    try:
+        res = ch.query(
+            "SELECT run_id, count() FROM fact_alert_evaluation GROUP BY run_id"
+        )
+    finally:
+        ch.close()
+    return {str(run_id): int(cnt) for run_id, cnt in res.result_rows}
+
+
+def _run_start_times() -> dict[str, datetime]:
+    with pg_connect() as conn:
+        rows = conn.execute("SELECT run_id, started_at FROM run_registry").fetchall()
+    return {str(r["run_id"]): _utc(r["started_at"]) for r in rows}
+
+
 def list_runs() -> list[RunResponse]:
     with pg_connect() as conn:
         rows = conn.execute(
             "SELECT run_id, config_yaml, git_commit, split, seed, started_at, finished_at, status, notes "
             "FROM run_registry "
-            "ORDER BY (run_id LIKE 'pipeline_%%') DESC, (split = 'test') DESC, started_at DESC"
+            "ORDER BY (run_id LIKE 'pipeline_%%') DESC, started_at DESC, (split = 'test') DESC"
         ).fetchall()
-    return [
+    counts = _alert_counts_by_run()
+    runs = [
         RunResponse(
             run_id=str(r["run_id"]),
             retrieval_strategy=_infer_strategy(str(r["config_yaml"])),
@@ -287,9 +337,15 @@ def list_runs() -> list[RunResponse]:
             finished_at=_utc(r["finished_at"]) if r["finished_at"] is not None else None,
             status=str(r["status"]),
             notes=str(r["notes"] or ""),
+            alert_count=counts.get(str(r["run_id"]), 0),
         )
         for r in rows
     ]
+    runs.sort(
+        key=lambda item: (item.alert_count > 0, item.started_at, item.split == "test"),
+        reverse=True,
+    )
+    return runs
 
 
 def get_run_metrics(run_id: str) -> RunMetricsResponse | None:
@@ -537,17 +593,28 @@ def get_alert_detail(alert_id: str, run_id: str | None = None) -> AlertDetailRes
                 "WHERE run_id = {run_id:String} AND window_id = {window_id:String} LIMIT 1"
             )
             params: dict[str, Any] = {"run_id": run_id, "window_id": window_id}
+            res = ch.query(sql, parameters=params)
+            if not res.result_rows:
+                return None
+            chosen_row = res.result_rows[0]
         else:
             sql = (
                 f"SELECT {_ALERT_SELECT_COLS} FROM fact_alert_evaluation "
-                "WHERE window_id = {window_id:String} "
-                "ORDER BY (run_id LIKE 'pipeline_%') DESC, window_ts DESC LIMIT 1"
+                "WHERE window_id = {window_id:String}"
             )
-            params = {"window_id": window_id}
-        res = ch.query(sql, parameters=params)
-        if not res.result_rows:
-            return None
-        alert = _row_to_alert(res.result_rows[0])
+            res = ch.query(sql, parameters={"window_id": window_id})
+            if not res.result_rows:
+                return None
+            starts = _run_start_times() if len(res.result_rows) > 1 else {}
+            chosen_row = max(
+                res.result_rows,
+                key=lambda row: (
+                    str(row[0]).startswith("pipeline_"),
+                    starts.get(str(row[0]), _utc(datetime.min.replace(tzinfo=UTC))),
+                    str(row[0]),
+                ),
+            )
+        alert = _row_to_alert(chosen_row)
 
         trace_res = ch.query(
             "SELECT event_id, modality, service, event_ts, score, rank, origin, graph_distance, debug_json "

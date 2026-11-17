@@ -14,7 +14,7 @@ import { api } from "@/api/client";
 import type { Alert, Incident, Verdict } from "@/api/types";
 import { Legend, TooltipRow, TooltipShell, axisProps } from "@/components/charts";
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
-import { clockUTC, cx, ms, num, pct, stampUTC, useAsync } from "@/lib/util";
+import { clockUTC, cx, dayUTC, ms, num, pct, policySteps, stampUTC, useAsync } from "@/lib/util";
 import { ink, status, verdictColor, verdictGlyph, verdictLabel, VERDICT_ORDER } from "@/theme/tokens";
 import { useRuns } from "@/lib/runContext";
 
@@ -23,14 +23,18 @@ const BUCKET_MINUTES = 10;
 type VerdictFilter = Verdict | "ALL";
 
 export default function Timeline() {
-  const { runId, runsLoading, runsError } = useRuns();
+  const { runs, runId, setRunId, runsLoading, runsError } = useRuns();
   const [verdict, setVerdict] = useState<VerdictFilter>("ALL");
   const [service, setService] = useState("ALL");
   const [tab, setTab] = useState<"alerts" | "incidents">("alerts");
 
+  const activeRun = runs.find((r) => r.run_id === runId);
+  const rcaOnlyRun = Boolean(activeRun && activeRun.alert_count === 0);
+  const defaultPipelineRun = runs.find((r) => r.alert_count > 0);
+
   const alertsQ = useAsync(
-    () => (runId ? api.listAlerts({ runId }) : Promise.resolve<Alert[]>([])),
-    [runId],
+    () => (runId && !rcaOnlyRun ? api.listAlerts({ runId }) : Promise.resolve<Alert[]>([])),
+    [runId, rcaOnlyRun],
   );
   const incidentsQ = useAsync(
     () => (runId ? api.listIncidents(runId) : Promise.resolve<Incident[]>([])),
@@ -103,7 +107,7 @@ export default function Timeline() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatTile label="Cảnh báo" value={String(filtered.length)} hint={`trên ${alerts.length} của run`} />
         <StatTile
-          label="Đúng cảnh báo"
+          label="Xác nhận cảnh báo"
           value={String(stats.tp + stats.fp)}
           hint={`${stats.tp} khớp nhãn · ${stats.fp} sai`}
           accent={verdictColor.TRUE_ALERT}
@@ -146,9 +150,12 @@ export default function Timeline() {
               <YAxis {...axisProps} allowDecimals={false} width={40} />
               <Tooltip
                 cursor={{ fill: "rgb(11 11 11 / 0.04)" }}
-                content={({ active, payload, label }) =>
-                  active && payload?.length ? (
-                    <TooltipShell title={`${label} UTC`}>
+                content={({ active, payload, label }) => {
+                  const fullLabel = (
+                    payload?.[0]?.payload as { fullLabel?: string } | undefined
+                  )?.fullLabel;
+                  return active && payload?.length ? (
+                    <TooltipShell title={fullLabel ?? `${label} UTC`}>
                       {VERDICT_ORDER.map((v) => (
                         <TooltipRow
                           key={v}
@@ -172,8 +179,8 @@ export default function Timeline() {
                         />
                       </div>
                     </TooltipShell>
-                  ) : null
-                }
+                  ) : null;
+                }}
               />
               {VERDICT_ORDER.map((v, i) => (
                 <Bar
@@ -221,7 +228,38 @@ export default function Timeline() {
         className="overflow-hidden"
       >
         {tab === "alerts" ? (
-          <AlertTable key={`${verdict}-${service}-${filtered.length}`} alerts={filtered} />
+          rcaOnlyRun ? (
+            <div className="space-y-3 rounded-lg border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)] p-4 text-[12.5px] text-ink-2">
+              <p>
+                Run <span className="font-mono font-medium text-ink">{runId}</span> là kết quả RCA từ M9
+                (0 cảnh báo trong ClickHouse; chỉ có {incidentsQ.data?.length ?? 0} sự cố trong PostgreSQL).
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTab("incidents")}
+                  className="rounded border border-[color:var(--color-hairline)] bg-surface px-3 py-1 text-[11.5px] font-medium text-ink hover:bg-[color:var(--color-plane)]"
+                >
+                  Xem tab Sự cố ({incidentsQ.data?.length ?? 0})
+                </button>
+                {defaultPipelineRun && (
+                  <button
+                    type="button"
+                    onClick={() => setRunId(defaultPipelineRun.run_id)}
+                    className="rounded border border-[color:var(--color-hairline)] bg-surface px-3 py-1 text-[11.5px] text-ink-2 hover:text-ink"
+                  >
+                    Chuyển sang {defaultPipelineRun.run_id}
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <AlertTable
+              key={`${runId}-${verdict}-${service}-${filtered.length}`}
+              alerts={filtered}
+              runId={runId}
+            />
+          )
         ) : incidentsQ.loading ? (
           <Loading />
         ) : incidentsQ.error ? (
@@ -236,7 +274,7 @@ export default function Timeline() {
 
 const ALERT_PAGE_SIZE = 200;
 
-function AlertTable({ alerts }: { alerts: Alert[] }) {
+function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
   const [page, setPage] = useState(0);
   if (!alerts.length) return <Empty>Không có cảnh báo nào khớp bộ lọc.</Empty>;
   const totalPages = Math.max(1, Math.ceil(alerts.length / ALERT_PAGE_SIZE));
@@ -293,17 +331,18 @@ function AlertTable({ alerts }: { alerts: Alert[] }) {
           </thead>
           <tbody>
             {visible.map((a) => {
-              const policyReasons: string[] = [];
-              if (a.downgraded_by_anchoring) policyReasons.push("C3 neo");
-              if (a.downgraded_by_gating) policyReasons.push("C2 gate");
-              if (a.downgraded_by_evidence_rule) policyReasons.push("thiếu chứng cứ");
+              const steps = policySteps(a);
+              const targetRunId = a.run_id || runId;
               return (
                 <tr
                   key={a.alert_id}
                   className="border-b border-[color:var(--color-hairline)] last:border-0 hover:bg-[color:var(--color-plane)]"
                 >
                   <td className="py-1.5 pr-3 tabular-nums whitespace-nowrap">
-                    <Link to={`/alerts/${a.alert_id}`} className="hover:underline">
+                    <Link
+                      to={`/alerts/${a.alert_id}?run_id=${encodeURIComponent(targetRunId)}`}
+                      className="hover:underline"
+                    >
                       {stampUTC(a.ts)}
                     </Link>
                   </td>
@@ -320,9 +359,7 @@ function AlertTable({ alerts }: { alerts: Alert[] }) {
                     <div>
                       T{a.routing_tier ?? "—"} · {a.evidence_origin ?? "—"}
                     </div>
-                    {policyReasons.length > 0 && (
-                      <Pill tone="warn">{policyReasons.join(" + ")}</Pill>
-                    )}
+                    {steps.shortReason && <Pill tone="warn">{steps.shortReason}</Pill>}
                   </td>
                   <td className="py-1.5 pr-3 text-right tabular-nums">
                     {num(a.anomaly_score, 2)}
@@ -472,9 +509,21 @@ function bucketise(alerts: Alert[]) {
     if (a.label.is_fault) row.ground_truth_faults += 1;
     map.set(key, row);
   }
-  return [...map.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([ts, row]) => ({ label: clockUTC(new Date(ts).toISOString()).slice(0, 5), ...row }));
+  const sorted = [...map.entries()].sort((a, b) => a[0] - b[0]);
+  let prevDay = "";
+  return sorted.map(([ts, row]) => {
+    const iso = new Date(ts).toISOString();
+    const day = dayUTC(iso);
+    const ddmm = `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+    const hhmm = clockUTC(iso).slice(0, 5);
+    const showDate = day !== prevDay;
+    prevDay = day;
+    return {
+      label: showDate ? `${ddmm} ${hhmm}` : hhmm,
+      fullLabel: `${ddmm} ${hhmm} UTC`,
+      ...row,
+    };
+  });
 }
 
 function summarise(alerts: Alert[]) {
@@ -486,10 +535,9 @@ function summarise(alerts: Alert[]) {
   for (const a of alerts) {
     if (a.verdict === "TRUE_ALERT") (a.label.is_fault ? tp++ : fp++);
     if (a.candidate_source === "rescue") rescue++;
-    if (a.downgraded_by_anchoring) anchored++;
-    if (a.downgraded_by_anchoring || a.downgraded_by_gating || a.downgraded_by_evidence_rule) {
-      policyDowngraded++;
-    }
+    const steps = policySteps(a);
+    if (steps.anchoring.status === "downgraded") anchored++;
+    if (steps.shortReason !== null) policyDowngraded++;
   }
   return {
     tp,

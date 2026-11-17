@@ -24,7 +24,7 @@ export interface DataSource {
   listRuns(): Promise<Run[]>;
   runMetrics(runId: string): Promise<RunMetrics>;
   listAlerts(params: { runId: string; verdict?: Verdict | "ALL" }): Promise<Alert[]>;
-  getAlert(alertId: string): Promise<AlertDetail>;
+  getAlert(alertId: string, runId?: string): Promise<AlertDetail>;
   listIncidents(runId: string): Promise<Incident[]>;
   getIncident(incidentId: string): Promise<IncidentDetail>;
 }
@@ -46,7 +46,8 @@ const mockSource: DataSource = {
     const all = fixtures.listAlerts(runId);
     return delay(!verdict || verdict === "ALL" ? all : all.filter((a) => a.verdict === verdict));
   },
-  getAlert: async (alertId) => {
+  getAlert: async (alertId, _runId) => {
+    void _runId;
     const a = fixtures.getAlertDetail(alertId);
     if (!a) throw new Error(`Không có alert ${alertId}`);
     return delay(a);
@@ -75,7 +76,10 @@ const httpSource: DataSource = {
     if (verdict && verdict !== "ALL") q.set("verdict", verdict);
     return get(`/alerts?${q}`);
   },
-  getAlert: (alertId) => get(`/alerts/${encodeURIComponent(alertId)}`),
+  getAlert: (alertId, runId) => {
+    const base = `/alerts/${encodeURIComponent(alertId)}`;
+    return get(runId ? `${base}?run_id=${encodeURIComponent(runId)}` : base);
+  },
   listIncidents: (runId) => get(`/incidents?run_id=${encodeURIComponent(runId)}`),
   getIncident: (incidentId) => get(`/incidents/${encodeURIComponent(incidentId)}`),
 };

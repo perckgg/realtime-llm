@@ -200,6 +200,7 @@ export interface Run {
   finished_at: string | null;
   status: "running" | "done" | "failed";
   notes: string;
+  alert_count: number;
 }
 
 /** Khoảng tin cậy bootstrap — 02 §4 yêu cầu mọi chỉ số đều có CI. */

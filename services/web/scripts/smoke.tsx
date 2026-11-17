@@ -69,6 +69,7 @@ const { createRoot } = await import("react-dom/client");
 const { MemoryRouter, Route, Routes } = await import("react-router-dom");
 const { RunContext } = await import("@/lib/runContext");
 const { runs, listAlerts, listIncidents } = await import("@/mock/fixtures");
+const { policySteps } = await import("@/lib/util");
 const Timeline = (await import("@/screens/Timeline")).default;
 const AlertDetail = (await import("@/screens/AlertDetail")).default;
 const IncidentDetail = (await import("@/screens/IncidentDetail")).default;
@@ -159,6 +160,8 @@ const CASES: {
       ["có thanh sai số CI", (h) => countOf(h, "recharts-errorBar") >= 15],
       ["có đường cong ngân sách H4", (h) => countOf(h, "recharts-line-curve") >= 4],
       ["có đủ giả thuyết H0–H5", (h) => ["H0", "H1", "H2", "H3", "H4", "H5"].every((k) => h.includes(k))],
+      ["có dòng H1 Giữ một phần", (h) => h.includes("Giữ một phần")],
+      ["có H5 0/4 vế đúng chuẩn Bảng 5.26", (h) => h.includes("Không được chấp nhận (0 / 4 vế)") && h.includes("Alert Reduction ≥ 30% trên sự cố cascade")],
       ["có số đo CTAV test thật (0.066)", (h) => h.includes("0.066")],
       ["có bảng H5 RCA", (h) => h.includes("C3-trượt (test — độ nhạy)")],
     ],
@@ -183,6 +186,63 @@ for (const c of CASES) {
       failed += 1;
       console.error(`  FAIL  ${c.name.padEnd(22)} ${what}`);
     }
+  }
+}
+
+// Kiểm tra 4 ca hàm thuần `policySteps` theo thứ tự `services/judge/policy.py::decide`.
+const policyCases: [string, Parameters<typeof policySteps>[0], string][] = [
+  [
+    "raw FALSE_POSITIVE",
+    {
+      raw_verdict: "FALSE_POSITIVE",
+      verdict: "FALSE_POSITIVE",
+      downgraded_by_evidence_rule: false,
+      downgraded_by_gating: false,
+      downgraded_by_anchoring: false,
+    },
+    "không áp dụng (dừng ở raw_verdict ≠ TRUE_ALERT)",
+  ],
+  [
+    "luật thiếu bằng chứng",
+    {
+      raw_verdict: "TRUE_ALERT",
+      verdict: "UNCERTAIN",
+      downgraded_by_evidence_rule: true,
+      downgraded_by_gating: false,
+      downgraded_by_anchoring: false,
+    },
+    "không áp dụng (dừng ở luật bằng chứng)",
+  ],
+  [
+    "C3 neo hạ verdict",
+    {
+      raw_verdict: "TRUE_ALERT",
+      verdict: "UNCERTAIN",
+      downgraded_by_evidence_rule: false,
+      downgraded_by_gating: false,
+      downgraded_by_anchoring: true,
+    },
+    "đã hạ verdict",
+  ],
+  [
+    "TRUE_ALERT cuối",
+    {
+      raw_verdict: "TRUE_ALERT",
+      verdict: "TRUE_ALERT",
+      downgraded_by_evidence_rule: false,
+      downgraded_by_gating: false,
+      downgraded_by_anchoring: false,
+    },
+    "đạt ngưỡng neo",
+  ],
+];
+for (const [label, input, expectedAnchoring] of policyCases) {
+  const actual = policySteps(input).anchoring.label;
+  if (actual === expectedAnchoring) {
+    console.log(`  ok    policySteps            ${label} -> ${actual}`);
+  } else {
+    failed += 1;
+    console.error(`  FAIL  policySteps            ${label}: got "${actual}", want "${expectedAnchoring}"`);
   }
 }
 

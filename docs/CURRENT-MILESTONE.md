@@ -77,6 +77,7 @@ mỗi mốc con một phiên:
 | - [x] M10-A | `pipeline.py` + nạp verdict CTAV `val` / `test` vào ClickHouse (5.677 / 13.699 dòng, 7.716 / 19.794 trace) + parity | **Đạt (2026-11-17):** 26 / 26 (`val`), 38 / 38 (`test`), 0 lần gọi API, `b0c54fa68ef65535` | QĐ-045 | 2026-11-24 |
 | - [x] M10-B | API FastAPI chỉ đọc, 7 endpoint; thêm trường policy CTAV vào `types.ts` | **Đạt (2026-11-17):** 7 endpoint 200 trên `pipeline_{val,test}_v1` & Docker `api` healthy; `/alerts` `test` 0,561 s; test hợp đồng `types.ts` qua | QĐ-046 | 2026-12-01 |
 | - [x] M10-C | 4 màn hình trên API thật; `ExperimentComparison` bảng tĩnh; service `web` trong compose | **Đạt (2026-11-17):** `experiment_table.json` parity; 4 container `healthy` (cổng `5173` proxy `/api`); `npm.cmd run check` sạch; `248` pytest qua | QĐ-047 | 2026-12-12 |
+| - [x] M10-C.1 | Sửa lỗi sau review M10-C (F1..F6, `M10-handoff.md` §7): bảng H1 / H5 sai so với đăng ký, thẻ C3 AlertDetail, `cache_hit`, `run_id` ở AlertDetail, run không có cảnh báo | **Đạt (2026-11-17):** F1..F10 xong (`m10_experiment_table_v2` khớp Bảng 5.18 / 5.26); parity `pipeline_{val,test}_v2` 26 / 26 & 38 / 38; `pytest` 249 qua; `npm run check` sạch; proxy & `stop/start api` đã kiểm *(Chromium tương tác bị người dùng huỷ)* | Bổ sung QĐ-047 | 2026-11-24 |
 | - [ ] M10-D | Chọn ca demo bằng quy tắc; demo offline; tự kiểm trình duyệt + ảnh | Kịch bản `08` §6 chạy trọn, kể cả không mạng | QĐ-048 | 2026-12-22 |
 | - [ ] M10-E | Báo cáo `M10-platform.md`, `ch6-demo-platform.md`, tóm tắt gửi GVHD | Người dùng đã xem | QĐ-049 | 2026-12-29 |
 
@@ -125,7 +126,7 @@ demo bước "đồ thị lan truyền chỉ đúng root cause" (`08` §6) cần
 | ~~V44~~ | DoD ARR `network_delay` không đạt trên `val` | Người dùng cho sang M9-B 2026-11-17 (QĐ-042) | |
 | ~~V45~~ | **H5 không được chấp nhận** — cách trình bày trong luận văn | Người dùng chốt **(b) 2026-11-17 (QĐ-045):** báo đúng bảng kiểm định + dòng độ nhạy + nguyên nhân, nêu rõ nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ | |
 | ~~V46~~ | Đóng M9 | Người dùng chốt đóng 2026-11-17 (QĐ-043) | |
-| ~~V47~~–~~V49~~ | M10: vị trí `store.py`, ca demo cascade bước 4, service `web` | Người dùng chốt **2026-11-17 (QĐ-045):** V47 → (a), V48 → (a) kèm (b) dự phòng, V49 → (a) | |
+| ~~V47~~–~~V49~~ | M10: vị trí `store.py`, ca demo cascade bước 4, service `web` | Người dùng chốt **2026-11-17 (QĐ-045):** V47 → (a), V48 → **(b') kèm (a')** *(chốt lại 2026-11-17 cho M10-D sau review M10-C)*, V49 → (a) | |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
@@ -171,6 +172,26 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-C.1, chờ M10-D)
+
+**Trạng thái:** M10-C.1 hoàn tất (QĐ-047 bổ sung, 0 lần gọi API). Người dùng đã chốt **V48 mở lại → (b') kèm (a')** cho M10-D.
+**Đã làm:**
+- Sửa F1–F10 theo `M10-handoff.md` §7.2: bảng `eval/results/m10_experiment_table_v2/experiment_table.json` (`52.379` B) chuẩn hoá H1 `"partial"` / H5 4 vế Bảng 5.26 & thập phân dấu phẩy; hàm thuần `policySteps()` + thẻ C3 `"không áp dụng"` cho raw FP / bị chặn sớm; `_build_eval_row` đọc `cache_hit` thật & chạy `pipeline_val_v2` (**26/26**, E2E `5.764,165 ms`) và `pipeline_test_v2` (**38/38**, E2E `4.242,424 ms`, giữ nguyên `_v1`); `getAlert` truyền `?run_id=`; `Run.alert_count` + `<optgroup>` hộp chọn run + F7..F10.
+- Kiểm chứng: `npm.cmd --prefix services/web run check` sạch (26/26 kiểm SSR + 4 ca `policySteps`); `py -m mypy packages services` sạch (43 file); `py -m ruff check services scripts/m10_experiment_table.py tests` sạch; `py -m pytest tests/ -q` **`249 passed in 28.75s`**. Rebuild container `api` & `web`, cả 4 container `healthy`; probe proxy `:5173` và `docker compose stop api` / `start api` (error state `502` trên API trong khi `/compare` vẫn `200`, phục hồi `{"status":"ok"}`).
+- **Chưa kiểm:** thao tác click kiểm trực tiếp trên cửa sổ trình duyệt Chromium (subagent `browser` đã bị người dùng huỷ khi mở `/timeline`; khuyến nghị mở lại trong bước chụp ảnh M10-D).
+**Việc đầu tiên phiên sau:** làm **M10-D** theo prompt `P4-D` (`scripts/m10_pick_demo_cases.py`, triển khai **V48 (b')** nạp `pipeline_sens_test_v1` parity `114/114` kèm nhãn `"dòng độ nhạy, không phải kết quả H5"`, `DEMO_OFFLINE`, mở trình duyệt thật & chụp `docs/drafts/figures/m10-*.png`).
+**Còn chờ người dùng:** sửa dòng H5 `"Chờ M9"` ở Bảng 5.18 của `ch5-ket-qua-test.md`; V35 (chấm 525 dòng context precision, hạn trước M12).
+
+## Ghi chú bàn giao — 2026-11-17 (review M10-C, mở M10-C.1)
+
+**Trạng thái:** đã review code M10-A..C và mở dashboard thật. Kiểm tự động sạch, parity đúng, số TP / FP khớp M8; nhưng có
+2 lỗi mức cao (bảng Experiment ghi H5 "đạt nhánh B" với một vế không có trong đăng ký, H1 "Bác bỏ" thay vì "giữ một phần")
+và 4 lỗi mức trung bình. Phiên review không sửa code; chỉ thêm §7 vào `docs/prompts/M10-handoff.md` (danh sách F1..F11, DoD,
+prompt P4-C1). 0 lần gọi API.
+**Việc đầu tiên phiên sau:** prompt **P4-C1** trong `docs/prompts/M10-handoff.md` §7.6 (M10-C.1), trước M10-D.
+**Còn chờ người dùng:** chốt lại **V48** (`M10-handoff.md` §7.3 — phương án (a) không dùng được trên dữ liệu thật); sửa dòng
+H5 "Chờ M9" ở Bảng 5.18 của `ch5-ket-qua-test.md`; V35.
 
 ## Ghi chú bàn giao — 2026-11-17 (xong M10-C, chờ M10-D)
 

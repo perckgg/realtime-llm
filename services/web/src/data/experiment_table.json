@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T04:02:28.549569+00:00",
+  "generated_at": "2026-11-17T06:19:57.083271+00:00",
   "sources": [
     "eval/results/h0_test_compare_bm25ref_v1/compare.json",
     "eval/results/h0_test_compare_c1ref_v1/compare.json",
@@ -49,11 +49,11 @@
     },
     {
       "id": "H1",
-      "title": "Cơ chế nguồn gốc độ lợi của C1",
+      "title": "Thí nghiệm cơ chế trên mẫu dựng",
       "split": "val",
-      "status": "falsified",
-      "status_label": "Bác bỏ giả thuyết thứ tự đồ thị (M5)",
-      "summary": "Độ lợi C1 trên fault đến từ metric/span gần nhất theo thời gian: near_log−near_trace Δ=-0.456 (p<0.001), time_0−near_trace Δ=-0.250 (p=0.004), neighbor_trace−near_trace Δ=-0.281.",
+      "status": "partial",
+      "status_label": "Giữ một phần (val, M5 — QĐ-028); không chạy lại trên test",
+      "summary": "Độ lợi C1 trên fault đến từ metric/span gần nhất theo thời gian: near_log − near_trace Δ = −0,456 (p < 0,001), time_0 − near_trace Δ = −0,250 (p = 0,004), neighbor_trace − near_trace Δ = −0,281 (p = 0,004).",
       "clauses": []
     },
     {
@@ -112,7 +112,7 @@
         {
           "clause": "báo ΔRecall, ΔFPR, +lần gọi (không có tiêu chí đạt / không đạt)",
           "met": null,
-          "detail": "điểm eta=(0,0.4,0.6)|tau=0.8: ΔRecall +0,000 [+0,000; +0,000]; ΔFPR +0,0001 [+0,0000; +0,0003]; ΔF1 −0,000 [−0,001; +0,000]; +61 lần gọi"
+          "detail": "điểm eta=(0,0,4,0,6)|tau=0,8: ΔRecall +0,000 [+0,000; +0,000]; ΔFPR +0,0001 [+0,0000; +0,0003]; ΔF1 −0,000 [−0,001; +0,000]; +61 lần gọi"
         }
       ]
     },
@@ -133,26 +133,32 @@
     },
     {
       "id": "H5",
-      "title": "Tác tử RCA (Branch A định vị + Branch B gom & tóm tắt)",
+      "title": "Tác tử RCA trên incident gom từ CTAV",
       "split": "test",
       "status": "rejected",
-      "status_label": "Không đạt nhánh A; đạt nhánh B (QĐ-045)",
-      "summary": "Test: Hit@1=8/17 (0,471 < 0,60), Hit@3=8/17 (0,471 < 0,80), multi_service=0. Nhánh B đạt: ARR=0,513 (test) / 0,675 (val), JSON hợp lệ=38/38 (100%).",
+      "status_label": "Không được chấp nhận (0 / 4 vế)",
+      "summary": "Hit@1 = Hit@3 = 8 / 17 = 0,471 [0,235; 0,706]; ΔHit@1 = 0,000; 0 / 50 lần tiêm lỗi là cascade. Tham chiếu (không phải tiêu chí đăng ký): ARR mọi cảnh báo = 0,513 [0,362; 0,626], ARR cảnh báo trong lỗi = 0,556 [0,382; 0,674].",
+      "note": "Nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ (JSON hợp lệ 38 / 38).",
       "clauses": [
         {
-          "clause": "Hit@1 ≥ 0,60 (đăng ký trước G-test)",
+          "clause": "Hit@1 ≥ 0,60",
           "met": false,
-          "detail": "8 / 17 = 0,471"
+          "detail": "8 / 17 = 0,471 [0,235; 0,706]"
         },
         {
-          "clause": "Hit@3 ≥ 0,80 (đăng ký trước G-test)",
+          "clause": "Hit@3 ≥ 0,80",
           "met": false,
-          "detail": "8 / 17 = 0,471"
+          "detail": "8 / 17 = 0,471 [0,235; 0,706]"
         },
         {
-          "clause": "Nhánh B (bổ trợ): ARR & tóm tắt JSON hợp lệ 100%",
-          "met": true,
-          "detail": "ARR test=0,513, val=0,675; valid=38/38"
+          "clause": "Cận dưới CI95 của ΔHit@1 (RCA − baseline) > 0",
+          "met": false,
+          "detail": "0,000 (baseline 8 / 17; 0 cặp lệch) [0,000; 0,000]"
+        },
+        {
+          "clause": "Alert Reduction ≥ 30% trên sự cố cascade",
+          "met": false,
+          "detail": "không tính được: 0 / 50 lần tiêm lỗi là cascade"
         }
       ]
     }

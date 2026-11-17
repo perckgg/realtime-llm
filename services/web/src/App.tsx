@@ -80,12 +80,30 @@ export default function App() {
               {!loading && (!runs || runs.length === 0) && (
                 <option value="">{error ? "Lỗi tải run" : "Chưa có run"}</option>
               )}
-              {(runs ?? []).map((r) => (
-                <option key={r.run_id} value={r.run_id}>
-                  {strategyLabel[r.retrieval_strategy] ?? r.retrieval_strategy} — {r.run_id} (
-                  {r.split})
-                </option>
-              ))}
+              {(runs ?? []).some((r) => r.alert_count > 0) && (
+                <optgroup label="Có cảnh báo">
+                  {(runs ?? [])
+                    .filter((r) => r.alert_count > 0)
+                    .map((r) => (
+                      <option key={r.run_id} value={r.run_id}>
+                        {strategyLabel[r.retrieval_strategy] ?? r.retrieval_strategy} — {r.run_id} (
+                        {r.split} · {r.alert_count.toLocaleString("vi-VN")} alert)
+                      </option>
+                    ))}
+                </optgroup>
+              )}
+              {(runs ?? []).some((r) => r.alert_count === 0) && (
+                <optgroup label="Chỉ có incident (RCA M9)">
+                  {(runs ?? [])
+                    .filter((r) => r.alert_count === 0)
+                    .map((r) => (
+                      <option key={r.run_id} value={r.run_id}>
+                        {strategyLabel[r.retrieval_strategy] ?? r.retrieval_strategy} — {r.run_id} (
+                        {r.split})
+                      </option>
+                    ))}
+                </optgroup>
+              )}
             </select>
           </label>
         </header>

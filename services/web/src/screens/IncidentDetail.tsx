@@ -409,7 +409,7 @@ export default function IncidentDetail() {
                 {data.alerts.map((a) => (
                   <li key={a.alert_id}>
                     <Link
-                      to={`/alerts/${a.alert_id}`}
+                      to={`/alerts/${a.alert_id}?run_id=${encodeURIComponent(a.run_id || data.run_id)}`}
                       className="flex items-center gap-2 rounded px-1.5 py-1 text-[11.5px] hover:bg-[color:var(--color-plane)]"
                     >
                       <span className="tabular-nums text-ink-muted">{clockUTC(a.ts)}</span>

@@ -1,0 +1,54 @@
+{
+  "run_id": "pipeline_val_v2",
+  "split": "val",
+  "reference_run_id": "rca_final_val_v1",
+  "alerts_run": "ctav_final_val_v1",
+  "evidence_run": "h0_val_c1_k0_v1",
+  "method_fingerprint": "b0c54fa68ef65535",
+  "finished_at": "2026-11-17T06:22:08.608097+00:00",
+  "latency_note": "Replay-from-cache latency only (CTAV verdicts and RCA summaries read 100% from disk/cache; not live LLM API latency).",
+  "stages_ms": {
+    "load_alerts_ms": 615.161,
+    "clickhouse_write_ms": 2903.706,
+    "grouping_ms": 3.019,
+    "propagation_ms": 1.257,
+    "summarizer_ms": 424.397,
+    "postgres_write_ms": 333.75,
+    "e2e_wall_ms": 5764.165
+  },
+  "counts": {
+    "candidates_loaded": 5677,
+    "confirmed_alerts": 80,
+    "retrieval_trace_rows": 7716,
+    "incidents": 26,
+    "diagnostic_reports": 26,
+    "diagnostic_rejected": 0,
+    "postgres_rows": {
+      "incidents": 26,
+      "diagnostic_reports": 26,
+      "diagnostic_rejected": 0
+    }
+  },
+  "tokens_from_cache": {
+    "ctav_judge_prompt_tokens": 5173670,
+    "ctav_judge_completion_tokens": 691941,
+    "rca_summarizer_prompt_tokens": 66080,
+    "rca_summarizer_completion_tokens": 9528
+  },
+  "llm_operations": {
+    "api_calls": 0,
+    "new_api_calls": 0,
+    "summarizer_llm_calls": 26,
+    "summarizer_cache_hits": 26,
+    "cache_hit_rate": 1.0,
+    "estimated_usd_by_tokens": 0.0
+  },
+  "parity": {
+    "reference_run_id": "rca_final_val_v1",
+    "incidents_expected": 26,
+    "incidents_matched": 26,
+    "rankings_matched": 26,
+    "reports_matched": 26,
+    "all_matched": true
+  }
+}

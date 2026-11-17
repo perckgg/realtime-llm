@@ -28,6 +28,7 @@ class RunResponse(BaseModel):
     finished_at: datetime | None
     status: str
     notes: str
+    alert_count: int = 0
 
 
 class MetricWithCIResponse(BaseModel):

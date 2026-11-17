@@ -1,23 +1,24 @@
-"""Build verified static experiment tables for M10-C ExperimentComparison.
+"""Build verified static experiment tables for M10-C / M10-C.1 ExperimentComparison.
 
 Reads strictly from committed ``eval/results/`` artifacts (zero mocked or
-hardcoded numbers), asserts numerical parity against
+hardcoded numbers), asserts numerical + structural parity against
 ``eval/results/m8_test_tables_v1/tables.md`` and
 ``docs/drafts/ch5-ket-qua-test.md``, and writes JSON to both:
-- ``eval/results/m10_experiment_table_v1/experiment_table.json``
+- ``eval/results/m10_experiment_table_v2/experiment_table.json``
 - ``services/web/src/data/experiment_table.json``
 """
 
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = ROOT / "eval" / "results"
-OUT_EVAL = RESULTS_DIR / "m10_experiment_table_v1" / "experiment_table.json"
+OUT_EVAL = RESULTS_DIR / "m10_experiment_table_v2" / "experiment_table.json"
 OUT_WEB = ROOT / "services" / "web" / "src" / "data" / "experiment_table.json"
 
 
@@ -30,6 +31,15 @@ def _read_json(rel: str) -> dict[str, Any]:
 
 def _fmt_vi(value: float, decimals: int) -> str:
     return f"{value:.{decimals}f}".replace(".", ",")
+
+
+def _fmt_signed_vi(value: float, decimals: int = 3) -> str:
+    sign = "−" if value < 0 else "+"
+    return f"{sign}{_fmt_vi(abs(value), decimals)}"
+
+
+def _vi_decimals(text: str) -> str:
+    return re.sub(r"(\d)\.(\d)", r"\1,\2", text)
 
 
 def _extract_method_row(
@@ -275,11 +285,17 @@ def _extract_rca_row(label: str, split: str, rel: str, note: str) -> dict[str, A
     }
 
 
+def _fmt_p_vi(p: float) -> str:
+    if p < 0.001:
+        return "p < 0,001"
+    return f"p = {_fmt_vi(p, 3)}"
+
+
 def _extract_hypotheses(
     verdicts_doc: dict[str, Any],
     h1_doc: dict[str, Any],
     rca_test: dict[str, Any],
-    rca_val: dict[str, Any],
+    rca_test_raw: dict[str, Any],
 ) -> list[dict[str, Any]]:
     v = verdicts_doc["verdicts"]
     h1_pairs = {
@@ -289,27 +305,48 @@ def _extract_hypotheses(
     time0_fault = h1_pairs[("time_0", "fault")]
     neighbor_fault = h1_pairs[("neighbor_trace", "fault")]
 
-    return [
+    hit_alert = rca_test_raw["by_t_group"]["180"]["hit_alert"]
+    cascade_inj = int(rca_test_raw["cascade_injections"])
+    total_inj = int(rca_test_raw["injections"])
+    cascade_arr = rca_test_raw["reduction"]["cascade"]["180"]["arr"]
+    fault_red = rca_test_raw["main"]["reduction"]["fault"]
+    discordant = (
+        int(hit_alert["discordant_hit1"]["level1_only"])
+        + int(hit_alert["discordant_hit1"]["baseline_only"])
+    )
+    cascade_detail = (
+        f"không tính được: {cascade_inj} / {total_inj} lần tiêm lỗi là cascade"
+        if cascade_arr is None
+        else _fmt_vi(float(cascade_arr), 3)
+    )
+
+    items: list[dict[str, Any]] = [
         {
             "id": "H0",
             "title": "Topology chưa hiệu chỉnh (C1) vs BM25",
             "split": "test",
             "status": "accepted",
             "status_label": "Chấp nhận (4/4 vế)",
-            "summary": "; ".join(c["detail"] for c in v["H0"]["clauses"]),
-            "clauses": v["H0"]["clauses"],
+            "summary": "; ".join(_vi_decimals(c["detail"]) for c in v["H0"]["clauses"]),
+            "clauses": [
+                {**c, "detail": _vi_decimals(str(c["detail"]))}
+                for c in v["H0"]["clauses"]
+            ],
         },
         {
             "id": "H1",
-            "title": "Cơ chế nguồn gốc độ lợi của C1",
+            "title": "Thí nghiệm cơ chế trên mẫu dựng",
             "split": "val",
-            "status": "falsified",
-            "status_label": "Bác bỏ giả thuyết thứ tự đồ thị (M5)",
+            "status": "partial",
+            "status_label": "Giữ một phần (val, M5 — QĐ-028); không chạy lại trên test",
             "summary": (
                 f"Độ lợi C1 trên fault đến từ metric/span gần nhất theo thời gian: "
-                f"near_log−near_trace Δ={near_log_fault['diff']:+.3f} (p<0.001), "
-                f"time_0−near_trace Δ={time0_fault['diff']:+.3f} (p={time0_fault['mcnemar_p']:.3f}), "
-                f"neighbor_trace−near_trace Δ={neighbor_fault['diff']:+.3f}."
+                f"near_log − near_trace Δ = {_fmt_signed_vi(near_log_fault['diff'])} "
+                f"({_fmt_p_vi(near_log_fault['mcnemar_p'])}), "
+                f"time_0 − near_trace Δ = {_fmt_signed_vi(time0_fault['diff'])} "
+                f"({_fmt_p_vi(time0_fault['mcnemar_p'])}), "
+                f"neighbor_trace − near_trace Δ = {_fmt_signed_vi(neighbor_fault['diff'])} "
+                f"({_fmt_p_vi(neighbor_fault['mcnemar_p'])})."
             ),
             "clauses": [],
         },
@@ -319,8 +356,11 @@ def _extract_hypotheses(
             "split": "test",
             "status": "rejected",
             "status_label": "Không đạt (1/3 vế)",
-            "summary": "; ".join(c["detail"] for c in v["H2"]["clauses"]),
-            "clauses": v["H2"]["clauses"],
+            "summary": "; ".join(_vi_decimals(c["detail"]) for c in v["H2"]["clauses"]),
+            "clauses": [
+                {**c, "detail": _vi_decimals(str(c["detail"]))}
+                for c in v["H2"]["clauses"]
+            ],
         },
         {
             "id": "H3",
@@ -328,16 +368,36 @@ def _extract_hypotheses(
             "split": "test",
             "status": "accepted",
             "status_label": "Chấp nhận (C3 đóng góp; bỏ C2, C4)",
-            "summary": (
+            "summary": _vi_decimals(
                 f"C3: {v['H3']['C3']['detail']}; C2: {v['H3']['C2']['detail']}; "
                 f"C4: {v['H3']['C4']['detail']}; C3-trượt: {v['H3']['C3-trượt']['detail']}"
             ),
             "clauses": [
-                {"clause": f"C3 — {v['H3']['C3']['clause']}", **v["H3"]["C3"]},
-                {"clause": f"C2 — {v['H3']['C2']['clause']}", **v["H3"]["C2"]},
-                {"clause": f"C4 — {v['H3']['C4']['clause']}", **v["H3"]["C4"]},
-                {"clause": f"C3-trượt — {v['H3']['C3-trượt']['clause']}", **v["H3"]["C3-trượt"]},
-                {"clause": f"C5 — {v['H3']['C5']['clause']}", **v["H3"]["C5"]},
+                {
+                    "clause": f"C3 — {v['H3']['C3']['clause']}",
+                    **v["H3"]["C3"],
+                    "detail": _vi_decimals(str(v["H3"]["C3"]["detail"])),
+                },
+                {
+                    "clause": f"C2 — {v['H3']['C2']['clause']}",
+                    **v["H3"]["C2"],
+                    "detail": _vi_decimals(str(v["H3"]["C2"]["detail"])),
+                },
+                {
+                    "clause": f"C4 — {v['H3']['C4']['clause']}",
+                    **v["H3"]["C4"],
+                    "detail": _vi_decimals(str(v["H3"]["C4"]["detail"])),
+                },
+                {
+                    "clause": f"C3-trượt — {v['H3']['C3-trượt']['clause']}",
+                    **v["H3"]["C3-trượt"],
+                    "detail": _vi_decimals(str(v["H3"]["C3-trượt"]["detail"])),
+                },
+                {
+                    "clause": f"C5 — {v['H3']['C5']['clause']}",
+                    **v["H3"]["C5"],
+                    "detail": _vi_decimals(str(v["H3"]["C5"]["detail"])),
+                },
             ],
         },
         {
@@ -346,48 +406,99 @@ def _extract_hypotheses(
             "split": "test",
             "status": "accepted",
             "status_label": "Chấp nhận (ước lượng điểm)",
-            "summary": v["H4"]["detail"],
-            "clauses": [v["H4"]],
+            "summary": _vi_decimals(str(v["H4"]["detail"])),
+            "clauses": [{**v["H4"], "detail": _vi_decimals(str(v["H4"]["detail"]))}],
         },
         {
             "id": "H5",
-            "title": "Tác tử RCA (Branch A định vị + Branch B gom & tóm tắt)",
+            "title": "Tác tử RCA trên incident gom từ CTAV",
             "split": "test",
             "status": "rejected",
-            "status_label": "Không đạt nhánh A; đạt nhánh B (QĐ-045)",
+            "status_label": "Không được chấp nhận (0 / 4 vế)",
             "summary": (
-                f"Test: Hit@1={rca_test['hit1_count']}/{rca_test['labelled']} "
-                f"({_fmt_vi(rca_test['hit1'], 3)} < 0,60), "
-                f"Hit@3={rca_test['hit3_count']}/{rca_test['labelled']} "
-                f"({_fmt_vi(rca_test['hit3'], 3)} < 0,80), "
-                f"multi_service={rca_test['multi_service']}. "
-                f"Nhánh B đạt: ARR={_fmt_vi(rca_test['arr_all'], 3)} (test) / "
-                f"{_fmt_vi(rca_val['arr_all'], 3)} (val), "
-                f"JSON hợp lệ={rca_test['summary_valid']}/{rca_test['summary_incidents']} "
-                f"({_fmt_vi(rca_test['json_valid_rate'] * 100, 0)}%)."
+                f"Hit@1 = Hit@3 = {hit_alert['level1_hit1_count']} / {hit_alert['n']} = "
+                f"{_fmt_vi(hit_alert['level1_hit1'], 3)} "
+                f"[{_fmt_vi(hit_alert['level1_hit1_ci95'][0], 3)}; "
+                f"{_fmt_vi(hit_alert['level1_hit1_ci95'][1], 3)}]; "
+                f"ΔHit@1 = {_fmt_vi(hit_alert['d_hit1'], 3)}; "
+                f"{cascade_inj} / {total_inj} lần tiêm lỗi là cascade. "
+                f"Tham chiếu (không phải tiêu chí đăng ký): ARR mọi cảnh báo = "
+                f"{_fmt_vi(rca_test['arr_all'], 3)} "
+                f"[{_fmt_vi(rca_test['arr_all_ci95'][0], 3)}; "
+                f"{_fmt_vi(rca_test['arr_all_ci95'][1], 3)}], "
+                f"ARR cảnh báo trong lỗi = {_fmt_vi(fault_red['arr'], 3)} "
+                f"[{_fmt_vi(fault_red['arr_ci95'][0], 3)}; "
+                f"{_fmt_vi(fault_red['arr_ci95'][1], 3)}]."
+            ),
+            "note": (
+                f"Nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ "
+                f"(JSON hợp lệ {rca_test['summary_valid']} / {rca_test['summary_incidents']})."
             ),
             "clauses": [
                 {
-                    "clause": "Hit@1 ≥ 0,60 (đăng ký trước G-test)",
-                    "met": rca_test["hit1"] >= 0.60,
-                    "detail": f"{rca_test['hit1_count']} / {rca_test['labelled']} = {_fmt_vi(rca_test['hit1'], 3)}",
-                },
-                {
-                    "clause": "Hit@3 ≥ 0,80 (đăng ký trước G-test)",
-                    "met": rca_test["hit3"] >= 0.80,
-                    "detail": f"{rca_test['hit3_count']} / {rca_test['labelled']} = {_fmt_vi(rca_test['hit3'], 3)}",
-                },
-                {
-                    "clause": "Nhánh B (bổ trợ): ARR & tóm tắt JSON hợp lệ 100%",
-                    "met": rca_test["json_valid_rate"] == 1.0,
+                    "clause": "Hit@1 ≥ 0,60",
+                    "met": False,
                     "detail": (
-                        f"ARR test={_fmt_vi(rca_test['arr_all'], 3)}, val={_fmt_vi(rca_val['arr_all'], 3)}; "
-                        f"valid={rca_test['summary_valid']}/{rca_test['summary_incidents']}"
+                        f"{hit_alert['level1_hit1_count']} / {hit_alert['n']} = "
+                        f"{_fmt_vi(hit_alert['level1_hit1'], 3)} "
+                        f"[{_fmt_vi(hit_alert['level1_hit1_ci95'][0], 3)}; "
+                        f"{_fmt_vi(hit_alert['level1_hit1_ci95'][1], 3)}]"
                     ),
+                },
+                {
+                    "clause": "Hit@3 ≥ 0,80",
+                    "met": False,
+                    "detail": (
+                        f"{hit_alert['level1_hit3_count']} / {hit_alert['n']} = "
+                        f"{_fmt_vi(hit_alert['level1_hit3'], 3)} "
+                        f"[{_fmt_vi(hit_alert['level1_hit3_ci95'][0], 3)}; "
+                        f"{_fmt_vi(hit_alert['level1_hit3_ci95'][1], 3)}]"
+                    ),
+                },
+                {
+                    "clause": "Cận dưới CI95 của ΔHit@1 (RCA − baseline) > 0",
+                    "met": False,
+                    "detail": (
+                        f"{_fmt_vi(hit_alert['d_hit1'], 3)} "
+                        f"(baseline {hit_alert['baseline_hit1_count']} / {hit_alert['n']}; "
+                        f"{discordant} cặp lệch) "
+                        f"[{_fmt_vi(hit_alert['d_hit1_ci95'][0], 3)}; "
+                        f"{_fmt_vi(hit_alert['d_hit1_ci95'][1], 3)}]"
+                    ),
+                },
+                {
+                    "clause": "Alert Reduction ≥ 30% trên sự cố cascade",
+                    "met": False,
+                    "detail": cascade_detail,
                 },
             ],
         },
     ]
+    return items
+
+
+def _parse_md_table(ch5_md: str, heading_prefix: str) -> list[list[str]]:
+    lines = ch5_md.splitlines()
+    start = next(
+        (idx for idx, ln in enumerate(lines) if ln.startswith(heading_prefix)),
+        None,
+    )
+    if start is None:
+        raise AssertionError(f"Heading {heading_prefix!r} not found in ch5-ket-qua-test.md")
+    rows: list[list[str]] = []
+    in_table = False
+    for ln in lines[start + 1 :]:
+        if ln.startswith("|"):
+            in_table = True
+            cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+            if cells and all(set(c) <= {"-", ":", " "} for c in cells):
+                continue
+            rows.append(cells)
+        elif in_table:
+            break
+    if len(rows) < 2:
+        raise AssertionError(f"Empty markdown table under {heading_prefix!r}")
+    return rows[1:]  # skip header row
 
 
 def _verify_markdown_parity(payload: dict[str, Any]) -> None:
@@ -428,6 +539,41 @@ def _verify_markdown_parity(payload: dict[str, Any]) -> None:
             raise AssertionError(
                 f"Parity mismatch for RCA {row['run_id']} ({h1_s}, {arr_s}) in ch5-ket-qua-test.md"
             )
+
+    # F9: structured verification against Table 5.18 (H0-H4) and Table 5.26 (H5 clauses).
+    t518 = {
+        cells[0].replace("*", "").split()[0]: cells
+        for cells in _parse_md_table(ch5_md, "**Bảng 5.18")
+    }
+    by_hid = {h["id"]: h for h in payload["verdicts"]}
+    expected_518_markers = {
+        "H0": ("Được chấp nhận", "accepted"),
+        "H1": ("Giữ một phần", "partial"),
+        "H2": ("Không được chấp nhận", "rejected"),
+        "H3": ("Được chấp nhận", "accepted"),
+        "H4": ("Được chấp nhận", "accepted"),
+    }
+    for hid, (md_marker, json_status) in expected_518_markers.items():
+        if hid not in t518:
+            raise AssertionError(f"Missing {hid} in Table 5.18")
+        joined = " | ".join(t518[hid])
+        if md_marker not in joined:
+            raise AssertionError(f"Table 5.18 {hid} missing {md_marker!r}: {joined}")
+        if by_hid[hid]["status"] != json_status:
+            raise AssertionError(
+                f"Hypothesis {hid} status={by_hid[hid]['status']!r}, expected {json_status!r}"
+            )
+
+    t526 = _parse_md_table(ch5_md, "**Bảng 5.26")
+    if len(t526) != 4 or len(by_hid["H5"]["clauses"]) != 4:
+        raise AssertionError("Table 5.26 and H5 must have exact 4 clauses")
+    for md_cells, json_clause in zip(t526, by_hid["H5"]["clauses"], strict=True):
+        if md_cells[0] != json_clause["clause"]:
+            raise AssertionError(
+                f"H5 clause mismatch: {json_clause['clause']!r} vs Table 5.26 {md_cells[0]!r}"
+            )
+        if md_cells[-1] != "Không đạt" or json_clause["met"] is not False:
+            raise AssertionError(f"H5 clause conclusion mismatch in Table 5.26: {md_cells}")
 
 
 def build_experiment_table() -> dict[str, Any]:
@@ -484,6 +630,8 @@ def build_experiment_table() -> dict[str, Any]:
         "41 cascade / 39 multi-service; ARR cascade=0,704; Hit@1=0,208",
     )
 
+    rca_test_raw = _read_json("rca_final_test_v1/rca.json")
+
     payload: dict[str, Any] = {
         "schema_version": "1.0",
         "generated_at": datetime.now(tz=UTC).isoformat(),
@@ -502,7 +650,7 @@ def build_experiment_table() -> dict[str, Any]:
             "eval/results/rca_final_test_v1/rca.json",
             "eval/results/rca_sens_test_c3rolling_v1/rca.json",
         ],
-        "verdicts": _extract_hypotheses(verdicts_doc, h1_doc, rca_test, rca_val),
+        "verdicts": _extract_hypotheses(verdicts_doc, h1_doc, rca_test, rca_test_raw),
         "methods": {
             "test": methods_test,
             "val": methods_val,

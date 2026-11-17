@@ -154,6 +154,8 @@ const RUN_SPEC: Record<
 
 const STRATEGIES = Object.keys(RUN_SPEC) as RetrievalStrategy[];
 
+const N_WINDOWS = 300; // theo eval/configs/bm25_baseline.yaml
+
 export const runs: Run[] = STRATEGIES.map((strategy, i) => ({
   run_id: `${strategy}_dev_v1`,
   retrieval_strategy: strategy,
@@ -167,9 +169,8 @@ export const runs: Run[] = STRATEGIES.map((strategy, i) => ({
     strategy === "bm25_hybrid"
       ? "Baseline port từ Giai đoạn 1, time_source=epoch để đối chiếu."
       : `Biến thể ${strategy}, cùng split và seed với baseline.`,
+  alert_count: N_WINDOWS,
 }));
-
-const N_WINDOWS = 300; // theo eval/configs/bm25_baseline.yaml
 
 export const runMetrics: Record<string, RunMetrics> = Object.fromEntries(
   STRATEGIES.map((strategy, i) => {

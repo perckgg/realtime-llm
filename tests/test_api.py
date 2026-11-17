@@ -104,18 +104,65 @@ def test_api_endpoints_real_data_and_contract() -> None:
         assert res.status_code == 200
         assert res.json() == {"status": "ok"}
 
-    # 2. /runs
+    # 2. /runs (F6: includes alert_count distinguishing pipeline_* from rca_*)
     runs_res = client.get("/runs")
     assert runs_res.status_code == 200
     runs = runs_res.json()
-    run_ids = {r["run_id"] for r in runs}
-    assert {"pipeline_val_v1", "pipeline_test_v1"} <= run_ids
+    by_run_id = {r["run_id"]: r for r in runs}
+    assert {
+        "pipeline_val_v1",
+        "pipeline_test_v1",
+        "pipeline_val_v2",
+        "pipeline_test_v2",
+        "rca_final_test_v1",
+    } <= set(by_run_id)
     assert set(runs[0].keys()) >= ifaces["Run"]
+    assert by_run_id["pipeline_test_v1"]["alert_count"] == 13699
+    assert by_run_id["pipeline_test_v2"]["alert_count"] == 13699
+    assert by_run_id["rca_final_test_v1"]["alert_count"] == 0
+
+    # F5 + F4: requesting same alert_id across _v1 vs _v2 returns exact run_id & authentic cache_hit.
+    import json as _json
+
+    judged_path = (
+        Path(__file__).resolve().parents[1]
+        / "eval"
+        / "results"
+        / "ctav_final_test_v1"
+        / "judged.jsonl"
+    )
+    false_wid: str | None = None
+    true_wid: str | None = None
+    with judged_path.open(encoding="utf-8") as handle:
+        for line in handle:
+            rec = _json.loads(line)
+            if false_wid is None and rec.get("cache_hit") is False:
+                false_wid = str(rec["window_id"])
+            elif true_wid is None and rec.get("cache_hit") is True:
+                true_wid = str(rec["window_id"])
+            if false_wid and true_wid:
+                break
+    assert false_wid is not None and true_wid is not None
+    false_id = f"cand-{false_wid}:hybrid_bm25_graph:r0"
+    true_id = f"cand-{true_wid}:hybrid_bm25_graph:r0"
+
+    res_v1 = client.get(f"/alerts/{false_id}?run_id=pipeline_test_v1")
+    res_v2 = client.get(f"/alerts/{false_id}?run_id=pipeline_test_v2")
+    assert res_v1.status_code == 200 and res_v2.status_code == 200
+    assert res_v1.json()["run_id"] == "pipeline_test_v1"
+    assert res_v1.json()["cache_hit"] is True
+    assert res_v2.json()["run_id"] == "pipeline_test_v2"
+    assert res_v2.json()["cache_hit"] is False
+
+    res_v2_true = client.get(f"/alerts/{true_id}?run_id=pipeline_test_v2")
+    assert res_v2_true.status_code == 200
+    assert res_v2_true.json()["run_id"] == "pipeline_test_v2"
+    assert res_v2_true.json()["cache_hit"] is True
 
     # 3. /runs/{run_id}/metrics & 4. /alerts & 5. /alerts/{alert_id} & 6-7. /incidents
     for run_id, n_windows, tp, fp, n_alerts, n_true, n_inc in [
-        ("pipeline_val_v1", 7636, 29, 51, 5677, 80, 26),
-        ("pipeline_test_v1", 11985, 14, 64, 13699, 78, 38),
+        ("pipeline_val_v2", 7636, 29, 51, 5677, 80, 26),
+        ("pipeline_test_v2", 11985, 14, 64, 13699, 78, 38),
     ]:
         m_res = client.get(f"/runs/{run_id}/metrics")
         assert m_res.status_code == 200

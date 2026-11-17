@@ -90,6 +90,53 @@ class LoadedAlerts:
     ctav_completion_tokens: int
 
 
+def _build_eval_row(
+    run_id: str,
+    alert: JudgedAlert,
+    pw: Mapping[str, Any],
+    ret: Mapping[str, Any],
+    strategy: str,
+) -> dict[str, Any]:
+    """Build one ClickHouse `fact_alert_evaluation` row preserving input `cache_hit`."""
+    events = ret.get("events") or []
+    return {
+        "run_id": run_id,
+        "window_id": alert.window_id,
+        "service": alert.service,
+        "window_ts": alert.ts.astimezone(UTC),
+        "anomaly_score": float(pw["anomaly_score"] or 0.0),
+        "candidate_source": "metric",
+        "rescue_score": None,
+        "rescue_lambda_log": None,
+        "rescue_phi_topo": None,
+        "rescue_delta_time": None,
+        "retrieval_strategy": strategy,
+        "retrieval_latency_ms": float(ret.get("latency_ms") or 0.0),
+        "context_event_count": len(events),
+        "context_tokens": int(ret.get("token_estimate") or 0),
+        "retrieval_truncated": int(bool(ret.get("truncated", False))),
+        "verdict": alert.verdict,
+        "raw_verdict": alert.raw_verdict,
+        "routing_tier": int(alert.routing_tier),
+        "evidence_origin": alert.evidence_origin,
+        "threshold_applied": (
+            float(alert.threshold_applied)
+            if alert.threshold_applied is not None
+            else None
+        ),
+        "confidence": float(alert.confidence),
+        "judge_backend": alert.judge_backend,
+        "llm_latency_ms": float(alert.llm_latency_ms),
+        "cache_hit": int(bool(alert.cache_hit)),
+        "downgraded": int(alert.downgraded_by_evidence_rule),
+        "downgraded_gating": int(alert.downgraded_by_gating),
+        "downgraded_anchoring": int(alert.downgraded_by_anchoring),
+        "label_is_fault": int(_flag(pw["label_is_fault"])),
+        "label_fault_type": pw["label_fault_type"],
+        "label_root_cause": pw["label_root_cause"] or "",
+    }
+
+
 def load_alerts(
     alerts_run: str,
     evidence_run: str,
@@ -148,44 +195,7 @@ def load_alerts(
         ctav_prompt_tokens += int(alert.debug.get("prompt_tokens") or 0)
         ctav_completion_tokens += int(alert.debug.get("completion_tokens") or 0)
 
-        eval_rows.append(
-            {
-                "run_id": run_id,
-                "window_id": alert.window_id,
-                "service": alert.service,
-                "window_ts": alert.ts.astimezone(UTC),
-                "anomaly_score": float(pw["anomaly_score"] or 0.0),
-                "candidate_source": "metric",
-                "rescue_score": None,
-                "rescue_lambda_log": None,
-                "rescue_phi_topo": None,
-                "rescue_delta_time": None,
-                "retrieval_strategy": strategy,
-                "retrieval_latency_ms": float(ret.get("latency_ms") or 0.0),
-                "context_event_count": len(events),
-                "context_tokens": int(ret.get("token_estimate") or 0),
-                "retrieval_truncated": int(bool(ret.get("truncated", False))),
-                "verdict": alert.verdict,
-                "raw_verdict": alert.raw_verdict,
-                "routing_tier": int(alert.routing_tier),
-                "evidence_origin": alert.evidence_origin,
-                "threshold_applied": (
-                    float(alert.threshold_applied)
-                    if alert.threshold_applied is not None
-                    else None
-                ),
-                "confidence": float(alert.confidence),
-                "judge_backend": alert.judge_backend,
-                "llm_latency_ms": float(alert.llm_latency_ms),
-                "cache_hit": 1,
-                "downgraded": int(alert.downgraded_by_evidence_rule),
-                "downgraded_gating": int(alert.downgraded_by_gating),
-                "downgraded_anchoring": int(alert.downgraded_by_anchoring),
-                "label_is_fault": int(_flag(pw["label_is_fault"])),
-                "label_fault_type": pw["label_fault_type"],
-                "label_root_cause": pw["label_root_cause"] or "",
-            }
-        )
+        eval_rows.append(_build_eval_row(run_id, alert, pw, ret, strategy))
 
         for event in events:
             debug_payload = dict(event.get("debug") or {})
@@ -534,7 +544,7 @@ def run_pipeline(
         )
 
     reference_run_id = str(config["run_id"])
-    effective_run_id = run_id or f"pipeline_{config['split']}_v1"
+    effective_run_id = run_id or f"pipeline_{config['split']}_v2"
     out_dir = (output_root or results_root) / effective_run_id
     if out_dir.exists():
         raise SystemExit(
@@ -712,7 +722,7 @@ def main() -> int:
         description="M10-A end-to-end replay pipeline: CTAV -> ClickHouse -> RCA -> PostgreSQL.",
     )
     parser.add_argument("--config", type=Path, required=True, help="RCA config YAML (rca_final*.yaml)")
-    parser.add_argument("--run-id", default=None, help="Override output run_id (default: pipeline_<split>_v1)")
+    parser.add_argument("--run-id", default=None, help="Override output run_id (default: pipeline_<split>_v2)")
     parser.add_argument(
         "--no-db",
         action="store_true",
