@@ -13,6 +13,7 @@ Mỗi hình có ba file cùng tên:
 | Hình | File | Đặt ở | Label đề xuất |
 |---|---|---|---|
 | 1.1 Tổng quan hệ thống và khoảng trống ngữ nghĩa | `ch1/fig-tong-quan` | cuối 1.1.1 | `fig:ch1-tong-quan` |
+| 1.1 (bản tiếng Anh) | `ch1/fig-tong-quan-en` | như trên | `fig:ch1-tong-quan` |
 | 1.2 Đánh đổi của ngữ cảnh topology | `ch1/fig-danh-doi` | 1.1.2 | `fig:ch1-danh-doi` |
 
 Cách 1 — dùng PDF:
@@ -49,7 +50,7 @@ rồi thay `\includegraphics[...]{...pdf}` bằng `\resizebox{\linewidth}{!}{\in
 
 ```bash
 cd thesis/figures/ch1
-for f in tong-quan danh-doi; do
+for f in tong-quan tong-quan-en danh-doi; do
   printf '%s\n' '\documentclass[border=3pt]{standalone}' '\usepackage{fontspec}\setmainfont{Latin Modern Roman}' \
     '\usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc,decorations.pathreplacing}' \
     "\\begin{document}\\input{fig-$f}\\end{document}" > _build-$f.tex
