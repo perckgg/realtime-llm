@@ -28,6 +28,10 @@ kế chắc chắn, kết quả điền tới đâu hay tới đó, phần còn 
 
 ## 2. Lịch theo tuần
 
+> Cập nhật 2026-11-18: danh mục hình đã cắt còn **23 hình** (outline mục 5). Mã hình bị bỏ hoặc chuyển phụ lục
+> trong bảng dưới (H2.1–H2.3, H2.5, H2.6, H2.8, H2.9, H3.1, H4.2, H4.3, H4.7–H4.9, H4.11, H4.12, H5.2, H5.5–H5.7,
+> H5.14–H5.16, H6.6, H6.7, H7.1, HK.1) không cần làm. Kế hoạch thực hiện trình bày bằng bảng BK.1.
+
 Mỗi tuần có hai làn: **Viết** (LaTeX) và **Code / số** (việc kỹ thuật mà phần viết phụ thuộc). Mã hình/bảng theo outline.
 
 | Tuần | Viết | Hình, bảng làm cùng | Code / số (song song) | Đầu ra cuối tuần |

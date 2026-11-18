@@ -36,7 +36,7 @@
 
 | Mục | Nội dung | Bảng | Hình | Độ dài | Trạng thái |
 |---|---|---|---|---|---|
-| 5.7.1 | Giao thức G-test và các lần chạy | T1 | F1 | ½ trang | ✅ (T1 còn 3 dòng ⏳) |
+| 5.7.1 | Giao thức G-test và các lần chạy | T1 | — (dẫn chiếu H5.3) | ½ trang | ✅ (T1 còn 3 dòng ⏳) |
 | 5.7.2 | Detector trên `test`, độ lệch giữa các split | T2 | F2 | 1 trang | ✅ |
 | 5.7.3 | Bức tranh chung: mọi phương pháp trên `test` | T3 | F3 | 1 trang | ✅ một phần (BM25, C1, detector-only) |
 | 5.7.4 | H0: topology chưa hiệu chỉnh | T4 | — | ¾ trang | ✅ |
@@ -67,7 +67,7 @@ không", §5.8 trả lời "thành phần nào gây ra".
   hình `test` là bản sao của cấu hình `val`. Nêu phương pháp đóng băng trong một câu.
 - Đoạn 2: phạm vi chấm (toàn bộ candidate), cách tính CI và McNemar, H2 là giả thuyết chính.
 
-**Hình F1. Quy trình G-test.** Sơ đồ khối theo trục thời gian, vẽ bằng công cụ sơ đồ. Nhấn mạnh mũi mốc "đăng ký và
+**Hình F1. Quy trình G-test.** *(Đã gộp vào H5.3 ba cổng kiểm chứng theo đợt cắt hình 2026-11-18; giữ phần mô tả dưới đây làm nội dung cho cổng G-test trong H5.3.)* Sơ đồ khối theo trục thời gian, vẽ bằng công cụ sơ đồ. Nhấn mạnh mũi mốc "đăng ký và
 commit" nằm trước mọi bước chạm `test`.
 
 ```mermaid
@@ -366,7 +366,7 @@ Nguồn: `eval/manual/context_precision_test_v1.csv` sau khi bạn chấm, ghép
 
 | Mã | Tên | Loại | Mục | Dựng được ngay? |
 |---|---|---|---|---|
-| F1 | Quy trình G-test | sơ đồ khối | 5.7.1 | ✅ |
+| F1 | Quy trình G-test | sơ đồ khối | — | **bỏ**: gộp vào H5.3 (§5.5), quyết định cắt hình 2026-11-18 |
 | F2 | Tỉ lệ candidate theo split và hệ thống | cột nhóm | 5.7.2 | ✅ |
 | F3 | Điểm vận hành Recall–FPR, `val` và `test` | phân tán | 5.7.3 | ✅ khung và 3 điểm `test`; ⏳ CTAV, không-RAG |
 | F4 | Hiệu ghép cặp và CI | forest plot | 5.7.5 | ✅ dòng C1 − BM25 và mọi dòng `val`; ⏳ còn lại |

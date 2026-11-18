@@ -160,7 +160,11 @@ pipeline (G-port, G-paper) không phải kiểm định giả thuyết; viết t
 - Mỗi hình, bảng được nhắc trong văn **trước** khi xuất hiện, kèm ít nhất một câu nói người đọc cần nhìn vào đâu.
 - Caption bảng **trên** bảng; caption hình **dưới** hình. Caption tự đủ nghĩa: split, tập cửa sổ, `run\_id` nếu là kết quả chạy.
 - Sơ đồ (kiến trúc, luồng): một bộ màu và kiểu khối thống nhất cả luận văn.
-- Biểu đồ số liệu: sinh bằng script đọc thẳng `eval/results/`, không nhập số tay.
+- Biểu đồ số liệu: sinh bằng script đọc thẳng `eval/results/`, không nhập số tay (`scripts/thesis_figures.py`).
+- Mọi hình xuất **PNG 300 dpi** để chèn vào Word; không xuất PDF.
+- Chữ trên **biểu đồ số liệu** bằng **tiếng Anh**, dấu chấm thập phân (ngoại lệ của §4, chỉ áp dụng bên trong hình).
+  Caption và văn bản quanh hình vẫn tiếng Việt, dấu phẩy thập phân. Mỗi phương pháp giữ một màu ở mọi hình (BM25, C1,
+  CTAV); danh sách và caption: `docs/drafts/figures/danh-sach-bieu-do.md`.
 - Ảnh chụp, ví dụ prompt, ca cụ thể: lấy từ hệ thống chạy thật.
 - Bảng dài hơn nửa trang hoặc chỉ để tra cứu (theo service, cấu hình đầy đủ) đưa vào phụ lục.
 
