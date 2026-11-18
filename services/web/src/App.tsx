@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
-import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { NavLink, Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import { api } from "@/api/client";
 import { FixtureBanner, Loading, ErrorBox } from "@/components/ui";
-import { RunContext, type RunCtx } from "@/lib/runContext";
+import { RunContext, isSensitivityRunId, resolveRunId, type RunCtx } from "@/lib/runContext";
 import { useAsync } from "@/lib/util";
 import { strategyLabel } from "@/theme/tokens";
 import Timeline from "@/screens/Timeline";
@@ -17,12 +17,35 @@ const NAV = [
 
 export default function App() {
   const { data: runs, loading, error } = useAsync(() => api.listRuns(), []);
-  const [runId, setRunId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [chosenRunId, setChosenRunId] = useState<string | null>(null);
 
-  const effectiveRunId = runId ?? runs?.[0]?.run_id ?? "";
+  const effectiveRunId = resolveRunId(runs ?? [], searchParams.get("run_id"), chosenRunId);
   const activeRun = runs?.find((r) => r.run_id === effectiveRunId) ?? runs?.[0];
-  const isSensitivityRun =
-    effectiveRunId.includes("sens") || effectiveRunId.includes("c3rolling");
+  const isSensitivityRun = isSensitivityRunId(effectiveRunId);
+
+  // Nhớ run lấy từ URL để các link không kèm `?run_id=` (thanh điều hướng, "← Timeline") giữ run.
+  useEffect(() => {
+    if (effectiveRunId && searchParams.get("run_id") === effectiveRunId) {
+      setChosenRunId(effectiveRunId);
+    }
+  }, [effectiveRunId, searchParams]);
+
+  // Ghi run vừa chọn lên URL để F5 / chép link giữ nguyên run (lỗi tổng duyệt M11, 2026-11-18).
+  const setRunId = useCallback(
+    (id: string) => {
+      setChosenRunId(id);
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set("run_id", id);
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
   const ctx = useMemo<RunCtx>(
     () => ({
       runs: runs ?? [],
@@ -31,7 +54,7 @@ export default function App() {
       runsLoading: loading,
       runsError: error,
     }),
-    [runs, effectiveRunId, loading, error],
+    [runs, effectiveRunId, setRunId, loading, error],
   );
 
   return (
@@ -141,12 +164,12 @@ export default function App() {
             </Routes>
           ) : (
             <Routes>
-              <Route path="/" element={<Navigate to="/timeline" replace />} />
+              <Route path="/" element={<Navigate to={{ pathname: "/timeline", search: searchParams.toString() ? `?${searchParams}` : "" }} replace />} />
               <Route path="/timeline" element={<Timeline />} />
               <Route path="/alerts/:alertId" element={<AlertDetail />} />
               <Route path="/incidents/:incidentId" element={<IncidentDetail />} />
               <Route path="/compare" element={<ExperimentComparison />} />
-              <Route path="*" element={<Navigate to="/timeline" replace />} />
+              <Route path="*" element={<Navigate to={{ pathname: "/timeline", search: searchParams.toString() ? `?${searchParams}` : "" }} replace />} />
             </Routes>
           )}
         </main>

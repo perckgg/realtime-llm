@@ -16,7 +16,7 @@ import { Legend, TooltipRow, TooltipShell, axisProps } from "@/components/charts
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, dayUTC, ms, num, pct, policySteps, stampUTC, useAsync } from "@/lib/util";
 import { ink, status, verdictColor, verdictGlyph, verdictLabel, VERDICT_ORDER } from "@/theme/tokens";
-import { useRuns } from "@/lib/runContext";
+import { pickDefaultRunId, useRuns } from "@/lib/runContext";
 
 const BUCKET_MINUTES = 10;
 
@@ -30,7 +30,7 @@ export default function Timeline() {
 
   const activeRun = runs.find((r) => r.run_id === runId);
   const rcaOnlyRun = Boolean(activeRun && activeRun.alert_count === 0);
-  const defaultPipelineRun = runs.find((r) => r.alert_count > 0);
+  const defaultPipelineRun = runs.find((r) => r.run_id === pickDefaultRunId(runs) && r.alert_count > 0);
 
   const alertsQ = useAsync(
     () => (runId && !rcaOnlyRun ? api.listAlerts({ runId }) : Promise.resolve<Alert[]>([])),

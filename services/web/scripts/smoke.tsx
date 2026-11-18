@@ -70,6 +70,7 @@ const { MemoryRouter, Route, Routes } = await import("react-router-dom");
 const { RunContext } = await import("@/lib/runContext");
 const { runs, listAlerts, listIncidents } = await import("@/mock/fixtures");
 const { policySteps } = await import("@/lib/util");
+const { resolveRunId } = await import("@/lib/runContext");
 const Timeline = (await import("@/screens/Timeline")).default;
 const AlertDetail = (await import("@/screens/AlertDetail")).default;
 const IncidentDetail = (await import("@/screens/IncidentDetail")).default;
@@ -243,6 +244,31 @@ for (const [label, input, expectedAnchoring] of policyCases) {
   } else {
     failed += 1;
     console.error(`  FAIL  policySteps            ${label}: got "${actual}", want "${expectedAnchoring}"`);
+  }
+}
+
+// Chọn run (lỗi tổng duyệt M11, 2026-11-18): thứ tự giống `GET /runs` thật — run độ nhạy đứng đầu.
+const realRuns = [
+  { run_id: "pipeline_sens_test_v1", alert_count: 13699 },
+  { run_id: "pipeline_test_v2", alert_count: 13699 },
+  { run_id: "pipeline_val_v2", alert_count: 5677 },
+  { run_id: "rca_final_test_v1", alert_count: 0 },
+];
+const runCases: [string, string | null, string | null, string][] = [
+  ["no URL, nothing chosen", null, null, "pipeline_test_v2"],
+  ["URL ?run_id=pipeline_val_v2", "pipeline_val_v2", null, "pipeline_val_v2"],
+  ["URL sensitivity run", "pipeline_sens_test_v1", null, "pipeline_sens_test_v1"],
+  ["URL wins over chosen", "pipeline_test_v2", "pipeline_val_v2", "pipeline_test_v2"],
+  ["unknown URL -> chosen", "nope", "pipeline_val_v2", "pipeline_val_v2"],
+  ["unknown URL -> default", "nope", null, "pipeline_test_v2"],
+];
+for (const [label, url, chosen, want] of runCases) {
+  const got = resolveRunId(realRuns, url, chosen);
+  if (got === want) {
+    console.log(`  ok    resolveRunId           ${label} -> ${got}`);
+  } else {
+    failed += 1;
+    console.error(`  FAIL  resolveRunId           ${label}: got "${got}", want "${want}"`);
   }
 }
 
