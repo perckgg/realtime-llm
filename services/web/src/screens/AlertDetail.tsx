@@ -14,6 +14,7 @@ import {
 import { api } from "@/api/client";
 import type { ContextEvent } from "@/api/types";
 import { TooltipRow, TooltipShell, axisProps } from "@/components/charts";
+import C1ContextExplainer from "@/components/C1ContextExplainer";
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, ms, num, policySteps, stampUTC, useAsync } from "@/lib/util";
 import { useRuns } from "@/lib/runContext";
@@ -270,6 +271,8 @@ export default function AlertDetail() {
           </Card>
         </div>
       </div>
+
+      <C1ContextExplainer alert={a} />
 
       <Card
         title={`Retrieved RAG Evidence (${a.context_events.length})`}

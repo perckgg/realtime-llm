@@ -202,6 +202,22 @@ def test_api_endpoints_real_data_and_contract() -> None:
         assert detail["context_events"][0]["content"] != ""
         assert "origin" in detail["context_events"][0]["debug"]
 
+        # C1 search scope + Fusion Score breakdown used by the "How C1 built this context" card.
+        scope = detail["search_scope"]
+        assert scope[0] == {"service": detail["service"], "distance": 0}
+        assert all(0 <= s["distance"] <= 2 for s in scope)
+        weights = detail["fusion_weights"]
+        assert weights is not None
+        for ev in detail["context_events"]:
+            dbg = ev["debug"]
+            recomposed = (
+                weights["alpha"] * dbg["bm25_norm"]
+                + weights["beta"] * dbg["time_sim"]
+                + weights["gamma"] * dbg["graph_sim"]
+            )
+            assert recomposed == pytest.approx(dbg["score_final"], abs=1e-6)
+            assert dbg["graph_sim"] == pytest.approx(1 / (1 + dbg["graph_distance"]))
+
         anchored = next((a for a in alerts if a["downgraded_by_anchoring"]), None)
         assert anchored is not None
         anc_res = client.get(f"/alerts/{anchored['alert_id']}?run_id={run_id}")
@@ -264,3 +280,18 @@ def test_api_404_and_empty_run() -> None:
         with readers.pg_connect() as conn:
             conn.execute("DELETE FROM run_registry WHERE run_id = %s", (empty_run_id,))
             conn.commit()
+
+
+def test_c1_fusion_weights_match_frozen_configs() -> None:
+    """The alert-detail breakdown must use the weights the registered C1 runs actually used."""
+    import yaml
+
+    from services.api.readers import C1_FUSION_WEIGHTS
+
+    for name in ("h0_val_c1_k0.yaml", "h0_test_c1_k0.yaml"):
+        params = yaml.safe_load((Path(__file__).resolve().parents[1] / "eval" / "configs" / name).read_text(encoding="utf-8"))["retrieval"]["params"]
+        assert params["alpha"] == C1_FUSION_WEIGHTS.alpha
+        assert params["beta"] == C1_FUSION_WEIGHTS.beta
+        assert params["gamma"] == C1_FUSION_WEIGHTS.gamma
+        assert params["tau_seconds"] == C1_FUSION_WEIGHTS.tau_seconds
+        assert params["graph_max_distance"] == C1_FUSION_WEIGHTS.graph_max_distance

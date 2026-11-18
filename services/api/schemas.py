@@ -120,6 +120,23 @@ class MetricPointResponse(BaseModel):
     value: float
 
 
+class SearchScopeEntryResponse(BaseModel):
+    """A service C1 searches for evidence: hop distance d_G on the undirected service graph."""
+
+    service: str
+    distance: int
+
+
+class FusionWeightsResponse(BaseModel):
+    """C1 Fusion Score = alpha * BM25_norm + beta * time_sim + gamma * 1 / (1 + d_G)."""
+
+    alpha: float
+    beta: float
+    gamma: float
+    tau_seconds: float
+    graph_max_distance: int
+
+
 class AlertDetailResponse(AlertResponse):
     reasoning: str
     evidence_event_ids: list[str]
@@ -127,6 +144,9 @@ class AlertDetailResponse(AlertResponse):
     metric_series: list[MetricPointResponse]
     metric_name: str
     detector_threshold: float
+    # Empty / None when the context was not built by C1 (no `graph_sim` in the event debug).
+    search_scope: list[SearchScopeEntryResponse] = []
+    fusion_weights: FusionWeightsResponse | None = None
 
 
 class GroupingReasonResponse(BaseModel):

@@ -14,6 +14,7 @@ import {
 } from "@xyflow/react";
 import { api } from "@/api/client";
 import type { GraphNode, IncidentDetail as IncidentDetailT } from "@/api/types";
+import RcaPropagationStory from "@/components/RcaPropagationStory";
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, num, stampUTC, useAsync } from "@/lib/util";
 import { ink, series, status } from "@/theme/tokens";
@@ -234,10 +235,12 @@ export default function IncidentDetail() {
         />
       </div>
 
+      <RcaPropagationStory data={data} />
+
       <div className="grid gap-4 xl:grid-cols-[1.7fr_1fr]">
         <Card
-          title="Propagation Graph"
-          subtitle="Red arrows follow fault propagation direction (reverse of call direction). Grey nodes are healthy neighbors kept for contrast. Drag to rearrange or scroll to zoom."
+          title="Service Neighborhood Graph"
+          subtitle="Full 1-hop call neighborhood of the incident. Red arrows follow fault propagation direction (reverse of call direction). Grey nodes are healthy neighbors kept for contrast. Drag to rearrange or scroll to zoom."
           right={
             <ul className="flex flex-wrap gap-x-3 gap-y-1">
               {(Object.keys(ROLE) as GraphNode["role"][]).map((r) => (

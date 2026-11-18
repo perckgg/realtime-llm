@@ -111,6 +111,24 @@ export interface AlertDetail extends Alert {
   metric_series: { ts: string; value: number }[];
   metric_name: string;
   detector_threshold: number;
+  /** C1 search scope: services within `graph_max_distance` hops (undirected), s0 first. Empty when C1 did not build the context. */
+  search_scope: SearchScopeEntry[];
+  /** C1 Fusion Score weights; null when C1 did not build the context. */
+  fusion_weights: FusionWeights | null;
+}
+
+export interface SearchScopeEntry {
+  service: string;
+  distance: number;
+}
+
+/** Fusion Score = alpha * BM25_norm + beta * time_sim + gamma * 1 / (1 + d_G). */
+export interface FusionWeights {
+  alpha: number;
+  beta: number;
+  gamma: number;
+  tau_seconds: number;
+  graph_max_distance: number;
 }
 
 /** 03 §2 EvidenceItem */

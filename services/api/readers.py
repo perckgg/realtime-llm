@@ -27,6 +27,7 @@ from services.api.schemas import (
     AlertResponse,
     ContextEventResponse,
     EvidenceOrigin,
+    FusionWeightsResponse,
     GraphEdgeResponse,
     GraphNodeResponse,
     GraphRole,
@@ -38,6 +39,7 @@ from services.api.schemas import (
     RescueComponentsResponse,
     RunMetricsResponse,
     RunResponse,
+    SearchScopeEntryResponse,
     Verdict,
     WindowLabelResponse,
 )
@@ -45,6 +47,12 @@ from services.api.schemas import (
 REPO = Path(__file__).resolve().parents[2]
 RESULTS_DIR = Path(os.environ.get("RESULTS_DIR", str(REPO / "eval" / "results")))
 DEFAULT_DETECTOR_THRESHOLD = 0.85
+
+# C1 parameters of the frozen CTAV topology tier (eval/configs/h0_{val,test}_c1_k0.yaml,
+# QD-021..025); tests/test_api.py checks they still match both configs.
+C1_FUSION_WEIGHTS = FusionWeightsResponse(
+    alpha=0.35, beta=0.25, gamma=0.40, tau_seconds=300.0, graph_max_distance=2
+)
 
 _ALERT_ID_RE = re.compile(r"^cand-([^:]+):([^:]+):r\d+$")
 _ALERT_SELECT_COLS = (
@@ -658,6 +666,17 @@ def get_alert_detail(alert_id: str, run_id: str | None = None) -> AlertDetailRes
     reasoning, evidence_ids = _judged_details_index().get(alert.window_id, ("", []))
     series = _build_metric_series(alert.window_id, alert.ts, alert.anomaly_score)
 
+    built_by_c1 = any("graph_sim" in e.debug for e in events)
+    search_scope: list[SearchScopeEntryResponse] = []
+    if built_by_c1:
+        hops = _cached_graph().distances(alert.service, C1_FUSION_WEIGHTS.graph_max_distance)
+        search_scope = [
+            SearchScopeEntryResponse(service=svc, distance=int(d))
+            for svc, d in sorted(hops.items(), key=lambda kv: (kv[1], kv[0]))
+        ]
+        if not search_scope:  # service missing from the graph: C1 still searched s0 itself
+            search_scope = [SearchScopeEntryResponse(service=alert.service, distance=0)]
+
     return AlertDetailResponse(
         **alert.model_dump(),
         reasoning=reasoning,
@@ -666,6 +685,8 @@ def get_alert_detail(alert_id: str, run_id: str | None = None) -> AlertDetailRes
         metric_series=series,
         metric_name="anomaly_score (Isolation Forest)",
         detector_threshold=DEFAULT_DETECTOR_THRESHOLD,
+        search_scope=search_scope,
+        fusion_weights=C1_FUSION_WEIGHTS if built_by_c1 else None,
     )
 
 

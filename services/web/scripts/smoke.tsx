@@ -79,6 +79,8 @@ const ExperimentComparison = (await import("@/screens/ExperimentComparison")).de
 const firstRun = runs[0]!;
 const firstAlert = listAlerts(firstRun.run_id)[0]!;
 const firstIncident = listIncidents(firstRun.run_id)[0]!;
+const c1Run = runs.find((r) => r.retrieval_strategy === "hybrid_bm25_graph")!;
+const c1Alert = listAlerts(c1Run.run_id)[0]!;
 
 async function render(path: string, routePath: string, element: React.ReactElement): Promise<string> {
   const container = dom.window.document.createElement("div");
@@ -136,7 +138,20 @@ const CASES: {
       ["renders detector threshold", (h) => h.includes("threshold 0.85")],
       ["renders CTAV policy card", (h) => h.includes("CTAV Decision Policy")],
       ["renders 6 context events", (h) => countOf(h, "debug") >= 6],
+      ["no C1 card for a BM25 context", (h) => !h.includes("How C1 built this context")],
       ["not stuck loading", (h) => !h.includes("Loading")],
+    ],
+  },
+  {
+    name: "Alert detail (C1)",
+    path: `/alerts/${c1Alert.alert_id}`,
+    routePath: "/alerts/:alertId",
+    element: <AlertDetail />,
+    expect: [
+      ["renders C1 explainer card", (h) => h.includes("How C1 built this context")],
+      ["renders 3 hop bands", (h) => ["d = 0", "d = 1", "d = 2"].every((k) => h.includes(k))],
+      ["renders Fusion Score bars", (h) => countOf(h, "BM25 0.") >= 6],
+      ["renders takeaway", (h) => h.includes("c1-takeaway") && h.includes("selected events")],
     ],
   },
   {
@@ -149,6 +164,9 @@ const CASES: {
       ["renders graph edges", (h) => h.includes("react-flow__edge")],
       ["renders diagnostic report", (h) => h.includes("root_cause_service")],
       ["renders table fallback", (h) => h.includes("View as table")],
+      ["renders RCA story card", (h) => h.includes("How the RCA agent localized the root cause")],
+      ["renders 3 story steps", (h) => h.includes("Cluster alerts in time") && h.includes("Link services by trace calls") && h.includes("Step back one hop")],
+      ["renders vote outcome", (h) => h.includes("Predicted root cause") && (h.includes("blames itself") || h.includes("blames "))],
     ],
   },
   {

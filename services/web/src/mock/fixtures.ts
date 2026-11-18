@@ -21,6 +21,7 @@ import type {
   AlertDetail,
   ContextEvent,
   FaultType,
+  FusionWeights,
   GraphEdge,
   GraphNode,
   Incident,
@@ -29,6 +30,7 @@ import type {
   RetrievalStrategy,
   Run,
   RunMetrics,
+  SearchScopeEntry,
   Verdict,
 } from "@/api/types";
 
@@ -256,6 +258,30 @@ const REASONING: Record<Verdict, string[]> = {
   ],
 };
 
+const C1_WEIGHTS: FusionWeights = { alpha: 0.35, beta: 0.25, gamma: 0.4, tau_seconds: 300, graph_max_distance: 2 };
+
+/** Undirected BFS over the mock call graph, like `ServiceGraph.distances(s0, 2)`. */
+function searchScope(service: string, maxDistance: number): SearchScopeEntry[] {
+  const dist = new Map<string, number>([[service, 0]]);
+  let frontier = [service];
+  for (let d = 1; d <= maxDistance; d++) {
+    const next: string[] = [];
+    for (const s of frontier) {
+      for (const [a, b] of CALL_EDGES) {
+        const other = a === s ? b : b === s ? a : null;
+        if (other && !dist.has(other)) {
+          dist.set(other, d);
+          next.push(other);
+        }
+      }
+    }
+    frontier = next;
+  }
+  return [...dist.entries()]
+    .map(([svc, d]) => ({ service: svc, distance: d }))
+    .sort((x, y) => x.distance - y.distance || x.service.localeCompare(y.service));
+}
+
 function makeContextEvents(
   r: () => number,
   service: string,
@@ -299,8 +325,25 @@ function makeContextEvents(
             decay_applied: round(evService === service ? 1 : 0.6, 2),
             path: evService === service ? service : `${service} -> ${evService}`,
           };
-        case "hybrid_bm25_graph":
-          return { bm25_rank: i + 1, graph_rank: ((i * 3) % k) + 1, rrf_score: round(1 / (60 + i + 1), 5) };
+        case "hybrid_bm25_graph": {
+          // Same fields as the real C1 trace (services/retrieval/hybrid_bm25_graph.py).
+          const d = evService === service ? 0 : 1;
+          const bm25Norm = round(Math.max(0, 1 - i * 0.12 - r() * 0.05));
+          const timeSim = round(Math.exp(-Math.abs(offset) / 1000 / C1_WEIGHTS.tau_seconds));
+          const graphSim = round(1 / (1 + d));
+          return {
+            bm25_norm: bm25Norm,
+            time_sim: timeSim,
+            graph_sim: graphSim,
+            graph_distance: d,
+            time_distance_sec: Math.abs(offset) / 1000,
+            source_flags: i % 2 === 0 ? "bm25" : "graph",
+            origin: d === 0 ? "local" : "graph",
+            score_final: round(
+              C1_WEIGHTS.alpha * bm25Norm + C1_WEIGHTS.beta * timeSim + C1_WEIGHTS.gamma * graphSim,
+            ),
+          };
+        }
       }
     })();
 
@@ -310,7 +353,7 @@ function makeContextEvents(
       ts: iso(ts + offset),
       service: evService,
       content,
-      score: round(0.94 - i * 0.09 + r() * 0.03),
+      score: typeof debug.score_final === "number" ? debug.score_final : round(0.94 - i * 0.09 + r() * 0.03),
       debug,
     });
   }
@@ -441,6 +484,11 @@ export function getAlertDetail(alertId: string): AlertDetail | null {
       metric_series: metricSeries,
       metric_name: "anomaly_score (Isolation Forest)",
       detector_threshold: 0.85,
+      search_scope:
+        alert.retrieval_strategy === "hybrid_bm25_graph"
+          ? searchScope(alert.service, C1_WEIGHTS.graph_max_distance)
+          : [],
+      fusion_weights: alert.retrieval_strategy === "hybrid_bm25_graph" ? C1_WEIGHTS : null,
     };
   }
   return null;
