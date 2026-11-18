@@ -134,6 +134,6 @@ Phương án dự phòng khi trình diễn gặp trục trặc phần mềm tạ
 
 ---
 
-### Tóm tắt chương
+### 6.6 Kết chương
 
 Chương này đã trình bày hiện thực kỹ thuật của platform nghiên cứu AIOps RCA từ lớp lưu trữ, máy chủ API chỉ đọc đến dashboard bốn màn hình phục vụ đồng thời thực nghiệm và bảo vệ luận văn. Dữ liệu từ các lượt chạy chính thức (`pipeline_val_v2`, `pipeline_test_v2`) và độ nhạy (`pipeline_sens_test_v1`) được tái lập ngoại tuyến hoàn toàn từ `cache` với độ trễ đầu–cuối 4,24–10,65 giây, tỷ lệ trúng `cache` 100% và không tiêu tốn API hay kết nối ngoài `localhost`. Năm bước kịch bản demo ngắn gọn minh hoạ trọn vẹn cơ chế nén báo động giả của neo bằng chứng C3, khả năng bảo toàn ca `network_delay` mà `BM25` bỏ sót trên tập `test`, cơ chế gom nhóm và đồ thị lan truyền của tác tử RCA (nhánh B) cùng ranh giới trung thực về H2 và H5 (nhánh A). Toàn bộ mã nguồn kiểm thử tự động, kịch bản chọn ca xác định theo quy tắc và năm ảnh chụp giao diện thực tế đều được kiểm chứng trước khi bước vào các vòng tổng duyệt trình bày ở Chương 7 và các mốc hoàn thiện cuối cùng.

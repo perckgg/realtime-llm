@@ -209,7 +209,7 @@ Lấy số từ `ctav_final_test_v1/ctav.json`, trường `budget_curve`, phần
 
 ### 5.7.8 Tổng hợp kết quả kiểm định ⏳
 
-**Viết gì:** một đoạn 4–5 câu nối các kết luận, rồi bảng. Đây là bảng mà Chương 8 (Kết luận) sẽ trích lại.
+**Viết gì:** một đoạn 4–5 câu nối các kết luận, rồi bảng. Đây là bảng mà Chương 8 (Tổng kết, §8.1.3) sẽ trích lại.
 
 **Bảng T8. Kết quả H0–H4 trên `test`.** Cột: Giả thuyết · So sánh · Kết luận trên `test` · Kết luận sơ bộ trên `val`.
 

@@ -82,7 +82,7 @@ Vùng file: `eval/manual/diagnostic_quality*`, `scripts/m11_*`, `docs/milestones
 | 4. Tổng hợp kết quả chấm chất lượng báo cáo (CI bootstrap + độ đồng thuận nếu có, chỉ báo `n` thực chấm) | Bảng đánh giá chất lượng `test` | Chưa làm |
 | 5. Tổng duyệt demo lần 1 theo `08` §6, rà lại 3 lỗi mức thấp/thẩm mỹ từ M10-D | Danh sách lỗi tổng duyệt | Chưa làm |
 
-**DoD M11** (`04` / `P5`): có `eval/manual/diagnostic_quality.csv` đã chấm (`n ≥ 15`), `docs/milestones/M11-danh-gia-nguoi.md` đủ 4 phần, và `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3–7.5 theo sườn). Hạn mục tiêu: `2027-01-17`.
+**DoD M11** (`04` / `P5`): có `eval/manual/diagnostic_quality.csv` đã chấm (`n ≥ 15`), `docs/milestones/M11-danh-gia-nguoi.md` đủ 4 phần, và `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 mối đe doạ, §7.4 phân tích ca sai, và hạn chế cho §8.2.1, theo sườn cập nhật 2026-11-18). Hạn mục tiêu: `2027-01-17`.
 
 **Ngân sách API M11:** `0` USD (chỉ đọc kết quả & chạy script offline; ngưỡng dừng `1 USD`).
 

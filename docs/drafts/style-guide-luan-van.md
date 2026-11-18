@@ -8,6 +8,9 @@
 > Soạn 2026-11-16 từ hướng dẫn của người dùng; gộp §3 cũ của `outline-bao-cao-gd2.md`. Cập nhật cùng ngày: thuật ngữ
 > "đa phương thức", bảng vai trò thành phần (§1.4), phần đầu/cuối (§3.1), khung LaTeX (§6), mục tiêu đã chốt (§7).
 > Lịch viết: `ke-hoach-viet-bao-cao.md`.
+>
+> Cập nhật 2026-11-18 theo template GVHD (`outline-bao-cao-gd2.md` mục 9): cấu trúc 9 chương (§3), "Kết chương" đánh
+> số (§2.2), Chương 9 Công bố khoa học (§3.1), tài liệu tham khảo IEEE (§3.1), khai báo AI hỗ trợ (§5.3).
 
 ---
 
@@ -20,7 +23,7 @@
   tích nguyên nhân gốc (RCA) → platform trực quan hoá.
 - **Cấm** trong văn luận văn: "giai đoạn 1/2/3", "GĐ1", "GĐ2", "Phase", "kế thừa từ", "mở rộng từ báo cáo trước",
   "phiên bản trước của hệ thống".
-- Phần hướng phát triển (Chương 7) gọi là "hướng phát triển", không gọi là "giai đoạn tiếp theo".
+- Phần hướng phát triển (§8.2) gọi là "hướng phát triển", không gọi là "giai đoạn tiếp theo".
 - Kiểm tra tính đúng của pipeline (G-port, G-paper) viết như một bước kiểm chứng kỹ thuật: pipeline tái lập đúng
   baseline đã công bố. Không viết là "pipeline mới khớp pipeline cũ".
 
@@ -31,6 +34,8 @@
 - Bài báo là tiền đề thực nghiệm, **không** là trục tham chiếu. Không mở mục, chương hay bảng bằng "so với bài báo".
 - Số của bài báo chỉ xuất hiện ở hai chỗ: §1.1 (hiện tượng xuất phát) và mục kiểm tra tính đúng của pipeline
   (Chương 5). Ở mọi chỗ khác, baseline là BM25 chạy trong chính luận văn.
+- Chương 9 (Công bố khoa học) trình bày bài báo **như một công bố** của tác giả: thông tin bài, trạng thái thật, quan hệ
+  với luận văn. Chương này không lặp số và không biến bài báo thành trục so sánh.
 
 ### 1.3 Hai nguyên tắc trung thực (sợi chỉ đỏ)
 
@@ -70,8 +75,10 @@ Cấu hình CTAV chốt = C1 + θ = 0,80 + C3. Không gọi C2, C4 là "ablation
 ### 2.2 Khung chương, mục, đoạn
 
 - Mỗi chương mở bằng một đoạn dẫn 4–6 câu: chương trả lời câu hỏi gì, gồm những mục nào.
-- Mỗi chương (trừ Chương 8) kết bằng mục **"Tóm tắt chương"** 5–8 câu, không thêm ý mới.
-- Đoạn dẫn chương và "Tóm tắt chương" **không đánh số** (không có "3.0", "2.8 Tóm tắt"). Đánh số tối đa cấp 3 (1.2.3).
+- Chương 2–7 kết bằng mục **"Kết chương"** có đánh số (theo template GVHD), 5–8 câu, không thêm ý mới. Chương 1 kết ở
+  1.5 Cấu trúc báo cáo; Chương 8, 9 không có Kết chương. Kết chương của Ch2 phải **khẳng định nền tảng đã đủ** cho đề
+  tài; của Ch3 phải nêu khoảng trống và định vị đề tài.
+- Đoạn dẫn chương **không đánh số** (không có "3.0"). Đánh số tối đa cấp 3 (1.2.3).
 - Mỗi mục cấp 2 mở bằng một câu chủ đề nói mục này để làm gì.
 - Một đoạn một ý trọn vẹn, khoảng 4–7 câu.
 
@@ -93,23 +100,26 @@ Cấu hình CTAV chốt = C1 + θ = 0,80 + C3. Không gọi C2, C4 là "ablation
 | Chương | Khuôn |
 |---|---|
 | 1 Giới thiệu | Hình phễu: bối cảnh rộng → bài toán hẹp. Trực giác, động lực, kiến trúc tổng quan. **Không công thức, không CI, không số thập phân.** Được dùng số đếm (ví dụ số FP) hoặc tỷ lệ làm tròn; kết quả chính của luận văn viết định tính hoặc làm tròn. |
-| 2 Cơ sở lý thuyết | Mỗi khái niệm 4 bước: (1) định nghĩa → (2) công thức hoặc sơ đồ → (3) một ví dụ nhỏ trên dữ liệu Nezha → (4) một câu chỉ rõ luận văn dùng nó ở đâu (trỏ sang Chương 4). Không kết quả thực nghiệm. |
-| 3 Công trình liên quan | Khoảng một đoạn mỗi công trình, 3 bước: (1) họ làm gì → (2) giới hạn liên quan đến đề tài → (3) luận văn khác ở đâu. Chốt chương bằng bảng so sánh và khoảng trống nghiên cứu. |
-| 4 Phương pháp | Mỗi thành phần 5 bước: (1) vấn đề giải quyết → (2) thiết kế (công thức/luật) → (3) tham số và cách chọn → (4) vai trò hiện tại (đang dùng / đã bỏ / chỉ là ablation) → (5) dẫn chiếu mục Chương 5 chứa bằng chứng. C2, C4 viết gọn hơn nhưng không lược. Số `val` chỉ để giải thích một lựa chọn, mỗi chỗ một câu. **Không số `test`.** |
+| 2 Kiến thức và công nghệ nền tảng | Mỗi khái niệm 4 bước: (1) định nghĩa → (2) công thức hoặc sơ đồ → (3) một ví dụ nhỏ trên dữ liệu Nezha → (4) một câu chỉ rõ luận văn dùng nó ở đâu (trỏ sang Chương 4). Không kết quả thực nghiệm. Công nghệ (§2.8): là gì, vai trò, vì sao chọn; cách lắp ráp để ở §4.5. |
+| 3 Công trình liên quan | Hai nhánh: nghiên cứu (3.1) và hệ thống, công cụ (3.2). Khoảng một đoạn mỗi công trình, 3 bước: (1) họ làm gì → (2) giới hạn liên quan đến đề tài → (3) luận văn khác ở đâu. Tính năng sản phẩm ở 3.2 chỉ lấy từ tài liệu chính thức, ghi ngày truy cập. Kết chương: bảng so sánh, khoảng trống, định vị. |
+| 4 Đề xuất | 4.1 Mô tả đề xuất (tổng quan, vấn đề nghiên cứu, thách thức) trước, rồi từng thành phần. Mỗi thành phần 5 bước: (1) vấn đề giải quyết → (2) thiết kế (công thức/luật) → (3) tham số và cách chọn → (4) vai trò hiện tại (đang dùng / đã bỏ / chỉ là ablation) → (5) dẫn chiếu mục Chương 5 chứa bằng chứng. C2, C4 viết gọn hơn nhưng không lược. Số `val` chỉ để giải thích một lựa chọn, mỗi chỗ một câu. **Không số `test`.** |
 | 5 Thực nghiệm | Mỗi mục kiểm định giả thuyết theo 6 bước ở §3.2. |
 | 6 Platform | Theo mắt người vận hành, không theo mã nguồn. Mỗi màn hình: ảnh chụp, một đoạn "màn hình trả lời câu hỏi gì", một đoạn nối với thành phần ở Chương 4. Kịch bản demo là bảng từng bước. |
-| 7 Thảo luận | Không lặp bảng của Chương 5; mỗi luận điểm trích 1–2 con số then chốt rồi giải thích nguyên nhân. Hạn chế viết cụ thể (cái gì, ảnh hưởng kết luận nào). Mỗi hướng phát triển gắn với một hạn chế. |
-| 8 Kết luận | Không ý mới, không hình. Mỗi câu hỏi nghiên cứu một đoạn 3–4 câu: câu trả lời, số chính, giới hạn. |
+| 7 Thảo luận | Không lặp bảng của Chương 5; mỗi luận điểm trích 1–2 con số rồi giải thích nguyên nhân. Mối đe doạ tính hợp lệ và phân tích ca sai ở đây; hạn chế của hệ để ở §8.2. |
+| 8 Tổng kết | Không ý mới, không hình. 8.1 Kết quả đạt được: mỗi câu hỏi nghiên cứu một đoạn 3–4 câu (câu trả lời, số chính, giới hạn). 8.2: **mọi hạn chế**, viết cụ thể (cái gì, ảnh hưởng kết luận nào), mỗi hạn chế nối sang một hướng phát triển; hướng nằm trong mốc còn lại thì dẫn sang Kế hoạch. |
+| 9 Công bố khoa học | Xem §1.2 và §3.1. |
 
 ### 3.1 Phần đầu và phần cuối
 
 | Phần | Quy tắc |
 |---|---|
 | Tóm tắt, Abstract | Mỗi bản ≤ 1 trang, viết **sau cùng**. Bốn ý: bài toán, phương pháp, kết quả chính trên `test` (kèm CI), giới hạn. Abstract là bản dịch tương đương, không thêm bớt ý. |
+| Lời cam đoan | Có đoạn khai báo AI hỗ trợ (§5.3). |
+| Thứ tự phần đầu | Bìa · Lời cam đoan · Lời cảm ơn · Tóm tắt · Abstract · Mục lục · Danh mục từ viết tắt · Danh mục hình · Danh mục bảng (thứ tự của template GVHD). |
 | Danh mục từ viết tắt | Mọi viết tắt dùng ≥ 2 lần (CTAV, RCA, FPR, CI, ARR...). Lần đầu trong văn vẫn viết đầy đủ. |
-| Công bố khoa học | Không đánh số chương, đặt ngay sau Chương 8. Thông tin bài với **trạng thái thật** (đã nộp / được chấp nhận / đã đăng) và 1–2 câu quan hệ với luận văn. Không lặp số. |
+| Chương 9 Công bố khoa học | **Chương có số**, ngay sau Chương 8 (người dùng chốt 2026-11-18). 9.1 thông tin bài với **trạng thái thật** (đã nộp / được chấp nhận / đã đăng); 9.2 quan hệ với luận văn. Không lặp số. |
 | Kế hoạch thực hiện | Không đánh số chương, đặt trước Tài liệu tham khảo. Viết theo **mốc** (M9–M12), không "Giai đoạn 1–4". Chỉ gồm việc chưa xong lúc nộp. Việc ngoài phạm vi hiện tại (judge thứ hai, dataset thứ hai) ghi là "hướng mở rộng", tách khỏi mốc bắt buộc. |
-| Tài liệu tham khảo | Theo chuẩn của khoa; chỉ mục thật sự được `\cite{}` trong văn. |
+| Tài liệu tham khảo | Chuẩn **IEEE** (kiểu số `[n]`, theo template GVHD); chỉ mục thật sự được trích trong văn. |
 
 ### 3.2 Sáu bước cho một mục kiểm định (Chương 5)
 
@@ -154,6 +164,19 @@ pipeline (G-port, G-paper) không phải kiểm định giả thuyết; viết t
 - Ảnh chụp, ví dụ prompt, ca cụ thể: lấy từ hệ thống chạy thật.
 - Bảng dài hơn nửa trang hoặc chỉ để tra cứu (theo service, cấu hình đầy đủ) đưa vào phụ lục.
 
+### 5.3 Khai báo AI hỗ trợ
+
+Template GVHD: mọi phần lấy từ nguồn khác hoặc có AI hỗ trợ phải trích dẫn, từ Chương 1 đến hết báo cáo. Người dùng
+chốt 2026-11-18: AI chỉ hỗ trợ **lập dàn ý** và **vẽ sơ đồ**.
+
+- **Không tính là AI hỗ trợ:** judge `gemini-2.5-flash`. Đây là đối tượng nghiên cứu, trình bày ở Ch4, Ch5.
+- **Lời cam đoan:** một đoạn nêu tên công cụ, dùng cho dàn ý và sơ đồ, nội dung do tác giả viết, mọi sơ đồ do tác giả
+  kiểm lại.
+- **Sơ đồ** (loại SĐ trong outline mục 5) vẽ có AI hỗ trợ: dòng nguồn dưới caption, ví dụ "Nguồn: tác giả vẽ, có hỗ trợ
+  của công cụ AI [n]". Biểu đồ số liệu sinh từ script và ảnh chụp không cần dòng này.
+- **Tài liệu tham khảo:** mỗi công cụ một mục IEEE (tên, nhà cung cấp, phiên bản hoặc model, ngày truy cập).
+- Nếu sau này dùng AI cho việc khác (soạn hoặc sửa văn, dịch Abstract), phải mở rộng khai báo trước khi nộp.
+
 ### 5.2 Quy chuẩn LaTeX
 
 - Tên biến nhiều chữ cái trong môi trường toán bọc `\mathrm{}`: `\mathrm{GraphSim}`, `\mathrm{BM25}`,
@@ -176,7 +199,7 @@ Cấu trúc đề xuất (đổi theo template của khoa nếu khác):
 thesis/
   main.tex            % nạp gói, macro, \include từng chương
   macros.tex          % macro dưới đây
-  chapters/ch1.tex … ch8.tex, cong-bo.tex, ke-hoach.tex
+  chapters/ch1.tex … ch9.tex, ke-hoach.tex   % ch9 = Công bố khoa học
   appendices/a.tex … f.tex
   figures/            % sơ đồ (pdf/svg) và biểu đồ sinh từ script
   tables/             % bảng sinh từ script (.tex), \input vào chương
@@ -221,7 +244,7 @@ sách quyết định kiểm soát báo động giả khi thêm ngữ cảnh, ch
 platform tái lập được. Ý nghĩa khoa học: cơ chế thiên lệch xác nhận, giao thức đăng ký trước, kết quả âm có kiểm chứng.
 
 **Câu hỏi nghiên cứu:** RQ1–RQ5 theo `suon-bao-cao-gd2.md` (RQ1↔H0, RQ2↔H1, RQ3↔H2+H4, RQ4↔H3, RQ5↔H5). Dùng đúng
-5 RQ ở 1.2.3 và 8.1.
+5 RQ ở 1.2.3 và 8.1.1.
 
 ---
 
@@ -235,3 +258,4 @@ platform tái lập được. Ý nghĩa khoa học: cơ chế thiên lệch xác
 - [ ] C1–C5 dùng đúng nhãn vai trò ở §1.4; lần đầu mỗi chương có kèm chức năng.
 - [ ] Mỗi số thực nghiệm có `% src: <run_id>`.
 - [ ] Chỗ chưa có số đã gắn `\CHO{M*}{...}`; không còn `[cite: …]`.
+- [ ] Sơ đồ vẽ có AI hỗ trợ đã có dòng nguồn dưới caption (§5.3); chương 2–7 có Kết chương đánh số.

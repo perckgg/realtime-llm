@@ -14,20 +14,23 @@
 - Ký hiệu: τ_F = hằng số thời gian của Fusion Score (300 s); τ = ngưỡng của Rescue Score.
 - Judge GĐ2: `gemini-2.5-flash` (QĐ-021, QĐ-023); `gemini-2.5-flash-lite` chỉ dùng để phát lại cache paper (G-paper).
 
-## Đối chiếu cấu trúc với GĐ1 / template
+## Đối chiếu cấu trúc với template GVHD (2026-11-18)
 
-| GĐ1 (template) | GĐ2 (sườn này) | Ghi chú |
-|---|---|---|
-| Ch1 Giới thiệu đề tài | Ch1 Giới thiệu đề tài | thêm câu hỏi nghiên cứu, đóng góp |
-| Ch2 Cơ sở lý thuyết | Ch2 Cơ sở lý thuyết | bỏ local-first, học sâu; thêm topology, calibration, RCA, kiểm định |
-| Ch3 Công trình liên quan | Ch3 Công trình liên quan | thêm graph RCA, GraphRAG, calibration judge |
-| Ch4 Thực nghiệm (§4.3–4.4 chứa kiến trúc) | Ch4 Phương pháp đề xuất + Ch5 Thực nghiệm | tách phương pháp thành chương riêng |
-| — | Ch6 Demo platform | [MỚI] |
-| Ch5 Định hướng phát triển | Ch7 Thảo luận, hạn chế, hướng phát triển | |
-| Ch6 Kết luận | Ch8 Kết luận | |
+Template: `Final report template_20261118.docx`. Đối chiếu đầy đủ và các quyết định của người dùng:
+`outline-bao-cao-gd2.md` mục 9. Mã hình, bảng theo outline mục 5–6; số "Hình 4.x", "Bảng 4.x" trong sườn này chỉ là
+nhãn tạm.
 
-> Template quy định 6 chương; nếu khoa bắt buộc đúng 6, gộp Ch6 Demo vào Ch5 (mục "Hiện thực và demo") và Ch7 vào "Định hướng phát triển".
-
+| Template GVHD | Báo cáo (sườn này) |
+|---|---|
+| Ch1 Giới thiệu | Ch1 Giới thiệu (1.1 Động cơ của đề tài · 1.5 Cấu trúc báo cáo) |
+| Ch2 Kiến thức và công nghệ nền tảng | Ch2 cùng tên, thêm 2.8 Công nghệ nền tảng, 2.9 Kết chương |
+| Ch3 Công trình liên quan (bài báo · phần mềm, công cụ, hệ thống · Kết chương) | Ch3: 3.1 Nghiên cứu · 3.2 Hệ thống và công cụ · 3.3 Kết chương |
+| Ch4 Đề xuất (4.1 Mô tả: tổng quan, vấn đề nghiên cứu, thách thức · 4.2 Chi tiết · Kết chương) | Ch4: 4.1 Mô tả đề xuất · 4.2–4.5 chi tiết · 4.6 Kết chương |
+| Ch5 Đánh giá đề xuất | Ch5 Thực nghiệm và đánh giá (+ 5.11 Kết chương) |
+| (thuộc Chi tiết / Đánh giá) | Ch6 Demo platform; Ch7 Thảo luận |
+| Ch6 Tổng kết (kết quả đạt được · hướng phát triển, kèm mọi hạn chế) | Ch8 Tổng kết |
+| — | Ch9 Công bố khoa học |
+| Kế hoạch thực hiện | Kế hoạch thực hiện phần còn lại (không đánh số, M9–M12) |
 
 > Căn cứ: `docs/Template_LuanVan.docx` + bìa/mục lục/danh sách hình–bảng của GĐ1 (`phase1.txt` tr.1–6).
 > Template chỉ có: trang hướng dẫn (xoá trước khi nộp), bìa, MỤC LỤC, Danh sách hình, Danh sách bảng, các chương (Heading 1/2/3) và "Tài liệu tham khảo". Các mục khác bên dưới là **bổ sung chuẩn luận văn** — đánh dấu "(ngoài template)"; hỏi GVHD/khoa nếu cần bỏ.
@@ -43,7 +46,7 @@
 | 2 | MỤC LỤC (TOC cấp 1–3, trường tự động) | Heading 1–3 | ⏳ M12 |
 | 3 | Danh sách hình | Heading 1 | ⏳ M12 |
 | 4 | Danh sách bảng | Heading 1; caption style "Caption": "Bảng N. …" | ⏳ M12 |
-| 5 | Chương (Heading 1) → mục (Heading 2) → tiểu mục (Heading 3) | Template: 1 Giới thiệu đề tài · 2 Cơ sở lý thuyết · 3 Công trình liên quan · 4 Thực nghiệm · 5 Định hướng phát triển · 6 Kết luận | GĐ2: xem `parts/ch6-8.md` |
+| 5 | Chương (Heading 1) → mục (Heading 2) → tiểu mục (Heading 3) | Template GVHD 2026-11-18: 1 Giới thiệu · 2 Kiến thức và công nghệ nền tảng · 3 Công trình liên quan · 4 Đề xuất · 5 Đánh giá · 6 Tổng kết | Báo cáo: 9 chương, xem bảng đối chiếu ở đầu file |
 | 6 | Tài liệu tham khảo (Heading 1, cuối) | | ⏳ M12 |
 
 Quy ước: đánh số "1.2.1"; chỗ hình `[Chèn hình minh họa tại đây]`; caption bảng ở trên bảng.
@@ -56,6 +59,7 @@ Quy ước: đánh số "1.2.1"; chỗ hình `[Chèn hình minh họa tại đâ
 ### 2. Lời cam đoan (ngoài template)
 - Công trình do tác giả thực hiện dưới hướng dẫn GVHD; kết quả sinh từ script `eval/`, tái lập được.
 - Phần kế thừa GĐ1/paper ICAETM 2026 ghi nguồn; `test` split chỉ chạy một lần.
+- **Khai báo AI hỗ trợ** (template GVHD bắt buộc): công cụ AI chỉ dùng để hỗ trợ lập dàn ý và vẽ sơ đồ; nội dung do tác giả viết, mọi sơ đồ do tác giả kiểm lại. Quy tắc trích dẫn: style guide §5.3.
 - Ký tên, ngày tháng. ⏳ M12 (văn bản chuẩn của khoa).
 
 ### 3. Lời cảm ơn (ngoài template)
@@ -92,7 +96,7 @@ Kế thừa GĐ1 (bảng 1–5: nguồn telemetry; định dạng output LLM; c�
 - RCA Hit@1/Hit@3/ARR/JSON valid `[⏳ M9–M10]`; đánh giá bằng người `[⏳ M11]`; chi phí/độ trễ/cache hit.
 > [TÁI SỬ DỤNG GĐ1] + ✅ `val` / ⏳ `test`.
 
-### 9. Danh mục từ viết tắt (ngoài template)
+### 9. Danh mục từ viết tắt (có trong template GVHD, đặt trước Danh sách hình)
 - AIOps — Artificial Intelligence for IT Operations
 - ARR — Alert Reduction Ratio
 - BFS — Breadth-First Search
@@ -117,10 +121,10 @@ Kế thừa GĐ1 (bảng 1–5: nguồn telemetry; định dạng output LLM; c�
 - Rescue — Context Rescue / Rescue Score
 - θ, θ_local, θ_topo, τ, η, δ — ngưỡng/trọng số/biên
 - dev / val / test — tập debug / tuning / kiểm định cuối
-> ⏳ M12 (rà theo từ thực sự xuất hiện; GĐ1 và template không có mục này).
+> ⏳ M12 (rà theo từ thực sự xuất hiện).
 
 ### 10. Thứ tự lắp ráp (đề xuất)
-Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → Mục lục → Danh sách hình → Danh sách bảng → Danh mục từ viết tắt → Chương 1–8 → Tài liệu tham khảo → Phụ lục; đánh số La Mã cho phần trước Chương 1. ⏳ M12.
+Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → Mục lục → Danh mục từ viết tắt → Danh sách hình → Danh sách bảng → Chương 1–9 → Kế hoạch thực hiện → Tài liệu tham khảo → Phụ lục; đánh số La Mã cho phần trước Chương 1. ⏳ M12.
 
 ---
 
@@ -130,9 +134,9 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 ---
 
-## Chương 1 — Giới thiệu đề tài
+## Chương 1 — Giới thiệu
 
-### 1.1 Bối cảnh đề tài
+### 1.1 Động cơ của đề tài
 
 #### 1.1.1 Từ giám sát đến vận hành AIOps trên microservice [TÁI SỬ DỤNG GĐ1 §1.1, rút gọn]
 - Hệ microservice sinh khối lượng lớn metric/log/trace; quá tải cảnh báo làm SRE khó tìm sự cố thật.
@@ -180,7 +184,7 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 - RQ3: Có chính sách quyết định nào giữ recall của C1 mà FPR không tệ hơn BM25 trong cùng ngân sách? (H2, H4)
 - RQ4: Thành phần nào của chính sách đó là cần thiết? (H3)
 - RQ5: Dựa trên cảnh báo CTAV, tác tử RCA định vị đúng service gốc ở mức nào? (H5)
-- (Năm câu hỏi, đánh số khớp với §8.1.)
+- (Năm câu hỏi, đánh số khớp với §8.1.1.)
 
 > Nguồn: `08` §3, §5.1. Trạng thái: ✅ (phát biểu); trả lời RQ3–RQ5 ⏳ M8–M9
 
@@ -225,14 +229,14 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 > Nguồn: Phát hiện 7, 10, 12; `08` §5.2. Trạng thái: ✅ (`val`), ⏳ M8
 
-### 1.5 Bố cục luận văn [MỚI]
-- Tóm tắt từng chương theo cấu trúc 8 chương: Ch2 cơ sở lý thuyết, Ch3 công trình liên quan, Ch4 phương pháp CTAV + RCA, Ch5 thực nghiệm H0–H5, Ch6 demo platform, Ch7 thảo luận, hạn chế, hướng phát triển, Ch8 kết luận; chỉnh sau khi chốt mục lục cuối (xem ghi chú 6 chương của template).
+### 1.5 Cấu trúc báo cáo [MỚI]
+- Tóm tắt từng chương theo cấu trúc 9 chương: Ch2 kiến thức và công nghệ nền tảng, Ch3 công trình liên quan (nghiên cứu và hệ thống), Ch4 đề xuất CTAV + tác tử RCA, Ch5 thực nghiệm H0–H5, Ch6 demo platform, Ch7 thảo luận, Ch8 tổng kết (kết quả, hạn chế, hướng phát triển), Ch9 công bố khoa học; sau cùng là Kế hoạch thực hiện phần còn lại.
 
 > Nguồn: `08` §7. Trạng thái: ✅ (khung)
 
 ---
 
-## Chương 2 — Cơ sở lý thuyết
+## Chương 2 — Kiến thức và công nghệ nền tảng
 
 ### 2.1 Dữ liệu quan sát trên hệ microservice
 
@@ -365,8 +369,15 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 > Nguồn: `08` §5.1; mục đăng ký cuối `experiment-log.md`; QĐ-034. Trạng thái: ✅ (đăng ký), ⏳ M8 (kết quả)
 
-### 2.8 Tóm tắt chương [MỚI]
-- Bảng ánh xạ khái niệm Ch2 → thành phần (C1…C5, RCA) → giả thuyết kiểm.
+### 2.8 Công nghệ nền tảng [MỚI]
+- Mỗi công nghệ: là gì, vai trò trong hệ, vì sao chọn. Gemini API (judge, `gemini-2.5-flash`, QĐ-021); scikit-learn (Isolation Forest); ClickHouse (bảng fact đánh giá, truy xuất); PostgreSQL (incident); FastAPI (API chỉ đọc); React/Vite (dashboard); Docker Compose (triển khai, profile `dev`/`full`).
+- Không lặp phần lắp ráp: cách các công nghệ nối thành hệ để ở §4.5.
+- Bảng B2.4: công nghệ, vai trò, lý do chọn, phiên bản.
+> Nguồn: `01-architecture-design.md` §7–§8; `06-scope-guard.md`; `docker-compose.yml`. Trạng thái: ✅
+
+### 2.9 Kết chương [MỚI]
+- Tóm lại các khái niệm và công nghệ đã trình bày, và **khẳng định chúng đủ** cho phần đề xuất và đánh giá (yêu cầu của template).
+- Bảng B2.5: khái niệm/công nghệ Ch2 → thành phần (C1…C5, RCA, platform) → mục dùng ở Ch4, Ch5 → giả thuyết kiểm.
 - Ghi rõ phần GĐ1 bị lược: DL cho chuỗi thời gian, LLM local/fallback, prompt engineering chi tiết, khôi phục ngữ cảnh.
 
 > Nguồn: tổng hợp. Trạng thái: ✅
@@ -381,46 +392,48 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 - Nhắc lại luận điểm GĐ1: detector metric nhanh nhưng thiếu ngữ cảnh → LLM thẩm định cảnh báo ở tầng sau.
 - Mở rộng GĐ2: (i) bằng chứng truy xuất có cấu trúc topology; (ii) độ tin cậy/hiệu chỉnh của judge; (iii) từ thẩm định cảnh báo sang định vị service gốc (RCA).
-- Tổ chức: 3.1–3.3 (GĐ1, rút gọn) → 3.4 RCA topology/đồ thị → 3.5 retrieval đồ thị/GraphRAG → 3.6 calibration & thiên lệch judge → 3.7 cứu cảnh báo/triage → 3.8 bảng so sánh → 3.9 khoảng trống & định vị CTAV.
+- Tổ chức (theo template): 3.1 các nghiên cứu liên quan (3.1.1–3.1.3 GĐ1, rút gọn → 3.1.4 RCA topology/đồ thị → 3.1.5 retrieval đồ thị/GraphRAG → 3.1.6 calibration & thiên lệch judge → 3.1.7 cứu cảnh báo/triage) → 3.2 các hệ thống và công cụ hiện có → 3.3 kết chương (bảng so sánh, khoảng trống, định vị CTAV).
 
 > Nguồn: phase1.txt tr.35; `docs\Final_Thesis_Phase2\08-research-direction.md` §1–3.
 > Trạng thái: ⏳
 
-### 3.1 Phát hiện bất thường chuỗi thời gian (thống kê và học sâu) [TÁI SỬ DỤNG GĐ1, rút gọn]
+### 3.1 Các nghiên cứu liên quan
+
+#### 3.1.1 Phát hiện bất thường chuỗi thời gian (thống kê và học sâu) [TÁI SỬ DỤNG GĐ1, rút gọn]
 
 Rút gọn GĐ1 từ ~4 trang còn ~1 trang; giữ lập luận "detector chỉ là tầng sơ cấp".
 
-#### Robust Random Cut Forest (Guha và cộng sự)
+##### Robust Random Cut Forest (Guha và cộng sự)
 - Phát hiện bất thường trên dòng dữ liệu bằng cây cắt ngẫu nhiên; nhẹ, online (GĐ1 tr.35–36).
 - Hạn chế: chỉ dựa hình dạng phân bố, không biết ý nghĩa vận hành (batch job, backup, rolling deploy, autoscaling).
 - Liên hệ GĐ2: detector duy nhất của GĐ2 là Isolation Forest (+ Rescue); RRCF chỉ là bối cảnh (không thêm detector thứ hai — scope-guard).
 > Nguồn: phase1.txt tr.35–36; `06-scope-guard.md`.
 > Trạng thái: ✅
 
-#### MTAD-GAT (Zhao và cộng sự) và Graph Deviation Network – GDN (Deng và Hooi)
+##### MTAD-GAT (Zhao và cộng sự) và Graph Deviation Network – GDN (Deng và Hooi)
 - Đa biến, graph attention / học cấu trúc phụ thuộc giữa các **metric** (đồ thị đặc trưng, khác đồ thị gọi giữa service ở 3.4–3.5 — nêu rõ để tránh nhầm "graph").
 - Hạn chế chung: chỉ định lượng, vẫn sinh cảnh báo giả khi thiếu ngữ cảnh log/sự kiện.
 > Nguồn: phase1.txt tr.36–38.
 > Trạng thái: ✅
 
-### 3.2 LLM trong phân tích log và RCA [TÁI SỬ DỤNG GĐ1, rút gọn]
+#### 3.1.2 LLM trong phân tích log và RCA [TÁI SỬ DỤNG GĐ1, rút gọn]
 
-#### LogParser-LLM (Zhong và cộng sự) và LogLLM (Guan và cộng sự)
+##### LogParser-LLM (Zhong và cộng sự) và LogLLM (Guan và cộng sự)
 - LogParser-LLM: parsing log bằng LLM, tiết kiệm số lần gọi (LogPub, 14 hệ thống, TB 272,5 lần gọi LLM, F1 grouping 90,6%, parsing accuracy 81,1% — theo GĐ1).
 - LogLLM: BERT + Llama + projector cho phát hiện bất thường log; chỉ dùng log, huấn luyện nhiều giai đoạn.
 - Liên hệ GĐ2: log là một loại bằng chứng (cùng trace span) trong EvidenceDoc; GĐ2 không fine-tune (cấm).
 > Nguồn: phase1.txt tr.38–41.
 > Trạng thái: ✅
 
-#### RCAgent (Wang và cộng sự)
+##### RCAgent (Wang và cộng sự)
 - LLM agent tự chủ dùng công cụ để điều tra; phù hợp sau sự cố, độ trễ cao.
 - Tham chiếu chính cho phần B (RCA Agent) ở 3.4; khác biệt: GĐ2 dùng pipeline cố định (grouping → propagation → summary), không dùng agent framework (cấm LangChain/AutoGen/CrewAI).
 > Nguồn: phase1.txt tr.40–43.
 > Trạng thái: ✅
 
-### 3.3 Kiến trúc giám sát lai và LLM-as-a-Judge [TÁI SỬ DỤNG GĐ1, rút gọn]
+#### 3.1.3 Kiến trúc giám sát lai và LLM-as-a-Judge [TÁI SỬ DỤNG GĐ1, rút gọn]
 
-#### RAAD-LLM (Russell-Gilbert), ARGOS (Gu), CALM (Devireddy và Huang)
+##### RAAD-LLM (Russell-Gilbert), ARGOS (Gu), CALM (Devireddy và Huang)
 - RAAD-LLM: LLM + RAG cho bất thường thích ứng, bảo trì dự đoán (70,7% → 88,6%).
 - ARGOS: LLM sinh luật phát hiện (F1 +9,5% dữ liệu công khai, +28,3% dữ liệu nội bộ Microsoft).
 - CALM: Apache Beam + TimesFM + LLM-as-a-Judge + fine-tuning liên tục (TSB-UAD); gần nhất về kiến trúc.
@@ -428,22 +441,22 @@ Rút gọn GĐ1 từ ~4 trang còn ~1 trang; giữ lập luận "detector chỉ 
 > Nguồn: phase1.txt tr.42–47.
 > Trạng thái: ✅
 
-#### LLM-as-a-Judge for Time Series Explanations (Sivalingam và cộng sự)
+##### LLM-as-a-Judge for Time Series Explanations (Sivalingam và cộng sự)
 - Benchmark 350 trường hợp, 7 loại truy vấn; LLM đánh giá ổn định hơn khi sinh → cơ sở cho vai trò judge.
 - Chưa xét pipeline cloud, chưa xét thiên lệch do ngữ cảnh truy xuất.
 > Nguồn: phase1.txt tr.45.
 > Trạng thái: ✅
 
-#### Nezha (Yu và cộng sự) — vừa là công trình RCA vừa là bộ dữ liệu
+##### Nezha (Yu và cộng sự) — vừa là công trình RCA vừa là bộ dữ liệu
 - RCA phi giám sát đa phương thức (metric, log, trace), đồ thị sự kiện theo trace; Top-1 trung bình 89,77% trên 101 kịch bản (theo GĐ1).
 - Vai trò kép: baseline RCA ngoại tuyến (3.4) và dataset đánh giá của GĐ1 + GĐ2 (nhãn root-cause mức pod: QĐ-001).
 - Khác biệt: Nezha chẩn đoán sau khi biết có sự cố; CTAV quyết định cảnh báo có thật hay không.
 > Nguồn: phase1.txt tr.45–47; `docs\experiment-log.md` QĐ-001.
 > Trạng thái: ✅
 
-### 3.4 RCA trên microservice dựa topology/đồ thị và nhân quả [MỚI]
+#### 3.1.4 RCA trên microservice dựa topology/đồ thị và nhân quả [MỚI]
 
-#### Nhóm đồ thị phụ thuộc/lan truyền
+##### Nhóm đồ thị phụ thuộc/lan truyền
 - MonitorRank (Kim và cộng sự, SIGMETRICS 2013): random walk trên đồ thị gọi để xếp hạng nguyên nhân.
 - CauseInfer (Chen và cộng sự, INFOCOM 2014): đồ thị nhân quả phân tầng cho dịch vụ đa tầng.
 - MicroRCA (Wu, Tordsson, Elmroth, Kao; NOMS 2020): đồ thị attributed, personalized PageRank, metric ứng dụng + hạ tầng.
@@ -451,14 +464,14 @@ Rút gọn GĐ1 từ ~4 trang còn ~1 trang; giữ lập luận "detector chỉ 
 > Nguồn: bài gốc các công trình (chi tiết trích dẫn: [CẦN TRA CỨU] khi lập danh mục tham khảo); `08-research-direction.md` dòng "B RCA Agent".
 > Trạng thái: ⏳
 
-#### Nhóm nhân quả/benchmark hiện đại
+##### Nhóm nhân quả/benchmark hiện đại
 - RCD (Ikram và cộng sự, NeurIPS 2022) và CIRCA (Li và cộng sự, KDD 2022): suy diễn nhân quả cho RCA — [CẦN TRA CỨU] xác minh tên/hội nghị.
 - BARO (Pham và cộng sự, FSE 2024) và benchmark RCAEval (Pham và cộng sự) — [CẦN TRA CỨU] chi tiết.
 - Hạn chế cần nêu: đánh giá top-k trên sự cố đã biết; không đo FP của khâu cảnh báo; ít tích hợp LLM judge.
 > Nguồn: [CẦN TRA CỨU].
 > Trạng thái: [CẦN TRA CỨU]
 
-#### RCA bằng LLM
+##### RCA bằng LLM
 - RCAgent (3.2); RCACopilot (Chen và cộng sự, EuroSys 2024): handler thu thập thông tin theo loại sự cố + LLM dự đoán nguyên nhân dựa trên sự cố lịch sử tương tự — ⏳ xác minh chi tiết.
 - Ahmed và cộng sự (ICSE 2023): LLM đề xuất nguyên nhân/giảm thiểu sự cố đám mây (có fine-tune; GĐ2 không) — [CẦN TRA CỨU].
 - Roy và cộng sự (2024): agent ReAct cho RCA — [CẦN TRA CỨU].
@@ -466,13 +479,13 @@ Rút gọn GĐ1 từ ~4 trang còn ~1 trang; giữ lập luận "detector chỉ 
 > Nguồn: [CẦN TRA CỨU] (RCACopilot, Ahmed, Roy); phase1.txt tr.40–42 cho RCAgent.
 > Trạng thái: [CẦN TRA CỨU]
 
-#### Liên hệ phần B của GĐ2
+##### Liên hệ phần B của GĐ2
 - Grouping theo thời gian + topology → lan truyền ngược → báo cáo JSON; đánh giá Hit@1/Hit@3, Alert Reduction (H5).
 - Điểm nhấn: đầu vào RCA là cảnh báo đã được CTAV hiệu chỉnh (ít FP), không phải mọi bất thường.
 > Nguồn: `08-research-direction.md` §4 (B), H5; `01-architecture-design.md` §6.5.
 > Trạng thái: ✅
 
-### 3.5 Truy xuất dựa đồ thị / GraphRAG cho AIOps [MỚI]
+#### 3.1.5 Truy xuất dựa đồ thị / GraphRAG cho AIOps [MỚI]
 
 - RAG nền tảng (Lewis và cộng sự, NeurIPS 2020) và BM25 lai là baseline truy xuất (bm25_hybrid, GĐ1).
 - GraphRAG (Edge và cộng sự, Microsoft Research, 2024): đồ thị tri thức + tóm tắt cộng đồng cho văn bản; khác topology gọi giữa service — ⏳ xác minh.
@@ -482,29 +495,29 @@ Rút gọn GĐ1 từ ~4 trang còn ~1 trang; giữ lập luận "detector chỉ 
 > Nguồn: `08-research-direction.md` §2 (cập nhật QĐ-027); `docs\experiment-log.md` QĐ-026, QĐ-027; tài liệu GraphRAG/RAG [CẦN TRA CỨU].
 > Trạng thái: ⏳
 
-### 3.6 Calibration và độ tin cậy của LLM-as-a-Judge [MỚI]
+#### 3.1.6 Calibration và độ tin cậy của LLM-as-a-Judge [MỚI]
 
-#### Thiên lệch của LLM judge
+##### Thiên lệch của LLM judge
 - Zheng và cộng sự (NeurIPS 2023, MT-Bench/Chatbot Arena): thiên lệch vị trí, độ dài, tự ưu tiên.
 - Wang và cộng sự (2023, "Large Language Models are not Fair Evaluators"): thiên lệch thứ tự trình bày.
 - Liên hệ: thiên lệch **theo nội dung ngữ cảnh** (judge xác nhận sự cố khi đọc telemetry bình thường) ít được nghiên cứu trong AIOps; QĐ-026 Phát hiện 7: judge xác nhận 30–42% candidate normal có bằng chứng.
 > Nguồn: [CẦN TRA CỨU] xác minh MT-Bench và Wang 2023; `docs\experiment-log.md` QĐ-026.
 > Trạng thái: ⏳
 
-#### Calibration độ tin cậy mô hình
+##### Calibration độ tin cậy mô hình
 - Guo và cộng sự (ICML 2017): calibration mạng nơ-ron hiện đại (temperature scaling, ECE).
 - Kadavath và cộng sự (2022); Xiong và cộng sự (ICLR 2024): độ tự tin LLM diễn đạt bằng lời — [CẦN TRA CỨU] kiểm tra chi tiết.
 - Khác biệt: CTAV hiệu chỉnh theo hồ sơ/nguồn gốc bằng chứng (C2: θ_topo > θ_local; C3: neo bằng chứng bất thường), không hiệu chỉnh xác suất đầu ra. Nêu thẳng: C2 bị bỏ (QĐ-031), trọng tâm là C3.
 > Nguồn: `08-research-direction.md` §4 (C2, C3); `docs\experiment-log.md` QĐ-028, QĐ-029, QĐ-031.
 > Trạng thái: ⏳
 
-#### Grounding / trích dẫn bằng chứng (provenance)
+##### Grounding / trích dẫn bằng chứng (provenance)
 - Hướng attribution/grounded generation — [CẦN TRA CỨU] chọn 1–2 công trình chắc chắn.
 - C3 là grounding có kiểm chứng bằng ngưỡng nền (p90 trên `dev`), không chỉ yêu cầu trích dẫn.
 > Nguồn: [CẦN TRA CỨU]; `08-research-direction.md` C3.
 > Trạng thái: [CẦN TRA CỨU]
 
-### 3.7 Cứu cảnh báo (rescue) và alert triage [MỚI]
+#### 3.1.7 Cứu cảnh báo (rescue) và alert triage [MỚI]
 
 - Bối cảnh: alert fatigue, alert storm, gom cảnh báo thành incident — [CẦN TRA CỨU] chọn công trình triage/gom nhóm có thật (không nêu tên trước khi xác minh).
 - Context Rescue GĐ1: tăng recall nhưng tốn LLM; số liệu mock GĐ1 không dùng làm kết luận khoa học (AGENTS.md).
@@ -513,9 +526,30 @@ Rút gọn GĐ1 từ ~4 trang còn ~1 trang; giữ lập luận "detector chỉ 
 > Nguồn: `docs\experiment-log.md` QĐ-032, QĐ-033; `08-research-direction.md` dòng C5; `AGENTS.md`.
 > Trạng thái: ⏳ (phần công trình ngoài: [CẦN TRA CỨU])
 
-### 3.8 Bảng so sánh các công trình [MỚI]
+### 3.2 Các hệ thống và công cụ hiện có [MỚI]
 
-Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô của công trình ngoài GĐ1 phải kiểm lại với bài gốc.
+> Template GVHD tách riêng công trình dạng phần mềm, công cụ, hệ thống. Tính năng của từng sản phẩm chỉ lấy từ tài liệu
+> chính thức của hãng, ghi ngày truy cập; chưa xác minh thì giữ [CẦN TRA CỨU]. Không mô tả tính năng theo trí nhớ.
+
+#### 3.2.1 Nền tảng AIOps thương mại
+- Nhóm nền tảng giám sát, quản lý sự cố có tính năng gom, giảm nhiễu cảnh báo và gợi ý nguyên nhân: [CẦN TRA CỨU] chọn 2–3 sản phẩm, mỗi sản phẩm ghi cách thẩm định cảnh báo, có dùng topology hay không, có công bố cách đánh giá FP hay không.
+> Trạng thái: ⏳ [CẦN TRA CỨU]
+
+#### 3.2.2 Công cụ mã nguồn mở
+- Gom, dập cảnh báo theo luật (bộ định tuyến cảnh báo của hệ giám sát) và trợ lý LLM điều tra sự cố mã nguồn mở: [CẦN TRA CỨU] chọn 2–3 công cụ, cùng các tiêu chí như 3.2.1.
+> Trạng thái: ⏳ [CẦN TRA CỨU]
+
+#### 3.2.3 Nhận xét
+- Vì sao các hệ thống này chưa giải bài toán của đề tài: cách thẩm định không công bố hoặc không kiểm định được; gom theo luật không đánh giá bằng chứng; trợ lý LLM không đo FP của khâu cảnh báo. Mỗi nhận xét chỉ viết khi đã có nguồn ở 3.2.1, 3.2.2.
+> Trạng thái: ⏳ sau 3.2.1, 3.2.2
+
+### 3.3 Kết chương [MỚI]
+
+> Template: chỉ ra, phân tích khoảng trống từ các công trình và hệ thống liên quan, rồi định vị đề tài.
+
+#### 3.3.1 Bảng so sánh các công trình và hệ thống [MỚI]
+
+Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô của công trình ngoài GĐ1 phải kiểm lại với bài gốc. Thêm dòng cho các hệ thống ở 3.2 sau khi tra cứu.
 
 | Công trình | Topology | LLM judge | Calibration theo nguồn bằng chứng | RCA | Đánh giá FP |
 |---|---|---|---|---|---|
@@ -537,9 +571,9 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 > Nguồn: phase1.txt tr.48 (Bảng 3 GĐ1); 3.4–3.7; `08-research-direction.md` §1–4.
 > Trạng thái: ⏳
 
-### 3.9 Khoảng trống nghiên cứu và định vị CTAV [MỚI, thay 3.4 GĐ1]
+#### 3.3.2 Khoảng trống nghiên cứu và định vị CTAV [MỚI, thay 3.4 GĐ1]
 
-#### Khoảng trống
+##### Khoảng trống
 - (G1) RCA topology/đồ thị giả định bất thường đã đúng; không đo FP của khâu cảnh báo.
 - (G2) LLM-judge cho cảnh báo chưa xét thiên lệch xác nhận do **nội dung bằng chứng truy xuất** (paper: recall tăng, FP 7 → 137, F1 0,703 → 0,476).
 - (G3) Calibration judge thường ở mức xác suất/độ tự tin, chưa theo nguồn gốc/hồ sơ bằng chứng.
@@ -547,15 +581,15 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 > Nguồn: `08-research-direction.md` §2–3; phase1.txt tr.47–49; 3.4–3.7.
 > Trạng thái: ⏳ (khẳng định "chưa có công trình" cần khảo sát thêm: [CẦN TRA CỨU])
 
-#### Định vị CTAV
+##### Định vị CTAV
 - Giữ C1 (topology) để giữ recall; C3 (evidence anchoring) giảm FP; C2/C4 thử và bỏ có chủ đích sau ablation (QĐ-031); C5 Rescue không có đóng góp có ý nghĩa trên `val` (QĐ-033).
 - Phát biểu khiêm tốn: thẩm định cảnh báo có hiệu chỉnh theo bằng chứng + RCA trên cảnh báo đã thẩm định; một dataset (Nezha), một judge (`gemini-2.5-flash`, QĐ-021) — nêu trong hạn chế.
 - H2 giữ nguyên văn, báo trung thực recall CTAV < C1 trên `val` (QĐ-032); kết quả `test` chưa có (M8).
 > Nguồn: `08-research-direction.md` §4–5; `docs\experiment-log.md` QĐ-027, QĐ-031, QĐ-032, QĐ-033.
 > Trạng thái: ✅ (cấu trúc)
 
-#### Tóm tắt chương
-- 3–4 gạch ý chuyển sang Chương 4 (bài toán và phương pháp CTAV).
+##### Câu chuyển chương
+- 3–4 gạch ý chuyển sang Chương 4 (đề xuất CTAV và tác tử RCA).
 > Nguồn: tự tổng hợp.
 > Trạng thái: ⏳
 
@@ -566,22 +600,14 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 
 ---
 
-## Chương 4 — Phương pháp đề xuất: CTAV và tác tử RCA
+## Chương 4 — Đề xuất: CTAV và tác tử RCA
 
 > Trạng thái tại 2026-11-11 (`docs/CURRENT-MILESTONE.md`): M0–M6 đã qua (M6 qua có điều kiện), M7 đã đóng 2026-11-14 (H0–H5 đã đăng ký, QĐ-034), M8 (G-test) đang chạy. RCA agent mới có `grouping.py`; `propagation`, `summarizer`, `pipeline` thuộc M9 (⏳). API/dashboard dữ liệu thật thuộc M10 (⏳).
 > Ký hiệu: ✅ đã hiện thực · ⏳ chờ mốc · ✂️ đã thử rồi bỏ/ablation (có QĐ).
 
-### 4.1 Phát biểu bài toán hình thức
+### 4.1 Mô tả đề xuất
 
-- Dữ liệu: telemetry (metric, log, trace span) hệ microservice Nezha, chia **cửa sổ** `w` 60 s (GĐ1: 120 s), nhãn theo wall-clock (QĐ-002..004); mỗi `w` gắn service `s_0`, thời điểm `t_0` (`TelemetryWindow`).
-- **Cảnh báo ứng viên** `AlertCandidate` (từ Detector, `source ∈ {metric, rescue}`); nhãn thật `y(w) ∈ {fault, normal}`; verdict judge ∈ {TRUE_ALERT, FALSE_POSITIVE, UNCERTAIN} kèm `confidence` và bằng chứng trích dẫn.
-- Cần thiết kế ánh xạ `(w, E(w)) → verdict`, `E(w)` = bằng chứng truy hồi (top-k, ngân sách token), dưới **ngân sách LLM** `B` (số lần gọi); đo Recall, FPR, F1 cùng `B`.
-- Vấn đề nghiên cứu: topology tăng recall nhưng gây thiên lệch xác nhận (paper: BM25 F1 0,703/FP 7 vs topology 0,476/FP 137); phát biểu lại theo QĐ-027 là thiên lệch theo **nội dung/nguồn gốc bằng chứng**.
-- Bài toán B (RCA): từ alert đã xác nhận + đồ thị phụ thuộc `G`, gom incident và xếp hạng service gốc (Hit@k).
-- Hình/bảng: **Bảng 4.1** Bảng ký hiệu (w, s_0, t_0, E(w), θ, α/β/γ, τ_F của Fusion, η và τ của Rescue, B). **Hình 4.1** Cửa sổ 60 s + ngữ cảnh + nhãn wall-clock.
-> Nguồn: `08-research-direction.md` §2–§3, QĐ-002..004, QĐ-027; `03-schemas-and-contracts.md` §1.1–1.4; `02-data-and-experiment-protocol.md` §1–2. Trạng thái: ✅
-
-### 4.2 Kiến trúc tổng thể của platform
+#### 4.1.1 Tổng quan về đề xuất: kiến trúc tổng thể của platform
 
 - Pipeline: `Replayer → Detector (IForest + Rescue) → CTAV (retrieval → judge → policy) → RCA Agent → ClickHouse/Postgres → API → Dashboard 4 màn hình`; một pipeline cho cả thực nghiệm lẫn demo; demo offline từ cache.
 - **Bốn Protocol lõi** (`packages/schemas/protocols.py`): `SourceAdapter`, `Detector`, `RetrievalStrategy` (`retrieve(candidate, budget)`), `Judge`; tham số riêng trong `__init__`, không đổi signature.
@@ -591,7 +617,28 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Hình/bảng: **Hình 4.2** Kiến trúc tổng thể (`01` §3). **Hình 4.3** 4 Protocol ↔ module. **Bảng 4.2** Tái sử dụng GĐ1 vs mới GĐ2.
 > Nguồn: `01-architecture-design.md` §1–§5, §8; `08` §4.1, §6; QĐ-013, QĐ-021; GĐ1 `phase1.txt` Ch4 §4.3–4.4. Trạng thái: ✅ (đến CTAV); ⏳ M10 (API/Dashboard dữ liệu thật; MVP dữ liệu giả QĐ-007)
 
-### 4.3 Detector: Isolation Forest và luật tạo candidate
+#### 4.1.2 Các vấn đề nghiên cứu: phát biểu hình thức
+
+- Dữ liệu: telemetry (metric, log, trace span) hệ microservice Nezha, chia **cửa sổ** `w` 60 s (GĐ1: 120 s), nhãn theo wall-clock (QĐ-002..004); mỗi `w` gắn service `s_0`, thời điểm `t_0` (`TelemetryWindow`).
+- **Cảnh báo ứng viên** `AlertCandidate` (từ Detector, `source ∈ {metric, rescue}`); nhãn thật `y(w) ∈ {fault, normal}`; verdict judge ∈ {TRUE_ALERT, FALSE_POSITIVE, UNCERTAIN} kèm `confidence` và bằng chứng trích dẫn.
+- Cần thiết kế ánh xạ `(w, E(w)) → verdict`, `E(w)` = bằng chứng truy hồi (top-k, ngân sách token), dưới **ngân sách LLM** `B` (số lần gọi); đo Recall, FPR, F1 cùng `B`.
+- Vấn đề nghiên cứu: topology tăng recall nhưng gây thiên lệch xác nhận (paper: BM25 F1 0,703/FP 7 vs topology 0,476/FP 137); phát biểu lại theo QĐ-027 là thiên lệch theo **nội dung/nguồn gốc bằng chứng**.
+- Bài toán B (RCA): từ alert đã xác nhận + đồ thị phụ thuộc `G`, gom incident và xếp hạng service gốc (Hit@k).
+- Nối RQ1–RQ5 (§1.2.3) với từng bài toán con.
+- Hình/bảng: **Bảng 4.1** Bảng ký hiệu (w, s_0, t_0, E(w), θ, α/β/γ, τ_F của Fusion, η và τ của Rescue, B). **Hình 4.1** Cửa sổ 60 s + ngữ cảnh + nhãn wall-clock.
+> Nguồn: `08-research-direction.md` §2–§3, QĐ-002..004, QĐ-027; `03-schemas-and-contracts.md` §1.1–1.4; `02-data-and-experiment-protocol.md` §1–2. Trạng thái: ✅
+
+#### 4.1.3 Các thách thức và khó khăn [MỚI]
+
+- Bản đầy đủ của §1.1.3 (Ch1 chỉ giữ một đoạn và dẫn sang đây). Mỗi thách thức: vì sao khó, thành phần nào giải, bằng chứng ở mục nào của Ch5.
+- (T1) Giảm cảnh báo sai mà giữ độ phủ của topology → C1 + C3; recall CTAV < C1 trên `val` là giới hạn đã biết (Phát hiện 10).
+- (T2) Cơ chế chưa rõ: hiện tượng của paper lặp lại, cơ chế "nhiễu lân cận" thì không; nguyên nhân thực là thiên lệch xác nhận trên bằng chứng cục bộ (QĐ-027, Phát hiện 7) → H1, C3.
+- (T3) Ngân sách và chi phí gọi LLM → cache bắt buộc, H4 (ngân sách 120 lần gọi).
+- (T4) Từ cảnh báo đã thẩm định tới service gốc khi cảnh báo thưa → tác tử RCA, H5.
+- (T5) Kỷ luật đánh giá: chỉ chạm `test` một lần, đăng ký trước → G-test.
+> Nguồn: QĐ-027, QĐ-031, QĐ-034; Phát hiện 7, 10, 12. Trạng thái: ✅
+
+### 4.2 Detector: Isolation Forest và luật tạo candidate
 
 - `IsolationForestDetector` (`services/detector/isolation_forest.py`): đặc trưng GĐ1 mỗi metric (mean/std/min/max/last/delta) trên bộ đệm cuộn theo pod/service; `fit` chỉ trên train; điểm chuẩn hoá [0,1]; ngưỡng 0,85; không promote khi cold-start (QĐ-015); `top_features` để giải thích.
 - Luật candidate (`candidates.py`): `score ≥ 0,85 → AlertCandidate(source="metric")`.
@@ -600,9 +647,9 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Hình/bảng: **Hình 4.4** Luồng detector + Rescue gate. **Bảng 4.3** Tham số Detector/Rescue (ngưỡng, k_log, σ, η, τ) + nguồn config. **Bảng 4.4** Quét η/τ (tham chiếu Ch5).
 > Nguồn: `01` §6.2; `02` §6.1–6.4; `services/detector/*`; QĐ-008, QĐ-015, QĐ-033. Trạng thái: IForest ✅; Rescue ✅ (offline, M7); không đưa vào CTAV cuối (V34 (b)); một điểm ablation trên `test` ⏳ M8
 
-### 4.4 CTAV — Calibrated Topology-Aware Alert Validation
+### 4.3 CTAV — Calibrated Topology-Aware Alert Validation
 
-#### 4.4.1 Tổng quan và vai trò hiện tại của từng thành phần
+#### 4.3.1 Tổng quan và vai trò hiện tại của từng thành phần
 
 - Thiết kế ban đầu (08 §4): tầng 1 BM25 → judge; tầng 2 topology (C4) khi cần; chính sách C2 gating + C3 anchoring.
 - **Cấu hình chốt sau M6 (QĐ-031, `ctav_final.yaml`)**: mọi candidate → C1 → judge → θ_local = 0,80 → C3; `gating: false`, `routing.enabled: false`.
@@ -611,14 +658,14 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Hình/bảng: **Hình 4.5** CTAV thiết kế vs cấu hình chốt. **Bảng 4.5** Vai trò & trạng thái C1–C5 kèm QĐ.
 > Nguồn: `08` §4 (khối "Kết quả M6"), `eval/configs/ctav_final.yaml`, QĐ-027, QĐ-029..033. Trạng thái: ✅ (cấu hình `val`); kiểm định `test` ⏳ M8
 
-#### 4.4.2 Tầng 1 — BM25 + judge (baseline cục bộ)
+#### 4.3.2 Tầng 1 — BM25 + judge (baseline cục bộ)
 
 - `bm25_hybrid`: truy vấn BM25 trên bằng chứng cục bộ của `s_0` trong cửa sổ; truy vấn không chứa tag fault type (unit test chặn rò nhãn, paper §3.5).
 - Vừa là baseline (H0) vừa là tầng 1 của thiết kế hai tầng (C4 — ablation); `no_retrieval` (LLM không RAG) là baseline cùng ngân sách.
 - Hình/bảng: **Bảng 4.6** Các strategy: `bm25_hybrid`, `hybrid_bm25_graph`, `no_retrieval` (temporal/graph thuần = ablation của C1).
 > Nguồn: `services/retrieval/bm25_hybrid.py`, `no_retrieval.py`; `08` §4 (QĐ-011). Trạng thái: ✅
 
-#### 4.4.3 Tầng 2 — Topology retrieval C1 (Fusion Score)
+#### 4.3.3 Tầng 2 — Topology retrieval C1 (Fusion Score)
 
 - Công thức: `Score = α·BM25_norm + β·exp(−|t_i−t_0|/τ_F) + γ·GraphSim(s_i,s_0)`, `α+β+γ=1`, τ_F = 300 s (τ không chỉ số dành cho ngưỡng của Rescue); cấu hình A4: α 0,35, β 0,25, γ 0,40; mở rộng 2-hop; top-k = 6.
 - `HybridBm25GraphRetriever` (`build_pool` → `top_events` → `reweighted`): pool BM25 top-`bm25_k` + mở rộng đồ thị (`packages/graph/service_graph.py`); ngân sách token; biến thể quota `k_graph` (C1-quota).
@@ -627,7 +674,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Hình/bảng: **Hình 4.6** Mở rộng 2-hop + xếp hạng Fusion. **Bảng 4.7** Tham số Fusion (α, β, γ, τ, k, k-hop, `bm25_k`).
 > Nguồn: `08` §2, §4 (C1); `01` §5.3, §6.3; `services/retrieval/hybrid_bm25_graph.py`; `02` §6.5; QĐ-020, QĐ-026, QĐ-027. Trạng thái: ✅
 
-#### 4.4.4 Chính sách quyết định: C3 evidence anchoring (và C2 gating)
+#### 4.3.4 Chính sách quyết định: C3 evidence anchoring (và C2 gating)
 
 - **C3**: TRUE_ALERT chỉ giữ khi judge trích ≥ 1 bằng chứng **bất thường của `s_0`** — log ERROR/WARN, hoặc span có `duration_ms` vượt ngưỡng nền p90 của cùng service+operation (tính trên `dev`; span không có ngưỡng ⇒ không neo được); không thì hạ UNCERTAIN (`is_abnormal`, `decide`, `apply_policy` trong `policy.py`; mở rộng `require_evidence` của GĐ1).
 - Ngưỡng nền `dev` p90 chọn thay baseline trượt 60 phút (V30: trượt phủ 93% nhưng F1 thấp hơn có ý nghĩa); hạn chế: 15 service chưa có ngưỡng (Phát hiện 11, V31 (a); C3-trượt là ablation bắt buộc ở M8, QĐ-032); `span_baseline.py`.
@@ -636,14 +683,14 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Hình/bảng: **Hình 4.7** Sơ đồ quyết định (verdict thô → θ → anchoring → verdict cuối). **Bảng 4.8** Điều kiện neo C3 + độ phủ. **Hình 4.8** Ví dụ ca alert normal bị hạ bởi C3.
 > Nguồn: `08` §4 (C2, C3); `01` §6.4; `services/judge/policy.py`, `span_baseline.py`; QĐ-027, QĐ-029..032. Trạng thái: C3 ✅; C2 ✂️ (QĐ-031)
 
-#### 4.4.5 Định tuyến hai tầng thích nghi C4 (✂️ ablation)
+#### 4.3.5 Định tuyến hai tầng thích nghi C4 (✂️ ablation)
 
 - `routing.route`: chạy tầng 1 BM25; leo tầng 2 khi `no_context`, `uncertain` (gồm bị C2/C3 hạ) hoặc `weak_fp` (FP với confidence < `fp_confidence` = 0,95) — `escalation_reason`, `RoutingConfig`.
 - Lý do bỏ (QĐ-031): toàn bộ recall thêm của C1 trên `val` nằm ở FP của BM25; TRUE_ALERT tầng 1 qua θ_local thêm nhiều FP; C1 cho mọi candidate rẻ hơn. Trình bày như thiết kế đã kiểm chứng và loại (kết quả âm).
 - Hình/bảng: **Bảng 4.9** Chi phí USD/F1: two-tier vs topology-only.
 > Nguồn: `services/judge/routing.py`; `08` §4 (C4); QĐ-031. Trạng thái: ✂️ (code giữ cho ablation)
 
-#### 4.4.6 Judge: prompt, đầu ra có cấu trúc, cache LLM
+#### 4.3.6 Judge: prompt, đầu ra có cấu trúc, cache LLM
 
 - Prompt: nguyên văn prompt GĐ1 (`prompt.py`: `compose_prompt`, `alert_payload`, `context_payload`); `gemini-2.5-flash`, temperature 0, `thinkingBudget: 0`, kiểm `modelVersion` (lệch ⇒ run dừng) (QĐ-021).
 - Đầu ra 3 nhãn + `confidence` + bằng chứng trích dẫn; `require_evidence_for_true_alert` hạ TRUE_ALERT → UNCERTAIN nếu thiếu bằng chứng; lỗi API: retry có trần, hết ⇒ `manual_review`.
@@ -652,7 +699,7 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Hình/bảng: **Hình 4.9** Luồng gọi judge qua cache. **Bảng 4.10** Cấu hình judge & cache. **Hình 4.10** Ví dụ prompt/JSON đầu ra.
 > Nguồn: `01` §6.4; `03` §6; `services/judge/{prompt,cache,backends,llm_judge,registry}.py`; `08` §4.1; QĐ-013, QĐ-021. Trạng thái: ✅
 
-### 4.5 Tác tử RCA (Nhánh B)
+### 4.4 Tác tử RCA (Nhánh B)
 
 - Ba nhiệm vụ: **grouping → propagation → summarizer** (`pipeline.py` điều phối); đầu vào là alert TRUE_ALERT từ CTAV.
 - **Grouping** (`grouping.py`, thuần thuật toán, không LLM): cụm theo `T_group` (mặc định 300 s; quét {180,300,600} trên `val`) → đồ thị con từ dependency graph → mỗi thành phần liên thông = 1 `Incident` (`time_clusters`, `group_alerts`, `_incident_id`). Đo Alert Reduction Ratio = 1 − (#incident/#alert) trên cascade.
@@ -662,15 +709,20 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Hình/bảng: **Hình 4.11** Sơ đồ 3 bước RCA. **Hình 4.12** Ví dụ đồ thị lan truyền + root cause. **Bảng 4.11** Schema DiagnosticReport. **Bảng 4.12** Chỉ số RCA (Hit@1, Hit@3, ARR, JSON valid, E2E latency).
 > Nguồn: `01` §6.5; `03` §1.5, §2; `02` §4.3; `04` M9; `services/rca_agent/grouping.py`; H5. Trạng thái: grouping ✅ (mã; chưa quét T_group); propagation, summarizer, pipeline ⏳ M9 — không mô tả như đã hoàn thành
 
-### 4.6 Hiện thực hoá
+### 4.5 Hiện thực hoá
 
-- Công nghệ: Python (`py`), pytest/mypy/ruff, Docker Compose (profile `dev`/`full`), ClickHouse (`fact_alert_evaluation`, `fact_retrieval_trace`), PostgreSQL, API + dashboard 4 màn hình (Timeline, Alert detail, Incident detail, Experiment comparison); không K8s, vector DB, LangChain, auth (scope guard).
+- Công nghệ (giới thiệu ở §2.8; mục này chỉ nói cách lắp): Python (`py`), pytest/mypy/ruff, Docker Compose (profile `dev`/`full`), ClickHouse (`fact_alert_evaluation`, `fact_retrieval_trace`), PostgreSQL, API + dashboard 4 màn hình (Timeline, Alert detail, Incident detail, Experiment comparison); không K8s, vector DB, LangChain, auth (scope guard).
 - Cấu trúc repo: `packages/{schemas,graph,llm,storage}`, `services/{replayer,detector,retrieval,judge,rca_agent,api,web}`, `eval/{configs,harness,results}` (`runner`, `ctav`, `compare`, `fusion_ablation`, `h1`, `kgraph`, `rescue`, `metrics`, `stats`).
 - **Harness điều khiển bằng config**: không hardcode tham số; `py -m eval run|ctav|compare|ablation --config eval/configs/<name>.yaml`; ví dụ `ctav_final.yaml` (tiers, policy, routing, ngân sách, `n_boot`, `seed`).
 - **Tái lập**: `run_id` bất biến `<biến_thể>_<mục_đích>_v<n>`, không ghi đè; mỗi run xuất `metrics.json`, `per_window.csv`, `retrieval.jsonl`, `config.snapshot.yaml`, `git_commit.txt`, `runtime.json`; CTAV đánh giá bằng replay verdict đã cache (0 USD); chạm `test` một lần ở M8; bootstrap CI + McNemar.
 - Cổng chặn: G-port (M2: P 0,3158; R 0,375; FPR 0,0458), G-paper (M3: BM25 F1 0,703/FP 7; Topology 0,476/FP 137, cache hit 100%), G-test (M8 ⏳).
 - Hình/bảng: **Hình 4.13** Cây thư mục repo ↔ mốc. **Bảng 4.13** Công nghệ & lý do. **Bảng 4.14** Output một run. **Bảng 4.15** Lệnh/config chính.
 > Nguồn: `01` §7–§8; `02` §3.1–3.3; `05-agent-coding-rules.md`; `06-scope-guard.md`; AGENTS.md; `eval/harness/*`. Trạng thái: harness ✅; API/dashboard dữ liệu thật ⏳ M10; đóng gói ⏳ M12
+
+### 4.6 Kết chương [MỚI]
+- Cấu hình chốt CTAV = C1 + θ = 0,80 + C3; C2, C4 đã kiểm và loại (QĐ-031); C5 chỉ là ablation (QĐ-034).
+- Tác tử RCA: grouping → propagation → summarizer; chuyển sang Ch5 nơi kiểm H0–H5.
+> Trạng thái: ✅
 
 ### Danh mục hình/bảng đề xuất
 
@@ -1002,6 +1054,10 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 
 > Nguồn: `docs/experiment-log.md` (các mục "Phát hiện n"); `docs/milestones/M1..M7`. Trạng thái: ✅ (thảo luận dựa trên `val`; cập nhật sau M8 và M9–M10).
 
+### 5.11 Kết chương [MỚI]
+- H0–H5 đạt hay không trên `test`, mỗi giả thuyết một dòng, chép đúng tiêu chí đăng ký; chuyển sang Ch6 (demo) và Ch7 (thảo luận).
+> Trạng thái: ⏳ sau M8, M9
+
 ---
 
 **Phụ lục chương (gợi ý):** run_id liên quan (`eval/results/`): `gd1_phase4_parity_v1`; `h0_val_bm25_{v1,v2,v3,b120_v1}`, `h0_val_c1_k0_{v1,b120_v1}`, `h0_val_c1_k1_{v1,b120_v1}`, `h0_val_norag_{v1,reqev_v1,b120_v1}`, `h0_val_compare_{v1,k1_vs_k0_v1}`, `h0_val_evidence_diff_v1`; `h1_val_*`, `h1_val_analysis_v2`; `m4_kgraph_val_k0..k3_v1`, `m4_fusion_ablation_val_v1`; `m6_anchor_features_val_v1`, `m6_ctav_select_val_v{1,2}`, `ctav_final_val_v1`; `m7_*_val_*`; `val_detector_count_v1`. Các run smoke `m1..m4_*_smoke_*` không đưa vào bảng kết quả. Lệnh tái lập: cuối mỗi báo cáo milestone.
@@ -1048,9 +1104,15 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Danh sách lỗi demo từ tổng duyệt M11.
 > Nguồn: 04 §M10–M12. ⏳ chờ M10–M12.
 
+### 6.6 Kết chương [MỚI]
+- Đoạn cuối của `ch6-demo-platform.md`: platform hiện thực toàn bộ chuỗi xử lý, phục vụ cả thực nghiệm và demo.
+> Trạng thái: ✅ (đã có trong nháp Ch6)
+
 ---
 
-## Chương 7 — Thảo luận, hạn chế và hướng phát triển
+## Chương 7 — Thảo luận
+
+> Chương bàn kết quả có nghĩa gì và đáng tin tới đâu. Hạn chế của hệ và hướng phát triển chuyển sang §8.2 theo template GVHD.
 
 ### 7.1 Tổng hợp kết quả chính
 - H0 `val`: C1 − BM25 ΔRecall +0,100 [+0,052; +0,155], ΔFPR +0,025 [+0,020; +0,031]; tái lập về hiện tượng, không về cơ chế (Phát hiện 7).
@@ -1065,40 +1127,30 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - Cột `PodSuccessRate(%)` lỗi làm lệch judge (Phát hiện 5); đánh đổi recall–FPR–chi phí (đường ngân sách H4).
 > Nguồn: Phát hiện 1–12. ✅ `val`; ⏳ cập nhật sau M8.
 
-### 7.3 Hạn chế
-- **Một dataset** (Nezha); phân bố service `val` ≠ `test` có thể đổi số mạnh (V31); 15 service không có ngưỡng `dev` ⇒ C3 không neo được (Phát hiện 11).
-- **Judge duy nhất** Gemini qua API (QĐ-013); Gemini 3.x thận trọng hơn (recall 0,14 vs 0,33, QĐ-023); phương sai LLM chỉ đo trên tập con (`repeat` 1, 2).
-- **Detector bỏ sót fault:** 100 fault có telemetry bị bỏ sót, C5 cứu tối đa 2 TP (Phát hiện 12); recall CTAV 0,139.
-- **C2, C4, C5 không đạt** ⇒ phương pháp thu về C1 + C3; không đăng ký lại H2 sau khi thấy `val` (V32 (a)).
-- **Chi phí/độ trễ:** ≈ 4,40 USD token cho H0 `val` (billing báo 5 USD); 1,03 USD cho Rescue; phụ thuộc API; không đo local-first (GĐ1: 4/6 lần fallback, ~13,6× độ trễ).
-- Nhìn `val` hai lần khi chọn cấu hình ⇒ số `val` lạc quan; chỉ `test` không thiên lệch.
-- Cỡ mẫu RCA/đánh giá người nhỏ (30 incident, 50 window) `[⏳ M9, M11]`.
-> Nguồn: QĐ-013, 023, 026, 031–033; 08 §4.1. ✅ `val`; ⏳ M8/M11.
-
-### 7.4 Mối đe doạ tính hợp lệ
+### 7.3 Mối đe doạ tính hợp lệ
 - **Internal:** rò nhãn qua tag fault type/"có bằng chứng" (Phát hiện 1; có unit test chặn); chọn tham số trên `val` hai lần; cột dataset lỗi (Phát hiện 5); model bị chuyển ngầm (QĐ-020, đã chặn); không hiệu chỉnh đa so sánh (H2 chính, còn lại phụ).
 - **External:** một dataset, một judge, chủ yếu lỗi `cpu_*`/`network_delay`; chưa kiểm trên hệ thống khác/luồng thật.
 - **Construct:** nhãn cửa sổ theo quy tắc QĐ-003; chỉ số trên tập có telemetry so với mọi cửa sổ; δ chốt sau khi thấy `val` (V33).
 - **Conclusion:** bootstrap CI, McNemar; CI chồng ở ngân sách thấp; `test` chạy một lần.
 > Nguồn: 08 §5.2; QĐ-003, 016, 020; registration. ✅ khung; ⏳ rà sau M8.
 
-### 7.5 Phân tích ca sai
+### 7.4 Phân tích ca sai
 - FP còn lại của CTAV (51 trên `val`): loại nào, vì sao anchoring không chặn; FN: 10 ca `network_delay` mất (Phát hiện 10); ca RCA sai.
 > Nguồn: 04 §M11. ⏳ chờ M11.
 
-### 7.6 Hướng phát triển (tương lai, **không** là việc của luận văn)
-- Causal Span Grounding đầy đủ (GĐ2 chỉ làm anchoring rút gọn).
-- Local-first LLM routing khi có phần cứng; đo lại hiệu chỉnh và biến ẩn do routing.
-- Retrieval `cross_modal`, RRF; `temporal`/`graph` độc lập (QĐ-011).
-- Hình thức hoá Rescue Score; mở rộng chỉ số chất lượng ngữ cảnh; baseline trượt cho service thiếu ngưỡng; thêm dataset/streaming thật (kế thừa GĐ1 Ch5).
-- Mục cấm (K8s, vector DB, fine-tuning, multi-tenant, notification, runbook…) chỉ nhắc nếu GVHD yêu cầu, nêu rõ ngoài phạm vi.
-> Nguồn: docs/ideas.md; GĐ1 Ch5 (tr.79–82); 06. ✅; [TÁI SỬ DỤNG GĐ1] cho phần kế thừa.
+### 7.5 Kết chương [MỚI]
+- 3–4 câu: kết quả đáng tin tới đâu, ca sai nói gì; chuyển sang Ch8.
+> Trạng thái: ⏳ sau 7.4
 
 ---
 
-## Chương 8 — Kết luận
+## Chương 8 — Tổng kết
 
-### 8.1 Trả lời câu hỏi nghiên cứu
+> Theo template GVHD: kết quả đạt được, rồi mọi hạn chế nối sang hướng phát triển.
+
+### 8.1 Kết quả đạt được
+
+#### 8.1.1 Trả lời câu hỏi nghiên cứu
 - RQ1 topology có tăng recall và FPR không? → H0 `[val ✅; test ⏳ M8]`.
 - RQ2 cơ chế? → H1 giữ một phần (độ gần thời gian + loại bằng chứng; vế số lượng chưa kiểm).
 - RQ3 CTAV hơn BM25 trong cùng ngân sách? → H2 `[CHỜ M8]`; sơ bộ `val` ΔF1 +0,098 [+0,046; +0,149] nhưng vế recall ≥ C1 − δ không đạt.
@@ -1106,14 +1158,14 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 - RQ5 RCA định vị tốt không? → H5 `[CHỜ M9–M10]`.
 > Nguồn: 08 §5.1; registration. ⏳ M8, M10.
 
-### 8.2 Tóm tắt đóng góp
+#### 8.1.2 Đóng góp
 - Tái lập vấn đề của paper trên split có kỷ luật (G-port/G-paper, `test` một lần).
 - Phát hiện về cơ chế và lỗi đánh giá của paper (Phát hiện 1–4, 6–7).
 - CTAV (C1 + C3) giảm FPR ~8× so với BM25 trên `val`; kết quả âm trung thực cho C2/C4/C5.
 - Tác tử RCA + platform demo offline `[⏳ M9–M10]`.
 > ✅ phần `val`; ⏳ cập nhật sau M8.
 
-### 8.3 Kết quả H0–H5
+#### 8.1.3 Kết quả H0–H5
 | | Kết quả | TT |
 |---|---|---|
 | H0 | `[CHỜ M8]` (val: đạt) | ⏳ |
@@ -1124,15 +1176,59 @@ Ký hiệu: ● có / ◐ một phần / ○ không / ? chưa xác minh. Ô củ
 | H5 | `[CHỜ M9–M10]` | ⏳ |
 > Nguồn: bản đăng ký (2026-11-14, QĐ-034). Viết H2 dù kết quả là gì.
 
-### 8.4 Ý nghĩa và kết luận chung
+#### 8.1.4 Ý nghĩa và kết luận chung
 - Hiệu chỉnh theo nguồn gốc bằng chứng quan trọng hơn thêm ngữ cảnh; FPR và chi phí là ràng buộc cốt lõi.
-- Một câu hạn chế chính; trỏ sang Ch7. ⏳ viết sau M8.
+- Một câu hạn chế chính; trỏ sang §8.2. ⏳ viết sau M8.
+
+### 8.2 Hạn chế và hướng phát triển
+
+#### 8.2.1 Hạn chế
+- **Một dataset** (Nezha); phân bố service `val` ≠ `test` có thể đổi số mạnh (V31); 15 service không có ngưỡng `dev` ⇒ C3 không neo được (Phát hiện 11).
+- **Judge duy nhất** Gemini qua API (QĐ-013); Gemini 3.x thận trọng hơn (recall 0,14 vs 0,33, QĐ-023); phương sai LLM chỉ đo trên tập con (`repeat` 1, 2).
+- **Detector bỏ sót fault:** 100 fault có telemetry bị bỏ sót, C5 cứu tối đa 2 TP (Phát hiện 12); recall CTAV 0,139.
+- **C2, C4, C5 không đạt** ⇒ phương pháp thu về C1 + C3; không đăng ký lại H2 sau khi thấy `val` (V32 (a)).
+- **Chi phí/độ trễ:** ≈ 4,40 USD token cho H0 `val` (billing báo 5 USD); 1,03 USD cho Rescue; phụ thuộc API; không đo local-first (GĐ1: 4/6 lần fallback, ~13,6× độ trễ).
+- Nhìn `val` hai lần khi chọn cấu hình ⇒ số `val` lạc quan; chỉ `test` không thiên lệch.
+- Cỡ mẫu RCA/đánh giá người nhỏ (30 incident, 50 window) `[⏳ M9, M11]`.
+> Nguồn: QĐ-013, 023, 026, 031–033; 08 §4.1. ✅ `val`; ⏳ M8/M11.
+
+#### 8.2.2 Hướng phát triển (tương lai, **không** là việc của luận văn)
+- Causal Span Grounding đầy đủ (GĐ2 chỉ làm anchoring rút gọn).
+- Local-first LLM routing khi có phần cứng; đo lại hiệu chỉnh và biến ẩn do routing.
+- Retrieval `cross_modal`, RRF; `temporal`/`graph` độc lập (QĐ-011).
+- Hình thức hoá Rescue Score; mở rộng chỉ số chất lượng ngữ cảnh; baseline trượt cho service thiếu ngưỡng; thêm dataset/streaming thật (kế thừa GĐ1 Ch5).
+- Mục cấm (K8s, vector DB, fine-tuning, multi-tenant, notification, runbook…) chỉ nhắc nếu GVHD yêu cầu, nêu rõ ngoài phạm vi.
+- Bảng B8.3: mỗi hạn chế ở §8.2.1 → hướng phát triển tương ứng. Hướng nằm trong các mốc còn lại (M9–M12) thì dẫn sang mục Kế hoạch thực hiện (chú thích của template).
+> Nguồn: docs/ideas.md; GĐ1 Ch5 (tr.79–82); 06. ✅; [TÁI SỬ DỤNG GĐ1] cho phần kế thừa.
+
+---
+
+## Chương 9 — Công bố khoa học [MỚI]
+
+> Chương có số theo quyết định của người dùng 2026-11-18. Nội dung theo style guide §1.2: bài báo là khảo sát bước đầu,
+> không là trục tham chiếu, không lặp lại số.
+
+### 9.1 Bài báo đã công bố
+- Tác giả, tên bài, hội nghị ICAETM 2026, kỷ yếu, **trạng thái thật** lúc nộp (đã nộp / được chấp nhận / đã đăng); trích dẫn IEEE.
+> Trạng thái: ✅ (cần xác nhận trạng thái bài)
+
+### 9.2 Quan hệ với luận văn
+- Khảo sát thực nghiệm bước đầu cho riêng khâu truy xuất ngữ cảnh, trên `paper_500`; luận văn dùng nó ở §1.1.2 (hiện tượng xuất phát) và §5.5.2 (kiểm chứng pipeline), rồi đi xa hơn ở cơ chế, hiệu chỉnh và RCA.
+> Trạng thái: ✅
+
+---
+
+## Kế hoạch thực hiện phần còn lại (không đánh số)
+- Theo mốc M9–M12 (không theo "giai đoạn"); chỉ gồm việc chưa xong lúc nộp; hướng mở rộng ngoài phạm vi tách riêng. Khung chi tiết: `outline-bao-cao-gd2.md` mục 4 (Kế hoạch thực hiện).
+> Trạng thái: ✅ (khung)
 
 ---
 
 ## Tài liệu tham khảo
-- Kế thừa toàn bộ danh mục GĐ1 (cuối `phase1.txt`) `[TÁI SỬ DỤNG GĐ1]`, giữ định dạng trích dẫn.
+- Kế thừa toàn bộ danh mục GĐ1 (cuối `phase1.txt`) `[TÁI SỬ DỤNG GĐ1]`, chuyển sang định dạng IEEE nếu GĐ1 dùng kiểu khác.
 - Bổ sung: paper ICAETM 2026; bài gốc Nezha; tài liệu Gemini API (ghi ngày truy cập); scikit-learn Isolation Forest, ClickHouse, PostgreSQL, FastAPI, React/Vite; bootstrap CI, McNemar, BM25; công trình RCA microservice mới nếu Ch3 cập nhật.
+- Định dạng **IEEE** (kiểu số `[n]`), theo template GVHD.
+- Mỗi công cụ AI hỗ trợ (dàn ý, sơ đồ) một mục IEEE: tên, nhà cung cấp, phiên bản, ngày truy cập (style guide §5.3).
 - Chỉ trích dẫn nguồn đã đọc. ⏳ M12.
 
 ---
