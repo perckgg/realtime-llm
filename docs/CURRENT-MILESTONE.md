@@ -163,7 +163,7 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 - Soạn nháp Chương 6 (`docs/drafts/ch6-demo-platform.md`), tóm tắt gửi GVHD (`docs/drafts/2026-11-17-mail-gvhd-platform.md`, tác giả Nguyễn Văn Hoàng Khang), hoàn tất `docs/milestones/M10-platform.md` (4 phần + Phụ lục), cập nhật `docs/milestones/README.md`, `04-implementation-roadmap.md` §1 và `docs/experiment-log.md` (`QĐ-048`, `QĐ-049`).
 - Kiểm tra cuối trước khi đóng M10: `npm.cmd --prefix services/web run check` (26/26 ok), `mypy` (43 file sạch), `ruff` sạch, `pytest tests/ -q` **`253 passed in 30.37s`** (`0` skipped).
 **Việc đầu tiên phiên sau:** Làm **M11** theo prompt **P5** trong `docs/prompts/M8-M12-prompts.md` (`scripts/m11_sample_incidents.py` lấy mẫu 30 incident từ `rca_final_test_v1`, `seed = 42`, xuất `eval/manual/diagnostic_quality.csv` cho người dùng chấm mù tối thiểu 15 incident đầu; phân tích ca sai CTAV & RCA cho Ch7; tổng duyệt demo lần 1).
-**Còn chờ người dùng:** Sửa dòng H5 `"Chờ M9"` ở Bảng 5.18 của `ch5-ket-qua-test.md`; chấm `V35` (`eval/manual/context_precision_test_v1.csv`, 525 dòng, hạn trước M12); gửi mail `2026-11-17-mail-gvhd-platform.md` nếu muốn báo cáo Cô ngay.
+**Còn chờ người dùng:** ~~Sửa dòng H5 `"Chờ M9"` ở Bảng 5.18~~ (đã sửa 2026-11-18: H5 "Không được chấp nhận", cột `val` 2/4 vế); chấm `V35` (`eval/manual/context_precision_test_v1.csv`, 525 dòng, hạn trước M12); gửi mail `2026-11-17-mail-gvhd-platform.md` nếu muốn báo cáo Cô ngay.
 
 ## Ghi chú bàn giao — 2026-11-17 (xong M10-C.1, chờ M10-D)
 

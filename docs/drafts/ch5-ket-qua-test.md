@@ -258,9 +258,9 @@ giả thuyết H0–H5 để dẫn chiếu sang Chương 8.
 | **H2** (chính) | CTAV − BM25, CTAV − C1 | **Không được chấp nhận** (đạt vế (ii) FPR; không đạt vế (i) F1 và (iii) recall) | Đạt một phần (không đạt vế (iii)) |
 | **H3** | Một-thay-đổi-một-lần quanh CTAV | **Được chấp nhận** (C3 đóng góp; xác nhận bỏ C2, C4; C3-trượt tăng F1 +0,054; C5 +0 TP) | C3 đóng góp; xác nhận bỏ C2, C4 |
 | **H4** | CTAV và LLM-không-RAG ở 120 lần gọi | **Được chấp nhận** (ước lượng điểm 0,034 ≥ 0,017; CI chồng nhau) | Đạt (0,028 so với 0,000) |
-| **H5** | Tác tử RCA trên incident gom từ CTAV | *Chờ M9* | — |
+| **H5** | Tác tử RCA trên sự cố gom từ cảnh báo CTAV | **Không được chấp nhận** (0/4 vế: Hit@1 = Hit@3 = 0,471 = baseline, ΔHit@1 = 0; không có lỗi cascade nên vế Alert Reduction không tính được) | Không đạt (đạt vế Hit@1 0,636 và ARR cascade 0,667 trên 1 lần tiêm lỗi; không đạt vế Hit@3 và ΔHit@1 = 0) |
 
-*Nguồn: tổng hợp từ Bảng 5.14d–5.17 (`eval/results/m8_test_tables_v1/verdicts.json`) và QĐ-028, QĐ-038.*
+*Nguồn: tổng hợp từ Bảng 5.14d–5.17 (`eval/results/m8_test_tables_v1/verdicts.json`), Bảng 5.26–5.27 (`eval/results/rca_final_test_v1/`, `eval/results/rca_final_val_v1/`) và QĐ-028, QĐ-038, QĐ-042.*
 
 ---
 
