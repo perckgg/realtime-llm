@@ -21,7 +21,7 @@
 | M8 | **QUA (đóng 2026-11-16; người dùng đã xem báo cáo, V36 (a) — QĐ-039; M8: xong phần API)** — hoàn tất 2026-11-16 (21.094 gọi mới, 0 lỗi, 15,85 USD theo token): **H0 đạt, H2 không đạt** (do 61% fault rơi vào 32 service thiếu ngưỡng `dev`; đối chứng `C3-trượt` đạt F1 0,120), **H3 & H4 đạt** | `docs/milestones/M8-g-test.md`; QĐ-034..039 |
 | M9 | **QUA — H5 không được chấp nhận** (đóng 2026-11-17, người dùng đã xem — QĐ-043): `test` Hit@1 = Hit@3 = 0,471 = baseline, ΔHit@1 = 0, 0 lỗi cascade; `val` ARR `network_delay` 0,25 < 0,30; 0,2772 USD theo token | `docs/milestones/M9-rca.md`; QĐ-037, QĐ-039..043 |
 | M10 | **QUA** (đóng 2026-11-17, người dùng đã xem — QĐ-049): platform end-to-end, API 7 endpoint, dashboard tiếng Anh 4 màn hình, `DEMO_OFFLINE=1` (`0` gọi API / `0,0000` USD), parity `val` 26/26 & `test` 38/38 & độ nhạy 114/114, `ch6-demo-platform.md` + 5 ảnh chụp, `253` pytest qua | `docs/milestones/M10-platform.md`; QĐ-045..049 |
-| M11 | **Đang làm** (mở 2026-11-17) | QĐ-049; báo cáo sẽ ở `docs/milestones/M11-danh-gia-nguoi.md` |
+| M11 | **Đang làm** (mở 2026-11-17; **M11-A xong 2026-11-19**, chờ người dùng chấm tay **V50**) | QĐ-049, **QĐ-050**; bản nháp `docs/milestones/M11-danh-gia-nguoi.md` |
 
 M10 tóm tắt (QĐ-045..049): `services/rca_agent/pipeline.py` nạp ClickHouse/PostgreSQL và đối chiếu parity 100% với M9 (`pipeline_val_v2`: 26/26, `5.764,165 ms`; `pipeline_test_v2`: 38/38, `4.242,424 ms`, dấu vân tay `b0c54fa68ef65535`; V48 `(b')+(a')` `pipeline_sens_test_v1`: 114/114, `10.646,898 ms`), chế độ `DEMO_OFFLINE=1` xoá khoá API và đọc 100% từ cache. API FastAPI chỉ đọc 7 endpoint (`services/api/`), giao diện React/Vite 4 màn hình chuyển ngữ 100% tiếng Anh (bảng tĩnh `experiment_table.json` kiểm khớp Chương 5), chọn ca demo xác định `seed=42` (`demo_cases.json`), kiểm trình duyệt thật 5 bước (`0` lỗi console, `0` kết nối ngoài `localhost`) kèm 5 ảnh (`docs/drafts/figures/m10-*.png`), nháp Chương 6 (`docs/drafts/ch6-demo-platform.md`), tóm tắt GVHD (`2026-11-17-mail-gvhd-platform.md`), `253` pytest qua (`0` skipped). `0` USD chi phí API mới.
 
@@ -76,11 +76,11 @@ Vùng file: `eval/manual/diagnostic_quality*`, `scripts/m11_*`, `docs/milestones
 
 | Mục tiêu / Việc (`04` §M11 & `P5`) | Đầu ra | Trạng thái |
 |---|---|---|
-| 1. `scripts/m11_sample_incidents.py`: lấy 30 incident `test` (`rca_final_test_v1`, `seed = 42`), xáo thứ tự sao cho 15 dòng đầu tự nó là mẫu ngẫu nhiên hợp lệ; xuất bảng chấm mù 3 tiêu chí theo `02` §4.4 + hướng dẫn chấm ≤ 1 trang (tách nhãn `root_cause` ra file riêng) | `eval/manual/diagnostic_quality.csv` + file nhãn riêng | Chưa làm |
-| 2. Dừng báo người dùng chấm (tối thiểu 15 dòng đầu; song song làm việc 3) | Điểm người chấm (+ người thứ 2 trên 20% nếu có) | Chờ người dùng chấm sau bước 1 |
-| 3. Phân tích ca sai trên `test` (chỉ mô tả, không đổi tham số): phân loại 64 FP còn lại & FN của CTAV (theo service, loại bằng chứng, có/không ngưỡng nền `dev`, verdict C1 gốc, độ lệch detector từ M8) và toàn bộ ca RCA sai kèm số đếm + `window_id` / `incident_id` | Bảng phân loại & ca minh hoạ cho Chương 7 | Chưa làm |
-| 4. Tổng hợp kết quả chấm chất lượng báo cáo (CI bootstrap + độ đồng thuận nếu có, chỉ báo `n` thực chấm) | Bảng đánh giá chất lượng `test` | Chưa làm |
-| 5. Tổng duyệt demo lần 1 theo `08` §6, rà lại 3 lỗi mức thấp/thẩm mỹ từ M10-D | Danh sách lỗi tổng duyệt | Chưa làm |
+| 1. `scripts/m11_sample_incidents.py`: lấy 30 incident `test` (`rca_final_test_v1`, `seed = 42`), xáo thứ tự sao cho 15 dòng đầu tự nó là mẫu ngẫu nhiên hợp lệ; xuất bảng chấm mù 3 tiêu chí theo `02` §4.4 + hướng dẫn chấm ≤ 1 trang (tách nhãn `root_cause` ra file riêng) | `eval/manual/diagnostic_quality.csv`, `.key.csv`, `README-diagnostic-quality.md` | **Đã làm (2026-11-19)** |
+| 2. Dừng báo người dùng chấm (tối thiểu 15 dòng đầu; song song làm việc 3) | Điểm người chấm (+ người thứ 2 trên 20% nếu có) | **Chờ người dùng chấm (`V50`)** |
+| 3. Phân tích ca sai trên `test` (chỉ mô tả, không đổi tham số): phân loại 64 FP còn lại & FN của CTAV (theo service, loại bằng chứng, có/không ngưỡng nền `dev`, verdict C1 gốc, độ lệch detector từ M8) và toàn bộ ca RCA sai kèm số đếm + `window_id` / `incident_id` | `scripts/m11_error_analysis.py` → `eval/results/m11_error_analysis_test_v1/`, `docs/drafts/ch7-phan-tich-ca-sai.md` | **Đã làm (2026-11-19)** |
+| 4. Tổng hợp kết quả chấm chất lượng báo cáo (CI bootstrap + độ đồng thuận nếu có, chỉ báo `n` thực chấm) | `scripts/m11_score_diagnostic_quality.py` (đã test logic; chờ CSV đã chấm) | **Đã có script; chờ CSV chấm (`V50`)** |
+| 5. Tổng duyệt demo lần 1 theo `08` §6, rà lại 3 lỗi mức thấp/thẩm mỹ từ M10-D | `docs/milestones/M11-danh-gia-nguoi.md` §1 (kèm kết quả rà `2af9480`, `538f8cc`) | **Đã làm (2026-11-19)** |
 
 **DoD M11** (`04` / `P5`): có `eval/manual/diagnostic_quality.csv` đã chấm (`n ≥ 15`), `docs/milestones/M11-danh-gia-nguoi.md` đủ 4 phần, và `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 mối đe doạ, §7.4 phân tích ca sai, và hạn chế cho §8.2.1, theo sườn cập nhật 2026-11-18). Hạn mục tiêu: `2027-01-17`.
 
@@ -90,10 +90,13 @@ Vùng file: `eval/manual/diagnostic_quality*`, `scripts/m11_*`, `docs/milestones
 
 ### Vấn đề cần chốt
 
-*(Xem vấn đề từ trước và bảng dưới; M11 dùng **V50..V52** nếu phát sinh mới.)*
+*(Xem vấn đề từ trước và bảng dưới; **V50–V52** phát sinh ở M11-A.)*
 
 | # | Vấn đề | Khuyến nghị | Chặn gì |
 |---|---|---|---|
+| **V50** | Chấm mù `eval/manual/diagnostic_quality.csv` (không mở `.key.csv` trước) | **(a)** tối thiểu 15 dòng đầu (`sample_no = 1..15`); **(b)** đủ 30 dòng; kèm người chấm 2 trên 20% đầu nếu có | **Chặn đóng M11** |
+| **V51** | Cách rút mẫu `30/38` incident bằng SRS không phân tầng (`seed = 42`) — agent tự quyết | **(a)** giữ nguyên (15 dòng đầu: `6 labelled / 7 no_fault / 2 ambiguous`, đủ 30: `15 / 13 / 2`) | Không |
+| **V52** | Chụp lại Hình 6.2–6.4 sau `538f8cc` (tổng duyệt demo lần 1) | Chụp ở tổng duyệt lần 2 (M12) | Không chặn M11 |
 | ~~V26~~ | Billing chưa đối chiếu | Đóng (QĐ-034): người dùng báo billing đã reset, số dư ≈ 1.000.000 đ | |
 | ~~V27~~ | Phạm vi chấm `test` | Người dùng chốt **toàn bộ candidate** 2026-11-14 (QĐ-034) | |
 | ~~V29~~ | Báo GVHD V28 (b), bỏ C2/C4, kết quả C5 | Người dùng đã gửi 2026-11-14 (QĐ-034) và chốt tự giải quyết phần GVHD (QĐ-037); không chặn | |
@@ -152,6 +155,18 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD
 5. Người dùng đặt spend cap ở AI Studio ≈ 40 USD làm chốt chặn cuối.
 
 ---
+
+## Ghi chú bàn giao — 2026-11-19 (M11-A xong, chờ người dùng chấm tay)
+
+**Trạng thái:** M11 vẫn **Đang làm** (chưa đóng mốc; chờ người dùng chấm mù **V50**). Đã hoàn tất 100% việc kỹ thuật 0 USD của M11 (`P5` việc 1, 3, 5 + script chấm điểm việc 4 + nháp Chương 7; **QĐ-050**). `0` lần gọi LLM, `0,0000` USD API.
+**Đã làm ở M11-A:**
+- `scripts/m11_sample_incidents.py`: rút mẫu SRS không hoàn lại (`seed = 42`, `30 / 38` incident `test` của `rca_final_test_v1`) → xuất `eval/manual/diagnostic_quality.csv` (30 dòng mù, 15 dòng đầu = SRS hợp lệ `6 labelled / 7 no_fault / 2 ambiguous`), `.key.csv` và `eval/manual/README-diagnostic-quality.md` (32 dòng).
+- `scripts/m11_score_diagnostic_quality.py`: sẵn sàng tính trung bình ± SD, CI 95% bootstrap, đối chiếu `.key.csv` và Cohen's $\kappa$ khi người dùng chấm xong.
+- `scripts/m11_error_analysis.py` → `eval/results/m11_error_analysis_test_v1/{error_analysis.json,tables.md}`: phân tích toàn bộ **64 FP** CTAV (`31` collateral trùng lỗi downstream + `33` dao động đuôi dài bình thường; 100% ở `frontend`/`ts-travel-service`, neo `span > dev_p90`), **332 FN** CTAV (`122` detector + `128` judge `FALSE_POSITIVE` + `82` C3 gồm `67` thiếu `dev`, `3` thiếu thao tác gồm 2 `WARN` > 1.000 ms, `12` span dưới `p90`), và toàn bộ ca RCA sai (`9/17` tập đăng ký + `29/50` không cảnh báo; `38/48` dòng độ nhạy gồm `33` thiếu cảnh báo gốc + `5` lỗi xếp hạng đa service).
+- Soạn `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 Bảng 7.2, §7.4 Bảng 7.3, §7.5 Kết chương, 6 hạn chế §8.2.1), bản nháp `docs/milestones/M11-danh-gia-nguoi.md` (gồm tổng duyệt demo lần 1 từ `2af9480`, `538f8cc` và 4 tồn đọng), thêm `tests/test_m11.py`.
+- Kiểm chứng: `py -m pytest tests/ -q` → `254 passed, 5 skipped` (5 test DB Docker bỏ qua do Docker tắt); `mypy` 43 file sạch; `ruff check` sạch trên code M11.
+**Việc đầu tiên phiên sau (M11-B):** Sau khi người dùng chấm xong `eval/manual/diagnostic_quality.csv` (`n ≥ 15`), chạy `scripts/m11_score_diagnostic_quality.py`, điền số vào `ch7-phan-tich-ca-sai.md` §7.4.4–§7.5, hoàn thiện `M11-danh-gia-nguoi.md`, ghi `QĐ-051` và đóng M11 sang **M12**.
+**Còn chờ người dùng:** Chấm mù `eval/manual/diagnostic_quality.csv` (**V50**, tối thiểu 15 dòng đầu, không mở `.key.csv`); xác nhận **V51** (SRS `seed = 42`); chấm **V35** (`context_precision_test_v1.csv`, `0 / 525`, hạn trước M12); chụp lại Hình 6.2–6.4 (**V52**, ở M12).
 
 ## Ghi chú bàn giao — 2026-11-17 (đóng M10, mở M11)
 
