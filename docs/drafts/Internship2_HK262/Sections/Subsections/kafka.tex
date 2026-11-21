@@ -1,0 +1,88 @@
+\subsection{Apache Kafka}
+\subsubsection{Apache Kafka là gì?}
+Apache Kafka là một nền tảng phân phối sự kiện phân tán mã nguồn mở được phát triển bởi Apache Software Foundation và được viết bằng Java và Scala.\\
+Kafka được dùng để xây dựng hệ thống xử lý dữ liệu thời gian thực, cho phép dữ liệu di chuyển giữa các hệ thống khác nhau một cách đáng tin cậy. Nó thu thập, lưu trữ và phân phối dữ liệu cho các ứng dụng, ví dụ như theo dõi hoạt động người dùng trên website. Kafka cũng có thể làm trình truyền tải thông điệp, kết nối và hỗ trợ giao tiếp giữa hai ứng dụng.\\
+Kafka cung cấp các chức năng chính cho người dùng:
+\begin{itemize}
+    \item Xuất bản và đăng ký các luồng bản ghi (record)
+    \item Lưu trữ hiệu quả các luồng bản ghi theo thứ tự tạo bản ghi
+    \item Xử lý các luồng bản ghi trong thời gian thực
+\end{itemize}
+\subsubsection{Các thành phần của Kafka}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/hkhang/KafkaArchitecture.png}
+    \vspace{5pt}
+    \caption{Kiến trúc Kafka}
+\end{figure}
+\begin{enumerate}
+    \item \textbf{Kafka Events}\\
+    Một Kafka event (sự kiện) còn được gọi là record (bản ghi) hoặc message (thông điệp).Việc sử dụng 3 thuật ngữ event, record và message mang nghĩa tương đương nhau.Hay chỉ đơn giản nó là đơn vị dữ liệu cơ bản trong Kafka, là một mảng byte không có định dạng cụ thể.
+
+Việc đọc và ghi dữ liệu trong Kafka thực hiện thông qua event. Mỗi event chứa một key (khoá), value (giá trị) và metadata (nếu có).
+\\
+\{\\
+key: "ID",\\
+value: "2433.544",\\
+timestamp: "Feb. 12, 2024, at 20:06 p.m."\\
+\}\\
+    \item \textbf{Kafka Topics}:\\
+    Các event được tổ chức và lưu trữ lâu dài trong các topics (chủ đề). Có thể coi một topic ví như một thư mục (folder) trong hệ thống tập tin (filesystem), còn mỗi event là một tập tin (file) nằm bên trong thư mục đó.
+
+Hình dưới cho thấy một topic có 4 partitions, với phần ghi được thêm vào cuối mỗi partition. Kafka cung cấp khả năng dự phòng (redundancy) và khả năng mở rộng (scalability) thông qua các partitions. Mỗi partition có thể được lưu trữ trên một máy chủ khác nhau, điều đó có nghĩa là một topic có thể được mở rộng theo chiều ngang trên nhiều máy chủ để cung cấp hiệu suất vượt xa khả năng của một máy chủ.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/hkhang/KafkaTopic.png}
+    \vspace{5pt}
+    \caption{Kafka Topic}
+\end{figure}
+
+\item \textbf{Kafka Brokers và Kafka Clusters}\\
+Kafka được chạy dưới dạng một \textbf{Kafka cluster} gồm một hoặc nhiều \textbf{Kafka server} có thể mở rộng trên nhiều data center hoặc cloud. Một Kafka server này tạo thành lớp lưu trữ, được gọi là\textbf{ Kafka broker}.
+
+\textbf{Brokers} chịu trách nhiệm quản lý bộ lưu trữ, xử lý các yêu cầu đọc và ghi cũng như sao chép dữ liệu trên toàn cluster (cụm).
+
+Trong mỗi \textbf{cluster} sẽ có một \textbf{broker} sẽ hoạt động như một \textbf{cluster controller} (bộ điều khiển cụm), chịu trách nhiệm chỉ định phân vùng cho brokers và theo dõi lỗi của brokers.
+
+\item \textbf{ Kafka Partitions và Kafka Replication}\\
+Các \textbf{topic} được chia thành các \textbf{partitions} (phân vùng), là \textbf{đơn vị cơ bản} của tính song song và phân phối trong Kafka. Mỗi phân vùng được lưu trữ trên \textbf{một broker duy nhất} và nhiều phân vùng cho phép mở rộng quy mô theo chiều ngang và cải thiện hiệu suất.
+
+Mỗi event trong một partition được gán một \textbf{offset} duy nhất, bắt đầu từ 0 cho event đầu tiên trong partition và tăng dần một cho mỗi event tiếp theo. \textbf{Offset} được sử dụng để xác định vị trí của event trong một partition.
+
+Kafka đảm bảo độ bền của dữ liệu bằng cách \textbf{sao chép dữ liệu} (replication) trên nhiều brokers. Mỗi partition có thể có một hoặc nhiều \textbf{replica (bản sao)} trên các brokers khác nhau, ngăn ngừa mất dữ liệu trong trường hợp broker lỗi.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/hkhang/kafkacluster.png}
+    \vspace{5pt}
+    \caption{Kafka Cluster}
+\end{figure}
+Mỗi partition có một broker được chỉ định làm \textbf{leader}, nắm quyền sở hữu partition đó, trong khi các \textbf{brokers} còn lại lưu trữ các \textbf{replicas} (bản sao) của phân vùng đó được gọi là \textbf{followers}.
+
+Nếu \textbf{leader broker} xảy ra lỗi, một trong những followers có dữ liệu cập nhật sẽ được chọn làm leader mới. Quá trình này được gọi là \textbf{leader failover} (chuyển đổi dự phòng lãnh đạo), nhằm đảm bảo tính khả dụng của dữ liệu.
+
+\item  \textbf{Kafka Producers}\\
+\textbf{Kafka Producer} là một client appication (ứng dụng khách), \textbf{publish} (xuất bản) event vào một topic cụ thể trong Kafka và luôn ghi vào \textbf{leader broker}. Theo mặc định, producers không quan tâm tới event được ghi ở partition nào mà sẽ publish đều event trên tất cả partition của một topic. Trong vài trường hợp, một producer sẽ gửi trực tiếp event tới các partition cụ thể.
+
+\textbf{Producers} kết nối tới \textbf{Kafka Brokers} thông qua giao thức mạng TCP. Đây là kết nối hai chiều (bi-directional connection).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/hkhang/KafkaProducer.png}
+    \vspace{5pt}
+    \caption{Kafka Producer}
+\end{figure}
+Quá trình gửi event như sau :
+\begin{enumerate}
+    \item Tạo produceRecord
+    \item Serializer: Trước khi gửi ProducerRecord qua network, producer sẽ serialize (tuần tự hoá) key và value thành ByteArrays (mảng các bytes).
+    \item Xác định số Partitions: Nếu chúng ta chỉ định sẵn partition thì partitioner sẽ trả về partition được chỉ định, còn không thì partitioner sẽ chọn một partition dựa vào ProducerRecord key.
+    \item  Brokers xử lý events và trả về kết quả cho producers Khi biết event cần được gửi tới topic và partition nào, producer sẽ thêm event vào một lô các bản ghi (a batch of records). Từ đó, chúng sẽ được gửi đi cùng topic và partition. Một thread độc lập chịu trách nhiệm gửi các lô bản ghi tới Kafka brokers phù hợp.
+
+    Broker sẽ gửi lại một response khi nhận được events. Nếu event được ghi thành công vào Kafka, broker sẽ gửi lại một object chứa RecordMetadata bao gồm topic, partition và offset của record bên trong partition. Còn nếu không thành công thì broker trả về lỗi. Khi producer nhận được lỗi, event sẽ được gửi lại (retry) vài lần trước khi bỏ cuộc và trả về lỗi.
+\end{enumerate}
+    \item \textbf{Kafka Consumers}: 
+    \textbf{Kafka consumer} là một \textbf{client application} (ứng dụng khách), subscribe (đăng ký) một hoặc nhiều Kafka topics và đọc các bản ghi theo thứ tự chúng được tạo ra. Consumers đọc dữ liệu theo thời gian thực hoặc theo tốc độ của riêng chúng, cho phép các ứng dụng phản ứng với các sự kiện khi chúng xảy ra.
+
+Consumers kết nối tới Kafka Brokers thông qua giao thức mạng TCP. Đây là kết nối hai chiều (bi-directional connection).
+
+Consumers hoạt động trong một consumer group, làm việc cùng nhau để xử lý dữ liệu từ các partitions, cung cấp khả năng mở rộng theo chiều ngang và cho phép nhiều phiên bản của cùng một ứng dụng xử lý dữ liệu đồng thời.
+\end{enumerate}

@@ -1,0 +1,64 @@
+\section{Tổng kết}
+\noindent \textit{Trong chương này, nhóm tác giả sẽ tổng kết quá trình thực hiện đề tài. Từ đó, đánh giá được đóng góp của hệ thống, kết quả đạt được và hạn chế tồn tại, cũng như xây dựng được hướng phát triển cho hệ thống.}
+\subsection{Kết quả đạt được}
+\noindent Trong quá trình thực hiện đồ án, nhóm đã đạt được những kết quả bao gồm:
+\begin{itemize}[label=--]
+    \item Tìm hiểu về các kiến thức liên quan đến lĩnh vực giám sát và quản lý tài sản công nghệ thông tin.
+    \item Xây dựng hệ thống giám sát tài sản IT theo thời gian thực và hỗ trợ các tính năng quản lý tài sản: Hệ thống cung cấp khả năng theo dõi hoạt động của các máy tính và tài sản IT trong mạng doanh nghiệp một cách liên tục và chính xác, cũng như khả năng quản lý tài sản IT của doanh nghiệp.
+    \item Tích hợp công nghệ thu thập dữ liệu real-time cụ thể là Apache Kafka truyền thống và Kafka trên Confluent Cloud vào dự án.
+    \item Phát triển tính năng cảnh báo sớm với mô hình dự đoán hiệu suất tài sản sử dụng mạng LSTM.
+    \item Thực hiện kiểm thử, đánh giá hệ thống để kiểm tra khả năng triển khai trong thực tế.
+    \item Tìm hiểu và thực hiện đóng gói và triển khai hệ thống trong nội bộ công ty, tổ chức.
+\end{itemize}
+\subsection{Những đóng góp của hệ thống}
+
+\noindent Trong quá trình thực hiện đồ án, hệ thống quản lý tài sản CNTT thời gian thực đã mang lại một số đóng góp quan trọng cả về mặt học thuật lẫn thực tiễn, cụ thể như sau:
+
+\begin{itemize}[label=--]
+    \item \textbf{Đóng góp về kiến thức:} Nhóm đã nghiên cứu và hệ thống hóa các kiến thức liên quan đến lĩnh vực giám sát và quản lý tài sản công nghệ thông tin, bao gồm các nguyên lý giám sát tài sản, quản lý vòng đời, đánh giá hiệu năng và ứng dụng công nghệ thời gian thực.
+    
+    \item \textbf{Xây dựng hệ thống giám sát tài sản IT theo thời gian thực:} Hệ thống cho phép theo dõi hoạt động của các thiết bị IT trong doanh nghiệp một cách liên tục và chính xác. Qua đó hỗ trợ công tác quản lý tài sản hiệu quả hơn, giảm thiểu rủi ro từ việc thiếu thông tin hoặc quản lý rời rạc.
+
+    \item \textbf{Tích hợp công nghệ thu thập dữ liệu real-time:} Hệ thống ứng dụng Apache Kafka truyền thống và Kafka trên nền tảng Confluent Cloud để thu thập dữ liệu hiệu suất từ các máy tính trong mạng nội bộ theo thời gian thực, đảm bảo tính mở rộng, ổn định và khả năng xử lý dữ liệu lớn. Với Kafka Confluent Cloud, hệ thống giờ đây có khả năng thu thập dữ liệu từ xa, bất kể vị trí địa lý, chỉ cần thiết bị có kết nối với Internet thì sẽ được quản lý và giám sát.
+
+    \item \textbf{Ứng dụng trí tuệ nhân tạo trong quản lý tài sản:} Việc phát triển mô hình LSTM nhằm dự đoán hiệu suất sử dụng CPU và RAM của các thiết bị giúp hệ thống đưa ra cảnh báo sớm về các nguy cơ quá tải hoặc suy giảm hiệu năng. Đây là bước tiến quan trọng trong việc áp dụng AI vào công tác vận hành hạ tầng IT.
+
+    \item \textbf{Kiểm thử và đánh giá toàn diện:} Hệ thống được kiểm thử qua nhiều kịch bản khác nhau, kiểm tra khả năng xử lý dữ liệu, phản hồi API, tính chính xác của mô hình dự đoán và độ ổn định khi triển khai trong môi trường thực tế.
+
+    \item \textbf{Khả năng triển khai thực tế:} Dự án không chỉ dừng lại ở mức mô phỏng mà còn được nhóm đóng gói và triển khai thử nghiệm nội bộ, đảm bảo khả năng áp dụng thực tế trong các doanh nghiệp, tổ chức có nhu cầu giám sát và quản lý tài sản IT.
+
+\end{itemize}
+
+\noindent Tóm lại, hệ thống là một giải pháp tiềm năng cho các doanh nghiệp trong việc hiện đại hóa công tác giám sát và quản lý tài sản CNTT, kết hợp hiệu quả giữa công nghệ thời gian thực và trí tuệ nhân tạo.
+
+\subsection{Hạn chế và tồn tại của hệ thống}
+
+\noindent Bên cạnh những kết quả đã đạt được, hệ thống vẫn còn tồn tại một số hạn chế nhất định, cụ thể như sau:
+
+\begin{itemize}[label=--]
+    \item \textbf{Chưa tối ưu hoá mô hình dự đoán:} Mô hình LSTM hiện tại được huấn luyện dựa trên tập dữ liệu tổng hợp chung cho tất cả các máy tính. Điều này có thể ảnh hưởng đến độ chính xác khi áp dụng cho từng thiết bị cụ thể với đặc điểm sử dụng khác nhau. Ngoài ra, việc tối ưu hyperparameter chưa được thực hiện đầy đủ do hạn chế thời gian. Ngoài ra do việc thu thập dữ liệu hiệu suất vẫn còn phức tạp nên dẫn đến chưa đủ dữ liệu.
+    \item \textbf{Chưa hỗ trợ nhiều loại tài sản ngoài máy tính:} Phiên bản hiện tại của hệ thống chủ yếu áp dụng cho máy tính để bàn và laptop, chưa mở rộng đến các thiết bị khác như máy chủ, thiết bị mạng hoặc IoT. Ngoài ra công cụ thu thập dữ liệu hiện tại vẫn chỉ hỗ trợ cho hệ điều hành Window.
+    \item \textbf{Thiếu các cơ chế bảo mật nâng cao:} Các cơ chế mã hóa dữ liệu truyền tải chưa được triển khai đầy đủ, gây hạn chế khi triển khai trong môi trường doanh nghiệp thực tế có yêu cầu bảo mật cao.
+    \item \textbf{Hiệu năng hệ thống có thể bị ảnh hưởng khi mở rộng quy mô lớn:} Khi số lượng thiết bị gửi dữ liệu đồng thời tăng cao, cần đánh giá thêm khả năng chịu tải của hệ thống khi mở rộng quy mô trên 1000 máy, hiện chưa được thử nghiệm ở quy mô lớn.
+\end{itemize}
+\noindent Các vấn đề trên là những điểm mà nhóm sẽ tiếp tục cải thiện trong các giai đoạn phát triển tiếp theo nhằm hoàn thiện hệ thống và đáp ứng tốt hơn nhu cầu triển khai thực tế.
+
+\subsection{Hướng phát triển trong tương lai}
+\begin{itemize}[label=--]
+\item \textbf{Tối ưu hoá mô hình dự đoán:} Trong giai đoạn tiếp theo, nhóm dự định huấn luyện mô hình LSTM riêng biệt cho từng nhóm thiết bị hoặc người dùng cụ thể để nâng cao độ chính xác. Đồng thời, sẽ thực hiện tối ưu các siêu tham số (hyperparameters) và mở rộng tập dữ liệu bằng cách cải tiến công cụ thu thập hiệu suất.
+   \item \textbf{Mở rộng phạm vi thu thập dữ liệu:} Hệ thống hiện tại chỉ áp dụng cho máy tính để bàn và laptop sử dụng hệ điều hành Windows. Trong tương lai, nhóm sẽ mở rộng phạm vi hỗ trợ sang các nền tảng khác như Linux và macOS, cũng như các thiết bị như máy chủ, thiết bị mạng, IoT.
+
+\item \textbf{Cải tiến hiệu năng và khả năng mở rộng:} Nhóm sẽ tiến hành thử nghiệm hệ thống ở quy mô lớn hơn (trên 1000 thiết bị), đồng thời cải thiện kiến trúc hạ tầng và tối ưu luồng xử lý Kafka để tăng khả năng chịu tải. Bên cạnh đó, hệ thống sẽ được nâng cấp để hỗ trợ quản lý và giám sát tài sản IT ở mọi vị trí địa lý—chỉ cần thiết bị có kết nối Internet, dữ liệu vẫn sẽ được thu thập và xử lý tập trung theo thời gian thực, đảm bảo khả năng giám sát từ xa toàn diện và không bị giới hạn bởi không gian địa lý.
+
+\item \textbf{Tăng cường bảo mật:} Hệ thống sẽ được bổ sung các cơ chế bảo mật nâng cao như mã hóa dữ liệu đầu cuối (end-to-end encryption), xác thực đa yếu tố (MFA), kiểm soát truy cập chi tiết (RBAC) nhằm đáp ứng các yêu cầu khắt khe trong môi trường doanh nghiệp.
+
+\item \textbf{Phát triển giao diện người dùng hiện đại và đa nền tảng:} Hướng tới việc nâng cấp UI/UX, nhóm sẽ thiết kế lại giao diện theo hướng hiện đại, thân thiện và có khả năng đáp ứng tốt trên các thiết bị di động và màn hình cảm ứng.
+
+\item \textbf{Tích hợp phân tích dữ liệu nâng cao:} Bổ sung các module AI/ML để khai thác dữ liệu lịch sử và đưa ra dự đoán sâu hơn như tuổi thọ còn lại của thiết bị, khả năng hỏng hóc hoặc đề xuất thời điểm bảo trì tối ưu.
+
+\item \textbf{Đa ngôn ngữ và khả năng triển khai quốc tế:} Nhóm sẽ triển khai hỗ trợ đa ngôn ngữ, đặc biệt là Tiếng Anh, nhằm phục vụ tốt hơn cho các tổ chức hoặc doanh nghiệp hoạt động trong môi trường quốc tế.
+
+\item \textbf{Khảo sát người dùng và cải tiến dựa trên phản hồi thực tế:} Trong các giai đoạn tiếp theo, nhóm sẽ triển khai khảo sát người dùng trên diện rộng và tích hợp công cụ theo dõi hành vi người dùng nhằm thu thập dữ liệu về trải nghiệm thực tế, từ đó điều chỉnh và cải tiến hệ thống một cách hiệu quả và sát với nhu cầu sử dụng.
+
+\end{itemize}
+

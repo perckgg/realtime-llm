@@ -1,0 +1,100 @@
+\section{Triển khai hệ thống}
+\subsection{Đóng gói với Docker}
+\noindent Để đảm bảo khả năng triển khai đồng nhất và dễ dàng quản lý các dịch vụ trong dự án, toàn bộ hệ thống được đóng gói và triển khai thông qua \textbf{Docker}. Hệ thống bao gồm 4 thành phần chính: Frontend (Next.js), Backend (ASP.NET Core), Database (SQL Server), và AI Server (FastAPI - Python).
+
+\begin{enumerate}
+    \item \textbf{Sử dụng Dockerfile cho từng thành phần:}
+    
+    \textbf{Frontend (Next.js):}
+    \begin{itemize}[label=--]
+        \item Sử dụng multi-stage Dockerfile: giai đoạn đầu để build source bằng \texttt{npm run build}, giai đoạn hai để chạy ứng dụng bằng \texttt{npm run start}.
+        \item Dùng image \texttt{node:18-alpine} để đảm bảo kích thước image nhỏ và hiệu năng cao.
+    \end{itemize}
+    
+    \textbf{Backend (ASP.NET Core):}
+    \begin{itemize}[label=--]
+        \item Sử dụng multi-stage Dockerfile: giai đoạn đầu dùng \texttt{mcr.microsoft.com/dotnet/sdk:8.0} để build và publish; giai đoạn thứ hai dùng runtime \texttt{aspnet:8.0}.
+        \item Tích hợp chứng chỉ số \texttt{.pfx} vào container để hỗ trợ HTTPS (port 443).
+    \end{itemize}
+    
+    \textbf{AI Server (FastAPI - Python):}
+    \begin{itemize}[label=--]
+        \item Dùng image \texttt{python:3.12-slim}, tối ưu cài đặt bằng cách thêm tuỳ chọn \texttt{--no-cache-dir} khi cài dependencies.
+        \item Chạy server bằng \texttt{uvicorn} tại cổng 8000.
+    \end{itemize}
+    
+    \item \textbf{Quản lý container bằng Docker Compose:}
+    
+    Hệ thống được điều phối tập trung bằng một file \texttt{docker-compose.yml}, bao gồm 4 dịch vụ chính:
+
+    \begin{itemize}[label=--]
+        \item \textbf{sqlserver:} Dùng image SQL Server 2022, gắn volume \texttt{sqlserver-data} để lưu trữ dữ liệu bền vững. Cổng mặc định ánh xạ ra ngoài là 1434.
+        
+        \item \textbf{backend:} Build từ thư mục \texttt{./Backend}, cấu hình biến môi trường để:
+        \begin{itemize}[label=\textbullet]
+            \item Kết nối nội bộ với SQL Server qua Docker network.
+            \item Sử dụng HTTPS với chứng chỉ số được mount vào container.
+            \item Giao tiếp qua cổng 8080 (HTTP) và 443 (HTTPS).
+        \end{itemize}
+        
+        \item \textbf{frontend:} Build từ thư mục \texttt{./Frontend}, chạy trên cổng 3000. Biến môi trường \texttt{NEXT\_PUBLIC\_BACKEND\_URL} được cấu hình để frontend có thể gọi API từ backend.
+        
+        \item \textbf{fastapi-predictor (AI Server):} Build từ thư mục chứa mã nguồn AI. Dịch vụ này:
+        \begin{itemize}[label=\textbullet]
+            \item Chạy trên cổng 8000 bằng \texttt{Uvicorn}.
+            \item Mount thư mục \texttt{./model} vào container để sử dụng mô hình dự đoán.
+            \item Cấu hình chính sách \texttt{restart: unless-stopped} để đảm bảo độ sẵn sàng.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Triển khai và cài đặt}
+\noindent Hệ thống sử dụng trong nội bộ doanh nghiệp, vì thế sẽ được triển khai trong mạng nội bộ. Đầu tiên chúng ta cần đảm bảo có sẵn một máy chủ nội bộ (server) đã được cài đặt môi trường Docker và Docker Compose. Ngoài ra, cần kết nối internet để pull các image cần thiết.
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Khởi tạo cơ sở dữ liệu của hệ thống bằng cách chạy container SQL Server trước tiên:}
+    
+    Trước hết, cần chạy container SQL Server để khởi tạo cơ sở dữ liệu. Cơ sở dữ liệu sẽ được tự động tạo cùng với các bảng cần thiết dựa trên các tệp migration đã được chuẩn bị sẵn trong hệ thống.
+
+    \item \textbf{Chạy container backend:}
+
+    Sau khi cơ sở dữ liệu đã được khởi tạo thành công, tiếp theo là chạy container chứa ứng dụng backend. Ứng dụng backend sẽ đảm nhận vai trò cung cấp API và kết nối trực tiếp đến cơ sở dữ liệu để xử lý các yêu cầu từ người dùng và các dịch vụ khác.
+
+    \item \textbf{Chạy container AI server và frontend:}
+
+    Sau khi backend đã được triển khai ổn định, tiếp tục chạy các container cho AI server và frontend. 
+    \begin{itemize}[label=--]
+        \item \textbf{AI server} xử lý các tác vụ liên quan đến phân tích, dự đoán hoặc tự động hoá dựa trên dữ liệu thu thập được.
+        \item \textbf{Frontend} là giao diện người dùng, cho phép quản trị viên hoặc nhân viên truy cập vào hệ thống, theo dõi trạng thái, xem báo cáo và thao tác với dữ liệu.
+    \end{itemize}
+
+    \item \textbf{Cài đặt ứng dụng Collector trên tất cả các máy tính cần giám sát và quản lý:} (các bước thực hiện xem chi tiết ở phụ lục)
+
+    Các Collector là các ứng dụng nhẹ được cài đặt trên tất cả các máy tính trong hệ thống nội bộ cần theo dõi. Các Collector này sẽ:
+    \begin{itemize}[label=--]
+        \item Thu thập thông tin phần cứng (CPU, RAM, ổ cứng, v.v.).
+        \item Thu thập thông tin phần mềm đã được cài đặt.
+        \item Theo dõi hiệu suất hệ thống (mức sử dụng CPU, RAM, dung lượng ổ đĩa...).
+        \item Gửi dữ liệu theo thời gian thực hoặc định kỳ về server để lưu trữ và phân tích.
+    \end{itemize}
+
+    \item \textbf{Cấu hình hệ thống giám sát và cảnh báo:}
+
+    Sau khi hệ thống đã hoạt động ổn định, cần thiết lập các quy tắc cảnh báo để phát hiện các bất thường, ví dụ:
+    \begin{itemize}[label=--]
+        \item Cảnh báo khi máy tính sử dụng quá 90\% CPU trong thời gian dài.
+        \item Gửi email hoặc thông báo cho quản trị viên khi có sự cố xảy ra.
+    \end{itemize}
+
+    \item \textbf{Kiểm tra và đánh giá hệ thống:}
+
+    Sau khi triển khai xong, cần tiến hành kiểm tra toàn bộ các chức năng của hệ thống để đảm bảo hoạt động ổn định và đúng yêu cầu. Có thể thực hiện một số bài test như:
+    \begin{itemize}[label=--]
+        \item Kiểm tra dữ liệu từ Collector có được gửi đầy đủ và chính xác.
+        \item Đảm bảo frontend hiển thị đúng thông tin và API phản hồi nhanh.
+        \item Kiểm tra khả năng mở rộng và hiệu suất của hệ thống khi có nhiều máy kết nối đồng thời.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Kết chương}
+\noindent Trong chương này, nhóm đã trình bày chi tiết quá trình đóng gói và triển khai hệ thống giám sát, quản lý tài sản công nghệ thông tin nội bộ thông qua công nghệ Docker. Việc sử dụng Docker và Docker Compose không chỉ giúp chuẩn hóa môi trường triển khai, mà còn đảm bảo tính linh hoạt, dễ dàng mở rộng và bảo trì hệ thống. \\ \\
+Thông qua việc cấu hình và vận hành các dịch vụ thành phần như Frontend, Backend, AI Server và Database, hệ thống có thể hoạt động ổn định trong môi trường mạng nội bộ doanh nghiệp. Bên cạnh đó, việc triển khai các Collector trên từng máy trạm và thiết lập cơ chế giám sát, cảnh báo theo thời gian thực đã góp phần nâng cao hiệu quả quản lý, kịp thời phát hiện các bất thường trong hệ thống. Sau cùng, cần phải có các bước kiểm tra đánh giá nhằm đảm bảo hệ thống sẵn sàng cho hoạt động thực tế.

@@ -1,0 +1,47 @@
+\contentsline {table}{\numberline {1}{\ignorespaces Ba loại tín hiệu quan sát trên Nezha và vai trò của chúng trong đề tài.}}{16}{table.caption.4}%
+\contentsline {table}{\numberline {2}{\ignorespaces Lược đồ đầu ra JSON của judge.}}{23}{table.caption.6}%
+\contentsline {table}{\numberline {3}{\ignorespaces Chỉ số đánh giá phân loại cảnh báo.}}{28}{table.caption.8}%
+\contentsline {table}{\numberline {4}{\ignorespaces Công nghệ nền tảng: vai trò trong hệ và lý do chọn.}}{30}{table.caption.9}%
+\contentsline {table}{\numberline {5}{\ignorespaces Khái niệm và công nghệ của Chương~2, thành phần sử dụng, mục ở Chương~4--6 và giả thuyết kiểm.}}{32}{table.caption.10}%
+\contentsline {table}{\numberline {6}{\ignorespaces So sánh công trình liên quan, hệ thống hiện có và đề xuất}}{42}{table.caption.11}%
+\contentsline {table}{\numberline {7}{\ignorespaces Bốn giao diện (\texttt {Protocol}) lõi và ánh xạ sang các mô-đun hiện thực.}}{46}{table.caption.13}%
+\contentsline {table}{\numberline {8}{\ignorespaces Bảng ký hiệu toán học dùng trong phát biểu bài toán và thiết kế thuật toán.}}{48}{table.caption.14}%
+\contentsline {table}{\numberline {9}{\ignorespaces Tham số cấu hình của bộ phát hiện Isolation Forest và cổng Rescue (C5).}}{51}{table.caption.15}%
+\contentsline {table}{\numberline {10}{\ignorespaces Vai trò hiện tại của từng thành phần trong không gian thiết kế CTAV{} và cổng cứu cảnh báo.}}{52}{table.caption.17}%
+\contentsline {table}{\numberline {11}{\ignorespaces So sánh ba chiến lược triển khai giao diện \texttt {RetrievalStrategy} trong hệ thống.}}{53}{table.caption.18}%
+\contentsline {table}{\numberline {12}{\ignorespaces Tham số cấu hình của chiến lược truy xuất nhận biết topology C1.}}{55}{table.caption.20}%
+\contentsline {table}{\numberline {13}{\ignorespaces Tổng hợp các điều kiện hạ bậc của chính sách quyết định và so sánh hai nguồn ngưỡng nền cho C3.}}{57}{table.caption.22}%
+\contentsline {table}{\numberline {14}{\ignorespaces Cấu hình bộ thẩm định LLM, chính sách lỗi và cơ chế khóa cache.}}{59}{table.caption.23}%
+\contentsline {table}{\numberline {15}{\ignorespaces Lược đồ đầu ra \texttt {DiagnosticReport} và năm quy tắc kiểm duyệt tự động.}}{62}{table.caption.25}%
+\contentsline {table}{\numberline {16}{\ignorespaces Các thành phần hiện thực hóa chính, lệnh vận hành và bộ tệp đầu ra bảo đảm tái lập.}}{64}{table.caption.26}%
+\contentsline {table}{\numberline {17}{\ignorespaces Giả thuyết H0--H5 và tiêu chí chấp nhận đã đăng ký}}{66}{table.caption.27}%
+\contentsline {table}{\numberline {18}{\ignorespaces Kích thước các split và tỷ lệ cửa sổ có telemetry trên Nezha}}{67}{table.caption.29}%
+\contentsline {table}{\numberline {19}{\ignorespaces Độ phủ bằng chứng giữa cửa sổ lỗi và cửa sổ bình thường}}{67}{table.caption.30}%
+\contentsline {table}{\numberline {20}{\ignorespaces Tổng hợp chi phí gọi API LLM theo các hạng mục thực nghiệm}}{68}{table.caption.31}%
+\contentsline {table}{\numberline {21}{\ignorespaces Kết quả kiểm chứng pipeline cơ sở G-port theo từng tầng}}{70}{table.caption.33}%
+\contentsline {table}{\numberline {22}{\ignorespaces Kết quả kiểm chứng hồi quy G-paper trên tập đối chiếu}}{70}{table.caption.34}%
+\contentsline {table}{\numberline {23}{\ignorespaces So sánh các phương pháp nền trên tập val}}{71}{table.caption.35}%
+\contentsline {table}{\numberline {24}{\ignorespaces Hiệu ghép cặp và kiểm định McNemar cho H0 trên tập val}}{71}{table.caption.36}%
+\contentsline {table}{\numberline {25}{\ignorespaces Kết quả quét hạn ngạch k\_graph trên tập val}}{72}{table.caption.37}%
+\contentsline {table}{\numberline {26}{\ignorespaces Tỷ lệ TRUE\_ALERT thô theo điều kiện can thiệp H1 trên tập val}}{72}{table.caption.39}%
+\contentsline {table}{\numberline {27}{\ignorespaces So sánh các biến thể H3 quanh CTAV trên tập val}}{74}{table.caption.40}%
+\contentsline {table}{\numberline {28}{\ignorespaces Kết quả cổng cứu cảnh báo C5 trên tập val}}{74}{table.caption.41}%
+\contentsline {table}{\numberline {29}{\ignorespaces Danh sách các lượt chạy kiểm định trên tập test}}{75}{table.caption.42}%
+\contentsline {table}{\numberline {30}{\ignorespaces So sánh hành vi bộ phát hiện đã đóng băng trên ba split}}{76}{table.caption.44}%
+\contentsline {table}{\numberline {31}{\ignorespaces So sánh tổng quan năm phương pháp trên test cạnh val}}{76}{table.caption.46}%
+\contentsline {table}{\numberline {32}{\ignorespaces Kiểm định giả thuyết H0 trên tập test}}{77}{table.caption.47}%
+\contentsline {table}{\numberline {33}{\ignorespaces Kiểm định giả thuyết chính H2 trên tập test}}{78}{table.caption.49}%
+\contentsline {table}{\numberline {34}{\ignorespaces Kiểm định giả thuyết H3 trên tập test}}{79}{table.caption.50}%
+\contentsline {table}{\numberline {35}{\ignorespaces Kiểm định giả thuyết H4 ở ngân sách 120 lần gọi trên test}}{79}{table.caption.51}%
+\contentsline {table}{\numberline {36}{\ignorespaces Tổng hợp kết luận kiểm định H0--H5 trên test và val}}{80}{table.caption.52}%
+\contentsline {table}{\numberline {37}{\ignorespaces Bảng ablation thành phần quanh CTAV trên test cạnh val}}{82}{table.caption.54}%
+\contentsline {table}{\numberline {38}{\ignorespaces Phân tách C1 và CTAV theo độ phủ ngưỡng nền dev của service}}{82}{table.caption.56}%
+\contentsline {table}{\numberline {39}{\ignorespaces Giá trị F1 theo ngân sách lần gọi LLM trên test}}{83}{table.caption.58}%
+\contentsline {table}{\numberline {40}{\ignorespaces So sánh CTAV và CTAV + C5 một điểm trên val và test}}{84}{table.caption.59}%
+\contentsline {table}{\numberline {41}{\ignorespaces Độ ổn định phán quyết của judge qua ba lần gọi độc lập}}{84}{table.caption.60}%
+\contentsline {table}{\numberline {42}{\ignorespaces Khung bảng đánh giá context precision chấm tay trên mẫu 50 cửa sổ test}}{85}{table.caption.61}%
+\contentsline {table}{\numberline {43}{\ignorespaces Kiểm định giả thuyết H5 trên tập test theo bản đăng ký}}{86}{table.caption.62}%
+\contentsline {table}{\numberline {44}{\ignorespaces So sánh tác tử RCA trên val, test đăng ký và dòng độ nhạy}}{86}{table.caption.63}%
+\contentsline {table}{\numberline {45}{\ignorespaces Phân rã kết quả định vị RCA theo loại lỗi trên tập test}}{86}{table.caption.64}%
+\contentsline {table}{\numberline {46}{\ignorespaces Tổng hợp 12 phát hiện thực nghiệm và vai trò trong đề tài}}{88}{table.caption.65}%
+\contentsfinish 

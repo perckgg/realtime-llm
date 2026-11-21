@@ -1,0 +1,580 @@
+\documentclass[a4paper,table]{article}
+\usepackage{vntex}
+\usepackage{float}
+\usepackage{tcolorbox}
+%\usepackage[english,vietnam]{babel}
+\usepackage[utf8]{inputenc}
+%\usepackage[utf8]{inputenc}
+%\usepackage[francais]{babel}
+\usepackage{tabularray}
+\usepackage{a4wide,amssymb,epsfig,latexsym,array,hhline,fancyhdr}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric}
+\usepackage{tcolorbox}
+\usepackage[normalem]{ulem}
+%\usepackage{soul}
+\usepackage[makeroom]{cancel}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{multicol,longtable,amscd}
+\usepackage{diagbox}%Make diagonal lines in tables
+\usepackage{booktabs}
+\usepackage{alltt}
+\usepackage[framemethod=tikz]{mdframed}% For highlighting paragraph backgrounds
+\usepackage{caption,subcaption}
+\usepackage{lastpage}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{graphicx}% Standard graphics package
+\usepackage{placeins}
+\usepackage{array}
+\usepackage{tabularx, caption}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{rotating}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{epsfig}
+\usepackage{tikz}
+\usepackage{xcolor}
+%\usepackage{minitoc}
+\usepackage{cite}%Tai lieu tham khao
+\usepackage{indentfirst}%Lui dau dong
+\usepackage{listings}
+\usepackage{pdfpages}
+\usepackage{tabularx}
+
+\usepackage[]{titlesec}
+\titleformat{\section}
+  {\normalfont\large\bfseries}{\thesection}{1em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\large\bfseries}{\thesubsubsection}{1em}{}
+\usepackage{titletoc}
+\usepackage{enumerate}
+\usepackage{lastpage}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{tabularx, caption}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor,colortbl}
+\usepackage{minted} 
+\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
+\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{afterpage}
+\usepackage{xurl}
+
+\def\thepart{\Roman{part}}
+\titleformat{\part}[display]
+{\bfseries\Large}
+{\filright TASK \Huge\thepart}
+{4ex}
+{\titlerule
+\vspace{2ex}%
+\filleft}
+[\vspace{2ex}%
+\titlerule]
+
+\lstdefinestyle{stylist}{
+    % language= Python,
+    aboveskip=3mm,
+    belowskip=3mm,
+    columns=flexible,
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    otherkeywords = {!,!=,~,\$,*,\&,\%/\%,\%*\%,\%\%, \%in\%,<-,<<-,/},
+    alsoletter={.,_}
+}
+\lstset{style=stylist}
+\usepackage{color} % tô màu cho code
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{black}{rgb}{0,0,0}
+\usetikzlibrary{arrows,snakes,backgrounds}
+\usetikzlibrary{calc} 
+\usepackage[normalem]{ulem}
+\usepackage[bottom]{footmisc}%footnote ở cuối trang
+\usepackage{amsfonts}
+\graphicspath{ {figures/} }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{theorem}{{\bf Định lý}}
+\newtheorem{property}{{\bf Tính chất}}
+\newtheorem{proposition}{{\bf Mệnh đề}}
+\newtheorem{corollary}[proposition]{{\bf Hệ quả}}
+\newtheorem{lemma}[proposition]{{\bf Bổ đề}}
+\theoremstyle{definition}
+\newtheorem{exer}{Bài toán}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\thesislayout{	% A4: 210 × 297
+	\geometry{
+		a4paper,
+		total={160mm,240mm},  % fix over page
+		left=30mm,
+		top=30mm,
+            bottom=20mm,
+	}
+}
+\thesislayout
+
+
+
+%\usepackage{fancyhdr}
+\setlength{\headheight}{40pt}
+\pagestyle{fancy}
+\fancyhead{} % clear all header fields
+\fancyhead[L]
+{
+ \begin{tabular}{rl}
+    \begin{picture}(25,15)(0,0)
+    \put(0,-8){\includegraphics[width=8mm,height=8mm]{Images/hcmut.png}}
+    %\put(0,-8){\epsfig{width=10mm,figure=hcmut.eps}}
+   \end{picture}&
+	\begin{tabular}{l}
+		\textbf{\bf \ttfamily Trường Đại Học Bách Khoa TP.Hồ Chí Minh}\\
+		\textbf{\bf \ttfamily Khoa Khoa học và Kỹ thuật Máy tính}
+	\end{tabular} 	
+ \end{tabular}
+}
+\fancyhead[R]{
+	\begin{tabular}{l}
+		\tiny \bf \\
+		\tiny \bf 
+	\end{tabular}  }
+\fancyfoot{} % clear all footer fields
+\fancyfoot[L]{\scriptsize \ttfamily Báo cáo Thực tập 2 - Năm học 2025 - 2026 - Học kỳ 262}
+\fancyfoot[R]{\scriptsize \ttfamily Trang {\thepage}/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\makeatletter
+\newcounter {subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection .\@alph\c@subsubsubsection}
+\newcommand\subsubsubsection{\@startsection{subsubsubsection}{4}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\newcommand*\l@subsubsubsection{\@dottedtocline{3}{10.0em}{4.1em}}
+\newcommand*{\subsubsubsectionmark}[1]{}
+\makeatother
+%\everymath{\color{blue}}%make in-line maths symbols blue to read/check easily
+
+\sloppy
+\captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=-9pt}
+%space remove between caption, figure, and text
+\captionsetup[table]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=7pt}
+%space remove between caption, table, and text
+
+%\floatplacement{figure}{H}%forced here float placement automatically for figures
+%\floatplacement{table}{H}%forced here float placement automatically for table
+%the following settings (11 lines) are to remove white space before or after the figures and tables
+%\setcounter{topnumber}{2}
+%\setcounter{bottomnumber}{2}
+%\setcounter{totalnumber}{4}
+%\renewcommand{\topfraction}{0.85}
+%\renewcommand{\bottomfraction}{0.85}
+%\renewcommand{\textfraction}{0.15}
+%\renewcommand{\floatpagefraction}{0.8}
+%\renewcommand{\textfraction}{0.1}
+\renewcommand{\listfigurename}{List of plots}
+
+\setlength{\floatsep}{5pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+
+\thesislayout
+
+\newcommand{\CTAV}{CTAV}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\splitname}[1]{\texttt{#1}}
+\newcommand{\CHO}[2]{\textcolor{red}{[CHỜ #1: #2]}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+\input{Sections/title}
+% \includepdf[pages=-]{Images/Phieucham.pdf}
+\newpage
+
+\fontsize{13pt}{20pt}\selectfont
+
+\setcounter{page}{1}
+
+% \textbf{\large Lời cam đoan}
+
+% Nhóm sinh viên thực hiện đề tài cam đoan mọi điều được ghi trong báo cáo, cũng như mã nguồn là do nhóm tự thực hiện - trừ các kiến thức tham khảo có trích dẫn, hoàn toàn không sao chép từ bất cứ nguồn nào khác. Nếu lời cam đoan trái với sự thật, nhóm xin chịu mọi trách nhiệm trước Ban Chủ nhiệm Khoa và Ban Giám hiệu Nhà trường.
+% \vspace{0.5cm}
+
+% \begin{flushright}
+%     Nhóm sinh viên thực hiện đề tài\\
+%     Nguyễn Văn Hoàng Khang, Lê Quang Hiển, Hoàng Ngọc Kim Tiên
+% \end{flushright}
+
+
+% \newpage
+% \textbf{\large Lời cảm ơn}
+
+% Nhóm sinh viên thực hiện đề tài xin chân thành cảm ơn quý thầy cô đã mang đến những kiến thức bổ ích trong suốt gần bốn năm học vừa qua, đặc biệt là cô Võ Thị Ngọc Châu đã tận tình giúp đỡ nhóm trong suốt quá trình thực hiện đề tài và thầy Phan Trung Hiếu đã hỗ trợ nhóm tìm hiểu kiến thức về nghiệp vụ quản lý tài sản.  
+
+% Với điều kiện thời gian cũng như kiến thức, kinh nghiệm còn hạn chế, báo cáo Đề tài này không thể tránh khỏi những thiếu sót. Nhóm rất mong nhận được sự đóng góp, chỉ bảo của quý thầy cô để có điều kiện nâng cao kiến thức và phát triển hoàn thiện hơn trong tương lai.
+
+% Cuối cùng, xin gửi lời cảm ơn chân thành đến các thầy cô, các anh chị và các bạn đã dành thời gian đọc bài báo cáo Đề tài này.
+% \vspace{0.5cm}
+
+% \newpage
+% \textbf{\large Tóm tắt báo cáo}
+
+% Đồ án tốt nghiệp này trình bày quá trình nghiên cứu, phân tích, thiết kế và triển khai hệ thống quản lý tài sản công nghệ thông tin (CNTT) theo thời gian thực. Trong bối cảnh nhu cầu quản lý tài sản CNTT ngày càng trở nên cấp thiết, đặc biệt là trong các tổ chức, doanh nghiệp với số lượng thiết bị lớn, việc xây dựng một hệ thống theo dõi và đánh giá tài sản theo thời gian thực mang lại nhiều lợi ích về hiệu quả và độ chính xác.
+
+% Mở đầu báo cáo là phần giới thiệu đề tài, trong đó trình bày tổng quan về tài sản CNTT, động cơ và mục tiêu nghiên cứu, phạm vi và ý nghĩa thực tiễn của hệ thống đề xuất. Tiếp theo, đồ án tập trung tìm hiểu các công nghệ nền tảng như Python, Apache Kafka, Confluent Cloud, SQL Server, ASP.NET Core, Docker,... giúp xây dựng một hệ thống hiện đại, mở rộng và phản hồi nhanh.
+
+% Phần tiếp theo tổng hợp và phân tích các sản phẩm tương tự đang có trên thị trường như ManageEngine, ServiceNow,... để làm cơ sở đánh giá và đề xuất hệ thống phù hợp hơn với nhu cầu thực tế tại Việt Nam. Trên cơ sở đó, báo cáo đề xuất một hệ thống quản lý tài sản CNTT bao gồm các chức năng như: theo dõi thông số tài nguyên phần cứng theo thời gian thực, cảnh báo ngưỡng sử dụng, quản lý vòng đời tài sản, và dự đoán hiệu suất sử dụng.
+
+% Trong phần phân tích và thiết kế hệ thống, đồ án đưa ra các mô hình quy trình nghiệp vụ, mô hình hóa tương tác, thiết kế cơ sở dữ liệu và API. Đặc biệt, đề tài áp dụng mô hình học sâu LSTM để xử lý và dự đoán hiệu suất tài sản như CPU, RAM, và dùng Random Forest để dự đoán tài sản cần nâng cấp.
+
+% Sau đó, hệ thống được hiện thực và kiểm thử trên môi trường Confluent Cloud với cấu hình Kafka, thực hiện kiểm thử các chức năng chính cũng như kiểm thử dự đoán hiệu suất sử dụng. Hệ thống được đánh giá kỹ lưỡng về hiệu năng, khả năng thu thập dữ liệu, xử lý theo thời gian thực và độ chính xác trong dự đoán thông qua các chương trình kiểm thử cụ thể.
+
+% Cuối cùng, đồ án tiến hành triển khai hệ thống bằng Docker, thử nghiệm và cài đặt. Phần tổng kết nêu bật các kết quả đạt được, đóng góp và hạn chế còn tồn tại, đồng thời đề xuất hướng phát triển trong tương lai như tối ưu hoá mô hình dự đoán, mở rộng phạm vi thu thập dữ liệu, tăng cường bảo mật, hỗ trợ đa nền tảng, cải tiến hiệu năng và khả năng mở rộng.
+
+% Nội dung
+
+% \begin{flushright}
+%     Nhóm sinh viên thực hiện đề tài\\
+%     Nguyễn Văn Hoàng Khang, Lê Quang Hiển, Hoàng Ngọc Kim Tiên
+% \end{flushright}
+% \newpage
+% \textbf{\large Tóm tắt}
+
+% Đồ án tập trung vào phát triển một hệ thống quản lý tài sản công nghệ thông tin, đặc trưng bởi khả năng tự động lấy dữ liệu từ các thiết bị. Kết quả đạt được là một hệ thống quản lý tài sản vững mạnh, không chỉ thực hiện hiệu quả nhiệm vụ theo dõi và giám sát tài sản, mà còn tự động hóa quá trình thu thập dữ liệu từ các nguồn đa dạng. Sự thành công của đề tài này mang lại giá trị lớn trong việc tối ưu hóa quản lý tài sản công nghệ thông tin, đồng thời khuyến khích sự linh hoạt và nhanh nhẹn trong quá trình quản lý toàn diện.
+
+% Trong quá trình nghiên cứu, chúng tôi không chỉ làm chủ kiến thức chuyên sâu về phát triển phần mềm mà còn áp dụng một cách linh hoạt và sáng tạo. Sự học tập trong việc quản lý tài sản công nghệ thông tin không chỉ là quá trình tiếp thu kiến thức mà còn là việc áp dụng chúng một cách hiệu quả trong môi trường thực tế. Điều này không chỉ nâng cao chuyên môn mà còn giúp chúng tôi phát triển khả năng giải quyết vấn đề và quản lý dự án.
+
+% Đồ án không chỉ là một sản phẩm công nghệ tốt mà còn là biểu hiện của sự sáng tạo và áp dụng linh hoạt kiến thức trong hành trình nghiên cứu và học tập.
+% \vspace{0.5cm}
+
+% Nội dung
+
+\newpage
+\tableofcontents
+
+\cleardoublepage
+\addcontentsline{toc}{section}{Danh sách hình}
+\listoffigures
+\newpage
+
+\cleardoublepage
+\addcontentsline{toc}{section}{Danh sách bảng}
+\listoftables
+\newpage
+
+% \phantomsection
+% \addcontentsline{toc}{section}{Danh mục viết tắt}
+% \section*{Danh mục viết tắt}
+
+% \begin{center}
+% \begin{tabular}{|c|c|c|}
+%   \hline
+%   \textbf{Số thứ tự} & \textbf{Ký hiệu viết tắt} & \textbf{Chữ viết đầy đủ} \\
+%   \hline
+%   1 & ITAM & Information Technology Asset Management \\
+%   \hline 
+%   2 & IT & Information Technology \\
+%   \hline 
+%   3 & DevOps & Development và Operations \\
+%   \hline 
+%   4 & SRE & Site Reliability Engineer \\
+%   \hline 
+%   5 & FDI & Foreign Direct Investment \\
+%   \hline
+%   6 & AI & Artificial Intelligence \\
+%   \hline
+%   7 & CNTT & Công nghệ thông tin \\
+%   \hline
+% \end{tabular}
+% \end{center}
+% \newpage
+
+ \input{Sections/C1_TongQuanDeTai}
+ \newpage
+ \input{Sections/Ch2_KienThucNenTang}
+ \newpage
+ \input{Sections/Ch3_CongTrinhLienQuan}
+ \newpage
+ \input{Sections/Ch4_DeXuatCTAV}
+ \newpage
+ \input{Sections/Ch5_ThucNghiemVaDanhGia}
+ \newpage
+% \input{Sections/C2_CoSoLyThuyet}
+% \newpage
+%  \input{Sections/C3_CacSanPhamLienQuanDeTai}
+%  \newpage
+% \input{Sections/C4_HeThongDeXuat}
+% \newpage
+%  \input{Sections/C5_PhantichThietKe}
+%  \newpage
+% \input{Sections/C6_HienThucVaKiemThu}
+% \newpage
+% \input{Sections/C7_DanhGiaHeThong}
+% \newpage
+% \input{Sections/C8_TrienKhaiHeThong}
+% \newpage
+% \input{Sections/C9_TongKet}
+
+% \newpage
+% \section*{Kế hoạch cho Đồ án Tốt nghiệp (Capstone Project)}
+% \input{Sections/DATN-Plan}
+
+
+\renewcommand\refname{}
+\newpage
+\section*{Tài liệu tham khảo}
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\begin{thebibliography}{99999}
+% \bibitem{thuctrang}
+% % {Ứng dụng công nghệ thông tin trong quản lý, sử dụng tài sản công của ngành Tài chính.} \url{https://tapchinganhang.gov.vn/thuc-trang-va-giai-phap-phat-trien-cong-nghe-tai-chinh-tai-viet-nam.htm}
+% \bibitem{kmc1}{IT Asset Management (ITAM)}, 15/09/2024, \url{https://invgate.com/guides/itam/}
+% \bibitem{rtd}{Real-Time Data}, 26/09/2024 ,\url{https://en.wikipedia.org/wiki/Real-time_data}
+% \bibitem{prtd}{Processing Real-time Data}, 27/09/2024 , \url{https://estuary.dev/what-is-real-time-processing/}
+% \bibitem{trtd} {Type of Real-time Data}, 27/09/2024, \url{https://imply.io/blog/real-time-data-what-it-is-why-it-matters-and-more/}
+% \bibitem{assetexplore}{AssetExplore. \emph{IT Asset Management Tool for your Business}, 19/09/2024, \url{https://www.manageengine.com/products/asset-explorer/}}
+% \bibitem{reviewExplore}{ManageEngine AssetExplorer Review}, 19/09/2024 ,\url{https://www.forbes.com/advisor/business/software/manageengine-assetexplorer-review/}
+% % \bibitem{snipeit}{Snipe IT. \url{https://snipeitapp.com/}}
+% \bibitem{servicenow}{IT Asset Management (ITAM), ServiceNow, 20/09/2024, \url{https://www.servicenow.com/products/it-asset-management.html}}
+% % \bibitem{nextjs}{Introduction, Nextjs. \url{https://nextjs.org/docs}}
+% % \bibitem{python}{Python Introduction, W3Schools. \url{https://www.w3schools.com/python/python_intro.asp}}
+% % \bibitem{typescript}{TypeScript Overview, TutorialsTeacher. \url{https://www.tutorialsteacher.com/typescript/typescript-overview#:~:text=TypeScript%20is%20an%20open%2Dsource,that%20compiles%20to%20plain%20JavaScript.}}
+% % \bibitem{mui}{Material UI - Overview, MUI CORE. \url{https://mui.com/material-ui/getting-started/}}
+% % \bibitem{servicedeskplus}{ManageEngine ServiceDesk Plus. \url{https://www.manageengine.com/products/service-desk/}}
+% % \bibitem{maximo}{IBM Maximo Asset Management. \url{https://www.ibm.com/cloud/maximo-asset-management}}
+% % \bibitem{webhelpdesk}{SolarWinds Web Help Desk. \url{https://www.solarwinds.com/web-help-desk}}
+% % \bibitem{freshservice}{Freshservice - ITSM Software. \url{https://freshservice.com/}}
+% % \bibitem{lansweeper}{Lansweeper - IT Asset Management. \url{https://www.lansweeper.com/}}
+% % \bibitem{mui}{Material UI - Overview, MUI CORE. \url{https://mui.com/material-ui/getting-started/}}
+% \bibitem{servicedeskplus}{ManageEngine ServiceDesk Plus, 20/09/2024, \url{https://www.manageengine.com/products/service-desk/}}
+% \bibitem{invgate}{IT Asset Management Tool, InvGate Insight. 20/09/2024,\url{https://invgate.com/insight}}
+% \bibitem{assetpanda}{Asset Panda, Asset Management \& Tracking Platform, 20/09/2024, 
+% \url{https://www.assetpanda.com/our-technology/#all-features}}
+% \bibitem{topitam}{Top 10 Best IT Asset Management Software, Jorge Farah, 21/09/2024
+% \url{https://blog.invgate.com/best-it-asset-management-and-inventory-tools}}
+% % \bibitem{maximo}{IBM Maximo Asset Management. \url{https://www.ibm.com/cloud/maximo-asset-management}}
+% % \bibitem{webhelpdesk}{SolarWinds Web Help Desk. \url{https://www.solarwinds.com/web-help-desk}}
+% % \bibitem{freshservice}{Freshservice - ITSM Software. \url{https://freshservice.com/}}
+% % \bibitem{lansweeper}{Lansweeper - IT Asset Management. \url{https://www.lansweeper.com/}}
+% \bibitem{accgroup}{Biên tập viên ACC, \emph{Tài sản công nghệ thông tin là gì?} Công ty Luật ACC, 10/09/2024, \url{https://accgroup.vn/tai-san-cong-nghe-thong-tin-la-gi}}
+% % \bibitem{assetmanagement}{IT Asset Management, ServiceNow. \url{https://www.servicenow.com/products/it-asset-management.html}}
+
+% \bibitem{kafka}{\emph{What is Apache Kafka?}, Confluent, 10/10/2024 \url{https://www.confluent.io/what-is-apache-kafka/}}
+
+% \bibitem{plink}{\emph{What is Apache Flink?}, Confluent , 10/10/2024, \url{https://www.confluent.io/learn/apache-flink/}}
+
+% \bibitem{}{\emph{Flink, Spark, Storm, Kafka: A Comparative Analysis of Big Data Stream Processing Frameworks for Your Business Project}, 10/10/2024 ,Roman Glushach \\\url{https://romanglushach.medium.com/flink-spark-storm-kafka-a-comparative-analysis-of-big-data-stream-processing-frameworks-for-dab3dd42fc16}}
+
+% \bibitem{dotnet} \emph{Why Choose .NET: Pros and Cons of .NET Development}, Waverley Software, 25/10/2024, \url{https://waverleysoftware.com/blog/why-choose-net-pros-and-cons/}
+
+% \bibitem{nodejs} \emph{When and Why to Use Node.js: An In-Depth Guide for 2024}, Relevant Software, \url{https://relevant.software/blog/why-and-when-to-use-node-js/}
+
+% \bibitem{java} \emph{12 Pros and Cons of Java for Your Project}, Anywhere Club, \url{https://aw.club/global/en/blog/pros-and-cons-java}
+
+% \bibitem{docker} \emph{Docker là gì?}, AWS, 10/10/2024 \url{https://aws.amazon.com/vi/docker/}
+
+% \bibitem{kubernetes} \emph{Kubernetes là gì?}, Kubernetes.io, 10/10/2024\url{https://kubernetes.io/vi/docs/concepts/overview/what-is-kubernetes/}
+
+% \bibitem{cicd} \emph{What is CI/CD?}, GitLab, 10/10/2024, \url{https://about.gitlab.com/topics/ci-cd/}
+
+% \bibitem{websockets} \emph{The WebSocket API (WebSockets)}, Mdn Web Docs, 10/10/2024, \url{https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API}
+
+% \bibitem{restapi} \emph{What is a RESTful API?}, 10/10/2024, \url{https://aws.amazon.com/what-is/restful-api/?nc1=h_ls}
+
+\bibitem{calm} \emph{CALM: A Framework for Continuous, Adaptive, and
+ LLM-Mediated Anomaly Detection in Time-Series Streams}, 01/09/2025, \url{https://arxiv.org/pdf/2508.21273}
+ \bibitem{sigllm} \emph{Large language models can be zero-shot anomaly detectors for time series?}, 31/10/2024, \url{https://arxiv.org/pdf/2405.14755}
+ \bibitem{aad-llm} \emph{Adaptive Anomaly Detection Using Large Language Models}, 01/11/2024, \url{https://www.semanticscholar.org/reader/620f58d59963bf4052a4abfbcb283d5623eb8eb9}
+ \bibitem{raad-llm} \emph{RAAD-LLM: Adaptive Anomaly Detection Using LLMs and RAG Integration}, 11/03/2025, \url{https://arxiv.org/pdf/2503.02800}
+ \bibitem{argos} \emph{ARGOS: Agentic Time-Series Anomaly Detection with Autonomous Rule
+Generation via Large Language Models}, 24/01/2025, \url{https://arxiv.org/pdf/2501.14170v1}
+%\bibitem{k6} \emph{Grafana k6}, 02/05/2025. \url{https://grafana.com/docs/k6/latest/}
+ \bibitem{anomaly} \emph{A review on outlier/anomaly detection in time series data}, 11/02/2020, \url{https://arxiv.org/pdf/2002.04236}
+  \bibitem{asurvey} \emph{Anomaly Detection: A Survey}, 15/08/2007, \url{https://www.researchgate.net/publication/220565847_Anomaly_Detection_A_Survey}
+  \bibitem{anoma} \emph{AnomaMind: Agentic Time Series Anomaly Detection with
+Tool-Augmented Reasoning}, 14/02/2026, \url{https://arxiv.org/pdf/2602.13807}
+  \bibitem{deepsurvey} \emph{NetWalk: A Flexible Deep Embedding Approach for Anomaly
+Detection in Dynamic Networks}, 23/08/2018, \url{https://www.researchgate.net/publication/329087157_A_Deep_Neural_Network_for_Unsupervised_Anomaly_Detection_and_Diagnosis_in_Multivariate_Time_Series_Data}
+\bibitem{judge} \emph{LLM-as-a-Judge for Time Series Explanations}, 02/04/2026, \url{https://arxiv.org/pdf/2604.02118}
+\bibitem{graph} \emph{Graph neural network-based anomaly detection in multivariate time series}, 13/06/2021, \url{https://arxiv.org/pdf/2106.06947}
+\bibitem{role} \emph{The Role of Large Language Models (LLMs) in
+IT Operations}, 12/2024, \url{https://www.ijlrp.com/papers/2024/12/1482.pdf}
+\bibitem{llmops} \emph{What are large language model operations (LLMOps)?}, \url{https://www.ibm.com/think/topics/llmops}
+\bibitem{nezha} \emph{Nezha: Interpretable Fine-Grained Root Causes Analysis for Microservices on Multi-modal Observability Data}, 9/12/2023, \url{https://dl.acm.org/doi/10.1145/3611643.3616249}
+\bibitem{isof} \emph{Isolation Forest}, \url{https://ieeexplore.ieee.org/document/4781136}
+\bibitem{guha2016robust} 
+\emph{Robust Random Cut Forest Based Anomaly Detection on Streams}, 11/06/2016, \url{https://proceedings.mlr.press/v48/guha16.pdf}
+
+\bibitem{zhao2020multivariate} 
+\emph{Multivariate Time-Series Anomaly Detection via Graph Attention Network}, 04/09/2020, \url{https://arxiv.org/abs/2009.02040}
+
+\bibitem{deng2021graph} 
+\emph{Graph Neural Network-Based Anomaly Detection in Multivariate Time Series}, 15/06/2021, \url{https://arxiv.org/abs/2106.06947}
+
+\bibitem{zhong2024logparser} 
+\emph{LogParser-LLM: Advancing Efficient Log Parsing with Large Language Models}, 25/08/2024, \url{https://arxiv.org/abs/2408.13727}
+
+\bibitem{wang2024logllm} 
+\emph{LogLLM: Log-based Anomaly Detection Using Large Language Models}, 18/11/2024, \url{https://arxiv.org/abs/2411.08561}
+
+\bibitem{rcagent2023} 
+\emph{RCAgent: Cloud Root Cause Analysis by Autonomous Agents with Tool-Augmented Large Language Models}, 30/10/2023, \url{https://arxiv.org/abs/2310.16340}
+
+\bibitem{thomas2025beyond} 
+\emph{Leveraging multi-agent framework for root cause analysis}, 2025, \url{https://link.springer.com/article/10.1007/s40747-025-02096-0}
+\bibitem{icaetm2026}
+Nguyễn Văn Hoàng Khang và cộng sự, ``Topology-Aware Evidence Retrieval for Cost-Aware LLM Alert Validation in Microservices,'' \textit{Proceedings of ICAETM 2026 (Atlantis Press / Springer Nature)}, 2026.
+
+\bibitem{zhao2020alertstorm}
+N. Zhao \textit{et al.}, ``Understanding and Handling Alert Storm for Online Service Systems,'' in \textit{Proc. ACM/IEEE 42nd Int. Conf. Softw. Eng.: Softw. Eng. Pract. (ICSE-SEIP)}, 2020, pp. 162--171. DOI: 10.1145/3377813.3381363.
+
+\bibitem{robertson2009bm25}
+S. Robertson and H. Zaragoza, ``The Probabilistic Relevance Framework: BM25 and Beyond,'' \textit{Foundations and Trends in Information Retrieval}, vol. 3, no. 4, pp. 333--389, 2009. DOI: 10.1561/1500000019.
+
+\bibitem{lewis2020rag}
+P. Lewis \textit{et al.}, ``Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, vol. 33, 2020, pp. 9459--9474.
+
+\bibitem{zheng2023judging}
+L. Zheng \textit{et al.}, ``Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, vol. 36, 2023, pp. 46595--46623.
+
+\bibitem{chow1970reject}
+C. K. Chow, ``On Optimum Recognition Error and Reject Tradeoff,'' \textit{IEEE Transactions on Information Theory}, vol. 16, no. 1, pp. 41--46, 1970. DOI: 10.1109/TIT.1970.1054406.
+
+\bibitem{chen2024frugalgpt}
+L. Chen, M. Zaharia, and J. Zou, ``FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance,'' \textit{Transactions on Machine Learning Research (TMLR)}, 2024.
+
+\bibitem{sharma2024sycophancy}
+M. Sharma \textit{et al.}, ``Towards Understanding Sycophancy in Language Models,'' in \textit{Proc. 12th Int. Conf. Learning Representations (ICLR)}, 2024.
+
+\bibitem{guo2017calibration}
+C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, ``On Calibration of Modern Neural Networks,'' in \textit{Proc. 34th Int. Conf. Machine Learning (ICML)}, PMLR vol. 70, 2017, pp. 1321--1330.
+
+\bibitem{xiong2024uncertainty}
+M. Xiong \textit{et al.}, ``Can LLMs Express Their Uncertainty? An Empirical Evaluation of Confidence Elicitation in LLMs,'' in \textit{Proc. 12th Int. Conf. Learning Representations (ICLR)}, 2024.
+
+\bibitem{efron1993bootstrap}
+B. Efron and R. J. Tibshirani, \textit{An Introduction to the Bootstrap}. New York, NY, USA: Chapman \& Hall, 1993.
+
+\bibitem{mcnemar1947note}
+Q. McNemar, ``Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages,'' \textit{Psychometrika}, vol. 12, no. 2, pp. 153--157, 1947. DOI: 10.1007/BF02295996.
+
+\bibitem{pedregosa2011sklearn}
+F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine Learning in Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
+
+\bibitem{google2026gemini}
+Google, ``Gemini API Documentation,'' 2026. \url{https://ai.google.dev/gemini-api/docs} (Truy cập tháng 11/2026).
+
+\bibitem{clickhouse2026docs}
+ClickHouse, Inc., ``ClickHouse Documentation,'' 2026. \url{https://clickhouse.com/docs} (Truy cập tháng 11/2026).
+
+\bibitem{ahmed2023recommending}
+T. Ahmed, S. Ghosh, C. Bansal, T. Zimmermann, X. Zhang, and S. Rajmohan, ``Recommending Root-Cause and Mitigation Steps for Cloud Incidents Using Large Language Models,'' in \textit{Proc. 45th IEEE/ACM Int. Conf. Softw. Eng. (ICSE)}, 2023, pp. 1737--1749. DOI: 10.1109/ICSE48619.2023.00149.
+
+\bibitem{chen2024rcacopilot}
+Y. Chen \textit{et al.}, ``Automatic Root Cause Analysis via Large Language Models for Cloud Incidents,'' in \textit{Proc. 19th European Conf. Computer Systems (EuroSys)}, 2024.
+
+\bibitem{roy2024exploring}
+D. Roy \textit{et al.}, ``Exploring LLM-Based Agents for Root Cause Analysis,'' in \textit{Companion Proc. 32nd ACM Int. Conf. Foundations of Softw. Eng. (FSE Companion)}, 2024.
+
+\bibitem{kim2013monitorrank}
+M. Kim, R. Sumbaly, and S. Shah, ``Root Cause Detection in a Service-Oriented Architecture,'' in \textit{Proc. ACM SIGMETRICS}, 2013, pp. 93--104. DOI: 10.1145/2465529.2465753.
+
+\bibitem{chen2014causeinfer}
+P. Chen, Y. Qi, P. Zheng, and D. Hou, ``CauseInfer: Automatic and Distributed Performance Diagnosis with Hierarchical Causality Graph in Large Distributed Systems,'' in \textit{Proc. IEEE INFOCOM}, 2014, pp. 1887--1895. DOI: 10.1109/INFOCOM.2014.6848128.
+
+\bibitem{wu2020microrca}
+L. Wu, J. Tordsson, E. Elmroth, and O. Kao, ``MicroRCA: Root Cause Localization of Performance Issues in Microservices,'' in \textit{Proc. IEEE/IFIP NOMS}, 2020, pp. 1--9. DOI: 10.1109/NOMS47738.2020.9110353.
+
+\bibitem{li2022circa}
+M. Li \textit{et al.}, ``Causal Inference-Based Root Cause Analysis for Online Service Systems with Intervention Recognition,'' in \textit{Proc. 28th ACM SIGKDD}, 2022, pp. 897--907. DOI: 10.1145/3534678.3539041.
+
+\bibitem{ikram2022rcd}
+A. Ikram \textit{et al.}, ``Root Cause Analysis of Failures in Microservices Through Causal Discovery,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, vol. 35, 2022.
+
+\bibitem{pham2024baro}
+L. Pham, H. Ha, and H. Zhang, ``BARO: Robust Root Cause Analysis for Microservices via Multivariate Bayesian Online Change Point Detection,'' in \textit{Proc. ACM on Software Engineering (FSE)}, 2024.
+
+\bibitem{pham2025rcaeval}
+L. Pham, H. Zhang, H. Ha, F. Salim, and X. Zhang, ``RCAEval: A Benchmark for Root Cause Analysis of Microservice Systems with Telemetry Data,'' in \textit{Companion Proc. ACM Web Conference (WWW)}, 2025.
+
+\bibitem{edge2024graphrag}
+D. Edge \textit{et al.}, ``From Local to Global: A Graph RAG Approach to Query-Focused Summarization,'' \textit{arXiv preprint arXiv:2404.16130}, 2024.
+
+\bibitem{wang2024fair}
+P. Wang \textit{et al.}, ``Large Language Models Are Not Fair Evaluators,'' in \textit{Proc. 62nd Annual Meeting of the ACL}, 2024.
+
+\bibitem{kadavath2022mostly}
+S. Kadavath \textit{et al.}, ``Language Models (Mostly) Know What They Know,'' \textit{arXiv preprint arXiv:2207.05221}, 2022.
+
+\bibitem{gao2023alce}
+T. Gao, H. Yen, J. Yu, and D. Chen, ``Enabling Large Language Models to Generate Text with Citations,'' in \textit{Proc. EMNLP}, 2023.
+
+\bibitem{chen2019empirical}
+J. Chen \textit{et al.}, ``An Empirical Investigation of Incident Triage for Online Service Systems,'' in \textit{Proc. IEEE/ACM 41st ICSE-SEIP}, 2019.
+
+\bibitem{chen2019continuous}
+J. Chen \textit{et al.}, ``Continuous Incident Triage for Large-Scale Online Service Systems,'' in \textit{Proc. 34th IEEE/ACM ASE}, 2019.
+
+\bibitem{kuang2024knowledge}
+J. Kuang \textit{et al.}, ``Knowledge-Aware Alert Aggregation in Large-Scale Cloud Systems: A Hybrid Approach,'' in \textit{Proc. 46th ICSE-SEIP}, 2024, pp. 369--380. DOI: 10.1145/3639477.3639745.
+
+\bibitem{datadog2026docs}
+Datadog, Inc., ``Datadog Event Management and Bits AI Documentation,'' 2026. \url{https://docs.datadoghq.com/service_management/events/} (Truy cập tháng 11/2026).
+
+\bibitem{dynatrace2026docs}
+Dynatrace LLC, ``Dynatrace Davis AI and Smartscape Topology Documentation,'' 2026. \url{https://docs.dynatrace.com/docs/observe/davis-ai} (Truy cập tháng 11/2026).
+
+\bibitem{pagerduty2026docs}
+PagerDuty, Inc., ``PagerDuty AIOps: Intelligent Alert Grouping, Probable Origin, and Event Orchestration,'' 2026. \url{https://support.pagerduty.com/main/docs/aiops} (Truy cập tháng 11/2026).
+
+\bibitem{prometheus2026alertmanager}
+Prometheus Authors, ``Alertmanager Documentation,'' 2026. \url{https://prometheus.io/docs/alerting/latest/alertmanager/} (Truy cập tháng 11/2026).
+
+\bibitem{keep2026docs}
+KeepHQ, ``Keep: Open-Source AIOps and Alert Management Platform Documentation,'' 2026. \url{https://docs.keephq.dev} (Truy cập tháng 11/2026).
+
+\bibitem{holmesgpt2026docs}
+HolmesGPT Contributors, ``HolmesGPT: Open-Source AI Investigation Agent Documentation,'' 2026. \url{https://holmesgpt.dev/} (Truy cập tháng 11/2026).
+\end{thebibliography}
+
+% \appendix
+% \input{Sections/Phuluc}
+
+\end{document}

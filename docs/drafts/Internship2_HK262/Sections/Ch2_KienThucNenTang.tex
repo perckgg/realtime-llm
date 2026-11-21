@@ -1,0 +1,423 @@
+% =============================================================================
+% Chuong 2: Kien thuc va cong nghe nen tang
+% =============================================================================
+% Cach dung tren Overleaf:
+%   1. Tai thu muc thesis/ (hoac sao chep macros.tex, refs.bib, chapters/ch2.tex
+%      va figures/ch2/*.png) vao du an Overleaf.
+%   2. Trong main.tex:
+%        \input{macros}
+%        ...
+%        \include{chapters/ch2}
+%        ...
+%        \bibliographystyle{IEEEtran}
+%        \bibliography{refs}
+%
+% Cac nhan lien chuong duoc tham chieu tu Chuong 2 (dat dung \label o cac
+% chuong tuong ung de \ref tu dong hien so):
+%   Chuong: ch:de-xuat, ch:thuc-nghiem, ch:platform, ch:thao-luan
+%   Chuong 4: sec:ch4-detector, sec:ch4-ctav, sec:ch4-bm25, sec:ch4-c1,
+%             sec:ch4-policy, sec:ch4-c4, sec:ch4-judge, sec:ch4-rca,
+%             sec:ch4-grouping, sec:ch4-propagation, sec:ch4-report, sec:ch4-impl
+%   Chuong 5: sec:ch5-hypotheses, sec:ch5-data, sec:ch5-metrics, sec:ch5-val,
+%             sec:ch5-h1, sec:ch5-c5, sec:ch5-h4, sec:ch5-budget, sec:ch5-rca,
+%             tab:h0-h5
+%   Chuong 7: sec:ch7-threats
+% =============================================================================
+
+\section{Kiến thức và công nghệ nền tảng}
+\label{ch:nen-tang}
+
+Chương này trình bày các khái niệm và công nghệ mà phần đề xuất (Chương~\ref{ch:de-xuat}) và phần thực nghiệm (Chương~\ref{ch:thuc-nghiem}) dựa vào. Nội dung đi theo đúng thứ tự xử lý của hệ thống. Mục~\ref{sec:ch2-du-lieu} mô tả dữ liệu quan sát của hệ microservice và bộ dữ liệu Nezha. Mục~\ref{sec:ch2-phat-hien} nói về phát hiện bất thường và hiện tượng quá tải cảnh báo. Mục~\ref{sec:ch2-truy-xuat} trình bày các cách truy xuất bằng chứng từ log và trace: BM25, đồ thị phụ thuộc service và cách hợp nhất chúng. Mục~\ref{sec:ch2-judge} giải thích cơ chế dùng mô hình ngôn ngữ lớn làm bộ thẩm định và các rủi ro của nó, Mục~\ref{sec:ch2-rca} giới thiệu bài toán phân tích nguyên nhân gốc. Mục~\ref{sec:ch2-danh-gia} và Mục~\ref{sec:ch2-dang-ky} định nghĩa chỉ số, kiểm định thống kê và nguyên tắc đăng ký giả thuyết trước. Mục~\ref{sec:ch2-cong-nghe} giới thiệu các công nghệ dùng để hiện thực hệ thống, và Mục~\ref{sec:ch2-ket-chuong} tổng kết.
+
+% -----------------------------------------------------------------------------
+\subsection{Dữ liệu quan sát trên hệ microservice}
+\label{sec:ch2-du-lieu}
+
+Mục này xác định đơn vị dữ liệu mà toàn bộ đề tài làm việc trên đó: ba loại tín hiệu quan sát, cách cắt chúng thành cửa sổ, và bộ dữ liệu có nhãn dùng để đánh giá.
+
+\subsubsection{Metric, log, trace và cửa sổ trượt}
+\label{sec:ch2-tin-hieu}
+
+Một hệ microservice gồm nhiều service nhỏ, mỗi service chạy trên một hoặc nhiều pod và gọi nhau qua mạng. Khả năng quan sát (\emph{observability}) của hệ dựa trên ba loại tín hiệu, tóm tắt ở Bảng~\ref{tab:ch2-tin-hieu}. \textbf{Metric} là chuỗi thời gian số đo định kỳ cho từng pod, như mức dùng CPU, bộ nhớ, lưu lượng mạng hay độ trễ phân vị. \textbf{Log} là các dòng văn bản do service ghi ra, thường kèm mức nghiêm trọng (\code{INFO}, \code{WARN}, \code{ERROR}). \textbf{Trace} ghi lại đường đi của một request qua nhiều service. Mỗi bước trên đường đi là một \textbf{span}, có định danh \code{SpanID}, định danh span cha \code{ParentID}, tên thao tác và thời lượng. Quan hệ cha--con giữa các span cho biết service nào gọi service nào.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Ba loại tín hiệu quan sát trên Nezha và vai trò của chúng trong đề tài.}
+  \label{tab:ch2-tin-hieu}
+  \begin{tabularx}{\linewidth}{@{}l Y Y Y@{}}
+    \toprule
+    \textbf{Tín hiệu} & \textbf{Dạng dữ liệu trên Nezha} & \textbf{Trường chính} & \textbf{Vai trò trong đề tài} \\
+    \midrule
+    Metric & CSV theo pod, một mẫu mỗi 60~s & 19 chỉ số: CPU, bộ nhớ, syscall, mạng vào/ra, độ trễ client/server P90/P95/P99, workload, tỉ lệ thành công, tài nguyên node & Đầu vào của bộ phát hiện bất thường \\
+    Log & CSV theo phút & thời điểm, pod, \code{TraceID}, \code{SpanID}, nội dung (kèm mức nghiêm trọng) & Bằng chứng văn bản cho judge \\
+    Trace & CSV theo phút & \code{TraceID}, \code{SpanID}, \code{ParentID}, pod, tên thao tác, thời điểm bắt đầu/kết thúc, thời lượng & Bằng chứng về độ trễ; nguồn dựng đồ thị phụ thuộc service \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Đề tài dùng metric để \emph{phát hiện} và dùng log, trace làm \emph{bằng chứng}. Cách chia vai này bám theo cách dữ liệu được ghi: metric có ở mọi thời điểm, còn log và trace dày đặc và cần được chọn lọc trước khi đưa cho một mô hình đọc.
+
+\textbf{Cửa sổ.} Đơn vị phân tích là \textbf{cửa sổ}: một mẫu metric của một pod, dài 60~s, vì file metric của Nezha lấy mẫu 60~s một lần. Mỗi cửa sổ có định danh tất định sinh từ service, pod và thời điểm bắt đầu. Một cửa sổ được gán nhãn \textbf{có sự cố} nếu nó thuộc đúng pod bị tiêm lỗi và thời điểm bắt đầu nằm trong khoảng $[t_{\mathrm{inject}} - 60\text{ s},\; t_{\mathrm{inject}} + 360\text{ s}]$; các cửa sổ còn lại là bình thường. Khoảng nhãn này phủ khoảng bảy cửa sổ cho mỗi lần tiêm lỗi: một phút trước để bắt dấu hiệu sớm và sáu phút sau để bắt khoảng thời gian lỗi lan ra. Bộ phát hiện không nhìn từng cửa sổ một cách cô lập mà giữ một bộ đệm trượt gồm vài mẫu gần nhất của cùng pod. Chi tiết bộ đệm ở Mục~\ref{sec:ch4-detector}.
+
+Ví dụ trên Nezha: pod \code{adservice-5f6585d649-fnmft} của hệ OnlineBoutique có một dòng metric lúc 03:51 ngày 22/08/2022. Dòng đó là một cửa sổ, kéo dài tới 03:52. Log và trace của ngày đó được ghi thành từng file theo phút, nên bằng chứng của cửa sổ này nằm rải trên nhiều file quanh mốc 03:51. Bằng chứng của một cửa sổ được tìm trong khoảng $\pm 8$~phút quanh cửa sổ (Mục~\ref{sec:ch2-bm25}).
+
+Đề tài dùng định nghĩa cửa sổ và quy tắc nhãn này ở mọi chương. Bộ phát hiện ở Mục~\ref{sec:ch4-detector} chấm điểm từng cửa sổ, và mọi chỉ số ở Chương~\ref{ch:thuc-nghiem} đếm trên cửa sổ.
+
+\subsubsection{Nezha và nhãn nguyên nhân gốc}
+\label{sec:ch2-nezha}
+
+Nezha~\cite{nezha} là bộ dữ liệu quan sát đa phương thức (metric + log + trace) thu từ hai hệ microservice mẫu, \textbf{OnlineBoutique} và \textbf{TrainTicket}, trong đó lỗi được tiêm có chủ đích và có ghi lại pod bị tiêm. Đề tài dùng bốn ngày dữ liệu: OnlineBoutique ngày 22 và 23/08/2022, TrainTicket ngày 29 và 30/01/2023. Có tổng cộng 101 lần tiêm lỗi thuộc năm loại: \code{network\_delay} (30 lần), \code{cpu\_contention} (23), \code{exception} (20), \code{return} (18) và \code{cpu\_consumed} (10). Toàn bộ dữ liệu có 95.660 cửa sổ trên 103 pod, tương ứng 56 service. Trong số đó, 704 cửa sổ có sự cố, tức khoảng 0,74\%: cứ một cửa sổ có sự cố thì có khoảng 135 cửa sổ bình thường.
+
+\textbf{Nhãn nguyên nhân gốc.} Mỗi lần tiêm lỗi được ghi kèm thời điểm, loại lỗi và pod bị tiêm. Nhãn vì vậy ở mức pod. Cả 28 pod từng bị tiêm lỗi đều ánh xạ được về tên service chuẩn, nên mọi cửa sổ có sự cố đều có nhãn \textbf{service gốc}. Nhãn này dùng cho phần đánh giá phân tích nguyên nhân gốc (Mục~\ref{sec:ch2-hitk}). Nezha ghi mỗi mốc thời gian ở hai cột, và hai cột không khớp nhau ở một phần dữ liệu. Đề tài dùng cột giờ hệ thống (\emph{wall-clock}), là cột nhất quán trên cả bốn ngày.
+
+\textbf{Chia dữ liệu chống rò rỉ.} Dữ liệu được chia thành ba phần (\emph{split}) theo tỉ lệ 20/30/50: \splitname{dev} để phát triển và fit bộ phát hiện, \splitname{val} để chọn cấu hình, \splitname{test} để kiểm định đúng một lần. Việc chia có hai ràng buộc. Thứ nhất, đơn vị gán là \textbf{lần tiêm lỗi}, không phải cửa sổ. Bảy cửa sổ của cùng một lần tiêm mô tả cùng một sự kiện, nên nếu chia lẻ chúng, cấu hình chọn trên \splitname{val} sẽ được chấm lại trên những sự kiện nó đã thấy. Thứ hai, có \textbf{vùng đệm 600~s}: cửa sổ bình thường của cùng pod nằm gần một lần tiêm lỗi dưới 600~s bị loại khỏi cả ba split (597 cửa sổ), vì chúng có thể mang dư âm của lỗi. Tỉ lệ mất cân bằng được giữ nguyên, không lấy mẫu bớt cửa sổ bình thường, vì precision phụ thuộc trực tiếp vào tỉ lệ này. Kết quả là \splitname{dev} có 19.316 cửa sổ (149 có sự cố, 21 lần tiêm), \splitname{val} có 28.898 cửa sổ (209 có sự cố, 30 lần tiêm) và \splitname{test} có 46.849 cửa sổ (346 có sự cố, 50 lần tiêm).
+
+\textbf{Cửa sổ có telemetry.} Nezha chỉ ghi log và trace quanh các lần tiêm lỗi. Mọi cửa sổ có sự cố đều có log hoặc trace trong $\pm 8$~phút, nhưng chỉ khoảng một phần tư cửa sổ bình thường có. Với ba phần tư còn lại, một judge bắt buộc trích bằng chứng sẽ ``đúng'' một cách tầm thường vì không có gì để trích. Đề tài vì vậy tính chỉ số chính trên tập \textbf{cửa sổ có telemetry}, gồm các cửa sổ có ít nhất một file log hoặc trace trong $\pm 8$~phút. Tập này được xác định từ danh sách file của bộ dữ liệu, không dùng nhãn. Chỉ số trên mọi cửa sổ vẫn được báo cáo làm số phụ.
+
+Bộ dữ liệu, cách chia và tập cửa sổ có telemetry là nền của mọi phép đo ở Chương~\ref{ch:thuc-nghiem}. Lý do chọn Nezha và giới hạn của việc chỉ dùng một bộ dữ liệu được bàn ở Mục~\ref{sec:ch7-threats}.
+
+% -----------------------------------------------------------------------------
+\subsection{Phát hiện bất thường và quá tải cảnh báo}
+\label{sec:ch2-phat-hien}
+
+Mục này giải thích vì sao một bộ phát hiện bất thường trên metric chưa đủ để cảnh báo người vận hành, và giới thiệu Isolation Forest, bộ phát hiện mà đề tài sử dụng.
+
+\subsubsection{Bất thường, khoảng trống ngữ nghĩa và quá tải cảnh báo}
+\label{sec:ch2-khoang-trong}
+
+\textbf{Bất thường} (\emph{anomaly}) là điểm dữ liệu lệch khỏi hành vi thường gặp của hệ. Một bộ phát hiện bất thường gán cho mỗi cửa sổ một \textbf{điểm bất thường} và so với một ngưỡng; cửa sổ vượt ngưỡng trở thành \textbf{candidate} cảnh báo. Điểm này chỉ nói rằng số đo khác thường. Nó không nói số đo khác thường \emph{vì sao}, cũng không nói có sự cố hay không. Một đợt tải tăng hợp lệ, một tác vụ định kỳ hay một pod vừa khởi động lại đều có thể làm metric lệch. Khoảng cách giữa ``số đo lệch'' và ``có sự cố cần người xử lý'' được gọi là \textbf{khoảng trống ngữ nghĩa}. Để lấp khoảng trống này, cần ngữ cảnh vận hành mà metric không có, chẳng hạn log lỗi hay trace chậm.
+
+Khi khoảng trống không được lấp, người vận hành nhận rất nhiều cảnh báo, phần lớn là báo động giả. Hiện tượng này gọi là \textbf{quá tải cảnh báo} (\emph{alert fatigue}): người vận hành dần bỏ qua cảnh báo, kể cả cảnh báo thật~\cite{zhao2020alertstorm}. Trên Nezha, mất cân bằng $1:135$ cho thấy vấn đề rõ ràng. Giả sử một bộ phát hiện chỉ báo nhầm 1\% cửa sổ bình thường của \splitname{val} (28.689 cửa sổ). Nó đã sinh khoảng 287 báo động giả, nhiều hơn cả tổng số cửa sổ có sự cố của split này (209). Precision khi đó không thể vượt $209 / (209 + 287) \approx 0{,}42$, kể cả khi bộ phát hiện bắt trọn mọi sự cố.
+
+Đề tài không thay bộ phát hiện. Đề tài thêm một khâu \textbf{thẩm định cảnh báo} đứng sau nó: mỗi candidate được đối chiếu với bằng chứng từ log và trace trước khi chuyển cho người vận hành. Khâu này là \CTAV{} (thẩm định cảnh báo hiệu chỉnh theo bằng chứng đa phương thức), trình bày ở Mục~\ref{sec:ch4-ctav}.
+
+\subsubsection{Isolation Forest}
+\label{sec:ch2-iforest}
+
+Isolation Forest~\cite{isof} phát hiện bất thường bằng cách \emph{cô lập} điểm dữ liệu thay vì mô hình hoá dữ liệu bình thường. Ý tưởng là: điểm bất thường ít và khác biệt, nên dễ bị tách riêng bằng vài nhát cắt ngẫu nhiên. Thuật toán dựng nhiều cây cô lập. Mỗi cây chọn ngẫu nhiên một đặc trưng và một giá trị cắt nằm giữa giá trị nhỏ nhất và lớn nhất của đặc trưng đó, rồi chia đệ quy cho đến khi mỗi điểm nằm riêng một lá. Độ dài đường đi $h(x)$ từ gốc tới lá chứa điểm $x$ càng ngắn thì $x$ càng dễ cô lập, tức càng bất thường. Điểm bất thường chuẩn hoá của $x$ trên tập huấn luyện cỡ $n$ được định nghĩa ở Phương trình~\eqref{eq:ch2-iforest}:
+\begin{align}
+  s(x, n) &= 2^{-\mathbb{E}[h(x)] / c(n)}, \nonumber \\
+  c(n) &= 2 H(n - 1) - \frac{2(n - 1)}{n}, \qquad H(i) \approx \ln(i) + 0{,}5772,
+  \label{eq:ch2-iforest}
+\end{align}
+trong đó $\mathbb{E}[h(x)]$ là độ dài đường đi trung bình qua các cây và $c(n)$ là độ dài đường đi trung bình của một tìm kiếm không thành công trên cây nhị phân, dùng để chuẩn hoá. Giá trị $s$ gần 1 nghĩa là rất bất thường; $s$ quanh 0,5 hoặc thấp hơn nghĩa là bình thường. Thuật toán không cần nhãn, chạy nhanh và ít tham số. Đó là lý do nó hợp với vai trò bộ lọc đầu tiên trên luồng metric lớn.
+
+Đề tài fit Isolation Forest trên các cửa sổ của \splitname{dev}, không dùng nhãn. Đặc trưng của một cửa sổ là các thống kê (trung bình, độ lệch chuẩn, nhỏ nhất, lớn nhất, giá trị cuối, độ thay đổi, tỉ lệ thiếu) của từng metric trên bộ đệm trượt của pod. Thay cho $s(x, n)$, điểm bất thường được quy về \textbf{thứ hạng phân vị} so với điểm của các cửa sổ huấn luyện: điểm 0,85 nghĩa là cửa sổ bất thường hơn 85\% cửa sổ của \splitname{dev}. Cách quy đổi này làm ngưỡng dễ diễn giải và không phụ thuộc thang đo thô của mô hình.
+
+Ví dụ: một pod \code{ts-travel-service} của TrainTicket bị tiêm \code{network\_delay}. Độ trễ server P90 của pod tăng vọt trong vài phút, nên trên bộ đệm trượt, giá trị lớn nhất và độ thay đổi của metric này lệch xa so với dữ liệu \splitname{dev}. Cửa sổ của pod bị tách riêng sau ít nhát cắt, nhận điểm cao và vượt ngưỡng 0,85, nên trở thành candidate. Một đợt tăng tải bình thường làm cùng metric lệch theo cách tương tự cũng có thể vượt ngưỡng. Đây chính là khoảng trống ngữ nghĩa ở Mục~\ref{sec:ch2-khoang-trong}.
+
+Isolation Forest là bộ phát hiện duy nhất của hệ. Ngưỡng 0,85, bộ đệm, cách xử lý metric thiếu và cổng Rescue cho cửa sổ dưới ngưỡng được trình bày ở Mục~\ref{sec:ch4-detector}.
+
+% -----------------------------------------------------------------------------
+\subsection{Truy xuất bằng chứng}
+\label{sec:ch2-truy-xuat}
+
+Mục này trình bày cách chọn một số ít sự kiện log và trace làm bằng chứng cho một candidate: truy xuất theo từ vựng (BM25), theo đồ thị phụ thuộc service, cách hợp nhất các tín hiệu đó, và khung chung RAG.
+
+\subsubsection{BM25 trên văn bản log và trace}
+\label{sec:ch2-bm25}
+
+\textbf{BM25}~\cite{robertson2009bm25} là hàm xếp hạng tài liệu theo mức khớp từ vựng với truy vấn. Mỗi sự kiện log hoặc span được coi là một tài liệu văn bản đã tách thành từ. Với truy vấn $Q = \{q_1, \dots, q_m\}$ và tài liệu $D$, điểm BM25 được tính theo Phương trình~\eqref{eq:ch2-bm25}:
+\begin{align}
+  \mathrm{BM25}(D, Q) &= \sum_{i=1}^{m} \mathrm{IDF}(q_i) \cdot
+    \frac{f(q_i, D) \cdot (k_1 + 1)}{f(q_i, D) + k_1 \cdot \left(1 - b + b \cdot \dfrac{|D|}{\mathrm{avgdl}}\right)}, \nonumber \\
+  \mathrm{IDF}(q) &= \ln\!\left(1 + \frac{N - n(q) + 0{,}5}{n(q) + 0{,}5}\right),
+  \label{eq:ch2-bm25}
+\end{align}
+trong đó $f(q, D)$ là số lần từ $q$ xuất hiện trong $D$, $|D|$ là độ dài tài liệu, $\mathrm{avgdl}$ là độ dài trung bình của kho, $N$ là số tài liệu và $n(q)$ là số tài liệu chứa $q$. Tham số $k_1$ điều khiển mức bão hoà theo tần suất từ, còn $b$ điều khiển mức phạt tài liệu dài. Đề tài dùng $k_1 = 1{,}5$ và $b = 0{,}75$. Từ hiếm (IDF cao) như tên một service hay một mã lỗi đóng góp nhiều hơn từ phổ biến như ``request''.
+
+\textbf{Truy vấn sinh từ candidate.} Truy vấn ghép tên service, tên pod, các metric lệch nhiều nhất và giá trị của chúng. Truy vấn \textbf{không} chứa loại lỗi đã tiêm. Đây là nhãn, và đưa nó vào truy vấn sẽ làm rò nhãn sang bằng chứng. Bằng chứng chỉ được tìm trong khoảng $\pm 8$~phút quanh cửa sổ.
+
+Ví dụ: candidate ở pod \code{paymentservice} có truy vấn gồm \code{paymentservice}, tên pod và các metric như \code{PodServerLatencyP90(s)}. Một dòng log của \code{paymentservice} chứa đúng tên service và từ ``error'' sẽ xếp trên một dòng log \code{INFO} của \code{frontend} chỉ chứa từ chung ``request''.
+
+BM25 cho phép tìm bằng chứng mà không cần huấn luyện. Baseline BM25 của đề tài dùng điểm BM25 làm thành phần từ vựng, kết hợp với độ gần thời gian, độ khớp service/pod và mức nghiêm trọng của sự kiện. Công thức đầy đủ ở Mục~\ref{sec:ch4-bm25}.
+
+\subsubsection{Đồ thị phụ thuộc service}
+\label{sec:ch2-do-thi}
+
+\textbf{Đồ thị phụ thuộc service} $G = (V, A)$ có mỗi nút là một service. Có cạnh $u \to v$ khi trace cho thấy một span của $u$ là cha của một span của $v$, tức $u$ gọi $v$. Đề tài dựng đồ thị từ mọi file trace của Nezha (307 file, khoảng 4,18 triệu span): với mỗi span có span cha thuộc service khác thì thêm một cạnh, trọng số là số lần xuất hiện. Cạnh xuất hiện dưới 5 lần bị loại để giảm nhiễu. Đồ thị thu được có 56 service và 68 cạnh, gồm 20 thành phần liên thông; thành phần lớn nhất có 28 service. Có 18 service TrainTicket không có span gọi qua service khác trong dữ liệu, nên nằm cô lập. Khoảng cách $d_G(s, s')$ là số cạnh trên đường ngắn nhất giữa hai service khi bỏ hướng cạnh. Hai service không nối với nhau có khoảng cách vô cùng.
+
+Hình~\ref{fig:ch2-service-graph} vẽ đồ thị của hai hệ. Người đọc nên nhìn vào vùng tô màu quanh service phát cảnh báo: nút gốc $s_0$, các nút cách 1~hop và 2~hop. Đây là phạm vi mà truy xuất theo topology (Mục~\ref{sec:ch2-fusion}) mở rộng tới.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{Images/C1/figures/ch2/h2.4-service-graph.png}
+  \vspace{0.35cm}
+  \caption[Đồ thị phụ thuộc service dựng từ trace của Nezha]{Đồ thị phụ thuộc service dựng từ trace của Nezha: (a)~OnlineBoutique (10 service, 13 cạnh) và (b)~TrainTicket (46 service, 55 cạnh), minh họa vùng mở rộng 1~hop và 2~hop quanh $s_0$.}
+  \label{fig:ch2-service-graph}
+\end{figure}
+
+Ví dụ trên OnlineBoutique: \code{paymentservice} chỉ có một láng giềng trực tiếp là \code{checkoutservice}, service gọi nó khi thanh toán. Ở khoảng cách 2 có \code{frontend}, \code{cartservice}, \code{productcatalogservice}, \code{shippingservice} và \code{emailservice}, tức những service mà \code{checkoutservice} gọi hoặc bị gọi bởi. Nếu \code{paymentservice} chậm, triệu chứng có thể hiện ở span của \code{checkoutservice} và \code{frontend} trước khi hiện ở log của chính \code{paymentservice}.
+
+Cần phân biệt \textbf{gần trên đồ thị} với \textbf{có quan hệ nhân quả}. Hai service kề nhau chỉ cho biết có lời gọi giữa chúng trong dữ liệu. Nó không cho biết lỗi ở service này \emph{gây ra} triệu chứng ở service kia. Đồ thị còn chỉ phản ánh những đường gọi có trong trace đã ghi, nên một service ít được gọi có thể bị thiếu cạnh. Đề tài dùng đồ thị theo hai cách: mở rộng ngữ cảnh truy xuất cho \CTAV{} (Mục~\ref{sec:ch4-c1}) và gom cảnh báo, lan truyền ngược trong tác tử RCA (Mục~\ref{sec:ch4-rca}).
+
+\subsubsection{Hợp nhất đa phương thức (Fusion Score)}
+\label{sec:ch2-fusion}
+
+Truy xuất theo từ vựng chỉ tìm sự kiện có từ khớp truy vấn, nên dễ bỏ sót triệu chứng ở service lân cận. \textbf{Truy xuất lai} gom bằng chứng từ nhiều kênh vào một \textbf{pool}, rồi xếp hạng lại bằng một điểm chung. Đề tài dùng \textbf{Fusion Score} từ khảo sát thực nghiệm trước của tác giả~\cite{icaetm2026}. Với candidate ở service $s_0$, thời điểm tham chiếu $t_0$ (giữa cửa sổ), mỗi sự kiện $e$ trong pool có service $s_e$ và thời điểm $t_e$, điểm hợp nhất được cho bởi Phương trình~\eqref{eq:ch2-fusion}:
+\begin{align}
+  \mathrm{Score}(e) &= \alpha \cdot \mathrm{BM25}_{\mathrm{norm}}(e)
+    + \beta \cdot \exp\!\left(-\frac{|t_e - t_0|}{\tau_F}\right)
+    + \gamma \cdot \mathrm{GraphSim}(s_e, s_0), \nonumber \\
+  \mathrm{GraphSim}(s_e, s_0) &=
+    \begin{cases}
+      \dfrac{1}{1 + d_G(s_e, s_0)}, & \text{nếu } s_e \text{ tới được } s_0, \\[8pt]
+      0, & \text{ngược lại,}
+    \end{cases}
+  \label{eq:ch2-fusion}
+\end{align}
+với $\alpha + \beta + \gamma = 1$.
+
+Ba thành phần ứng với ba câu hỏi: sự kiện có khớp nội dung không ($\mathrm{BM25}_{\mathrm{norm}}$, điểm BM25 chuẩn hoá min--max trên pool về $[0, 1]$); sự kiện có gần thời điểm cảnh báo không (độ gần thời gian giảm theo hàm mũ với hằng số thời gian $\tau_F$); và sự kiện có ở gần $s_0$ trên đồ thị không ($\mathrm{GraphSim}$ bằng 1 tại $s_0$, 0,5 ở 1~hop, khoảng 0,33 ở 2~hop). Ký hiệu $\tau_F$ được dùng thay cho $\tau$ để không lẫn với ngưỡng của Rescue Score ở Mục~\ref{sec:ch4-detector}. Pool gồm các sự kiện khớp từ vựng tốt nhất và các sự kiện gần thời điểm nhất của mọi service trong phạm vi 2~hop. Sau khi xếp hạng, $k$ sự kiện điểm cao nhất được giữ làm bằng chứng.
+
+Để minh hoạ cách ba thành phần cộng hưởng, ví dụ giả định dưới đây xét candidate ở \code{paymentservice} với $\tau_F = 300\text{ s}$ và bộ trọng số $(\alpha, \beta, \gamma) = (0{,}35;\; 0{,}25;\; 0{,}40)$ dùng ở Mục~\ref{sec:ch4-c1}:
+
+\begin{center}
+  \small
+  \begin{tabularx}{\linewidth}{@{}Y r r r r r r@{}}
+    \toprule
+    \textbf{Sự kiện} & $\mathrm{BM25}_{\mathrm{norm}}$ & $|t_e - t_0|$ & \textbf{Độ gần TG} & $d_G$ & $\mathrm{GraphSim}$ & $\mathrm{Score}$ \\
+    \midrule
+    log \code{ERROR} của \code{paymentservice} & 1,00 & 60~s & 0,82 & 0 & 1,00 & 0,95 \\
+    span chậm của \code{checkoutservice} & 0,20 & 30~s & 0,90 & 1 & 0,50 & 0,50 \\
+    log \code{INFO} của \code{frontend} & 0,00 & 0~s & 1,00 & 2 & 0,33 & 0,38 \\
+    \bottomrule
+  \end{tabularx}
+\end{center}
+
+Sự kiện thứ ba không khớp một từ nào của truy vấn, nhưng vẫn có điểm vì nó gần cả về thời gian lẫn trên đồ thị. Đây là chỗ truy xuất lai thêm được ngữ cảnh mà BM25 bỏ sót. Cũng chính cơ chế này đưa vào bằng chứng nền vô hại khi cửa sổ thực ra bình thường; Mục~\ref{sec:ch2-thien-lech} và Chương~\ref{ch:de-xuat} bàn về hệ quả đó.
+
+Các cách hợp nhất khác, như hợp nhất theo thứ hạng (\emph{reciprocal rank fusion}) hay xếp hạng lại bằng mô hình học, không được dùng. Fusion Score là thành phần C1 (truy xuất lai BM25--topology, đang dùng) của \CTAV{}. Cách chọn trọng số, phạm vi mở rộng và số bằng chứng $k$ trình bày ở Mục~\ref{sec:ch4-c1}.
+
+\subsubsection{RAG trong giám sát vận hành}
+\label{sec:ch2-rag}
+
+\textbf{Retrieval-Augmented Generation} (RAG)~\cite{lewis2020rag} là cách ghép một bộ truy xuất với một mô hình ngôn ngữ: thay vì để mô hình trả lời chỉ từ tri thức đã học, hệ thống tìm tài liệu liên quan rồi đưa chúng vào ngữ cảnh của câu hỏi. Trong giám sát vận hành, ``tài liệu'' là log và span quanh thời điểm cảnh báo, còn ``câu hỏi'' là cảnh báo này có phản ánh sự cố thật hay không. RAG có hai lợi ích. Mô hình được nhìn thấy dữ liệu của chính hệ thống đang vận hành, thứ nó không thể biết trước. Kết luận của nó cũng có thể dẫn về bằng chứng cụ thể.
+
+RAG cũng có rủi ro: kết luận của mô hình phụ thuộc vào \emph{cái được truy xuất}. Bằng chứng sai lệch hoặc gợi ý quá mức có thể kéo kết luận theo. Ví dụ, nếu sáu dòng log đưa vào đều chứa từ ``timeout'' nhưng thuộc một đợt retry bình thường, mô hình có thể kết luận có sự cố. Rủi ro này là trọng tâm của Mục~\ref{sec:ch2-thien-lech}.
+
+Một ý liên quan là \textbf{khôi phục ngữ cảnh}: dùng bằng chứng để xem xét lại cả những cửa sổ có điểm bất thường dưới ngưỡng. Đề tài hiện thực ý này thành cổng Rescue (C5, Rescue Score, chỉ là ablation) ở Mục~\ref{sec:ch4-detector}. Toàn bộ khâu \CTAV{} là một hệ RAG: truy xuất (Mục~\ref{sec:ch4-bm25}, \ref{sec:ch4-c1}), judge (Mục~\ref{sec:ch4-judge}) và chính sách quyết định (Mục~\ref{sec:ch4-policy}).
+
+% -----------------------------------------------------------------------------
+\subsection{LLM làm bộ thẩm định (LLM-as-a-Judge)}
+\label{sec:ch2-judge}
+
+Mục này giải thích cách một mô hình ngôn ngữ lớn được dùng để thẩm định cảnh báo, cách kiểm soát chi phí khi gọi nó, và các rủi ro về độ tin cậy mà phần đề xuất phải xử lý.
+
+\subsubsection{LLM, prompt và đầu ra có cấu trúc}
+\label{sec:ch2-prompt}
+
+\textbf{Mô hình ngôn ngữ lớn} (LLM) là mô hình học sâu được huấn luyện trên lượng lớn văn bản để sinh văn bản tiếp theo từ một đầu vào gọi là \textbf{prompt}. LLM đọc được log và mô tả lỗi bằng ngôn ngữ tự nhiên mà không cần huấn luyện riêng, nên thích hợp để đọc bằng chứng vận hành. Nó cũng có ba hạn chế khi dùng trong vận hành: độ trễ mỗi lần gọi lớn hơn nhiều so với một bộ phát hiện; chi phí tính theo token; và đầu ra không hoàn toàn tất định, kể cả khi đặt $\text{temperature} = 0$.
+
+Để dùng đầu ra của LLM trong một hệ thống tự động, đầu ra phải có \textbf{cấu trúc}: prompt yêu cầu mô hình chỉ trả về một đối tượng JSON theo lược đồ cố định, và hệ thống kiểm tra lược đồ trước khi dùng. Prompt của đề tài gồm vai trò (``judge thẩm định cảnh báo cho SRE''), thông tin candidate (service, pod, thời gian, điểm bất thường, metric lệch nhất), danh sách bằng chứng đã truy xuất (mỗi sự kiện có định danh, thời điểm, nguồn, mức nghiêm trọng, nội dung cắt tối đa 240 ký tự), danh sách định danh bằng chứng được phép trích, và các luật trả lời. Bảng~\ref{tab:ch2-judge-schema} trình bày lược đồ đầu ra.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Lược đồ đầu ra JSON của judge.}
+  \label{tab:ch2-judge-schema}
+  \begin{tabularx}{\linewidth}{@{}l l Y@{}}
+    \toprule
+    \textbf{Trường} & \textbf{Giá trị} & \textbf{Ý nghĩa} \\
+    \midrule
+    \code{label} & \code{true\_alert} $\mid$ \code{false\_positive} $\mid$ \code{uncertain} & Kết luận về candidate \\
+    \code{severity} & \code{P1} $\mid$ \code{P2} $\mid$ \code{P3} $\mid$ \code{none} & Mức ưu tiên đề xuất \\
+    \code{confidence} & số trong $[0, 1]$ & Độ tin cậy do mô hình tự khai \\
+    \code{evidence} & danh sách định danh bằng chứng & Bằng chứng mà kết luận dựa vào; chỉ được lấy từ danh sách cho phép \\
+    \code{reason} & một câu, tối đa 25 từ & Lý do ngắn \\
+    \code{recommended\_action} & một câu, tối đa 20 từ & Hành động gợi ý \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Luật trả lời yêu cầu: chỉ dùng \code{true\_alert} khi metric và bằng chứng cùng chỉ về một sự cố; dùng \code{false\_positive} khi bằng chứng giải thích được bất thường là vô hại; dùng \code{uncertain} khi bằng chứng yếu hoặc không liên quan; không được bịa định danh bằng chứng. Ví dụ, với candidate ở \code{paymentservice} và log \code{ERROR} ở ví dụ Mục~\ref{sec:ch2-fusion}, một đầu ra hợp lệ có \code{label = true\_alert}, $\text{confidence} = 0{,}9$ và \code{evidence} trỏ đúng định danh của dòng log đó.
+
+Đề tài dùng một LLM duy nhất qua API, \code{gemini-2.5-flash}, cho mọi phương pháp, không fine-tuning và không dùng LLM cục bộ. Prompt, cách đọc đầu ra và cache được trình bày ở Mục~\ref{sec:ch4-judge}.
+
+\subsubsection{Thẩm định theo tầng và kiểm soát ngân sách}
+\label{sec:ch2-ngan-sach}
+
+\textbf{LLM-as-a-Judge}~\cite{zheng2023judging} là cách dùng một LLM để chấm hoặc phân loại đầu ra theo tiêu chí cho trước. Trong đề tài, judge nhận một candidate cùng bằng chứng và trả về kết luận theo Bảng~\ref{tab:ch2-judge-schema}. Kết luận của judge chưa phải quyết định cuối cùng. Một \textbf{chính sách quyết định} chuyển nó thành hành động: chuyển cảnh báo cho người vận hành, bỏ qua, hoặc đưa vào hàng đợi xem tay (\code{manual\_review}). Chính sách cơ bản gồm hai luật. Luật \textbf{ngưỡng tin cậy} chỉ chấp nhận \code{true\_alert} khi $\text{confidence} \ge \theta$. Luật \textbf{bắt buộc có bằng chứng} (\code{require\_evidence}) hạ một \code{true\_alert} không trích bằng chứng nào. Cho phép hệ thống ``không quyết định'' và chuyển ca khó cho người là ý tưởng của phân loại có lựa chọn từ chối~\cite{chow1970reject}.
+
+\textbf{Thẩm định theo tầng} đặt một bộ thẩm định rẻ trước một bộ đắt hơn. Ca dễ được quyết ở tầng rẻ, chỉ ca khó mới được đẩy lên tầng sau. Ý tưởng này phổ biến khi cần cân bằng chi phí và chất lượng của LLM~\cite{chen2024frugalgpt}. Đề tài đã thiết kế và kiểm một biến thể là C4 (định tuyến hai tầng). Thành phần C4 \textbf{đã loại}; thiết kế và lý do loại trình bày ở Mục~\ref{sec:ch4-c4}.
+
+\textbf{Ngân sách.} Mỗi lần chạy có một ngân sách $B$ lần gọi LLM. Candidate được xử lý theo thứ tự thời gian, đúng như khi hệ chạy thật. Khi hết ngân sách, candidate còn lại đi vào \code{manual\_review}. Đánh giá theo ngân sách cho biết chất lượng thay đổi thế nào khi chỉ đủ tiền hoặc thời gian gọi một phần candidate. Đường F1 theo ngân sách được vẽ với $B \in \{120;\; 250;\; 500;\; 1.000;\; 2.000;\; 4.000;\; \text{đủ}\}$, trong đó ``đủ'' là chấm mọi candidate. Ví dụ, với $B = 120$, chỉ 120 candidate đầu tiên theo thời gian của \splitname{test} được judge đọc; các candidate có sự cố xuất hiện muộn hơn sẽ không được xác nhận dù bằng chứng tốt đến đâu.
+
+\textbf{Cache.} Mỗi lần gọi LLM được lưu với khoá \code{sha256(prompt + model + temperature + max\_tokens + repeat)}. Cùng một prompt chỉ được gọi API một lần; mọi lần chạy lại, mọi phép quét tham số và phần demo đọc từ cache. Trường \code{repeat} cho phép cố ý gọi lại cùng một prompt (\code{repeat} 1, 2) để đo độ dao động của judge. Ngân sách và cache được dùng ở mọi thực nghiệm của Chương~\ref{ch:thuc-nghiem} và ở chế độ demo ngoại tuyến của Chương~\ref{ch:platform}.
+
+\subsubsection{Thiên lệch xác nhận, hiệu chỉnh ngưỡng và nguồn gốc bằng chứng}
+\label{sec:ch2-thien-lech}
+
+\textbf{Thiên lệch xác nhận} (\emph{confirmation bias}) là xu hướng diễn giải thông tin theo hướng xác nhận một giả định có sẵn. Ở judge LLM, nó hiện ra khi prompt đã nói có một cảnh báo và bằng chứng \emph{trông} liên quan về thời gian hay nội dung; xu hướng đồng thuận theo ngữ cảnh gợi ý của LLM cũng đã được ghi nhận rộng rãi~\cite{sharma2024sycophancy}. Khi đó judge dễ kết luận \code{true\_alert} ngay cả khi bằng chứng chỉ là hoạt động nền. Hình~\ref{fig:ch2-confirmation-bias} minh hoạ hiện tượng: cùng một candidate trên cửa sổ bình thường, hai bộ bằng chứng khác nhau dẫn tới hai kết luận trái ngược.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{Images/C1/figures/ch2/h2.7-confirmation-bias.png}
+  \vspace{0.35cm}
+  \caption[Minh họa thiên lệch xác nhận của bộ thẩm định LLM]{Thiên lệch xác nhận của judge trên cùng một cửa sổ bình thường: (a)~ngữ cảnh xa thời điểm cảnh báo cho \code{false\_positive}; (b)~ngữ cảnh sát thời điểm hoặc từ lân cận dẫn tới \code{true\_alert} sai. \emph{(Nguồn: tác giả vẽ, có hỗ trợ AI.)}}
+  \label{fig:ch2-confirmation-bias}
+\end{figure}
+
+\textbf{Hiệu chỉnh.} Một bộ phân loại được gọi là \textbf{hiệu chỉnh tốt} nếu, trong các dự đoán có độ tin cậy 0,8, khoảng 80\% là đúng~\cite{guo2017calibration}. Độ tin cậy mà LLM tự khai bằng lời không đảm bảo tính chất này: nó thường tập trung ở vài giá trị tròn (0,8; 0,85; 0,9) và có xu hướng cao hơn tỉ lệ đúng thật~\cite{xiong2024uncertainty}. Vì vậy ngưỡng $\theta$ không thể lấy theo nghĩa đen (``0,8 là đủ chắc''). Ngưỡng $\theta$ phải được chọn trên dữ liệu tinh chỉnh, tức \splitname{dev} hoặc \splitname{val}, theo tiêu chí đã định trước, và không bao giờ chọn trên \splitname{test}.
+
+\textbf{Nguồn gốc bằng chứng} (\emph{provenance}) cho biết một bằng chứng đến từ đâu: từ chính service phát cảnh báo $s_0$, hay từ một service lân cận được đưa vào nhờ mở rộng đồ thị. Hai nguồn này có giá trị khác nhau. Bằng chứng tại $s_0$ trực tiếp nói về service đang bị nghi. Bằng chứng ở lân cận chỉ gián tiếp liên quan và dễ là hoạt động nền. Từ đó có hai ý tưởng thiết kế. Ý thứ nhất là đặt ngưỡng tin cậy khác nhau theo nguồn bằng chứng, chặt hơn khi kết luận dựa vào bằng chứng lân cận; đây là khái niệm nền của C2 (ngưỡng bất đối xứng theo nguồn bằng chứng, đã loại). Ý thứ hai là \textbf{neo bằng chứng}: chỉ chấp nhận \code{true\_alert} khi judge trích được ít nhất một bằng chứng \emph{bất thường} tại chính $s_0$, chẳng hạn một log mức \code{ERROR}/\code{WARN} hoặc một span chậm hơn mức thường gặp của chính thao tác đó. Mức thường gặp được đo bằng phân vị của thời lượng span trên dữ liệu \splitname{dev}. Đây là khái niệm nền của C3 (neo bằng chứng, đang dùng).
+
+Ví dụ: một cửa sổ bình thường của \code{ts-travel-service} có candidate do tải tăng. Bằng chứng truy xuất gồm vài span của \code{ts-basic-service} (lân cận 1~hop) sát thời điểm cảnh báo, với thời lượng bình thường, và một log \code{INFO} của chính \code{ts-travel-service}. Judge có thể trả \code{true\_alert} với $\text{confidence} = 0{,}9$ vì bằng chứng ``khớp thời điểm''. Neo bằng chứng sẽ hạ kết luận này, vì không có bằng chứng nào tại $s_0$ là bất thường.
+
+Thiên lệch xác nhận là cơ chế mà đề tài tìm ra để giải thích báo động giả của judge khi thêm ngữ cảnh. Bằng chứng thực nghiệm nằm ở Mục~\ref{sec:ch5-h1}, còn vai trò của C2, C3 và ngưỡng $\theta$ trình bày ở Mục~\ref{sec:ch4-policy}.
+
+% -----------------------------------------------------------------------------
+\subsection{Phân tích nguyên nhân gốc (RCA) trên microservice}
+\label{sec:ch2-rca}
+
+Mục này trình bày bài toán sau khi cảnh báo đã được xác nhận: gom các cảnh báo cùng một sự cố và chỉ ra service gốc.
+
+\subsubsection{Bài toán RCA và gom incident}
+\label{sec:ch2-gom}
+
+\textbf{Phân tích nguyên nhân gốc} (\emph{root cause analysis}, RCA) là việc xác định thành phần gây ra sự cố, phân biệt với các thành phần chỉ chịu ảnh hưởng. Trong hệ microservice, một lỗi ở một service thường \textbf{lan dây chuyền} (\emph{cascade}): service gọi nó chậm theo, rồi service gọi service đó cũng chậm. Một sự cố vì vậy sinh nhiều cảnh báo trên nhiều service. Đề tài gọi service bị tiêm lỗi là \textbf{service gốc}, và gọi một nhóm cảnh báo cùng thuộc một sự cố là một \textbf{incident}.
+
+\textbf{Gom incident} biến danh sách cảnh báo thành danh sách incident qua hai bước. Bước thời gian: sắp cảnh báo theo thời điểm và cắt ở chỗ hai cảnh báo liên tiếp cách nhau quá một khoảng $T_{\mathrm{group}}$; mỗi đoạn là một cụm thời gian. Bước topology: trong mỗi cụm, lấy đồ thị con của đồ thị phụ thuộc (Mục~\ref{sec:ch2-do-thi}) gồm các service có cảnh báo, bỏ hướng cạnh; mỗi thành phần liên thông của đồ thị con là một incident. Bước này thuần thuật toán, không gọi LLM.
+
+Ví dụ trên OnlineBoutique: \code{paymentservice} bị tiêm lỗi; trong hai phút, \code{paymentservice}, \code{checkoutservice} và \code{frontend} đều phát cảnh báo. Ba service này nối thành chuỗi trên đồ thị và các cảnh báo gần nhau về thời gian, nên chúng gộp thành một incident. Người vận hành nhận một incident thay vì ba cảnh báo rời.
+
+Tác tử RCA ở Mục~\ref{sec:ch4-grouping} dùng đúng định nghĩa này. Giá trị $T_{\mathrm{group}}$ và cách chọn nó trình bày ở đó.
+
+\subsubsection{Lan truyền ngược trên đồ thị gọi}
+\label{sec:ch2-lan-truyen}
+
+Khi một service bị lỗi, triệu chứng thường xuất hiện ở các service \textbf{gọi} nó, tức ở phía ngược chiều cạnh $u \to v$. \textbf{Lan truyền ngược} lần theo hướng ngược lại với chiều lan của triệu chứng: từ mỗi service có cảnh báo, đi một hop theo chiều gọi tới các service mà nó gọi trực tiếp. Mỗi service có cảnh báo bỏ một phiếu, chia đều cho các service nó gọi mà cũng đang bất thường; nếu không có service nào như vậy, nó tự bỏ phiếu cho chính mình. Điểm của một service là tỉ lệ phiếu nhận được, và các service trong incident được xếp hạng theo điểm này.
+
+Ví dụ: trong incident ở Mục~\ref{sec:ch2-gom}, \code{frontend} gọi \code{checkoutservice}, \code{checkoutservice} gọi \code{paymentservice}, và cả ba đều có cảnh báo. \code{frontend} bỏ phiếu cho \code{checkoutservice}; \code{checkoutservice} bỏ phiếu cho \code{paymentservice}; \code{paymentservice} không gọi service bất thường nào nên bỏ phiếu cho chính nó. \code{paymentservice} nhận $2/3$ số phiếu và được xếp hạng 1.
+
+Phương pháp có ba giới hạn. Thứ nhất, quan hệ gọi không đồng nghĩa với quan hệ nhân quả (Mục~\ref{sec:ch2-do-thi}). Thứ hai, một service có nhiều replica có thể chỉ hỏng ở một pod. Thứ ba, cảnh báo bị thiếu hoặc báo nhầm làm sai chuỗi lan truyền. Lan truyền ngược và quy tắc xếp hạng của tác tử RCA được trình bày chi tiết ở Mục~\ref{sec:ch4-propagation}.
+
+\subsubsection{Báo cáo chẩn đoán có cấu trúc}
+\label{sec:ch2-bao-cao}
+
+Sau khi xếp hạng, mỗi incident được tóm tắt thành một \textbf{báo cáo chẩn đoán}. LLM được gọi đúng một lần cho mỗi incident. Đầu vào gồm các cảnh báo, thứ hạng service và bằng chứng đã được trích; đầu ra là JSON theo lược đồ cố định. Giống judge (Mục~\ref{sec:ch2-prompt}), báo cáo phải trích bằng chứng từ danh sách cho phép, và một bộ kiểm tra lược đồ loại báo cáo không hợp lệ thay vì sửa nó. Ví dụ, báo cáo cho incident ở trên nêu \code{paymentservice} là service gốc nghi ngờ, trích dòng log lỗi của nó và span chậm của \code{checkoutservice} làm bằng chứng, rồi gợi ý một hành động kiểm tra. Lược đồ báo cáo và bộ kiểm tra trình bày ở Mục~\ref{sec:ch4-report}.
+
+% -----------------------------------------------------------------------------
+\subsection{Tiêu chí và phương pháp đánh giá}
+\label{sec:ch2-danh-gia}
+
+Mục này định nghĩa các chỉ số và các kiểm định thống kê dùng trong Chương~\ref{ch:thuc-nghiem}.
+
+\subsubsection{Precision, Recall, F1 và FPR}
+\label{sec:ch2-chi-so}
+
+Một cửa sổ được tính là \textbf{dương tính thật} (TP) nếu hệ chuyển cảnh báo cho người vận hành và cửa sổ thật sự có sự cố; \textbf{dương tính giả} (FP) nếu hệ cảnh báo trên cửa sổ bình thường; \textbf{âm tính giả} (FN) nếu cửa sổ có sự cố mà hệ không cảnh báo; \textbf{âm tính thật} (TN) nếu cửa sổ bình thường và hệ không cảnh báo. Bảng~\ref{tab:ch2-chi-so} định nghĩa bốn chỉ số chính.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Chỉ số đánh giá phân loại cảnh báo.}
+  \label{tab:ch2-chi-so}
+  \begin{tabularx}{\linewidth}{@{}l l Y@{}}
+    \toprule
+    \textbf{Chỉ số} & \textbf{Công thức} & \textbf{Trả lời câu hỏi} \\
+    \midrule
+    Precision & $\dfrac{\mathrm{TP}}{\mathrm{TP} + \mathrm{FP}}$ & Trong các cảnh báo gửi đi, bao nhiêu là thật? \\[8pt]
+    Recall & $\dfrac{\mathrm{TP}}{\mathrm{TP} + \mathrm{FN}}$ & Trong các cửa sổ có sự cố, bắt được bao nhiêu? \\[8pt]
+    F1 & $\dfrac{2 \cdot \mathrm{Precision} \cdot \mathrm{Recall}}{\mathrm{Precision} + \mathrm{Recall}}$ & Cân bằng hai chỉ số trên \\[8pt]
+    FPR & $\dfrac{\mathrm{FP}}{\mathrm{FP} + \mathrm{TN}}$ & Trong các cửa sổ bình thường, báo nhầm bao nhiêu? \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Hai lưu ý quan trọng. Thứ nhất, recall tính trên \textbf{mọi} cửa sổ có sự cố của split, kể cả cửa sổ mà bộ phát hiện không sinh candidate. Nếu chỉ tính trên candidate, recall bị thổi phồng. Thứ hai, dữ liệu mất cân bằng mạnh (Mục~\ref{sec:ch2-nezha}), nên precision và F1 nhạy với FPR: như ví dụ ở Mục~\ref{sec:ch2-khoang-trong}, chỉ 1\% báo nhầm trên \splitname{val} đã đủ kéo precision xuống dưới 0,42. FPR vì vậy được báo cáo riêng, không chỉ ngầm trong F1. Chỉ số chính tính trên cửa sổ có telemetry; chỉ số trên mọi cửa sổ là phụ. Bên cạnh chất lượng, đề tài báo cáo số lần gọi LLM, token và độ trễ.
+
+\subsubsection{Hit@k và Alert Reduction Ratio}
+\label{sec:ch2-hitk}
+
+Với RCA, mỗi incident có một danh sách service xếp hạng. \textbf{Hit@k} là tỉ lệ incident mà service gốc thật nằm trong $k$ vị trí đầu. Đề tài dùng Hit@1 và Hit@3 ở mức service; vì nhãn gốc ở mức pod nên cần ánh xạ pod về service (Mục~\ref{sec:ch2-nezha}). Incident chứa cảnh báo của nhiều lần tiêm lỗi khác nhau không có một service gốc duy nhất, nên bị loại khỏi Hit@k và số lượng bị loại được báo cáo riêng. \textbf{Alert Reduction Ratio} (ARR) đo mức gom theo Phương trình~\eqref{eq:ch2-arr}:
+\begin{equation}
+  \mathrm{ARR} = 1 - \frac{\text{số incident}}{\text{số cảnh báo}}.
+  \label{eq:ch2-arr}
+\end{equation}
+
+Ví dụ: ở Mục~\ref{sec:ch2-rca}, ba cảnh báo gộp thành một incident, $\mathrm{ARR} = 1 - 1/3 \approx 0{,}67$. Nếu danh sách xếp hạng là [\code{paymentservice}, \code{checkoutservice}, \code{frontend}], incident đó tính $\mathrm{Hit@1} = 1$; nếu \code{paymentservice} đứng thứ hai thì $\mathrm{Hit@1} = 0$ nhưng $\mathrm{Hit@3} = 1$. Baseline để so sánh là ``service có điểm bất thường cao nhất trong incident''. Ngoài ra, tỉ lệ báo cáo JSON hợp lệ cũng được đo. Các chỉ số này dùng cho H5 ở Mục~\ref{sec:ch5-rca}.
+
+\subsubsection{Bootstrap CI và kiểm định McNemar}
+\label{sec:ch2-thong-ke}
+
+Số cửa sổ có sự cố trong mỗi split chỉ vài trăm, nên chênh lệch nhỏ giữa hai phương pháp có thể chỉ là nhiễu. Đề tài dùng hai công cụ để tách tín hiệu khỏi nhiễu.
+
+\textbf{Khoảng tin cậy bootstrap}~\cite{efron1993bootstrap} ước lượng độ bất định của một chỉ số mà không cần giả định phân phối. Cách làm như sau. Lấy mẫu lại có hoàn lại $N$ cửa sổ từ $N$ cửa sổ của tập đánh giá, rồi tính chỉ số trên mẫu đó. Lặp 1.000 lần, với seed cố định 42. CI 95\% là khoảng từ phân vị 2,5\% đến phân vị 97,5\% của 1.000 giá trị. Để so sánh hai phương pháp A và B, dùng \textbf{bootstrap ghép cặp}: mỗi lần lấy mẫu chọn cùng một tập cửa sổ cho cả hai và tính hiệu $\Delta = \text{chỉ số}(A) - \text{chỉ số}(B)$. Nếu CI của $\Delta$ chứa 0, chưa đủ bằng chứng để khẳng định khác biệt.
+
+\textbf{Kiểm định McNemar chính xác}~\cite{mcnemar1947note} so sánh hai phương pháp phân loại trên cùng tập cửa sổ. Kiểm định chỉ dùng các cửa sổ mà hai phương pháp \textbf{bất đồng}: $b$ là số cửa sổ A đúng mà B sai, $c$ là số cửa sổ A sai mà B đúng. Dưới giả thuyết không có khác biệt, mỗi cửa sổ bất đồng nghiêng về A hay B với xác suất như nhau, nên giá trị $p$ hai phía được tính theo Phương trình~\eqref{eq:ch2-mcnemar}:
+\begin{equation}
+  n = b + c, \qquad
+  p = \min\!\left(1,\; 2 \sum_{i=0}^{\min(b, c)} \binom{n}{i} 0{,}5^n\right).
+  \label{eq:ch2-mcnemar}
+\end{equation}
+
+Ví dụ minh hoạ (số giả định): nếu $b = 3$ và $c = 12$ thì $n = 15$ và $p = 2 \cdot (1 + 15 + 105 + 455) / 32.768 \approx 0{,}035$, nhỏ hơn mức ý nghĩa $\alpha = 0{,}05$.
+
+Đề tài kiểm định với $\alpha = 0{,}05$ và kiểm định hai phía. H2 là giả thuyết chính; với các giả thuyết phụ, $p$ được báo thô, không hiệu chỉnh đa so sánh, và điều này được nêu như một giới hạn ở Mục~\ref{sec:ch7-threats}. Độ dao động của judge được đo riêng bằng cách gọi lại cùng prompt (\code{repeat} 1, 2) trên một tập con cố định 200 cửa sổ; kết quả này được báo cáo nhưng không dùng để quyết định giả thuyết. Mọi hiệu ở Chương~\ref{ch:thuc-nghiem} đều kèm CI bootstrap, và mọi so sánh ghép cặp đều kèm $p$ McNemar.
+
+% -----------------------------------------------------------------------------
+\subsection{Giả thuyết nghiên cứu và đăng ký trước}
+\label{sec:ch2-dang-ky}
+
+\textbf{Đăng ký trước} (\emph{pre-registration}) là việc ghi lại giả thuyết, phép so sánh và tiêu chí chấp nhận \emph{trước} khi nhìn dữ liệu kiểm định. Mục đích là chặn hai lỗi phổ biến: chỉnh tham số theo kết quả trên tập kiểm định, và đổi tiêu chí sau khi đã thấy số. Một bản đăng ký đầy đủ gồm ba phần: phát biểu giả thuyết, phép so sánh trên tập nào, và tiêu chí định lượng để chấp nhận hay không chấp nhận.
+
+Đề tài áp dụng kỷ luật này theo ba quy tắc. Mọi lựa chọn tham số chỉ dựa trên \splitname{dev} và \splitname{val}. Tập \splitname{test} chỉ được chạy một lần, sau khi bản đăng ký đã được lưu. Mọi sai lệch so với bản đăng ký khi chạy được ghi thành quyết định mới, không sửa ngược. Bản đăng ký sáu giả thuyết H0--H5 được lưu cố định ngày 14/11/2026, trước mọi lần chạy trên \splitname{test}. H2 là giả thuyết chính, với ngưỡng chấp nhận sai lệch recall $\delta = 0{,}05$. H1 là giả thuyết về cơ chế, đã được kiểm trên một mẫu cố định của \splitname{val} và không chạy lại trên \splitname{test}. Bảng đầy đủ của H0--H5 chỉ đặt một lần ở Bảng~\ref{tab:h0-h5} (Mục~\ref{sec:ch5-hypotheses}).
+
+% -----------------------------------------------------------------------------
+\subsection{Công nghệ nền tảng}
+\label{sec:ch2-cong-nghe}
+
+Mục này giới thiệu các công nghệ dùng để hiện thực hệ thống. Với mỗi công nghệ, mục nêu nó là gì, vai trò trong hệ và lý do chọn; cách các công nghệ được lắp thành một hệ hoàn chỉnh trình bày ở Mục~\ref{sec:ch4-impl}. Bảng~\ref{tab:ch2-cong-nghe} tóm tắt các công nghệ chính.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Công nghệ nền tảng: vai trò trong hệ và lý do chọn.}
+  \label{tab:ch2-cong-nghe}
+  \begin{tabularx}{\linewidth}{@{}l l Y Y@{}}
+    \toprule
+    \textbf{Công nghệ} & \textbf{Phiên bản} & \textbf{Vai trò trong hệ} & \textbf{Lý do chọn} \\
+    \midrule
+    Python & $\ge 3.11$ & Ngôn ngữ của mọi service, harness thực nghiệm và script & Hệ sinh thái khoa học dữ liệu; một ngôn ngữ cho cả thực nghiệm lẫn hệ thống \\
+    scikit-learn~\cite{pedregosa2011sklearn} & $\ge 1.4$ & Isolation Forest của bộ phát hiện & Cài đặt chuẩn, có kiểm thử, tham số rõ ràng \\
+    Gemini API~\cite{google2026gemini} (\code{gemini-2.5-flash}) & REST \code{v1beta} & Judge của \CTAV{} và bộ tóm tắt của tác tử RCA & Một model API cố định cho mọi phương pháp; trả JSON; chi phí thấp cho hàng chục nghìn lần gọi \\
+    ClickHouse~\cite{clickhouse2026docs} & 24.3 & Lưu mọi kết luận của judge cùng bằng chứng, phục vụ truy vấn phân tích & Cơ sở dữ liệu cột, truy vấn tổng hợp nhanh trên hàng chục nghìn candidate \\
+    PostgreSQL & 16 & Lưu incident và báo cáo chẩn đoán & Dữ liệu quan hệ, có ràng buộc, cần tính toàn vẹn \\
+    FastAPI & $\ge 0.110$ & API chỉ đọc cho dashboard & Kiểu dữ liệu tường minh qua Pydantic, tài liệu API tự sinh \\
+    React và Vite & React 19, Vite 8 & Dashboard bốn màn hình & Giao diện thành phần; build tĩnh, chạy ngoại tuyến \\
+    Docker Compose & --- & Triển khai toàn hệ bằng một lệnh, hai profile \code{dev} và \code{full} & Tái lập môi trường trên máy khác, kể cả lúc demo \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Có hai điểm cần nói rõ. Thứ nhất, Gemini được dùng cho mọi phương pháp với cùng prompt và cùng $\text{temperature} = 0$, nên khác biệt giữa các phương pháp không đến từ khác biệt mô hình. Mọi lần gọi đi qua cache (Mục~\ref{sec:ch2-ngan-sach}), nhờ đó thực nghiệm tái lập được mà không cần gọi lại API. Thứ hai, hai cơ sở dữ liệu có vai trò khác nhau. ClickHouse giữ dữ liệu dạng sự kiện, nhiều dòng và chủ yếu đọc để tổng hợp; PostgreSQL giữ đối tượng có quan hệ (incident chứa cảnh báo, báo cáo gắn incident). Phiên bản Python và thư viện lấy từ \code{pyproject.toml}, phiên bản cơ sở dữ liệu từ \code{docker-compose.yml}, phiên bản giao diện từ \code{services/web/package.json}.
+
+% -----------------------------------------------------------------------------
+\subsection{Kết chương}
+\label{sec:ch2-ket-chuong}
+
+Chương này đã trình bày các khái niệm và công nghệ mà hệ thống dựa vào, theo thứ tự xử lý. Dữ liệu là các cửa sổ 60~s của bộ Nezha, chia chống rò rỉ theo lần tiêm lỗi và đánh giá trên cửa sổ có telemetry. Isolation Forest sinh candidate nhưng không lấp được khoảng trống ngữ nghĩa giữa số đo lệch và sự cố thật. Truy xuất bằng chứng bằng BM25, đồ thị phụ thuộc service và Fusion Score cấp ngữ cảnh cho một judge LLM có đầu ra cấu trúc. Judge này chịu thiên lệch xác nhận và có độ tin cậy chưa hiệu chỉnh, nên cần một chính sách quyết định dựa trên nguồn gốc bằng chứng. Gom incident và lan truyền ngược trên đồ thị đưa cảnh báo đã xác nhận về service gốc. Chỉ số phân loại, Hit@k, ARR, bootstrap CI, McNemar và đăng ký trước tạo thành khung đánh giá. Bảng~\ref{tab:ch2-doi-chieu} đối chiếu từng khái niệm với thành phần và mục sử dụng nó. Mọi thành phần ở Chương~\ref{ch:de-xuat} và mọi phép đo ở Chương~\ref{ch:thuc-nghiem} đều có khái niệm nền trong chương này, nên nền tảng đã đủ để trình bày phần đề xuất.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Khái niệm và công nghệ của Chương~2, thành phần sử dụng, mục ở Chương~4--6 và giả thuyết kiểm.}
+  \label{tab:ch2-doi-chieu}
+  \begin{tabularx}{\linewidth}{@{}Y Y l l@{}}
+    \toprule
+    \textbf{Khái niệm, công nghệ (mục)} & \textbf{Thành phần} & \textbf{Dùng ở} & \textbf{Giả thuyết} \\
+    \midrule
+    Cửa sổ, nhãn, split, cửa sổ có telemetry (\ref{sec:ch2-du-lieu}) & Harness thực nghiệm & Mục~\ref{sec:ch4-impl}, \ref{sec:ch5-data} & H0--H5 \\
+    Isolation Forest (\ref{sec:ch2-iforest}) & Bộ phát hiện & Mục~\ref{sec:ch4-detector} & --- \\
+    Khôi phục ngữ cảnh (\ref{sec:ch2-rag}) & C5 Rescue Score (chỉ ablation) & Mục~\ref{sec:ch4-detector}, \ref{sec:ch5-c5} & H3 \\
+    BM25 (\ref{sec:ch2-bm25}) & Baseline BM25 & Mục~\ref{sec:ch4-bm25} & H0, H2 \\
+    Đồ thị phụ thuộc, Fusion Score (\ref{sec:ch2-do-thi}, \ref{sec:ch2-fusion}) & C1 truy xuất lai BM25--topology & Mục~\ref{sec:ch4-c1} & H0, H1, H2 \\
+    LLM-as-a-Judge, đầu ra JSON, cache (\ref{sec:ch2-prompt}, \ref{sec:ch2-ngan-sach}) & Judge của \CTAV{} & Mục~\ref{sec:ch4-judge} & H2, H4 \\
+    Thẩm định theo tầng (\ref{sec:ch2-ngan-sach}) & C4 định tuyến hai tầng (đã loại) & Mục~\ref{sec:ch4-c4} & H3 \\
+    Ngân sách gọi LLM (\ref{sec:ch2-ngan-sach}) & Chính sách ngân sách & Mục~\ref{sec:ch4-judge}, \ref{sec:ch5-h4}, \ref{sec:ch5-budget} & H4 \\
+    Thiên lệch xác nhận, hiệu chỉnh ngưỡng (\ref{sec:ch2-thien-lech}) & Ngưỡng $\theta$ & Mục~\ref{sec:ch4-policy} & H1, H2 \\
+    Nguồn gốc bằng chứng (\ref{sec:ch2-thien-lech}) & C2 gating (đã loại), C3 neo bằng chứng & Mục~\ref{sec:ch4-policy} & H3 \\
+    Gom incident, lan truyền ngược, báo cáo JSON (\ref{sec:ch2-rca}) & Tác tử RCA & Mục~\ref{sec:ch4-rca} & H5 \\
+    Precision, Recall, F1, FPR, Hit@k, ARR (\ref{sec:ch2-chi-so}, \ref{sec:ch2-hitk}) & Harness thực nghiệm & Mục~\ref{sec:ch5-metrics}, \ref{sec:ch5-val}--\ref{sec:ch5-rca} & H0--H5 \\
+    Bootstrap CI, McNemar, đăng ký trước (\ref{sec:ch2-thong-ke}, \ref{sec:ch2-dang-ky}) & Giao thức kiểm định & Mục~\ref{sec:ch5-hypotheses}, \ref{sec:ch5-metrics} & H0--H5 \\
+    Công nghệ nền tảng (\ref{sec:ch2-cong-nghe}) & Platform & Mục~\ref{sec:ch4-impl}, Ch.~\ref{ch:platform} & --- \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
