@@ -281,8 +281,8 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 #### 2.3.3 Fusion retrieval và Fusion Score [MỚI]
 - Score = α·BM25_norm + β·exp(−|t_e−t₀|/τ_F) + γ·GraphSim, α+β+γ = 1, hằng số thời gian τ_F = 300 s (viết τ_F để phân biệt với ngưỡng τ của Rescue Score); cấu hình A4 (0,35; 0,25; 0,40), 2-hop, top-6.
-- Temporal-only / graph-only là ablation của C1; RRF/reranker/cross-modal không dùng (QĐ-011), chỉ nhắc để định vị.
-- `k_graph` quét ở QĐ-024/025; CTAV dùng C1-paper `k_graph` 0 (`ctav_final.yaml`).
+- Chỉ nêu công thức và ý nghĩa ba trọng số; định nghĩa BM25_norm (min-max trên pool), t₀ (giữa cửa sổ), GraphSim = 0 khi không tới được. RRF/reranker không dùng (QĐ-011), chỉ nhắc để định vị.
+- Cấu hình (`k_graph`, lưới α/β/γ, temporal-only/graph-only) thuộc §4.3.3, không đặt ở đây (sửa 2026-11-18).
 
 > Nguồn: `08` §2, §4; QĐ-011, QĐ-024, QĐ-025. Trạng thái: ✅
 
@@ -299,39 +299,38 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 > Nguồn: `phase1.txt` tr.22–28; `08` §4.1; QĐ-013. Trạng thái: ✅
 
-#### 2.4.2 Cơ chế LLM-as-a-Judge hai tầng [TÁI SỬ DỤNG GĐ1 §2.7, rút gọn]
-- Định nghĩa judge; kiến trúc hai tầng (rẻ → đắt) là tiền đề của routing C4 (nay là ablation).
+#### 2.4.2 Thẩm định theo tầng và kiểm soát ngân sách [TÁI SỬ DỤNG GĐ1 §2.7, rút gọn]
+- Định nghĩa judge; ý tưởng thẩm định theo tầng (rẻ → đắt) chỉ nêu như khái niệm. C4 (định tuyến hai tầng) **đã loại**; vai trò và lý do để ở §4.3.5.
 - Luật `require_evidence`; `manual_review` khi hết ngân sách/lỗi.
+- Gộp §2.6.4 cũ (sửa 2026-11-18): ngân sách gọi LLM, xử lý candidate theo thứ tự thời gian, đường F1 theo ngân sách; cache key = sha256(prompt + model + temperature + max_tokens + repeat).
 
-> Nguồn: `phase1.txt` tr.30–31; `chuong-bai-toan.md` §2. Trạng thái: ✅
+> Nguồn: `phase1.txt` tr.30–31; `chuong-bai-toan.md` §2; `08` §4.1, §5; QĐ-013, QĐ-026. Trạng thái: ✅
 
 #### 2.4.3 Thiên lệch xác nhận, hiệu chỉnh và nguồn gốc bằng chứng [MỚI]
-- Thiên lệch xác nhận của LLM khi ngữ cảnh gợi ý sự cố; confidence bằng lời không tự hiệu chỉnh → ngưỡng θ chọn trên `val`/`dev` (θ = 0,80).
-- Evidence anchoring (C3): TRUE_ALERT phải trích bằng chứng bất thường tại s₀ (log ERROR/WARN hoặc span vượt ngưỡng nền `dev` p90); độ phủ ≈ 32% span, 15 service không có ngưỡng (Phát hiện 11).
-- Asymmetric gating C2 (θ_topo > θ_local) và routing C4: nêu lý thuyết và kết quả ablation bỏ chúng (QĐ-031).
-- Tài liệu tham khảo ngoài repo về LLM-judge bias/calibration chưa có — cần bổ sung khi viết Ch3, không bịa trích dẫn.
+- Thiên lệch xác nhận của LLM khi ngữ cảnh gợi ý sự cố; confidence bằng lời không tự hiệu chỉnh → cần ngưỡng θ chọn trên dữ liệu tinh chỉnh (giá trị θ để ở §4.3.4).
+- Nguồn gốc bằng chứng (provenance): bằng chứng ở chính s₀ hay ở service lân cận; ý tưởng neo kết luận vào bằng chứng bất thường của chính service (khái niệm nền của C3) và ngưỡng theo nguồn bằng chứng (khái niệm nền của C2).
+- **Không** đặt kết quả ở đây (sửa 2026-11-18): độ phủ ngưỡng nền, Phát hiện 11, kết quả ablation C2/C4 thuộc Ch4/Ch5.
+- Tài liệu tham khảo ngoài repo về LLM-judge bias/calibration chưa có — giữ `[CẦN TRA CỨU]`, không bịa trích dẫn.
 
-> Nguồn: `08` §4 (C2–C4), QĐ-027, QĐ-029, QĐ-031. Trạng thái: ✅ (thiết kế/`val`); tham khảo ⏳ Ch3
+> Nguồn: `08` §4 (C2–C4), QĐ-027, QĐ-029. Trạng thái: ✅ (khái niệm); tham khảo ⏳
 
-#### 2.4.4 Rescue Score (C5) [MỚI, nối GĐ1 §2.9]
-- RescueScore = η1·Λ_log + η2·Φ_topo + η3·Δ_time; η ≥ 0, Σ = 1; ngưỡng τ.
-- `val` (QĐ-033): rút về 2 thành phần (η = 0; 0,4; 0,6; τ = 0,8), +2 TP / +16 FP, ΔF1 +0,001 [−0,014; +0,022] — không đáng kể; ở M8 chỉ là một điểm ablation của H3 (V34 (b), QĐ-034). Số `test` [CHỜ M8].
-- Viết ngắn; không phải đóng góp chính.
+#### ~~2.4.4 Rescue Score (C5)~~ — đã bỏ khỏi Chương 2 (2026-11-18)
+- C5 chỉ là ablation, không thuộc cấu hình chốt. Công thức, tham số và số `val` chuyển về §4.2 (Isolation Forest và cổng Rescue); Chương 2 chỉ giữ một câu về "khôi phục ngữ cảnh" ở §2.3.4 làm khái niệm nền.
 
-> Nguồn: `01` §6.2; QĐ-008, QĐ-033; QĐ-034. Trạng thái: ✅ (`val`), ⏳ M8
+> Nguồn: `01` §6.2; QĐ-008, QĐ-033; QĐ-034.
 
 ### 2.5 Phân tích nguyên nhân gốc (RCA) trên microservice
 
 #### 2.5.1 Bài toán RCA và gom incident [MỚI]
-- Định nghĩa root cause service, cascade fault, alert → incident; grouping: cửa sổ trượt T_group = 300 s + thành phần liên thông trên đồ thị con (không gọi LLM).
+- Định nghĩa root cause service, cascade fault, alert → incident; grouping theo khoảng cách thời gian + thành phần liên thông trên đồ thị con (không gọi LLM). Chỉ nêu khái niệm; giá trị `T_group` (180 s, QĐ-041) để ở §4.4.1 (sửa 2026-11-18).
 
-> Nguồn: `01` §6.5. Trạng thái: ⏳ M9
+> Nguồn: `01` §6.5; `rca_final.yaml`. Trạng thái: ✅
 
 #### 2.5.2 Lan truyền ngược trên đồ thị gọi [MỚI]
-- Mức 1: từ span lỗi ở frontend đi ngược 1 hop, chọn upstream bất thường; mức 2: LLM lập luận call chain (nếu kịp).
+- Đi ngược theo cạnh phụ thuộc 1 hop, ưu tiên service upstream cũng bất thường. Mức 2 (LLM lập luận call chain) đã cắt (QĐ-037), không nhắc như phương án.
 - Giới hạn: replica, nhiễu, quan hệ gọi ≠ nhân quả.
 
-> Nguồn: `01` §6.5. Trạng thái: ⏳ M9
+> Nguồn: `01` §6.5; QĐ-037, QĐ-041. Trạng thái: ✅
 
 #### 2.5.3 Báo cáo chẩn đoán có cấu trúc [MỚI]
 - Summarizer gọi LLM một lần/incident, JSON schema cố định, validator, `require_evidence`; JSON valid rate.
@@ -358,10 +357,8 @@ Bìa → Lời cam đoan → Lời cảm ơn → Tóm tắt → Abstract → M�
 
 > Nguồn: mục "Đăng ký giả thuyết H0–H5" cuối `experiment-log.md` (đã đăng ký 2026-11-14, commit `be2b985`); `01` §6.8. Trạng thái: ✅
 
-#### 2.6.4 Đánh giá theo ngân sách và chi phí [MỚI]
-- Ngân sách gọi LLM, đường F1 theo ngân sách (120 … đủ), chi phí token/USD; cache key = sha256(prompt+model+temperature+max_tokens+repeat).
-
-> Nguồn: `08` §4.1, §5; QĐ-013, QĐ-026. Trạng thái: ✅ (thiết kế), ⏳ M8
+#### ~~2.6.4 Đánh giá theo ngân sách và chi phí~~ — gộp vào §2.4.2 (2026-11-18)
+- Outline không có mục này; nội dung (ngân sách, đường F1 theo ngân sách, cache key) chuyển lên §2.4.2 "Thẩm định theo tầng và kiểm soát ngân sách".
 
 ### 2.7 Giả thuyết nghiên cứu và đăng ký trước [MỚI]
 - Vì sao đăng ký trước, và đăng ký những gì (giả thuyết, so sánh, tiêu chí chấp nhận). **Không lặp bảng ở đây:** bảng H0–H5 đầy đủ chỉ đặt ở §5.1 (Bảng 5.1), mục này trỏ sang đó. H2 là giả thuyết chính, δ = 0,05 (V33 (a)); H1 đã kiểm trên `val`, không chạy lại trên `test`.
