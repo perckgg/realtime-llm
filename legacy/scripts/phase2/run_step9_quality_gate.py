@@ -170,10 +170,10 @@ def check_provenance() -> GateCheck:
             for artifact_name, artifact_path in variant.get("artifacts", {}).items():
                 if artifact_name == "cache_jsonl":
                     continue
-                path = Path(artifact_path)
+                path = absolute(artifact_path)
                 if not path.exists():
                     missing_sources.append(str(path))
-                evidence.append(relative(path) if path.is_relative_to(ROOT) else str(path))
+                evidence.append(relative(path))
     return gate(
         "result_provenance",
         "Every paper result traces to a source artifact and View B traces to audit/config/summary.",
@@ -445,7 +445,7 @@ def check_key_configs() -> GateCheck:
     for variant in view_b["variants"]:
         config_path = variant["artifacts"].get("config_snapshot")
         if config_path:
-            required.append(Path(config_path))
+            required.append(absolute(config_path))
     missing = [relative(path) for path in required if not path.exists()]
     return gate(
         "key_configs_stored",
@@ -612,13 +612,32 @@ def write_markdown(
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def absolute(path: str) -> Path:
+def absolute(path: str | Path) -> Path:
     candidate = Path(path)
-    return candidate if candidate.is_absolute() else ROOT / candidate
+    if candidate.is_absolute():
+        if candidate.exists():
+            return candidate
+        posix = candidate.as_posix()
+        for marker in ("outputs/phase2", "nezha_setup"):
+            idx = posix.find(marker)
+            if idx != -1:
+                remapped = ROOT / posix[idx:]
+                if remapped.exists():
+                    return remapped
+        return candidate
+    return ROOT / candidate
 
 
 def relative(path: Path) -> str:
-    return path.relative_to(ROOT).as_posix()
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        posix = path.as_posix()
+        for marker in ("outputs/phase2", "nezha_setup"):
+            idx = posix.find(marker)
+            if idx != -1:
+                return posix[idx:]
+        return posix
 
 
 if __name__ == "__main__":

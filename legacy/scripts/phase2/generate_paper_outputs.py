@@ -22,6 +22,22 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 
+def resolve_path(path: str | Path) -> Path:
+    candidate = Path(path)
+    if candidate.is_absolute():
+        if candidate.exists():
+            return candidate
+        posix = candidate.as_posix()
+        for marker in ("outputs/phase2", "nezha_setup"):
+            idx = posix.find(marker)
+            if idx != -1:
+                remapped = ROOT / posix[idx:]
+                if remapped.exists():
+                    return remapped
+        return candidate
+    return ROOT / candidate
+
+
 METHOD_LABELS = {
     "detector_only": "Detector-only",
     "llm_without_rag": "LLM without RAG",
@@ -244,8 +260,8 @@ def build_fault_type_rows() -> list[dict[str, Any]]:
                     report["protocol"]["split"],
                     report["protocol"]["budget_regime"],
                     variant["variant"],
-                    Path(variant["artifacts"]["by_fault_type_csv"]),
-                    Path(variant["artifacts"]["audit_jsonl"]),
+                    resolve_path(variant["artifacts"]["by_fault_type_csv"]),
+                    resolve_path(variant["artifacts"]["audit_jsonl"]),
                 )
             )
     for view, split, regime, method, metrics_path, audit_path in specs:
