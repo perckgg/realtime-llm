@@ -75,6 +75,7 @@ const Timeline = (await import("@/screens/Timeline")).default;
 const AlertDetail = (await import("@/screens/AlertDetail")).default;
 const IncidentDetail = (await import("@/screens/IncidentDetail")).default;
 const ExperimentComparison = (await import("@/screens/ExperimentComparison")).default;
+const MethodologyGuide = (await import("@/screens/MethodologyGuide")).default;
 
 const firstRun = runs[0]!;
 const firstAlert = listAlerts(firstRun.run_id)[0]!;
@@ -183,6 +184,18 @@ const CASES: {
       ["renders H5 0/4 criteria", (h) => h.includes("Rejected (0/4 criteria)") && h.includes("Alert Reduction ≥ 30% on cascade incidents")],
       ["renders real CTAV test F1 (0.066)", (h) => h.includes("0.066")],
       ["renders H5 RCA table", (h) => h.includes("C3-rolling (test — sensitivity)")],
+    ],
+  },
+  {
+    name: "Methodology guide",
+    path: "/guide",
+    routePath: "/guide",
+    element: <MethodologyGuide />,
+    expect: [
+      ["renders guide heading", (h) => h.includes("Methodology, Mathematical Formulations")],
+      ["renders H0-H5 outcomes", (h) => h.includes("Pre-Registered Hypothesis Outcomes")],
+      ["renders C1 fusion formula", (h) => h.includes("S_fusion(e, w)")],
+      ["renders glossary", (h) => h.includes("Glossary of Terminology")],
     ],
   },
 ];

@@ -10,13 +10,13 @@
  */
 
 export const ink = {
-  primary: "#0b0b0b",
-  secondary: "#52514e",
-  muted: "#898781",
-  grid: "#e1e0d9",
-  axis: "#c3c2b7",
-  surface: "#fcfcfb",
-  plane: "#f9f9f7",
+  primary: "#1f1b16",
+  secondary: "#524a3e",
+  muted: "#7a7062",
+  grid: "#e3dac8",
+  axis: "#c7bca6",
+  surface: "#faf6ed",
+  plane: "#f3ede0",
 } as const;
 
 /** Categorical — gán theo thứ tự cố định, không xoay vòng. */

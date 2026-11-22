@@ -13,17 +13,18 @@
    trong Giai đoạn 2: nó tốn thời gian đánh bóng mà không đóng góp gì cho luận văn.
 --------------------------------------------------------------------------- */
 @theme {
-  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Bề mặt và mực */
-  --color-surface: #fcfcfb;
-  --color-plane: #f9f9f7;
-  --color-ink: #0b0b0b;
-  --color-ink-2: #52514e;
-  --color-ink-muted: #898781;
-  --color-grid: #e1e0d9;
-  --color-axis: #c3c2b7;
-  --color-hairline: rgb(11 11 11 / 0.1);
+  /* Surfaces & ink — warm eye-comfort paper-cream theme */
+  --color-surface: #faf6ed;
+  --color-plane: #f3ede0;
+  --color-ink: #1f1b16;
+  --color-ink-2: #524a3e;
+  --color-ink-muted: #7a7062;
+  --color-grid: #e3dac8;
+  --color-axis: #c7bca6;
+  --color-hairline: rgb(68 52 28 / 0.13);
 
   /* Categorical — thứ tự cố định, không bao giờ xoay vòng */
   --color-series-1: #2a78d6; /* blue */
@@ -54,6 +55,7 @@ body,
 body {
   background: var(--color-plane);
   color: var(--color-ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
