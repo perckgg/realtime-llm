@@ -40,3 +40,6 @@ archive/phase1_extra/data/
 *.egg-info/
 build/
 dist/
+
+# Generated static GitHub Pages API mirror (committed only on demo/gh-pages)
+services/web/public/static-api/

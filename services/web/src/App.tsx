@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NavLink, Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import { api } from "@/api/client";
-import { FixtureBanner, Loading, ErrorBox } from "@/components/ui";
+import { FixtureBanner, StaticSnapshotBanner, Loading, ErrorBox } from "@/components/ui";
 import { RunContext, isSensitivityRunId, resolveRunId, type RunCtx } from "@/lib/runContext";
 import { useAsync } from "@/lib/util";
 import { strategyLabel } from "@/theme/tokens";
@@ -61,6 +61,7 @@ export default function App() {
     <RunContext.Provider value={ctx}>
       <div className="flex min-h-full flex-col">
         <FixtureBanner />
+        <StaticSnapshotBanner />
         <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[color:var(--color-hairline)] bg-surface px-5 py-3">
           <div className="flex items-baseline gap-6">
             <div>

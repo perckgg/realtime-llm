@@ -14,6 +14,7 @@ const apiProxy = {
 };
 
 export default defineConfig({
+  base: process.env.VITE_BASE_PATH ?? "/",
   plugins: [react(), tailwindcss()],
   // Alias `@/` phải khai ở CẢ hai nơi: tsconfig `paths` chỉ dạy TypeScript,
   // còn Vite phân giải import lúc chạy hoàn toàn độc lập với nó.

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { cx } from "@/lib/util";
-import { USING_FIXTURES } from "@/api/client";
+import { USING_FIXTURES, USING_STATIC_SNAPSHOT } from "@/api/client";
 import type { Verdict } from "@/api/types";
 import { verdictColor, verdictGlyph, verdictLabel } from "@/theme/tokens";
 
@@ -128,6 +129,73 @@ export function FixtureBanner() {
         <code className="font-mono">VITE_DATA_SOURCE=http</code> to read from{" "}
         <code className="font-mono">services/api</code>.
       </span>
+    </div>
+  );
+}
+
+const STATIC_DEMO_STEPS = [
+  {
+    label: "1. Timeline (test)",
+    to: "/timeline?run_id=pipeline_test_v2",
+    title: "13,699 candidates -> 78 TRUE_ALERT -> 38 incidents",
+  },
+  {
+    label: "2. C3 downgrade",
+    to: "/alerts/cand-ad327c0b162f6198%3Ahybrid_bm25_graph%3Ar0?run_id=pipeline_test_v2",
+    title: "Normal window on productcatalogservice downgraded by C3 anchoring",
+  },
+  {
+    label: "3. CTAV network_delay",
+    to: "/alerts/cand-fa85e82f02f08574%3Ahybrid_bm25_graph%3Ar0?run_id=pipeline_test_v2",
+    title: "cartservice network_delay caught by C1 + C3 (missed by BM25)",
+  },
+  {
+    label: "4. Cascade RCA (sens.)",
+    to: "/incidents/inc-46289ea526eaa3f3?run_id=pipeline_sens_test_v1",
+    title: "Multi-service cascade on sensitivity line (outside H5 registration)",
+  },
+  {
+    label: "5. H0–H5 Results",
+    to: "/compare",
+    title: "Pre-registered H0-H5 evaluation table on test and val",
+  },
+] as const;
+
+/**
+ * Dải thông tin cho bản tĩnh trên GitHub Pages: công bố rõ snapshot thật M8–M10
+ * và cung cấp thanh 5 bước kịch bản trình diễn Chương 6.
+ */
+export function StaticSnapshotBanner() {
+  if (!USING_STATIC_SNAPSHOT) return null;
+  return (
+    <div
+      className="flex flex-wrap items-center justify-between gap-2 border-b px-5 py-1.5 text-[11.5px]"
+      style={{
+        borderColor: "var(--color-hairline)",
+        background: "color-mix(in srgb, var(--color-accent) 8%, var(--color-surface))",
+        color: "var(--color-ink-2)",
+      }}
+      role="status"
+    >
+      <span>
+        <strong className="font-semibold text-ink">Static GitHub Pages snapshot</strong> — verified
+        M8–M10 runs (<code className="font-mono">pipeline_test_v2</code>,{" "}
+        <code className="font-mono">pipeline_val_v2</code>,{" "}
+        <code className="font-mono">pipeline_sens_test_v1</code>; 0 live API calls).
+      </span>
+      <nav aria-label="Chapter 6 demo tour" className="flex flex-wrap items-center gap-1.5">
+        <span className="text-[11px] font-medium text-ink-muted">Demo tour:</span>
+        {STATIC_DEMO_STEPS.map((step) => (
+          <Link
+            key={step.label}
+            to={step.to}
+            title={step.title}
+            className="rounded border border-[color:var(--color-hairline)] bg-surface px-2 py-0.5 text-[11px] font-medium text-ink transition-colors hover:bg-[color:var(--color-plane)]"
+          >
+            {step.label}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }
