@@ -69,7 +69,7 @@
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{xcolor,colortbl}
-\usepackage{minted} 
+% \usepackage{minted} % Không sử dụng trong báo cáo; bỏ để tránh phụ thuộc pygmentize/-shell-escape
 \hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
 \usepackage{indentfirst}
 \usepackage{amsmath}
@@ -209,7 +209,7 @@
 %\renewcommand{\textfraction}{0.15}
 %\renewcommand{\floatpagefraction}{0.8}
 %\renewcommand{\textfraction}{0.1}
-\renewcommand{\listfigurename}{List of plots}
+\renewcommand{\listfigurename}{Danh sách hình}
 
 \setlength{\floatsep}{5pt plus 2pt minus 2pt}
 \setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
@@ -337,6 +337,10 @@
  \newpage
  \input{Sections/Ch5_ThucNghiemVaDanhGia}
  \newpage
+ \input{Sections/Ch6_DemoPlatform}
+ \newpage
+ \input{Sections/Ch7_ThaoLuan}
+ \newpage
 % \input{Sections/C2_CoSoLyThuyet}
 % \newpage
 %  \input{Sections/C3_CacSanPhamLienQuanDeTai}
@@ -418,49 +422,44 @@
 
 % \bibitem{restapi} \emph{What is a RESTful API?}, 10/10/2024, \url{https://aws.amazon.com/what-is/restful-api/?nc1=h_ls}
 
-\bibitem{calm} \emph{CALM: A Framework for Continuous, Adaptive, and
- LLM-Mediated Anomaly Detection in Time-Series Streams}, 01/09/2025, \url{https://arxiv.org/pdf/2508.21273}
- \bibitem{sigllm} \emph{Large language models can be zero-shot anomaly detectors for time series?}, 31/10/2024, \url{https://arxiv.org/pdf/2405.14755}
- \bibitem{aad-llm} \emph{Adaptive Anomaly Detection Using Large Language Models}, 01/11/2024, \url{https://www.semanticscholar.org/reader/620f58d59963bf4052a4abfbcb283d5623eb8eb9}
- \bibitem{raad-llm} \emph{RAAD-LLM: Adaptive Anomaly Detection Using LLMs and RAG Integration}, 11/03/2025, \url{https://arxiv.org/pdf/2503.02800}
- \bibitem{argos} \emph{ARGOS: Agentic Time-Series Anomaly Detection with Autonomous Rule
-Generation via Large Language Models}, 24/01/2025, \url{https://arxiv.org/pdf/2501.14170v1}
-%\bibitem{k6} \emph{Grafana k6}, 02/05/2025. \url{https://grafana.com/docs/k6/latest/}
- \bibitem{anomaly} \emph{A review on outlier/anomaly detection in time series data}, 11/02/2020, \url{https://arxiv.org/pdf/2002.04236}
-  \bibitem{asurvey} \emph{Anomaly Detection: A Survey}, 15/08/2007, \url{https://www.researchgate.net/publication/220565847_Anomaly_Detection_A_Survey}
-  \bibitem{anoma} \emph{AnomaMind: Agentic Time Series Anomaly Detection with
-Tool-Augmented Reasoning}, 14/02/2026, \url{https://arxiv.org/pdf/2602.13807}
-  \bibitem{deepsurvey} \emph{NetWalk: A Flexible Deep Embedding Approach for Anomaly
-Detection in Dynamic Networks}, 23/08/2018, \url{https://www.researchgate.net/publication/329087157_A_Deep_Neural_Network_for_Unsupervised_Anomaly_Detection_and_Diagnosis_in_Multivariate_Time_Series_Data}
-\bibitem{judge} \emph{LLM-as-a-Judge for Time Series Explanations}, 02/04/2026, \url{https://arxiv.org/pdf/2604.02118}
-\bibitem{graph} \emph{Graph neural network-based anomaly detection in multivariate time series}, 13/06/2021, \url{https://arxiv.org/pdf/2106.06947}
-\bibitem{role} \emph{The Role of Large Language Models (LLMs) in
-IT Operations}, 12/2024, \url{https://www.ijlrp.com/papers/2024/12/1482.pdf}
-\bibitem{llmops} \emph{What are large language model operations (LLMOps)?}, \url{https://www.ibm.com/think/topics/llmops}
-\bibitem{nezha} \emph{Nezha: Interpretable Fine-Grained Root Causes Analysis for Microservices on Multi-modal Observability Data}, 9/12/2023, \url{https://dl.acm.org/doi/10.1145/3611643.3616249}
-\bibitem{isof} \emph{Isolation Forest}, \url{https://ieeexplore.ieee.org/document/4781136}
-\bibitem{guha2016robust} 
-\emph{Robust Random Cut Forest Based Anomaly Detection on Streams}, 11/06/2016, \url{https://proceedings.mlr.press/v48/guha16.pdf}
+\bibitem{calm}
+A. Devireddy and S. Huang, ``CALM: Continuous Adaptive LLM-Mediated Real-Time Anomaly Detection,'' \textit{arXiv preprint arXiv:2508.21273}, 2025.
 
-\bibitem{zhao2020multivariate} 
-\emph{Multivariate Time-Series Anomaly Detection via Graph Attention Network}, 04/09/2020, \url{https://arxiv.org/abs/2009.02040}
+\bibitem{raad-llm}
+A. Russell-Gilbert \textit{et al.}, ``RAAD-LLM: Adaptive Anomaly Detection Using LLMs and RAG Integration,'' \textit{arXiv preprint arXiv:2503.02800}, 2025.
 
-\bibitem{deng2021graph} 
-\emph{Graph Neural Network-Based Anomaly Detection in Multivariate Time Series}, 15/06/2021, \url{https://arxiv.org/abs/2106.06947}
+\bibitem{argos}
+Y. Gu \textit{et al.}, ``ARGOS: Agentic Time-Series Anomaly Detection with Autonomous Rule Generation via Large Language Models,'' \textit{arXiv preprint arXiv:2501.14170}, 2025.
 
-\bibitem{zhong2024logparser} 
-\emph{LogParser-LLM: Advancing Efficient Log Parsing with Large Language Models}, 25/08/2024, \url{https://arxiv.org/abs/2408.13727}
+\bibitem{judge}
+P. Sivalingam, M. Mandal, S. Deshpande, and D. Kumar, ``TSQueryBench: LLM-as-a-Judge for Time-Series Explanations,'' in \textit{ICML Workshop on Foundation Models for Structured Data (FMSD)}, 2026.
 
-\bibitem{wang2024logllm} 
-\emph{LogLLM: Log-based Anomaly Detection Using Large Language Models}, 18/11/2024, \url{https://arxiv.org/abs/2411.08561}
+\bibitem{nezha}
+G. Yu, P. Chen, Y. Li, H. Chen, X. Li, and Z. Zheng, ``Nezha: Interpretable Fine-Grained Root Causes Analysis for Microservices on Multi-Modal Observability Data,'' in \textit{Proc. 31st ACM Joint Eur. Softw. Eng. Conf. Symp. Found. Softw. Eng. (ESEC/FSE)}, 2023, pp. 553--565. DOI: 10.1145/3611643.3616249.
 
-\bibitem{rcagent2023} 
-\emph{RCAgent: Cloud Root Cause Analysis by Autonomous Agents with Tool-Augmented Large Language Models}, 30/10/2023, \url{https://arxiv.org/abs/2310.16340}
+\bibitem{isof}
+F. T. Liu, K. M. Ting, and Z.-H. Zhou, ``Isolation Forest,'' in \textit{Proc. 8th IEEE Int. Conf. Data Mining (ICDM)}, 2008, pp. 413--422. DOI: 10.1109/ICDM.2008.17.
 
-\bibitem{thomas2025beyond} 
-\emph{Leveraging multi-agent framework for root cause analysis}, 2025, \url{https://link.springer.com/article/10.1007/s40747-025-02096-0}
+\bibitem{guha2016robust}
+S. Guha, N. Mishra, G. Roy, and O. Schrijvers, ``Robust Random Cut Forest Based Anomaly Detection on Streams,'' in \textit{Proc. 33rd Int. Conf. Machine Learning (ICML)}, PMLR vol. 48, 2016, pp. 2712--2721.
+
+\bibitem{zhao2020multivariate}
+H. Zhao \textit{et al.}, ``Multivariate Time-Series Anomaly Detection via Graph Attention Network,'' in \textit{Proc. 20th IEEE Int. Conf. Data Mining (ICDM)}, 2020, pp. 841--850. DOI: 10.1109/ICDM50108.2020.00093.
+
+\bibitem{deng2021graph}
+A. Deng and B. Hooi, ``Graph Neural Network-Based Anomaly Detection in Multivariate Time Series,'' in \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 35, no. 5, 2021, pp. 4027--4035.
+
+\bibitem{zhong2024logparser}
+A. Zhong \textit{et al.}, ``LogParser-LLM: Advancing Efficient Log Parsing with Large Language Models,'' in \textit{Proc. 30th ACM SIGKDD Conf. Knowledge Discovery and Data Mining (KDD)}, 2024, pp. 4559--4570. DOI: 10.1145/3637528.3671810.
+
+\bibitem{wang2024logllm}
+W. Guan, J. Cao, S. Qian, J. Gao, and C. Ouyang, ``LogLLM: Log-Based Anomaly Detection Using Large Language Models,'' \textit{IEEE Transactions on Software Engineering}, 2025 (arXiv:2411.08561).
+
+\bibitem{rcagent2023}
+Z. Wang \textit{et al.}, ``RCAgent: Cloud Root Cause Analysis by Autonomous Agents with Tool-Augmented Large Language Models,'' in \textit{Proc. 33rd ACM Int. Conf. Information and Knowledge Management (CIKM)}, 2024. DOI: 10.1145/3627673.3680016.
+
 \bibitem{icaetm2026}
-Nguyễn Văn Hoàng Khang và cộng sự, ``Topology-Aware Evidence Retrieval for Cost-Aware LLM Alert Validation in Microservices,'' \textit{Proceedings of ICAETM 2026 (Atlantis Press / Springer Nature)}, 2026.
+Nguyễn Văn Hoàng Khang, ``Topology-Aware Evidence Retrieval for Cost-Aware LLM Alert Validation in Microservices,'' \textit{Proceedings of ICAETM 2026 (Atlantis Press / Springer Nature)}, 2026.
 
 \bibitem{zhao2020alertstorm}
 N. Zhao \textit{et al.}, ``Understanding and Handling Alert Storm for Online Service Systems,'' in \textit{Proc. ACM/IEEE 42nd Int. Conf. Softw. Eng.: Softw. Eng. Pract. (ICSE-SEIP)}, 2020, pp. 162--171. DOI: 10.1145/3377813.3381363.
@@ -503,6 +502,24 @@ Google, ``Gemini API Documentation,'' 2026. \url{https://ai.google.dev/gemini-ap
 
 \bibitem{clickhouse2026docs}
 ClickHouse, Inc., ``ClickHouse Documentation,'' 2026. \url{https://clickhouse.com/docs} (Truy cập tháng 11/2026).
+
+\bibitem{python2026docs}
+Python Software Foundation, ``Python 3 Documentation,'' 2026. \url{https://docs.python.org/3/} (Truy cập tháng 11/2026).
+
+\bibitem{postgresql2026docs}
+The PostgreSQL Global Development Group, ``PostgreSQL 16 Documentation,'' 2026. \url{https://www.postgresql.org/docs/16/} (Truy cập tháng 11/2026).
+
+\bibitem{fastapi2026docs}
+S. Ramírez, ``FastAPI Documentation,'' 2026. \url{https://fastapi.tiangolo.com/} (Truy cập tháng 11/2026).
+
+\bibitem{react2026docs}
+Meta Platforms, Inc., ``React Documentation,'' 2026. \url{https://react.dev/} (Truy cập tháng 11/2026).
+
+\bibitem{vite2026docs}
+Vite Contributors, ``Vite Documentation,'' 2026. \url{https://vite.dev/} (Truy cập tháng 11/2026).
+
+\bibitem{docker2026compose}
+Docker, Inc., ``Docker Compose Documentation,'' 2026. \url{https://docs.docker.com/compose/} (Truy cập tháng 11/2026).
 
 \bibitem{ahmed2023recommending}
 T. Ahmed, S. Ghosh, C. Bansal, T. Zimmermann, X. Zhang, and S. Rajmohan, ``Recommending Root-Cause and Mitigation Steps for Cloud Incidents Using Large Language Models,'' in \textit{Proc. 45th IEEE/ACM Int. Conf. Softw. Eng. (ICSE)}, 2023, pp. 1737--1749. DOI: 10.1109/ICSE48619.2023.00149.
@@ -574,7 +591,8 @@ KeepHQ, ``Keep: Open-Source AIOps and Alert Management Platform Documentation,''
 HolmesGPT Contributors, ``HolmesGPT: Open-Source AI Investigation Agent Documentation,'' 2026. \url{https://holmesgpt.dev/} (Truy cập tháng 11/2026).
 \end{thebibliography}
 
-% \appendix
-% \input{Sections/Phuluc}
+\newpage
+\appendix
+\input{Sections/Phuluc_CTAV}
 
 \end{document}

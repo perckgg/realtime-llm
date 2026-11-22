@@ -14,10 +14,12 @@ venv/
 env/
 
 # Local editor/runtime files
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 *.log
 *.tmp
+*.synctex.gz
 
 # Docker volumes (Phase 2 docker-compose)
 volumes/

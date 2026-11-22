@@ -1,0 +1,153 @@
+% =============================================================================
+% Phu luc: Cau hinh bo sung, lenh van hanh va cac bang thuc nghiem bo tro
+% =============================================================================
+
+\section{Phụ lục: Lệnh vận hành harness và cấu hình kỹ thuật}
+\label{app:config}
+
+Phụ lục này tập hợp các lệnh dòng lệnh vận hành harness thực nghiệm, pipeline hợp nhất và bộ kiểm thử tự động (liên quan đến Mục~\ref{sec:ch4-impl}).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Các thành phần hiện thực hóa chính, lệnh vận hành và bộ tệp đầu ra bảo đảm tái lập.}
+  \label{tab:ch4-harness}
+  \footnotesize
+  \begin{tabularx}{\linewidth}{@{}l Y Y@{}}
+    \toprule
+    \textbf{Lớp / Thành phần} & \textbf{Lệnh hoặc giao diện chính} & \textbf{Đầu ra bất biến \& kiểm chứng} \\
+    \midrule
+    Harness thẩm định \& loại trừ & \code{py -m eval run|ctav|compare|ablation --config ...} & \code{metrics.json}, \code{per\_window.csv}, \code{retrieval.jsonl}, \code{config.snapshot.yaml}, \code{git\_commit.txt}, \code{runtime.json} \\
+    Harness RCA & \code{py -m eval rca --config eval/configs/rca\_final.yaml} & Bảng kiểm định H5, \code{reports.jsonl}, dấu vân tay phương pháp, ghi PostgreSQL \\
+    Pipeline hợp nhất & \code{py -m services.rca\_agent.pipeline --config ...} & Nạp đồng thời ClickHouse \& PostgreSQL từ cache; kiểm parity 100\% với harness \\
+    API \& Dashboard & \code{docker compose --profile dev up -d} (7 endpoint chỉ đọc + 4 màn hình web) & Truy vấn trực tiếp ClickHouse/PostgreSQL; hỗ trợ chạy \code{DEMO\_OFFLINE=1} \\
+    Kiểm thử tự động & \code{py -m pytest}, \code{py -m mypy packages services}, \code{py -m ruff check .} & Kiểm tra đơn vị cho Rescue, Fusion, policy, grouping, propagation, summarizer, API và parity \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\newpage
+\section{Phụ lục: Các bảng thực nghiệm bổ trợ và danh sách lượt chạy}
+\label{app:tables}
+
+Phụ lục này lưu trữ các bảng chi tiết bổ trợ cho Chương~\ref{ch:thuc-nghiem}: hiệu ghép cặp H0, quét hạn ngạch $k_{\text{graph}}$ và bảng ablation đầy đủ trên tập \splitname{val}; danh sách các lượt chạy chính thức của cổng G-test; bảng giá trị F1 theo ngân sách gọi LLM; và phân rã định vị RCA theo năm loại lỗi tiêm trên \splitname{test}.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Hiệu ghép cặp và kiểm định McNemar cho H0 trên tập val]{Hiệu ghép cặp và giá trị $p$ của kiểm định McNemar trên tập \splitname{val} ($7.636$ cửa sổ có telemetry, $209$ lỗi).}
+  \label{tab:ch5-val-h0-diff}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{@{}Y c c c c@{}}
+    \toprule
+    \textbf{Cặp so sánh} & \textbf{$\Delta$Recall [CI95]} & \textbf{$\Delta$FPR [CI95]} & \textbf{$\Delta$F1 [CI95]} & \textbf{McNemar $p$ (lỗi / b.thường)} \\
+    \midrule
+    C1-paper $-$ BM25 & $+0{,}100$ $[+0{,}052;\, +0{,}155]$ & $+0{,}0254$ $[+0{,}0204;\, +0{,}0306]$ & $+0{,}023$ $[-0{,}004;\, +0{,}052]$ & $< 0{,}001$ / $< 0{,}001$ \\
+    C1-quota $-$ BM25 & $+0{,}091$ $[+0{,}040;\, +0{,}145]$ & $+0{,}0226$ $[+0{,}0177;\, +0{,}0277]$ & $+0{,}022$ & $0{,}001$ / $< 0{,}001$ \\
+    C1-quota $-$ C1-paper & $-0{,}010$ $[-0{,}044;\, +0{,}028]$ & $-0{,}0028$ & $-0{,}001$ & $0{,}790$ / $0{,}160$ \\
+    Không-RAG $-$ BM25 & $-0{,}077$ & $-0{,}0338$ & $-0{,}011$ & $0{,}003$ / $< 0{,}001$ \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Kết quả quét hạn ngạch k\_graph trên tập val]{Ảnh hưởng của hạn ngạch $k_{\text{graph}}$ trên tập \splitname{val} (đánh giá ở tầng truy xuất, 0 lượt gọi LLM).}
+  \label{tab:ch5-val-kgraph}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{@{}r r r r Y@{}}
+    \toprule
+    \textbf{$k_{\text{graph}}$} & \textbf{Trúng gốc (/109)} & \textbf{Normal có lân cận (/1.640)} & \textbf{Lỗi đồng thời (/166)} & \textbf{Tỷ lệ vị trí cục bộ trong top-6} \\
+    \midrule
+    0 & 109 & 3 & 0 & 0,997 \\
+    1 & 109 & 1.177 & 7 & 0,831 \\
+    2 & 109 & 1.177 & 10 & 0,665 \\
+    3 & 109 & 1.177 & 16 & 0,499 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[So sánh các biến thể H3 quanh CTAV trên tập val]{Kết quả lựa chọn cấu hình \CTAV{} và loại trừ từng thành phần trên tập \splitname{val} ($7.636$ cửa sổ có telemetry, $209$ lỗi).}
+  \label{tab:ch5-val-h3}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}Y r r r r c r r@{}}
+    \toprule
+    \textbf{Biến thể trên \splitname{val}} & \textbf{TP} & \textbf{FP} & \textbf{Prec.} & \textbf{Recall} & \textbf{F1 [CI95]} & \textbf{FPR} & \textbf{USD} \\
+    \midrule
+    \textbf{\CTAV{}} (chốt: C1 + $\theta = 0{,}80$ + C3 \splitname{dev} $p_{90}$) & 29 & 51 & 0,363 & 0,139 & 0,201 [0,138; 0,264] & 0,0069 & 3,28 \\
+    + C2 ($\theta_{\text{topo}} = 0{,}85$) & 29 & 49 & 0,372 & 0,139 & 0,202 [0,139; 0,265] & 0,0066 & 3,28 \\
+    Bỏ C3 (\code{no\_c3} = C1) & 55 & 606 & 0,083 & 0,263 & 0,126 [0,095; 0,156] & 0,0816 & 3,28 \\
+    + C4 (định tuyến hai tầng) & 31 & 90 & 0,256 & 0,148 & 0,188 [0,130; 0,247] & 0,0121 & 5,14 \\
+    C3 ngưỡng trượt 60 phút & 34 & 255 & 0,118 & 0,163 & 0,137 [0,097; 0,179] & 0,0343 & 3,28 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Danh sách các lượt chạy kiểm định trên tập test]{Tổng hợp các lượt chạy chính thức của cổng G-test trên tập \splitname{test} ($46.849$ cửa sổ, $13.699$ candidate).}
+  \label{tab:ch5-test-runs}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}l Y r r r r@{}}
+    \toprule
+    \textbf{Mã lượt chạy (\code{run\_id})} & \textbf{Nội dung} & \textbf{Lượt gọi LLM} & \textbf{API mới} & \textbf{Lỗi} & \textbf{USD mới} \\
+    \midrule
+    \code{m8\_test\_detector\_count\_v1} & Chỉ detector (đếm candidate) & 0 & 0 & -- & 0,00 \\
+    \code{h0\_test\_bm25\_v1} & BM25 + judge & 13.699 & 13.699 & 0 & 8,87 \\
+    \code{h0\_test\_c1\_k0\_v1} & C1 + judge & 13.699 & 3.299 & 0 & 4,71 \\
+    \code{h0\_test\_norag\_v2} & LLM-không-RAG (kế tiếp cache \code{\_v1}) & 13.699 & 3.287 & 0 & 1,10 \\
+    \code{h0\_test\_*\_b120\_v1} & Ba lượt ngân sách 120 lần gọi & $3 \times 120$ & 0 & 0 & 0,00 \\
+    \code{ctav\_final\_test\_v1} & Replay \CTAV{} + 4 nhánh ablation & 0 (replay) & 0 & -- & 0,00 \\
+    \code{m8\_rescue\_test\_c1\_v1} & C5 một điểm (cửa sổ được cứu) & 61 & 61 & 0 & 0,09 \\
+    \code{h0\_test\_*\_rep\{1,2\}\_v1} & Đo phương sai judge ($4 \times 200$ cửa sổ) & 800 & 748 & 0 & 1,08 \\
+    \midrule
+    \textbf{Tổng G-test} & & & \textbf{21.094} & \textbf{0} & \textbf{15,85} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Giá trị F1 theo ngân sách lần gọi LLM trên test]{F1 của bốn phương pháp theo các mốc ngân sách lượt gọi LLM trên \splitname{test} ($11.985$ cửa sổ có telemetry, $346$ lỗi; mức đủ $= 13.699$ candidate).}
+  \label{tab:ch5-budget}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{@{}Y r r r r r r r@{}}
+    \toprule
+    \textbf{Phương pháp} & \textbf{120} & \textbf{250} & \textbf{500} & \textbf{1.000} & \textbf{2.000} & \textbf{4.000} & \textbf{Đủ (13.699)} \\
+    \midrule
+    \textbf{\CTAV{}} & 0,034 & 0,033 & 0,032 & 0,036 & 0,036 & 0,036 & 0,066 \\
+    BM25 & 0,017 & 0,023 & 0,060 & 0,069 & 0,069 & 0,069 & 0,091 \\
+    C1 & 0,058 & 0,072 & 0,115 & 0,142 & 0,142 & 0,142 & 0,114 \\
+    LLM-không-RAG & 0,017 & 0,017 & 0,049 & 0,073 & 0,073 & 0,073 & 0,098 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Phân rã kết quả định vị RCA theo loại lỗi trên tập test]{Kết quả định vị service gốc theo năm loại lỗi tiêm trên tập \splitname{test} đăng ký ($50$ lần tiêm lỗi).}
+  \label{tab:ch5-rca-by-fault}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{@{}Y r r r r r@{}}
+    \toprule
+    \textbf{Loại lỗi tiêm} & \textbf{Lần tiêm} & \textbf{0 cảnh báo} & \textbf{Chỉ ở mơ hồ} & \textbf{Sự cố có nhãn} & \textbf{Trúng hạng 1} \\
+    \midrule
+    \code{network\_delay} & 15 & 5 & 2 & 8 & 2 \\
+    \code{cpu\_contention} & 11 & 5 & 1 & 5 & 3 \\
+    \code{exception} & 10 & 7 & 0 & 3 & 3 \\
+    \code{return} & 9 & 8 & 0 & 1 & 0 \\
+    \code{cpu\_consumed} & 5 & 4 & 1 & 0 & -- \\
+    \midrule
+    \textbf{Tổng cộng} & \textbf{50} & \textbf{29} & \textbf{4} & \textbf{17} & \textbf{8} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}

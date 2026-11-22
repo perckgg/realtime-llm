@@ -16,29 +16,29 @@
 Trong các hệ thống phần mềm phân tán hiện đại xây dựng theo kiến trúc microservice, một sự cố cục bộ thường lan truyền nhanh qua nhiều services phụ thuộc và tạo ra hàng loạt cảnh báo đồng thời. Việc kết hợp các bộ Time-series Anomaly Detector với Mô hình Ngôn ngữ Lớn (LLM) mở ra khả năng tự động thẩm định cảnh báo và truy vết nguyên nhân gốc, song cũng đặt ra thách thức lớn về báo động xảy ra có là thật hay không, thiên lệch khi xác nhận và chi phí cho mỗi lần thẩm định. Đề tài này nghiên cứu và xây dựng một nền tảng AIOps, đi từ phát hiện bất thường dữ liệu metric, thẩm định cảnh báo có hiệu chỉnh theo bằng chứng đa phương thức, đến tự động hóa phân tích nguyên nhân gốc (RCA) và trực quan hóa vận hành. Chương 1 trình bày bối cảnh thực tiễn, những phát hiện thực nghiệm định hình bài toán, các mục tiêu, câu hỏi nghiên cứu, đóng góp chính, phạm vi thực hiện và bố cục tổng thể của đề tài.
 \subsection{Bối cảnh và bài toán nghiên cứu}
 \subsubsection{Vận hành AIOps trên hệ thống microservice và bài toán quá tải cảnh báo}
-Kiến trúc microservice giúp các hệ thống đám mây đạt được tính linh hoạt, khả năng mở rộng theo chiều ngang và cô lập lỗi xảy ra tốt hơn so với kiến trúc \textit{monolithic} (nguyên khối). Tuy nhiên, khi hệ thống bị chia thành hàng chục đến hàng trăm dịch vụ độc lập, một yêu cầu từ người dùng có thể phải đi qua nhiều dịch vụ. Mỗi lần như vậy là một lần gọi qua mạng, nên luồng xử lý trở nên phức tạp hơn. Để giám sát trạng thái vận hành, các công cụ quan sát hiện đại  thu thập liên tục ba nguồn dữ liệu telemetry chính: chuỗi thời gian chỉ số hiệu năng (\textit{metric}), nhật ký sự kiện bán cấu trúc (\textit{log}) và vết thực thi phân tán (\textit{trace}).
+Kiến trúc microservice giúp các hệ thống đám mây đạt được tính linh hoạt, khả năng mở rộng theo chiều ngang và cô lập lỗi xảy ra tốt hơn so với kiến trúc \textit{monolithic} (nguyên khối). Tuy nhiên, khi hệ thống bị chia thành hàng chục đến hàng trăm dịch vụ độc lập, một yêu cầu từ người dùng có thể phải đi qua nhiều dịch vụ. Mỗi lần như vậy là một lần gọi qua mạng, nên luồng xử lý trở nên phức tạp hơn. Để giám sát trạng thái vận hành, các công cụ quan sát hiện đại thu thập liên tục ba nguồn dữ liệu telemetry chính: chuỗi thời gian chỉ số hiệu năng (\textit{metric}), nhật ký sự kiện bán cấu trúc (\textit{log}) và vết thực thi phân tán (\textit{trace}).
 
-Trong thực tế vận hành, kỹ sư SRE thường dùng các công cụ tự động phát hiện bất thường trên dữ liệu metric (ví dụ thuật toán Isolation Forest) để giám sát hệ thống liên tục trên các khoảng thời gian gần nhất được cập nhật dần. Các mô hình này xử lý nhanh và tốn ít tài nguyên tính toán, nhưng vì chỉ dựa vào chuỗi số nên chúng không hiểu ngữ cảnh. Khi lưu lượng thay đổi theo chu kỳ hoặc có các tác vụ nền bình thường, chúng dễ báo động giả hàng loạt. Điều này gây \textbf{quá tải cảnh báo (alert fatigue)} và khiến đội vận hành phản ứng với sự cố chậm hơn
+Trong thực tế vận hành, kỹ sư SRE thường dùng các công cụ tự động phát hiện bất thường trên dữ liệu metric (ví dụ thuật toán Isolation Forest~\cite{isof}) để giám sát hệ thống liên tục trên các khoảng thời gian gần nhất được cập nhật dần. Các mô hình này xử lý nhanh và tốn ít tài nguyên tính toán, nhưng vì chỉ dựa vào chuỗi số nên chúng không hiểu ngữ cảnh. Khi lưu lượng thay đổi theo chu kỳ hoặc có các tác vụ nền bình thường, chúng dễ báo động giả hàng loạt. Điều này gây \textbf{quá tải cảnh báo (alert fatigue)}~\cite{zhao2020alertstorm} và khiến đội vận hành phản ứng với sự cố chậm hơn.
 
 Sự phát triển của các Mô hình Ngôn ngữ Lớn (LLM) giúp hệ thống có khả năng đọc hiểu và suy luận trên dữ liệu văn bản không đồng nhất như log và trace, từ đó phân biệt sự cố thật với nhiễu vận hành. Tuy vậy, khi đưa LLM vào quy trình giám sát và chẩn đoán sự cố, có ba nút thắt kỹ thuật chính:
 \begin{enumerate}
     \item \textbf{Chi phí và độ trễ vận hành:} Nếu gọi LLM cho mọi khoảng dữ liệu giám sát thì chi phí API sẽ rất lớn, dễ chạm giới hạn số truy vấn và không đáp ứng được yêu cầu phản hồi nhanh của hệ thống giám sát liên tục.
-    \item \textbf{Rủi ro ảo giác và thiên lệch xác nhận:} Khi thiếu ngữ cảnh vận hành phù hợp hoặc không bị buộc phải dựa trên bằng chứng cụ thể, LLM dễ suy diễn quá mức: coi những dao động vô hại là sự cố nghiêm trọng. Kết quả là báo động giả tăng lên thay vì giảm đi.
+    \item \textbf{Rủi ro ảo giác và thiên lệch xác nhận:} Khi thiếu ngữ cảnh vận hành phù hợp hoặc không bị buộc phải dựa trên bằng chứng cụ thể, LLM dễ suy diễn quá mức và đồng thuận theo gợi ý cảnh báo~\cite{sharma2024sycophancy}, coi những dao động vô hại là sự cố nghiêm trọng. Kết quả là báo động giả tăng lên thay vì giảm đi.
     \item \textbf{Khoảng trống từ thẩm định đến định vị nguyên nhân gốc:} Ngay cả khi từng cảnh báo riêng lẻ đã được lọc đúng, một sự cố lan rộng vẫn có thể tạo ra nhiều cảnh báo liên quan trên nhiều dịch vụ gọi nhau. Đội vận hành vẫn cần một cơ chế tự động để: gom các cảnh báo cùng thuộc một sự cố, truy ngược theo sơ đồ phụ thuộc giữa các dịch vụ để tìm đúng thành phần khởi phát sự cố (RCA), và tổng hợp thành báo cáo chẩn đoán có cấu trúc.
 \end{enumerate}
 
 \begin{figure}[H]
     \centering
-     \includegraphics[width=0.88\textwidth]{Images/C1/figures/ch1/h1.1-tong-quan-he-thong.png}
+     \includegraphics[width=0.88\textwidth]{Images/C1/figures/ch1/h1.1-system-overview.png}
     % \fbox{\parbox{0.85\textwidth}{\centering\vspace{1.2cm}\textit{Hình 1.1: Khoảng trống ngữ nghĩa của bộ phát hiện metric và quy trình từ thẩm định cảnh báo đến chẩn đoán nguyên nhân gốc]}}
     \vspace{0.5cm}
     \caption{Tổng quan hệ thống}
     \label{fig:ch1_alert_fatigue}
 \end{figure}
 \subsubsection{Khảo sát bước đầu về kiến trúc giám sát lai và đánh đổi ngữ cảnh đồ thị}  
-Để giải quyết bài toán chi phí và khoảng trống ngữ nghĩa, hướng tiếp cận kiến trúc giám sát lai hai tầng được thiết lập:\textbf{ tầng thứ nhất} sử dụng bộ phát hiện metric tốc độ cao để sàng lọc các cửa sổ đáng nghi thành danh sách cảnh báo ứng viên; \textbf{tầng thứ hai} kết hợp kỹ thuật RAG trên dữ liệu log/trace với một LLM đóng vai trò bộ thẩm định (\textit{LLM-as-a-Judge}) xuất kết quả theo lược đồ JSON ràng buộc.
+Để giải quyết bài toán chi phí và khoảng trống ngữ nghĩa, hướng tiếp cận kiến trúc giám sát lai hai tầng được thiết lập: \textbf{tầng thứ nhất} sử dụng bộ phát hiện metric tốc độ cao để sàng lọc các cửa sổ đáng nghi thành danh sách cảnh báo ứng viên; \textbf{tầng thứ hai} kết hợp kỹ thuật RAG~\cite{lewis2020rag} trên dữ liệu log/trace với một LLM đóng vai trò bộ thẩm định (\textit{LLM-as-a-Judge})~\cite{zheng2023judging} xuất kết quả theo lược đồ JSON ràng buộc.
 
-Trong quá trình khảo sát bước đầu tầng truy xuất bằng chứng trên bộ dữ liệu microservice Nezha~\cite{icaetm2026}, việc đối chiếu giữa truy xuất từ khóa truyền thống (BM25) và truy xuất mở rộng theo đồ thị gọi dịch vụ 2-hop (mở rộng \textit{2-hop} nghĩa là thu thập thêm bằng chứng log và trace từ các dịch vụ nằm cách dịch vụ phát cảnh báo tối đa hai bước liên kết trên đồ thị phụ thuộc (tính theo cả hai chiều gọi đến và được gọi)) đã bộc lộ một nghịch lý đáng chú ý trong thiết kế hệ thống giám sát lai (minh họa ở Hình~\ref{fig:ch1_alert_fatigue}):
+Trong quá trình khảo sát bước đầu tầng truy xuất bằng chứng trên bộ dữ liệu microservice Nezha~\cite{icaetm2026}, việc đối chiếu giữa truy xuất từ khóa truyền thống (BM25)~\cite{robertson2009bm25} và truy xuất mở rộng theo đồ thị gọi dịch vụ 2-hop (mở rộng \textit{2-hop} nghĩa là thu thập thêm bằng chứng log và trace từ các dịch vụ nằm cách dịch vụ phát cảnh báo tối đa hai bước liên kết trên đồ thị phụ thuộc (tính theo cả hai chiều gọi đến và được gọi)) đã bộc lộ một nghịch lý đáng chú ý trong thiết kế hệ thống giám sát lai (minh họa ở Hình~\ref{fig:ch1_alert_fatigue}):
 \begin{itemize}
     \item \textbf{Lợi ích trong việc phát hiện sự cố lan truyền:} Nhiều sự cố hạ tầng (chẳng hạn độ trễ mạng) không sinh ra thông báo lỗi tường minh ngay tại dịch vụ phát cảnh báo, khiến truy xuất từ khóa cục bộ dễ bỏ sót do thiếu ngữ cảnh. Khi mở rộng phạm vi tìm kiếm sang các dịch vụ lân cận trên đồ thị phụ thuộc, hệ thống thu thập được chuỗi dấu vết liên đới giữa các dịch vụ gọi nhau, từ đó cải thiện rõ rệt khả năng nhận diện các sự cố lan truyền phức tạp.
     \item \textbf{Rủi ro bùng nổ báo động giả do thiếu hiệu chỉnh:} Trong trạng thái vận hành bình thường, truy xuất từ khóa thường trả về ngữ cảnh rỗng vì không có từ khóa lỗi, vô tình đóng vai trò như một lớp lọc nhiễu tự nhiên giúp bộ thẩm định LLM bác bỏ cảnh báo. Ngược lại, việc mở rộng ngữ cảnh theo đồ thị lại nạp thêm nhiều tín hiệu cảnh báo nền vô hại từ các dịch vụ xung quanh, dễ kích hoạt thiên lệch xác nhận ở LLM, làm gia tăng đột biến báo động giả và đẩy chi phí gọi API lên cao.
@@ -58,12 +58,7 @@ Từ những phân tích thực tiễn và tiền đề thực nghiệm nêu tr�
 
 \subsection{Mục tiêu đề tài}
 \subsubsection{Mục tiêu tổng quát}
-Mục tiêu tổng quát của đề tài là nghiên cứu, đề xuất và kiểm chứng một giải pháp AIOps khép kín trên hệ thống microservice, kết hợp bộ phát hiện bất thường chuỗi thời gian, cơ chế thẩm định cảnh báo hiệu chỉnh theo ngữ cảnh đồ thị và tác tử phân tích nguyên nhân gốc (RCA). Cụ thể, nghiên cứu hướng tới ba trụ cột chính:
-\begin{itemize}[label=--]
-    \item \textbf{Thẩm định cảnh báo hiệu chỉnh theo bằng chứng (CTAV):} Thiết kế cơ chế kết hợp truy xuất đa phương thức theo đồ thị phụ thuộc dịch vụ với chính sách neo bằng chứng và hiệu chỉnh ngưỡng tin cậy, nhằm duy trì khả năng phát hiện các sự cố lan truyền mà không làm gia tăng báo động giả trong cùng ngân sách gọi LLM.
-    \item \textbf{Tự động hóa chẩn đoán nguyên nhân gốc (Tác tử RCA):} Sử dụng tập cảnh báo đã được CTAV xác nhận làm đầu vào để tự động gom cụm sự cố, truy vết ngược trên đồ thị gọi dịch vụ nhằm định vị chính xác dịch vụ khởi phát và sinh báo cáo chẩn đoán có cấu trúc phục vụ kỹ sư vận hành.
-    \item \textbf{Hiện thực hóa nền tảng vận hành tái lập được:} Đóng gói toàn bộ chuỗi xử lý từ phát hiện, thẩm định đến định vị sự cố thành một nền tảng thống nhất có cơ chế lưu đệm định danh, kiểm soát chi phí và giao diện trực quan hóa phục vụ giám sát và trình diễn hệ thống.
-\end{itemize}
+Mục tiêu tổng quát của đề tài là nghiên cứu, đề xuất và kiểm chứng một giải pháp AIOps khép kín trên hệ thống microservice gồm ba khối liên kết chặt chẽ: phương pháp thẩm định cảnh báo hiệu chỉnh theo bằng chứng đa phương thức (\CTAV{}) nhằm giữ khả năng phát hiện sự cố lan truyền mà không làm tăng báo động giả trong cùng ngân sách gọi LLM; tác tử phân tích nguyên nhân gốc (RCA) gom các cảnh báo đã xác nhận, truy ngược đồ thị phụ thuộc để định vị dịch vụ khởi phát và sinh báo cáo chẩn đoán có cấu trúc; cùng nền tảng thực nghiệm thống nhất có bộ nhớ đệm định danh và giao diện trực quan hóa tái lập được.
 \subsubsection{Mục tiêu cụ thể}
 Để đạt các mục tiêu tổng quát trên, đề tài thực hiện năm mục tiêu cụ thể:
 \begin{itemize}[label=--]
@@ -82,7 +77,7 @@ Mục tiêu tổng quát của đề tài là nghiên cứu, đề xuất và ki
     có tín hiệu bất thường.
 
     \item \textbf{Kiểm định theo giả thuyết đăng ký trước:}
-    đánh giá một lần trên split \texttt{test} niêm phong bằng bootstrap CI và McNemar,
+    đánh giá một lần trên split \texttt{test} niêm phong bằng bootstrap CI~\cite{efron1993bootstrap} và McNemar~\cite{mcnemar1947note},
     gồm so sánh với các baseline, \textit{ablation} từng thành phần
     và hiệu quả theo ngân sách gọi LLM.
 
@@ -97,19 +92,11 @@ Mục tiêu tổng quát của đề tài là nghiên cứu, đề xuất và ki
 \subsubsection{Đối tượng nghiên cứu}
 \label{subsubsec:research_objects}
 
-Đề tài nghiên cứu ba đối tượng trong quy trình giám sát và chẩn đoán sự cố tự động trên hệ thống microservice:
+Đề tài tập trung vào ba đối tượng trong chuỗi giám sát và chẩn đoán sự cố tự động trên microservice:
 \begin{itemize}[label=--]
-    \item \textbf{Dữ liệu quan sát đa phương thức và đồ thị phụ thuộc dịch vụ:} các cửa sổ metric,
-    log và trace cùng đồ thị quan hệ gọi giữa các dịch vụ, dựng từ trace.
-
-    \item \textbf{Phương pháp thẩm định cảnh báo CTAV:} nhận candidate từ bộ phát hiện bất thường,
-    truy xuất bằng chứng theo cả độ liên quan từ vựng lẫn đồ thị phụ thuộc, đưa cho judge LLM
-    với đầu ra JSON có cấu trúc, rồi áp chính sách quyết định gồm ngưỡng tin cậy và neo bằng chứng
-    tại chính dịch vụ phát cảnh báo.
-
-    \item \textbf{Tác tử RCA và platform thực nghiệm:} gom các cảnh báo đã thẩm định thành sự cố,
-    lan truyền ngược trên đồ thị phụ thuộc để xếp hạng dịch vụ gốc, sinh báo cáo chẩn đoán
-    và hiển thị toàn bộ chuỗi xử lý trên dashboard.
+    \item \textbf{Dữ liệu quan sát đa phương thức và đồ thị phụ thuộc:} cửa sổ metric, log, trace và đồ thị gọi dịch vụ dựng từ trace.
+    \item \textbf{Phương pháp thẩm định cảnh báo \CTAV{}:} truy xuất lai theo từ vựng--topology, bộ thẩm định LLM có cấu trúc và chính sách neo bằng chứng tại dịch vụ phát cảnh báo.
+    \item \textbf{Tác tử RCA và nền tảng thực nghiệm:} gom cụm sự cố, lan truyền ngược xếp hạng dịch vụ gốc, báo cáo chẩn đoán JSON và dashboard trực quan hóa.
 \end{itemize}
 
 \subsubsection{Phạm vi nghiên cứu}
@@ -125,7 +112,7 @@ và đọc lại từ \textit{cache}, không triển khai trên hạ tầng prod
 bộ dữ liệu khác.
 
     \item \textbf{Mô hình:} bộ phát hiện bất thường cố định là Isolation Forest. Judge và bộ tóm tắt
-    sự cố dùng một LLM duy nhất qua API (\texttt{gemini-2.5-flash}, temperature 0); đề tài không
+    sự cố dùng một LLM duy nhất qua API (\texttt{gemini-2.5-flash}~\cite{google2026gemini}, temperature 0); đề tài không
     fine-tuning và không dùng LLM cục bộ.
 
     \item \textbf{Đánh giá:} chất lượng thẩm định cảnh báo (Precision, Recall, F1, FPR), định vị
