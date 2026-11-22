@@ -1,0 +1,164 @@
+=== PAGE 0 ===
+ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH
+TRƯỜNG ĐẠI HỌC BÁCH KHOA
+KHOA KHOA HỌC VÀ KỸ THUẬT MÁY TÍNH
+BÁO CÁO
+THỰC TẬP 1
+ỨNG DỤNG MÔ HÌNH NGÔN NGỮ LỚN
+TRONG GIÁM SÁT THỜI GIAN THỰC
+Ngành: KHOA HỌC MÁY TÍNH
+GVHD: VÕ THỊ NGỌC CHÂU
+HVTH: NGUYỄN V ĂN HOÀNG KHANG 2570754
+THÀNH PHỐ HỒ CHÍ MINH - 01/2026
+
+=== PAGE 1 ===
+Trường Đại Học Bách Khoa TP.Hồ Chí Minh
+Khoa Khoa học và Kỹ thuật Máy tính
+Mục lục
+Danh sách hình 4
+Danh sách bảng 5
+1 Giới thiệu đề tài 6
+1.1 Bối cảnh đề tài . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+1.2 Mục tiêu đề tài . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+1.2.1 Mục tiêu tổng quát . . . . . . . . . . . . . . . . . . . . . . . . . 7
+1.2.2 Mục tiêu cụ thể . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+1.3 Phạm vi đề tài . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+1.3.1 Đối tượng nghiên cứu . . . . . . . . . . . . . . . . . . . . . . . 7
+1.3.2 Phạm vi nghiên cứu . . . . . . . . . . . . . . . . . . . . . . . . 8
+1.4 Ý nghĩa . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+1.4.1 Ý nghĩa thực tiễn . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+1.4.2 Ý nghĩa khoa học . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+2 Cơ sở lý thuyết 11
+2.1 Tổng quan về dữ liệu chuỗi thời gian và luồng dữ liệu thời gian thực 11
+2.1.1 Dữ liệu chuỗi thời gian đa biến . . . . . . . . . . . . . . . . . . 11
+2.1.2 Đặc điểm của luồng dữ liệu thời gian thực . . . . . . . . . . . 12
+2.1.3 Dữ liệu giám sát trong môi trường server/cloud . . . . . . . . 13
+2.1.4 Các kỹ thuật tiền xử lý trên dòng dữ liệu . . . . . . . . . . . . 14
+2.2 Bài toán phát hiện bất thường trên chuỗi thời gian . . . . . . . . . . . 16
+2.2.1 Định nghĩa và phân loại bất thường . . . . . . . . . . . . . . . 17
+2.2.2 Khoảng trống ngữ nghĩa . . . . . . . . . . . . . . . . . . . . . . 17
+2.2.3 Hiện tượng Quá tải cảnh báo . . . . . . . . . . . . . . . . . . . 18
+2.3 Các phương pháp phát hiện cơ sở . . . . . . . . . . . . . . . . . . . . . 18
+2.3.1 Các phương pháp thống kê và học máy truyền thống . . . . . 19
+2.3.2 Các mô hình học sâu cho chuỗi thời gian . . . . . . . . . . . . 20
+2.4 Mô hình Ngôn ngữ Lớn trong Giám sát Hệ thống . . . . . . . . . . . . 21
+2.4.1 Tổng quan về mô hình ngôn ngữ lớn . . . . . . . . . . . . . . . 21
+2.4.2 Hạn chế của LLM trong hệ thống thời gian thực . . . . . . . . 22
+2.4.3 Kỹ thuật Prompt và Ràng buộc Đầu ra Có Cấu trúc . . . . . 23
+2.5 Triển khai LLM cục bộ và API fallback . . . . . . . . . . . . . . . . . 27
+Báo cáo Thực tập 1 (CO5107) - Năm học 2025 - 2026 - Học kỳ 261 Trang 1/86
+
+=== PAGE 2 ===
+Trường Đại Học Bách Khoa TP.Hồ Chí Minh
+Khoa Khoa học và Kỹ thuật Máy tính
+2.6 Retrieval-Augmented Generation trong hệ thống giám sát . . . . . . . 27
+2.7 Khung kiến trúc giám sát lai và cơ chế "LLM-as-a-Judge" . . . . . . . 29
+2.7.1 Định nghĩa cơ chế "LLM-as-a-Judge" . . . . . . . . . . . . . . 29
+2.7.2 Kiến trúc giám sát lai hai tầng . . . . . . . . . . . . . . . . . . 30
+2.8 Các tiêu chí đánh giá hệ thống phát hiện bất thường thời gian thực . 31
+2.9 Cơ chế khôi phục ngữ cảnh . . . . . . . . . . . . . . . . . . . . . . . . . 32
+2.10 Kiểm soát ngân sách LLM và chính sách quyết định . . . . . . . . . . 33
+3 Công trình liên quan 34
+3.1 Các nghiên cứu phát hiện bất thường trên chuỗi thời gian bằng mô
+hình thống kê và học sâu . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+3.2 Các nghiên cứu ứng dụng LLM trong phân tích log và chẩn đoán
+nguyên nhân gốc rễ . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+3.3 Các kiến trúc giám sát lai và cơ chế đánh giá LLM-as-a-Judge . . . . 42
+3.4 Tổng kết khoảng trống nghiên cứu và định hướng của đề tài . . . . . 47
+4 Thực nghiệm 49
+4.1 Mục tiêu thực nghiệm . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+4.2 Dữ liệu thực nghiệm . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50
+4.2.1 Microsoft Cloud Monitoring Dataset . . . . . . . . . . . . . . . 51
+4.2.2 Nezha Dataset . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51
+4.3 Môi trường và thiết lập thực nghiệm . . . . . . . . . . . . . . . . . . . 52
+4.3.1 Kiến trúc giám sát lai . . . . . . . . . . . . . . . . . . . . . . . 53
+4.3.2 Các thành phần chính . . . . . . . . . . . . . . . . . . . . . . . 53
+4.3.3 Cấu hình mô hình ngôn ngữ lớn . . . . . . . . . . . . . . . . . 55
+4.4 Tiền xử lý . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 58
+4.4.1 Trích xuất và tiền xử lý chuỗi metric . . . . . . . . . . . . . . . 58
+4.4.2 Chuẩn hóa sự kiện ngữ cảnh Log/Trace . . . . . . . . . . . . . 59
+4.4.3 CơchếmôphỏngluồngStreamingReplayvàquảnlýWatermark60
+4.4.4 Chuẩn hóa điểm bất thường đa biến và luật tạo Metric Can-
+didate . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
+4.5 Tiêu chí và Thước đo đánh giá . . . . . . . . . . . . . . . . . . . . . . 63
+4.5.1 Chỉ số chất lượng cảnh báo . . . . . . . . . . . . . . . . . . . . 63
+4.5.2 Chỉ số truy xuất ngữ cảnh . . . . . . . . . . . . . . . . . . . . . 64
+4.5.3 Chỉ số chi phí và vận hành . . . . . . . . . . . . . . . . . . . . 65
+4.6 Thiết lập kịch bản thực nghiệm . . . . . . . . . . . . . . . . . . . . . . 66
+Báo cáo Thực tập 1 (CO5107) - Năm học 2025 - 2026 - Học kỳ 261 Trang 2/86
+
+=== PAGE 3 ===
+Trường Đại Học Bách Khoa TP.Hồ Chí Minh
+Khoa Khoa học và Kỹ thuật Máy tính
+4.7 Kết quả thực nghiệm . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+4.7.1 Đánh giá tính khả thi của quy trình tổng thể . . . . . . . . . . 67
+4.7.2 Đánh giá sự ảnh hưởng của ngữ cảnh . . . . . . . . . . . . . . 69
+4.7.3 Đánh giá hiệu năng các cơ chế truy xuất RAG . . . . . . . . . 69
+4.7.4 Đánh giá hiệu quả của cơ chế khôi phục ngữ cảnh . . . . . . . 69
+4.7.5 Đánh giá chiến lược định tuyến LLM cục bộ (Local-first) . . . 70
+4.7.6 Đánh giá độ ổn định trên luồng thời gian thực . . . . . . . . . 71
+4.8 Phân tích và thảo luận . . . . . . . . . . . . . . . . . . . . . . . . . . . 72
+4.8.1 Vai trò quyết định của RAG trong thẩm định cảnh báo . . . . 72
+4.8.2 Giới hạn của mô hình phát hiện bất thường thuần metric . . . 73
+4.8.3 Sự đánh đổi giữa Recall và chi phí/độ trễ trong Context Rescue73
+4.8.4 Tiềm năng và rủi ro của kiến trúc Local-first . . . . . . . . . . 74
+4.8.5 Tổng hợp các yếu tố đánh đổi trong hệ thống giám sát thời
+gian thực . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 76
+5 Định hướng phát triển 78
+5.1 Tổng kết các giới hạn hiện tại . . . . . . . . . . . . . . . . . . . . . . . 78
+5.2 Hình thức hóa và tối ưu cơ chế Context Rescue . . . . . . . . . . . . . 78
+5.3 Bổ sung RCA Post-processing Agent cho xử lý hậu kỳ . . . . . . . . . 79
+5.4 Mở rộng bộ chỉ số đánh giá chất lượng ngữ cảnh và bằng chứng . . . 80
+5.5 Mở rộng thực nghiệm và triển khai trên luồng dữ liệu thời gian thực 80
+6 Kết luận 82
+6.1 Kết quả đạt được . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82
+6.2 Ý nghĩa của Context Rescue và chiến lược vận hành . . . . . . . . . . 82
+6.3 Hạn chế của nghiên cứu . . . . . . . . . . . . . . . . . . . . . . . . . . 83
+6.4 Kết luận chung . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 84
+Tài liệu tham khảo 85
+Báo cáo Thực tập 1 (CO5107) - Năm học 2025 - 2026 - Học kỳ 261 Trang 3/86
+
+=== PAGE 4 ===
+Trường Đại Học Bách Khoa TP.Hồ Chí Minh
+Khoa Khoa học và Kỹ thuật Máy tính
+Danh sách hình vẽ
+1 Ví dụ về cơ chế sliding window trên chuỗi dữ liệu thời gian thực . . . 16
+2 Khoảng trống ngữ nghĩa giữa bất thường định lượng và ngữ cảnh
+vận hành . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+3 Kiến trúc luồng xử lý của hệ thống giám sát lai . . . . . . . . . . . . . 53
+4 Sơ đồ luồng phân luồng quyết định ưu tiên mô hình cục bộ . . . . . . 58
+5 Quy trình tiền xử lý dữ liệu số liệu hiệu năng hệ thống . . . . . . . . 58
+6 Quy trình tiền xử lý dữ liệu ngữ cảnh vận hành (Log/Trace Prepro-
+cessing) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 59
+7 Cơ chế phát lại luồng tích hợp kiểm soát Watermark . . . . . . . . . . 60
+8 Quy trình tổng hợp và xử lý hậu kỳ cấu trúc báo cáo sự cố tự động . 80
+Báo cáo Thực tập 1 (CO5107) - Năm học 2025 - 2026 - Học kỳ 261 Trang 4/86
+
+=== PAGE 5 ===
+Trường Đại Học Bách Khoa TP.Hồ Chí Minh
+Khoa Khoa học và Kỹ thuật Máy tính
+Danh sách bảng
+1 Các nguồn dữ liệu telemetry trong môi trường server/cloud . . . . . . 14
+2 Định dạng cấu trúc đầu ra từ mô hình ngôn ngữ lớn . . . . . . . . . . 25
+3 Tổng hợp các nhóm công trình nghiên cứu liên quan . . . . . . . . . . 47
+4 Tóm tắt đặc điểm và vai trò của các bộ dữ liệu . . . . . . . . . . . . . 51
+5 Cấu trúc dữ liệu đầu ra chi tiết của tầng thẩm định cảnh báo . . . . 55
+6 Tóm tắt các chế độ vận hành của tầng ngôn ngữ lớn . . . . . . . . . . 55
+7 Tóm tắt các kịch bản thực nghiệm và cấu hình tương ứng . . . . . . . 66
+8 Kết quả smoke test trên 50 cửa sổ đánh giá . . . . . . . . . . . . . . . 67
+9 Kết quả thử nghiệm quy mô trung bình trên 5.000 cửa sổ . . . . . . . 68
+10 Chất lượng phân loại cảnh báo theo từng Service . . . . . . . . . . . . 68
+11 Chất lượng phân loại cảnh báo theo nhóm lỗi . . . . . . . . . . . . . 68
+12 Phân tích độ ảnh hưởng của thành phần ngữ cảnh RAG . . . . . . . 69
+13 Đánh giá các cấu hình hệ thống truy xuất RAG trên quy mô 300
+cửa sổ . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+14 Hiệu quả của cơ chế Context Rescue so với kiến trúc Hybrid tiêu chuẩn70
+15 Chi tiết hiệu năng hoạt động của cơ chế Context Rescue . . . . . . . 70
+16 Khả năng khôi phục cảnh báo phân loại theo nhóm lỗi . . . . . . . . 70
+17 So sánh năng lực thẩm định giữa chiến lược Local-first và Gemini-only71
+18 Chi tiết hiệu năng vận hành chiến lược định tuyến LLM cục bộ . . . 71
+19 Tổng hợp nguyên nhân kích hoạt cơ chế API Fallback . . . . . . . . . 71
+20 Kiểm thử mô phỏng dòng dữ liệu thời gian thực . . . . . . . . . . . . 72
+21 Tổng hợp các trade-off của từng thành phần trong hệ thống . . . . . 76
+Báo cáo Thực tập 1 (CO5107) - Năm học 2025 - 2026 - Học kỳ 261 Trang 5/86
+

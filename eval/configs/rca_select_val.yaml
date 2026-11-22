@@ -1,0 +1,28 @@
+# M9-A (QD-040): choose T_group and the abnormal sign of propagation level 1 on val.
+# Both rules are in eval/harness/rca.py (select_t_group, select_sign) and were written before
+# this config was first run. No LLM call, no PostgreSQL write: this run only selects.
+kind: rca
+run_id: rca_select_val_v1
+split: val
+input:
+  alerts_run: ctav_final_val_v1  # 80 CTAV alerts (29 TP, 51 FP), QD-031
+  evidence_run: h0_val_c1_k0_v1  # retrieval.jsonl holding the text of the cited evidence
+grouping:
+  t_group_seconds: 300  # default of 01 SS6.5; the reference of the selection rule
+  sweep: [180, 300, 600]
+  apply_selection: true
+propagation:
+  level: 1  # level 2 (LLM over the call chain) was cut, QD-037
+  sign: alert  # default
+  sweep: [alert, candidate]
+  apply_selection: true
+  sign_pad_seconds: 60  # one window on each side of the incident span
+labels:
+  window_seconds: 60  # QD-003
+  cascade_min_services: 2  # a cascade fault = its alerts touch at least 2 services
+summarizer:
+  enabled: false
+postgres:
+  write: false
+n_boot: 1000
+seed: 42

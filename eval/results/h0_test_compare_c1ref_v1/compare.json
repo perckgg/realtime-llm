@@ -1,0 +1,220 @@
+{
+  "created_at": "2026-11-16T06:56:50.730881+00:00",
+  "methods": [
+    {
+      "name": "c1",
+      "run_id": "h0_test_c1_k0_v1",
+      "detector_only": false
+    },
+    {
+      "name": "ctav",
+      "run_id": "ctav_final_test_v1",
+      "detector_only": false
+    }
+  ],
+  "n_boot": 1000,
+  "seed": 42,
+  "telemetry": {
+    "windows": 11985,
+    "fault_windows": 346,
+    "reference": "c1",
+    "methods": {
+      "c1": {
+        "tp": 96,
+        "fp": 1235,
+        "fn": 250,
+        "tn": 10404,
+        "precision": 0.07212622088655146,
+        "recall": 0.2774566473988439,
+        "f1": 0.11449016100178891,
+        "fpr": 0.10610877223129135,
+        "precision_ci95": [
+          0.05850828740575989,
+          0.08533351236458381
+        ],
+        "recall_ci95": [
+          0.22950443675740714,
+          0.32121505917904813
+        ],
+        "f1_ci95": [
+          0.09318864642631247,
+          0.13483302644269915
+        ],
+        "fpr_ci95": [
+          0.10067926483637177,
+          0.1118373856897794
+        ]
+      },
+      "ctav": {
+        "tp": 14,
+        "fp": 64,
+        "fn": 332,
+        "tn": 11575,
+        "precision": 0.1794871794871795,
+        "recall": 0.04046242774566474,
+        "f1": 0.0660377358490566,
+        "fpr": 0.005498754188504167,
+        "precision_ci95": [
+          0.10255681818181818,
+          0.26833139759969027
+        ],
+        "recall_ci95": [
+          0.021973742768135292,
+          0.061498354586589886
+        ],
+        "f1_ci95": [
+          0.036267671676083746,
+          0.0995850622406639
+        ],
+        "fpr_ci95": [
+          0.004211005801475529,
+          0.006866481350636622
+        ]
+      }
+    },
+    "pairs": {
+      "ctav - c1": {
+        "d_precision": 0.10736095860062803,
+        "d_recall": -0.23699421965317916,
+        "d_f1": -0.048452425152732306,
+        "d_fpr": -0.10061001804278719,
+        "d_precision_ci95": [
+          0.02979743121135615,
+          0.19664705974484897
+        ],
+        "d_recall_ci95": [
+          -0.28090057367867205,
+          -0.192546137645463
+        ],
+        "d_f1_ci95": [
+          -0.07941306723137205,
+          -0.012975535189955867
+        ],
+        "d_fpr_ci95": [
+          -0.10608482384847792,
+          -0.09552239407519714
+        ],
+        "mcnemar_all": {
+          "n": 11985,
+          "a_right_b_wrong": 82,
+          "a_wrong_b_right": 1171,
+          "p_value": 2.0893122595940454e-247
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 82,
+          "a_wrong_b_right": 0,
+          "p_value": 4.1359030627651384e-25
+        },
+        "mcnemar_normal": {
+          "n": 11639,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 1171,
+          "p_value": 0.0
+        }
+      }
+    }
+  },
+  "all": {
+    "windows": 46849,
+    "fault_windows": 346,
+    "reference": "c1",
+    "methods": {
+      "c1": {
+        "tp": 96,
+        "fp": 1235,
+        "fn": 250,
+        "tn": 45268,
+        "precision": 0.07212622088655146,
+        "recall": 0.2774566473988439,
+        "f1": 0.11449016100178891,
+        "fpr": 0.026557426402597683,
+        "precision_ci95": [
+          0.058598493643188324,
+          0.08607202142911038
+        ],
+        "recall_ci95": [
+          0.2309781058336899,
+          0.3241795366795367
+        ],
+        "f1_ci95": [
+          0.09425020290096352,
+          0.13522052748591554
+        ],
+        "fpr_ci95": [
+          0.025090476442409217,
+          0.028094280280372905
+        ]
+      },
+      "ctav": {
+        "tp": 14,
+        "fp": 64,
+        "fn": 332,
+        "tn": 46439,
+        "precision": 0.1794871794871795,
+        "recall": 0.04046242774566474,
+        "f1": 0.0660377358490566,
+        "fpr": 0.0013762552953572888,
+        "precision_ci95": [
+          0.09522200772200771,
+          0.2714285714285714
+        ],
+        "recall_ci95": [
+          0.021734113712374582,
+          0.06194995422642661
+        ],
+        "f1_ci95": [
+          0.03598511495802076,
+          0.09930227622433278
+        ],
+        "fpr_ci95": [
+          0.0010317893218084024,
+          0.0017198827052398453
+        ]
+      }
+    },
+    "pairs": {
+      "ctav - c1": {
+        "d_precision": 0.10736095860062803,
+        "d_recall": -0.23699421965317916,
+        "d_f1": -0.048452425152732306,
+        "d_fpr": -0.025181171107240392,
+        "d_precision_ci95": [
+          0.032131811735728676,
+          0.19948918174668476
+        ],
+        "d_recall_ci95": [
+          -0.2803606221991297,
+          -0.192546137645463
+        ],
+        "d_f1_ci95": [
+          -0.07847402455513221,
+          -0.012161163112717028
+        ],
+        "d_fpr_ci95": [
+          -0.026626569861896987,
+          -0.02385506702623276
+        ],
+        "mcnemar_all": {
+          "n": 46849,
+          "a_right_b_wrong": 82,
+          "a_wrong_b_right": 1171,
+          "p_value": 2.0893122595940454e-247
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 82,
+          "a_wrong_b_right": 0,
+          "p_value": 4.1359030627651384e-25
+        },
+        "mcnemar_normal": {
+          "n": 46503,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 1171,
+          "p_value": 0.0
+        }
+      }
+    }
+  },
+  "git_commit": "a5e74bd0aad7ba880d1802aebeb51aae762d915d\nmodified tracked files at run time:\n  docs/CURRENT-MILESTONE.md\n  docs/Final_Thesis_Phase2/04-implementation-roadmap.md\n  docs/experiment-log.md\n  docs/milestones/README.md\n  eval/configs/ctav_final_test.yaml\n  eval/configs/h0_test_norag.yaml\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py\n  services/web/README.md\n  services/web/index.html\n  services/web/scripts/smoke.tsx\n  services/web/src/App.tsx\n  services/web/src/api/types.ts\n  services/web/src/components/ui.tsx\n  services/web/src/main.tsx\n  services/web/src/mock/fixtures.ts\n  services/web/src/screens/AlertDetail.tsx\n  services/web/src/screens/ExperimentComparison.tsx\n  services/web/src/screens/IncidentDetail.tsx\n  services/web/src/screens/Timeline.tsx\n  services/web/src/theme/tokens.ts\n  services/web/tsconfig.json\n  services/web/vite.config.ts"
+}

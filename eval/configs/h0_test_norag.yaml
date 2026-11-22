@@ -1,6 +1,7 @@
 # M8 / G-test, config đăng ký #3 (QĐ-034): LLM-không-RAG trên `test` (require_evidence = false).
 # Sao từ h0_val_norag.yaml; chỉ đổi run_id, split, g_test.
-run_id: h0_test_norag_v1
+# _v1 rỗng do phiên 2026-11-14 bị ngắt ở 2.917/3.287 câu mới; chạy tiếp _v2 từ cache.
+run_id: h0_test_norag_v2
 seed: 42
 split: test
 g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)

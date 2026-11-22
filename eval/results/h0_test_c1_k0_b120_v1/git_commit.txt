@@ -1,0 +1,19 @@
+a5e74bd0aad7ba880d1802aebeb51aae762d915d
+modified tracked files at run time:
+  eval/configs/ctav_final_test.yaml
+  eval/configs/h0_test_norag.yaml
+  legacy/outputs/phase2/input_freeze.json
+  legacy/outputs/phase2/input_freeze.md
+  legacy/scripts/phase2/generate_paper_outputs.py
+  legacy/scripts/phase2/run_step9_quality_gate.py
+  services/web/index.html
+  services/web/src/App.tsx
+  services/web/src/api/types.ts
+  services/web/src/components/ui.tsx
+  services/web/src/main.tsx
+  services/web/src/mock/fixtures.ts
+  services/web/src/screens/AlertDetail.tsx
+  services/web/src/screens/Timeline.tsx
+  services/web/src/theme/tokens.ts
+  services/web/tsconfig.json
+  services/web/vite.config.ts

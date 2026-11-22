@@ -1,0 +1,1302 @@
+{
+  "created_at": "2026-11-19T07:57:50.934003+00:00",
+  "split": "test",
+  "scope": "telemetry_windows",
+  "counts": {
+    "telemetry_windows": 11985,
+    "fault_windows": 346,
+    "ctav_tp": 14,
+    "ctav_fp": 64,
+    "ctav_fn": 332
+  },
+  "ctav_fp": {
+    "total": 64,
+    "by_service": {
+      "frontend": 39,
+      "ts-travel-service": 25
+    },
+    "by_date": {
+      "2022-08-22": 39,
+      "2023-01-30": 25
+    },
+    "by_has_dev_baseline": {
+      "with_dev_baseline": 64
+    },
+    "by_c1_raw_verdict_and_confidence": {
+      "TRUE_ALERT|conf=0.9": 64
+    },
+    "by_evidence_origin": {
+      "local": 63,
+      "mixed": 1
+    },
+    "by_cited_modalities": {
+      "log+trace": 2,
+      "trace": 62
+    },
+    "by_anchor_mechanism": {
+      "trace:span>dev_p90": 64
+    },
+    "by_fault_overlap": {
+      "collateral_during_active_fault": {
+        "count": 31,
+        "by_service": {
+          "frontend": 17,
+          "ts-travel-service": 14
+        },
+        "by_target_root_cause": {
+          "ts-travel-service->ts-basic-service": 11,
+          "frontend->currencyservice": 9,
+          "frontend->emailservice": 4,
+          "frontend->checkoutservice": 2,
+          "frontend->paymentservice": 2,
+          "ts-travel-service->ts-route-service": 2,
+          "ts-travel-service->ts-security-service": 1
+        },
+        "by_active_fault_type": {
+          "network_delay": 20,
+          "cpu_contention": 10,
+          "return": 1
+        },
+        "anchor_duration_to_dev_p90_ratio": {
+          "n": 31,
+          "min": 1.01,
+          "median": 3.02,
+          "max": 68.78
+        },
+        "examples": [
+          {
+            "window_id": "f07889584e1176e6",
+            "service": "frontend",
+            "window_ts": "2022-08-22T04:58:19+00:00",
+            "anomaly_score": 0.9348,
+            "evidence_origin": "local",
+            "cited_modalities": [
+              "trace"
+            ],
+            "anchor_count": 3,
+            "top_anchor": {
+              "event_id": "trace-2022-08-22-c1c56ee86cbef114ebf9b00ed3fb06a4-2ec968fd783cae75",
+              "duration_ms": 23.932,
+              "dev_p90_ms": 7.689,
+              "ratio_to_p90": 3.11,
+              "excerpt": "Trace span hipstershop.CartService/GetCart on frontend-579b9bff58-t2dbm duration_ms=23.932"
+            },
+            "reasoning_excerpt": "Increased syscalls and CPU usage correlate with elevated trace span durations in the frontend service.",
+            "active_faults": [
+              "2022-08-22#007:checkoutservice(network_delay)"
+            ]
+          },
+          {
+            "window_id": "d5bc0d14ce2427b9",
+            "service": "frontend",
+            "window_ts": "2022-08-22T05:08:20+00:00",
+            "anomaly_score": 0.9444,
+            "evidence_origin": "local",
+            "cited_modalities": [
+              "trace"
+            ],
+            "anchor_count": 1,
+            "top_anchor": {
+              "event_id": "trace-2022-08-22-6219f15bb0e6cbedd47172312b65a16c-df09132a53ef0d78",
+              "duration_ms": 20.346,
+              "dev_p90_ms": 13.689,
+              "ratio_to_p90": 1.49,
+              "excerpt": "Trace span hipstershop.RecommendationService/ListRecommendations on frontend-579b9bff58-t2dbm duration_ms=20.346"
+            },
+            "reasoning_excerpt": "Increased SyscallRead/Write and CPU usage correlate with elevated latency in multiple frontend service traces.",
+            "active_faults": [
+              "2022-08-22#009:checkoutservice(return)"
+            ]
+          }
+        ]
+      },
+      "pure_normal_traffic": {
+        "count": 33,
+        "by_service": {
+          "frontend": 22,
+          "ts-travel-service": 11
+        },
+        "anchor_duration_to_dev_p90_ratio": {
+          "n": 33,
+          "min": 1.06,
+          "median": 1.95,
+          "max": 7.6
+        },
+        "examples": [
+          {
+            "window_id": "a675b9b2e3bdcba9",
+            "service": "frontend",
+            "window_ts": "2022-08-22T04:35:19+00:00",
+            "anomaly_score": 0.9523,
+            "evidence_origin": "local",
+            "cited_modalities": [
+              "trace"
+            ],
+            "anchor_count": 1,
+            "top_anchor": {
+              "event_id": "trace-2022-08-22-bbf40b816fa7dc93e5ded5c97de742b5-71cd662a127f3e96",
+              "duration_ms": 547.614,
+              "dev_p90_ms": 442.783,
+              "ratio_to_p90": 1.24,
+              "excerpt": "Trace span hipstershop.Frontend/Recv. on frontend-579b9bff58-t2dbm duration_ms=547.614"
+            },
+            "reasoning_excerpt": "Increased latency in Frontend/Recv and CheckoutService/PlaceOrder indicates a potential user-facing issue.",
+            "active_faults": []
+          },
+          {
+            "window_id": "1f52c206306c6bac",
+            "service": "frontend",
+            "window_ts": "2022-08-22T04:41:20+00:00",
+            "anomaly_score": 0.9783,
+            "evidence_origin": "local",
+            "cited_modalities": [
+              "trace"
+            ],
+            "anchor_count": 2,
+            "top_anchor": {
+              "event_id": "trace-2022-08-22-9c91b937ea80544bca98e3b61e520f44-044d54f99b11d019",
+              "duration_ms": 10.619,
+              "dev_p90_ms": 7.571,
+              "ratio_to_p90": 1.4,
+              "excerpt": "Trace span hipstershop.ProductCatalogService/GetProduct on frontend-579b9bff58-t2dbm duration_ms=10.619"
+            },
+            "reasoning_excerpt": "High CPU usage and increased syscalls correlate with elevated latency across multiple frontend service spans.",
+            "active_faults": []
+          }
+        ]
+      }
+    },
+    "detector_shift_from_m8": {
+      "by_service": {
+        "frontend": {
+          "dev": {
+            "windows": 690,
+            "candidates": 690,
+            "rate": 1.0
+          },
+          "val": null,
+          "test": {
+            "windows": 1221,
+            "candidates": 1221,
+            "rate": 1.0
+          }
+        },
+        "ts-travel-service": {
+          "dev": {
+            "windows": 883,
+            "candidates": 219,
+            "rate": 0.2480181200453001
+          },
+          "val": {
+            "windows": 14,
+            "candidates": 8,
+            "rate": 0.5714285714285714
+          },
+          "test": {
+            "windows": 734,
+            "candidates": 319,
+            "rate": 0.43460490463215257
+          }
+        }
+      },
+      "by_day": {
+        "2022-08-22": {
+          "dev": {
+            "windows": 3552,
+            "candidates": 680,
+            "rate": 0.19144144144144143
+          },
+          "val": {
+            "windows": 2372,
+            "candidates": 1173,
+            "rate": 0.4945193929173693
+          },
+          "test": {
+            "windows": 6021,
+            "candidates": 4381,
+            "rate": 0.7276199966782927
+          }
+        },
+        "2023-01-30": {
+          "dev": {
+            "windows": 5208,
+            "candidates": 814,
+            "rate": 0.15629800307219663
+          },
+          "val": {
+            "windows": 10409,
+            "candidates": 1232,
+            "rate": 0.1183591123066577
+          },
+          "test": {
+            "windows": 18357,
+            "candidates": 3603,
+            "rate": 0.19627390096420985
+          }
+        }
+      }
+    }
+  },
+  "ctav_fn": {
+    "total": 332,
+    "by_stage": {
+      "c3_anchoring_downgraded": 82,
+      "detector_missed": 122,
+      "judge_false_positive": 128
+    },
+    "by_fault_type_x_stage": {
+      "cpu_consumed": {
+        "c3_anchoring_downgraded": 17,
+        "judge_false_positive": 16
+      },
+      "cpu_contention": {
+        "c3_anchoring_downgraded": 34,
+        "detector_missed": 10,
+        "judge_false_positive": 30
+      },
+      "exception": {
+        "c3_anchoring_downgraded": 11,
+        "detector_missed": 23,
+        "judge_false_positive": 28
+      },
+      "network_delay": {
+        "c3_anchoring_downgraded": 11,
+        "detector_missed": 62,
+        "judge_false_positive": 30
+      },
+      "return": {
+        "c3_anchoring_downgraded": 9,
+        "detector_missed": 27,
+        "judge_false_positive": 24
+      }
+    },
+    "detector_missed_detail": {
+      "total": 122,
+      "by_service": {
+        "ts-verification-code-service": 21,
+        "ts-basic-service": 20,
+        "ts-route-service": 14,
+        "emailservice": 10,
+        "ts-food-service": 8,
+        "paymentservice": 7,
+        "recommendationservice": 7,
+        "ts-travel-service": 7,
+        "ts-price-service": 7,
+        "ts-security-service": 7,
+        "cartservice": 6,
+        "ts-contacts-service": 6,
+        "shippingservice": 1,
+        "adservice": 1
+      },
+      "examples": [
+        {
+          "window_id": "f12d634406d02706",
+          "service": "cartservice",
+          "window_ts": "2022-08-22T04:26:19+00:00",
+          "fault_type": "network_delay",
+          "anomaly_score": 0.8486
+        },
+        {
+          "window_id": "193c6233d560b0e2",
+          "service": "cartservice",
+          "window_ts": "2022-08-22T04:28:19+00:00",
+          "fault_type": "network_delay",
+          "anomaly_score": 0.8072
+        }
+      ]
+    },
+    "judge_false_positive_detail": {
+      "total": 128,
+      "by_has_dev_baseline": {
+        "with_dev_baseline": 64,
+        "without_dev_baseline": 64
+      },
+      "examples": [
+        {
+          "window_id": "0731855dab245bad",
+          "service": "frontend",
+          "window_ts": "2022-08-22T03:53:19+00:00",
+          "fault_type": "cpu_contention",
+          "anomaly_score": 0.9842,
+          "confidence": 0.9,
+          "context_events": 6,
+          "reasoning_excerpt": "The trace spans show normal durations for frontend requests, indicating no actual performance issue despite the anomaly score."
+        },
+        {
+          "window_id": "8e5f59bb4ff1c58c",
+          "service": "frontend",
+          "window_ts": "2022-08-22T03:54:19+00:00",
+          "fault_type": "cpu_contention",
+          "anomaly_score": 0.9978,
+          "confidence": 0.9,
+          "context_events": 6,
+          "reasoning_excerpt": "The trace spans show normal operation with low duration, indicating no actual performance issue despite the anomaly score."
+        }
+      ]
+    },
+    "c3_anchoring_detail": {
+      "total": 82,
+      "by_subreason": {
+        "c3_op_missing_dev_baseline": 3,
+        "c3_service_missing_dev_baseline": 67,
+        "c3_span_below_dev_p90": 12
+      },
+      "by_subreason_x_fault_type": {
+        "c3_op_missing_dev_baseline": {
+          "exception": 1,
+          "network_delay": 2
+        },
+        "c3_service_missing_dev_baseline": {
+          "cpu_consumed": 15,
+          "cpu_contention": 31,
+          "exception": 8,
+          "network_delay": 7,
+          "return": 6
+        },
+        "c3_span_below_dev_p90": {
+          "cpu_consumed": 2,
+          "cpu_contention": 3,
+          "exception": 2,
+          "network_delay": 2,
+          "return": 3
+        }
+      },
+      "service_missing_dev_by_service": {
+        "checkoutservice": 17,
+        "currencyservice": 10,
+        "adservice": 9,
+        "ts-food-service": 9,
+        "productcatalogservice": 8,
+        "ts-preserve-service": 7,
+        "ts-basic-service": 5,
+        "emailservice": 2
+      },
+      "examples_by_subreason": {
+        "c3_op_missing_dev_baseline": [
+          {
+            "window_id": "57549fece1b3bbcd",
+            "service": "ts-travel-service",
+            "window_ts": "2023-01-29T10:09:10+00:00",
+            "fault_type": "exception",
+            "anomaly_score": 0.8762,
+            "c3_subreason": "c3_op_missing_dev_baseline",
+            "local_cited_traces": [
+              {
+                "event_id": "trace-2023-01-29-e9d76eb7e67af6beacebe82496979d95-44b93f023e2071e5",
+                "severity": "INFO",
+                "duration_ms": 490.81,
+                "dev_p90_ms": null
+              }
+            ],
+            "reasoning_excerpt": "High latency in TravelController.getTripAllDetailInfo and related log shows 'Get Left Ticket of Internal Success' with a high number of tickets."
+          },
+          {
+            "window_id": "a51fd9368feedc27",
+            "service": "ts-travel-service",
+            "window_ts": "2023-01-30T13:22:55+00:00",
+            "fault_type": "network_delay",
+            "anomaly_score": 0.8921,
+            "c3_subreason": "c3_op_missing_dev_baseline",
+            "local_cited_traces": [
+              {
+                "event_id": "trace-2023-01-30-9ef1426e8ddfb9a4147ea820bde7cfba-143c27f18803d08c",
+                "severity": "WARN",
+                "duration_ms": 1469.73,
+                "dev_p90_ms": null
+              }
+            ],
+            "reasoning_excerpt": "High latency in TravelController.getTripAllDetailInfo indicates a performance issue."
+          }
+        ],
+        "c3_service_missing_dev_baseline": [
+          {
+            "window_id": "4040b91d762c13c7",
+            "service": "checkoutservice",
+            "window_ts": "2022-08-22T04:52:19+00:00",
+            "fault_type": "network_delay",
+            "anomaly_score": 0.9336,
+            "c3_subreason": "c3_service_missing_dev_baseline",
+            "local_cited_traces": [
+              {
+                "event_id": "trace-2022-08-22-13c251843fc981f00b01f0d0e20a2284-dfbba32cfb9404d3",
+                "severity": "INFO",
+                "duration_ms": 334.29,
+                "dev_p90_ms": null
+              },
+              {
+                "event_id": "trace-2022-08-22-13c251843fc981f00b01f0d0e20a2284-1e11fe84cd460e19",
+                "severity": "INFO",
+                "duration_ms": 273.45,
+                "dev_p90_ms": null
+              },
+              {
+                "event_id": "trace-2022-08-22-13c251843fc981f00b01f0d0e20a2284-a18ea0e096f18973",
+                "severity": "INFO",
+                "duration_ms": 11.76,
+                "dev_p90_ms": null
+              }
+            ],
+            "reasoning_excerpt": "High PodServerLatencyP99 and P95, along with increased NodeNetworkReceiveBytes, indicate a performance degradation."
+          },
+          {
+            "window_id": "5fbd6f918d6230a3",
+            "service": "checkoutservice",
+            "window_ts": "2022-08-22T04:53:19+00:00",
+            "fault_type": "network_delay",
+            "anomaly_score": 0.918,
+            "c3_subreason": "c3_service_missing_dev_baseline",
+            "local_cited_traces": [
+              {
+                "event_id": "trace-2022-08-22-1673c1da2f7b335fd2152c0a0fcdf0c9-4d5d1cefdb50dbc3",
+                "severity": "INFO",
+                "duration_ms": 123.38,
+                "dev_p90_ms": null
+              },
+              {
+                "event_id": "trace-2022-08-22-1673c1da2f7b335fd2152c0a0fcdf0c9-3e8a493406432b73",
+                "severity": "INFO",
+                "duration_ms": 38.35,
+                "dev_p90_ms": null
+              },
+              {
+                "event_id": "trace-2022-08-22-1673c1da2f7b335fd2152c0a0fcdf0c9-5305a18285495251",
+                "severity": "INFO",
+                "duration_ms": 8.0,
+                "dev_p90_ms": null
+              }
+            ],
+            "reasoning_excerpt": "High PodServerLatencyP99(s) and increased CPU usage rate indicate a performance degradation in the checkout service."
+          }
+        ],
+        "c3_span_below_dev_p90": [
+          {
+            "window_id": "6905ecde1bbc18f5",
+            "service": "frontend",
+            "window_ts": "2022-08-22T03:58:19+00:00",
+            "fault_type": "cpu_contention",
+            "anomaly_score": 0.9991,
+            "c3_subreason": "c3_span_below_dev_p90",
+            "local_cited_traces": [
+              {
+                "event_id": "trace-2022-08-22-0c6c3e7559791571e37041b9a0ad80e2-bd284763982348a5",
+                "severity": "INFO",
+                "duration_ms": 80.7,
+                "dev_p90_ms": 442.78
+              },
+              {
+                "event_id": "trace-2022-08-22-c08afa502f290d054be7c4457a55fe6b-b9f4dc1d0cbec5aa",
+                "severity": "INFO",
+                "duration_ms": 112.75,
+                "dev_p90_ms": 442.78
+              }
+            ],
+            "reasoning_excerpt": "High CPU usage and elevated server latencies indicate a performance degradation in the frontend service."
+          },
+          {
+            "window_id": "900c099bfa8fe4bb",
+            "service": "frontend",
+            "window_ts": "2022-08-22T03:59:20+00:00",
+            "fault_type": "cpu_contention",
+            "anomaly_score": 0.9982,
+            "c3_subreason": "c3_span_below_dev_p90",
+            "local_cited_traces": [
+              {
+                "event_id": "trace-2022-08-22-0c6c3e7559791571e37041b9a0ad80e2-80e273352c55c238",
+                "severity": "INFO",
+                "duration_ms": 7.02,
+                "dev_p90_ms": 7.57
+              },
+              {
+                "event_id": "trace-2022-08-22-0c6c3e7559791571e37041b9a0ad80e2-c0485f599e24503e",
+                "severity": "INFO",
+                "duration_ms": 7.21,
+                "dev_p90_ms": 7.57
+              }
+            ],
+            "reasoning_excerpt": "High PodServerLatencyP90/P95 and MemoryUsageRate indicate a performance issue on the frontend service."
+          }
+        ]
+      }
+    }
+  },
+  "rca_registered": {
+    "run_id": "rca_final_test_v1",
+    "total_incidents": 38,
+    "by_status": {
+      "ambiguous": 3,
+      "labelled": 17,
+      "no_fault": 18
+    },
+    "labelled_total": 17,
+    "labelled_hit1": 8,
+    "labelled_miss1": 9,
+    "miss_categories": {
+      "unalerted_1hop_callee": 7,
+      "unalerted_multihop_or_disconnected": 2
+    },
+    "miss_examples_by_category": {
+      "unalerted_1hop_callee": [
+        {
+          "incident_id": "inc-2d27db8f7988c3e0",
+          "start_ts": "2022-08-22T04:58:19Z",
+          "alert_ids": [
+            "cand-f07889584e1176e6:hybrid_bm25_graph:r0",
+            "cand-8d23a7e84a731968:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "frontend"
+          ],
+          "true_root_cause": "checkoutservice",
+          "fault_type": "network_delay",
+          "predicted_top1": "frontend",
+          "level1_ranking": [
+            "frontend"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-22#007"
+          ]
+        },
+        {
+          "incident_id": "inc-dff0dfc4d7801b47",
+          "start_ts": "2022-08-22T05:07:20Z",
+          "alert_ids": [
+            "cand-8bab56d6042658d8:hybrid_bm25_graph:r0",
+            "cand-d5bc0d14ce2427b9:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "frontend"
+          ],
+          "true_root_cause": "checkoutservice",
+          "fault_type": "return",
+          "predicted_top1": "frontend",
+          "level1_ranking": [
+            "frontend"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-22#009"
+          ]
+        }
+      ],
+      "unalerted_multihop_or_disconnected": [
+        {
+          "incident_id": "inc-f3161a3992b92cda",
+          "start_ts": "2022-08-22T05:58:19Z",
+          "alert_ids": [
+            "cand-b1363fae1e0ece9c:hybrid_bm25_graph:r0",
+            "cand-bc536cff2d25e170:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "frontend"
+          ],
+          "true_root_cause": "paymentservice",
+          "fault_type": "network_delay",
+          "predicted_top1": "frontend",
+          "level1_ranking": [
+            "frontend"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-22#014"
+          ]
+        },
+        {
+          "incident_id": "inc-049cc7be85eeacb2",
+          "start_ts": "2023-01-30T14:04:54Z",
+          "alert_ids": [
+            "cand-827e626bbf87e29d:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "ts-travel-service"
+          ],
+          "true_root_cause": "ts-security-service",
+          "fault_type": "network_delay",
+          "predicted_top1": "ts-travel-service",
+          "level1_ranking": [
+            "ts-travel-service"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2023-01-30#015"
+          ]
+        }
+      ]
+    },
+    "injections_coverage": {
+      "total": 50,
+      "with_labelled_incident": 17,
+      "only_in_ambiguous_incidents": 4,
+      "without_alert": 29,
+      "by_fault_type": {
+        "cpu_consumed": {
+          "injections": 5
+        },
+        "cpu_contention": {
+          "injections": 11,
+          "with_labelled_incident": 5,
+          "level1_hit1": 3,
+          "baseline_hit1": 3
+        },
+        "exception": {
+          "injections": 10,
+          "with_labelled_incident": 3,
+          "level1_hit1": 3,
+          "baseline_hit1": 3
+        },
+        "network_delay": {
+          "injections": 15,
+          "with_labelled_incident": 8,
+          "level1_hit1": 2,
+          "baseline_hit1": 2
+        },
+        "return": {
+          "injections": 9,
+          "with_labelled_incident": 1,
+          "level1_hit1": 0,
+          "baseline_hit1": 0
+        }
+      }
+    },
+    "no_fault_incidents_by_service": {
+      "frontend": 10,
+      "ts-travel-service": 8
+    },
+    "ambiguous_incidents": [
+      {
+        "incident_id": "inc-843a84203f579bdc",
+        "services": [
+          "frontend"
+        ],
+        "alert_count": 4,
+        "injection_ids": [
+          "2022-08-22#002",
+          "2022-08-22#003"
+        ]
+      },
+      {
+        "incident_id": "inc-c570cabea66d428e",
+        "services": [
+          "frontend"
+        ],
+        "alert_count": 4,
+        "injection_ids": [
+          "2022-08-22#012",
+          "2022-08-22#013"
+        ]
+      },
+      {
+        "incident_id": "inc-3c8d20d5d5829dc8",
+        "services": [
+          "ts-travel-service"
+        ],
+        "alert_count": 9,
+        "injection_ids": [
+          "2023-01-30#001",
+          "2023-01-30#002"
+        ]
+      }
+    ],
+    "summarizer_diagnostics": {
+      "fault_type_reported_all": {
+        "cpu_contention": 35,
+        "network_delay": 2,
+        "unknown": 1
+      },
+      "fault_type_reported_no_fault": {
+        "cpu_contention": 16,
+        "network_delay": 2
+      },
+      "fault_type_accuracy_on_labelled": {
+        "correct": 5,
+        "total": 17,
+        "rate": 0.2941
+      },
+      "invented_evidence_filtered": [
+        {
+          "incident_id": "inc-a0589ae59b492c07",
+          "invalid_evidence_ids": [
+            "trace-2023-01-30-a8a0faf2304d36406e9f929293c8e461ca-dc552f81dc8ea29f"
+          ],
+          "valid_evidence_remaining": 3
+        }
+      ]
+    }
+  },
+  "rca_sensitivity_out_of_registration": {
+    "run_id": "rca_sens_test_c3rolling_v1",
+    "total_incidents": 114,
+    "by_status": {
+      "ambiguous": 14,
+      "labelled": 48,
+      "no_fault": 52
+    },
+    "labelled_total": 48,
+    "labelled_hit1": 10,
+    "labelled_miss1": 38,
+    "miss_categories": {
+      "rc_alerted_ranked_lower_1hop_caller": 3,
+      "rc_alerted_ranked_lower_other": 2,
+      "unalerted_1hop_callee": 6,
+      "unalerted_1hop_caller": 6,
+      "unalerted_multihop_or_disconnected": 21
+    },
+    "miss_examples_by_category": {
+      "rc_alerted_ranked_lower_1hop_caller": [
+        {
+          "incident_id": "inc-bd062ac615eaf3d7",
+          "start_ts": "2022-08-22T03:54:19Z",
+          "alert_ids": [
+            "cand-edb7ef9fff67043e:hybrid_bm25_graph:r0",
+            "cand-bbe375ce4fc2769b:hybrid_bm25_graph:r0",
+            "cand-f00a7d37da2e4273:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "adservice",
+            "frontend",
+            "productcatalogservice"
+          ],
+          "true_root_cause": "frontend",
+          "fault_type": "cpu_contention",
+          "predicted_top1": "productcatalogservice",
+          "level1_ranking": [
+            "productcatalogservice",
+            "adservice",
+            "frontend"
+          ],
+          "level1_hit3": true,
+          "injection_ids": [
+            "2022-08-22#000"
+          ]
+        },
+        {
+          "incident_id": "inc-610569c6326d1d18",
+          "start_ts": "2022-08-23T12:51:28Z",
+          "alert_ids": [
+            "cand-3048d079450a10fc:hybrid_bm25_graph:r0",
+            "cand-18212fad99d81bf7:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "checkoutservice",
+            "productcatalogservice"
+          ],
+          "true_root_cause": "checkoutservice",
+          "fault_type": "network_delay",
+          "predicted_top1": "productcatalogservice",
+          "level1_ranking": [
+            "productcatalogservice",
+            "checkoutservice"
+          ],
+          "level1_hit3": true,
+          "injection_ids": [
+            "2022-08-23#006"
+          ]
+        }
+      ],
+      "rc_alerted_ranked_lower_other": [
+        {
+          "incident_id": "inc-15b089daf856a2e2",
+          "start_ts": "2022-08-23T12:37:28Z",
+          "alert_ids": [
+            "cand-d8feddbab3533a12:hybrid_bm25_graph:r0",
+            "cand-46f37f0c8a232d50:hybrid_bm25_graph:r0",
+            "cand-fa85e82f02f08574:hybrid_bm25_graph:r0",
+            "cand-32158a7fc05197be:hybrid_bm25_graph:r0",
+            "cand-3dc83741f614b936:hybrid_bm25_graph:r0",
+            "cand-c891f5d45fdc8f4a:hybrid_bm25_graph:r0",
+            "cand-8ffae7e81129d4ff:hybrid_bm25_graph:r0",
+            "cand-84778c633db6a2f0:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "cartservice",
+            "checkoutservice",
+            "productcatalogservice"
+          ],
+          "true_root_cause": "cartservice",
+          "fault_type": "network_delay",
+          "predicted_top1": "productcatalogservice",
+          "level1_ranking": [
+            "productcatalogservice",
+            "cartservice",
+            "checkoutservice"
+          ],
+          "level1_hit3": true,
+          "injection_ids": [
+            "2022-08-23#004"
+          ]
+        },
+        {
+          "incident_id": "inc-9ffa79a225da0c74",
+          "start_ts": "2023-01-29T09:22:09Z",
+          "alert_ids": [
+            "cand-9f399cd898b632d0:hybrid_bm25_graph:r0",
+            "cand-05cba5487a63f34b:hybrid_bm25_graph:r0",
+            "cand-de121cab0643dd51:hybrid_bm25_graph:r0",
+            "cand-9a539a4a010bd8c5:hybrid_bm25_graph:r0",
+            "cand-1c220134f07743c0:hybrid_bm25_graph:r0",
+            "cand-ab9faa7a4d8d1fc9:hybrid_bm25_graph:r0",
+            "cand-225169a006112c89:hybrid_bm25_graph:r0",
+            "cand-75fca7654073c66a:hybrid_bm25_graph:r0",
+            "cand-64b4d627f3b5139d:hybrid_bm25_graph:r0",
+            "cand-891ac4bcdb46792c:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "ts-basic-service",
+            "ts-cancel-service",
+            "ts-order-service",
+            "ts-preserve-other-service",
+            "ts-preserve-service"
+          ],
+          "true_root_cause": "ts-basic-service",
+          "fault_type": "exception",
+          "predicted_top1": "ts-order-service",
+          "level1_ranking": [
+            "ts-order-service",
+            "ts-basic-service",
+            "ts-preserve-service",
+            "ts-cancel-service",
+            "ts-preserve-other-service"
+          ],
+          "level1_hit3": true,
+          "injection_ids": [
+            "2023-01-29#006"
+          ]
+        }
+      ],
+      "unalerted_1hop_callee": [
+        {
+          "incident_id": "inc-608491d1afa37462",
+          "start_ts": "2022-08-23T13:42:28Z",
+          "alert_ids": [
+            "cand-7194d7efdbe87a21:hybrid_bm25_graph:r0",
+            "cand-f14b0cd90c148190:hybrid_bm25_graph:r0",
+            "cand-6fc315c99d81f84a:hybrid_bm25_graph:r0",
+            "cand-095a1a05937fdff9:hybrid_bm25_graph:r0",
+            "cand-f67189d2c28db006:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "checkoutservice",
+            "productcatalogservice"
+          ],
+          "true_root_cause": "emailservice",
+          "fault_type": "cpu_contention",
+          "predicted_top1": "productcatalogservice",
+          "level1_ranking": [
+            "productcatalogservice",
+            "checkoutservice"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-23#012"
+          ]
+        },
+        {
+          "incident_id": "inc-e89d6ce68ba8702b",
+          "start_ts": "2023-01-29T08:47:09Z",
+          "alert_ids": [
+            "cand-694d0a4a94f95c9c:hybrid_bm25_graph:r0",
+            "cand-61e154c28904f17f:hybrid_bm25_graph:r0",
+            "cand-bec7b712b5d42b21:hybrid_bm25_graph:r0",
+            "cand-88b42f357a57243e:hybrid_bm25_graph:r0",
+            "cand-53f5de32c8ad6993:hybrid_bm25_graph:r0",
+            "cand-75be78ddb145832a:hybrid_bm25_graph:r0",
+            "cand-e18b4c8b1069a3b2:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "ts-basic-service",
+            "ts-cancel-service",
+            "ts-order-service",
+            "ts-preserve-service"
+          ],
+          "true_root_cause": "ts-contacts-service",
+          "fault_type": "return",
+          "predicted_top1": "ts-order-service",
+          "level1_ranking": [
+            "ts-order-service",
+            "ts-basic-service",
+            "ts-preserve-service",
+            "ts-cancel-service"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2023-01-29#001"
+          ]
+        }
+      ],
+      "unalerted_1hop_caller": [
+        {
+          "incident_id": "inc-c11df42cc826b06e",
+          "start_ts": "2022-08-22T04:07:19Z",
+          "alert_ids": [
+            "cand-34f2ddae8feb0942:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "adservice"
+          ],
+          "true_root_cause": "frontend",
+          "fault_type": "return",
+          "predicted_top1": "adservice",
+          "level1_ranking": [
+            "adservice"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-22#001"
+          ]
+        },
+        {
+          "incident_id": "inc-d48d946ed6f1ee2c",
+          "start_ts": "2022-08-22T04:49:20Z",
+          "alert_ids": [
+            "cand-8e72154689ca51ec:hybrid_bm25_graph:r0",
+            "cand-50d32c7ace6ee515:hybrid_bm25_graph:r0",
+            "cand-c3953fdffe3e6212:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "productcatalogservice"
+          ],
+          "true_root_cause": "checkoutservice",
+          "fault_type": "network_delay",
+          "predicted_top1": "productcatalogservice",
+          "level1_ranking": [
+            "productcatalogservice"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-22#007"
+          ]
+        }
+      ],
+      "unalerted_multihop_or_disconnected": [
+        {
+          "incident_id": "inc-d8b9d549d12e19b2",
+          "start_ts": "2022-08-22T04:26:19Z",
+          "alert_ids": [
+            "cand-562ebbd06d9bec20:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "adservice"
+          ],
+          "true_root_cause": "cartservice",
+          "fault_type": "network_delay",
+          "predicted_top1": "adservice",
+          "level1_ranking": [
+            "adservice"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-22#004"
+          ]
+        },
+        {
+          "incident_id": "inc-e04f4dc659c9ba5b",
+          "start_ts": "2022-08-22T04:27:19Z",
+          "alert_ids": [
+            "cand-6f3d43ea42c84d8c:hybrid_bm25_graph:r0"
+          ],
+          "alerted_services": [
+            "productcatalogservice"
+          ],
+          "true_root_cause": "cartservice",
+          "fault_type": "network_delay",
+          "predicted_top1": "productcatalogservice",
+          "level1_ranking": [
+            "productcatalogservice"
+          ],
+          "level1_hit3": false,
+          "injection_ids": [
+            "2022-08-22#004"
+          ]
+        }
+      ]
+    },
+    "injections_coverage": {
+      "total": 50,
+      "with_labelled_incident": 34,
+      "only_in_ambiguous_incidents": 15,
+      "without_alert": 1,
+      "by_fault_type": {
+        "cpu_consumed": {
+          "injections": 5,
+          "with_labelled_incident": 3,
+          "level1_hit1": 3,
+          "baseline_hit1": 3
+        },
+        "cpu_contention": {
+          "injections": 11,
+          "with_labelled_incident": 8,
+          "level1_hit1": 5,
+          "baseline_hit1": 6
+        },
+        "exception": {
+          "injections": 10,
+          "with_labelled_incident": 8,
+          "level1_hit1": 1,
+          "baseline_hit1": 1
+        },
+        "network_delay": {
+          "injections": 15,
+          "with_labelled_incident": 9,
+          "level1_hit1": 0,
+          "baseline_hit1": 0
+        },
+        "return": {
+          "injections": 9,
+          "with_labelled_incident": 6,
+          "level1_hit1": 1,
+          "baseline_hit1": 1
+        }
+      }
+    },
+    "no_fault_incidents_by_service": {
+      "productcatalogservice": 15,
+      "currencyservice": 11,
+      "checkoutservice": 9,
+      "frontend": 6,
+      "ts-cancel-service": 6,
+      "ts-order-service": 5,
+      "ts-preserve-service": 4,
+      "ts-seat-service": 3,
+      "adservice": 2,
+      "ts-basic-service": 2,
+      "ts-station-food-service": 1,
+      "ts-preserve-other-service": 1,
+      "ts-station-service": 1
+    },
+    "ambiguous_incidents": [
+      {
+        "incident_id": "inc-9f7b7b1dde80a349",
+        "services": [
+          "productcatalogservice"
+        ],
+        "alert_count": 2,
+        "injection_ids": [
+          "2022-08-22#000",
+          "2022-08-22#001"
+        ]
+      },
+      {
+        "incident_id": "inc-87ba7ab2bd584c43",
+        "services": [
+          "adservice",
+          "currencyservice",
+          "frontend"
+        ],
+        "alert_count": 6,
+        "injection_ids": [
+          "2022-08-22#002",
+          "2022-08-22#003"
+        ]
+      },
+      {
+        "incident_id": "inc-e13e98d5957c5890",
+        "services": [
+          "adservice"
+        ],
+        "alert_count": 2,
+        "injection_ids": [
+          "2022-08-22#008",
+          "2022-08-22#009"
+        ]
+      },
+      {
+        "incident_id": "inc-9cb39103a2565e9d",
+        "services": [
+          "adservice",
+          "currencyservice",
+          "frontend",
+          "productcatalogservice"
+        ],
+        "alert_count": 19,
+        "injection_ids": [
+          "2022-08-22#010",
+          "2022-08-22#011",
+          "2022-08-22#012"
+        ]
+      },
+      {
+        "incident_id": "inc-484e2ae8025145cd",
+        "services": [
+          "checkoutservice",
+          "currencyservice",
+          "frontend"
+        ],
+        "alert_count": 10,
+        "injection_ids": [
+          "2022-08-23#000",
+          "2022-08-23#001"
+        ]
+      },
+      {
+        "incident_id": "inc-44fef46c775ea02a",
+        "services": [
+          "checkoutservice",
+          "productcatalogservice"
+        ],
+        "alert_count": 10,
+        "injection_ids": [
+          "2022-08-23#009",
+          "2022-08-23#010"
+        ]
+      },
+      {
+        "incident_id": "inc-3717fdf8ab3248ee",
+        "services": [
+          "ts-basic-service",
+          "ts-cancel-service",
+          "ts-contacts-service",
+          "ts-order-service",
+          "ts-preserve-other-service",
+          "ts-preserve-service"
+        ],
+        "alert_count": 21,
+        "injection_ids": [
+          "2023-01-29#009",
+          "2023-01-29#011"
+        ]
+      },
+      {
+        "incident_id": "inc-f281868e35d354a8",
+        "services": [
+          "ts-basic-service",
+          "ts-contacts-service",
+          "ts-preserve-other-service",
+          "ts-preserve-service",
+          "ts-travel-service",
+          "ts-travel2-service"
+        ],
+        "alert_count": 11,
+        "injection_ids": [
+          "2023-01-29#014",
+          "2023-01-29#015"
+        ]
+      },
+      {
+        "incident_id": "inc-8f5f21c9cefafc91",
+        "services": [
+          "ts-preserve-service",
+          "ts-travel-service"
+        ],
+        "alert_count": 11,
+        "injection_ids": [
+          "2023-01-30#002",
+          "2023-01-30#003"
+        ]
+      },
+      {
+        "incident_id": "inc-d757272f1a1393e5",
+        "services": [
+          "ts-preserve-other-service"
+        ],
+        "alert_count": 6,
+        "injection_ids": [
+          "2023-01-30#002",
+          "2023-01-30#003"
+        ]
+      },
+      {
+        "incident_id": "inc-7fd9bdcdf25e72a1",
+        "services": [
+          "ts-food-service",
+          "ts-preserve-service"
+        ],
+        "alert_count": 7,
+        "injection_ids": [
+          "2023-01-30#005",
+          "2023-01-30#006"
+        ]
+      },
+      {
+        "incident_id": "inc-870de74bcfa9681c",
+        "services": [
+          "ts-basic-service",
+          "ts-food-service",
+          "ts-preserve-other-service",
+          "ts-preserve-service",
+          "ts-route-service",
+          "ts-seat-service",
+          "ts-travel-service"
+        ],
+        "alert_count": 31,
+        "injection_ids": [
+          "2023-01-30#010",
+          "2023-01-30#011"
+        ]
+      },
+      {
+        "incident_id": "inc-12d334dcb959c851",
+        "services": [
+          "ts-cancel-service"
+        ],
+        "alert_count": 3,
+        "injection_ids": [
+          "2023-01-30#014",
+          "2023-01-30#015"
+        ]
+      },
+      {
+        "incident_id": "inc-4bec2a7409b96bc5",
+        "services": [
+          "ts-basic-service",
+          "ts-preserve-other-service",
+          "ts-preserve-service",
+          "ts-route-service",
+          "ts-travel-service"
+        ],
+        "alert_count": 29,
+        "injection_ids": [
+          "2023-01-30#014",
+          "2023-01-30#015"
+        ]
+      }
+    ],
+    "summarizer_diagnostics": {
+      "fault_type_reported_all": {
+        "cpu_contention": 96,
+        "exception": 1,
+        "network_delay": 14,
+        "unknown": 3
+      },
+      "fault_type_reported_no_fault": {
+        "cpu_contention": 42,
+        "network_delay": 8,
+        "unknown": 2
+      },
+      "fault_type_accuracy_on_labelled": {
+        "correct": 8,
+        "total": 48,
+        "rate": 0.1667
+      },
+      "invented_evidence_filtered": [
+        {
+          "incident_id": "inc-f8c1f6bb6a018e6b",
+          "invalid_evidence_ids": [
+            "trace-2022-08-22-6acbefaa0d605b5ec2902e5d3c15866d-e3b8e5cee987533c"
+          ],
+          "valid_evidence_remaining": 3
+        },
+        {
+          "incident_id": "inc-bdec08e67a980f06",
+          "invalid_evidence_ids": [
+            "trace-2022-08-22-377444adba72a671949390f29f4a39673-e14c08b5b7d3ac1d"
+          ],
+          "valid_evidence_remaining": 3
+        },
+        {
+          "incident_id": "inc-6cf6bb7177f67979",
+          "invalid_evidence_ids": [
+            "trace-2023-01-29-0893c4c68621c5cc99ce0c2bb49f70ad0-5cf819918d0f7366"
+          ],
+          "valid_evidence_remaining": 3
+        },
+        {
+          "incident_id": "inc-870de74bcfa9681c",
+          "invalid_evidence_ids": [
+            "trace-2023-01-30-0f1f27885eba297b65419c22236794c2-3d27b025758294c2"
+          ],
+          "valid_evidence_remaining": 3
+        }
+      ]
+    }
+  }
+}

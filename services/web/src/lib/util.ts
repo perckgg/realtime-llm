@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { Alert } from "@/api/types";
 
 /**
  * Hook tải dữ liệu tối giản. Cố ý không dùng react-query: dashboard chỉ đọc,
@@ -49,3 +50,81 @@ export const stampUTC = (isoTs: string): string => `${isoTs.slice(0, 10)} ${isoT
 /** Gộp className có điều kiện, thay cho clsx. */
 export const cx = (...parts: (string | false | null | undefined)[]): string =>
   parts.filter(Boolean).join(" ");
+
+export type PolicyStepStatus = "passed" | "downgraded" | "na";
+
+export interface PolicyStepInfo {
+  status: PolicyStepStatus;
+  label: string;
+}
+
+export interface PolicyEvaluation {
+  shortReason: string | null;
+  evidenceRule: PolicyStepInfo;
+  gating: PolicyStepInfo;
+  anchoring: PolicyStepInfo;
+}
+
+/**
+ * Suy diễn 3 bước kiểm tra policy CTAV đúng thứ tự `services/judge/policy.py::decide`:
+ * 1) raw_verdict != TRUE_ALERT -> dừng;
+ * 2) require_evidence (`downgraded_by_evidence_rule`);
+ * 3) ngưỡng θ_local / C2 gating (`downgraded_by_gating`);
+ * 4) C3 neo bằng chứng (`downgraded_by_anchoring`).
+ */
+export function policySteps(
+  a: Pick<
+    Alert,
+    | "raw_verdict"
+    | "verdict"
+    | "downgraded_by_evidence_rule"
+    | "downgraded_by_gating"
+    | "downgraded_by_anchoring"
+  >,
+): PolicyEvaluation {
+  const raw = a.raw_verdict ?? a.verdict;
+  if (raw !== "TRUE_ALERT") {
+    const na = { status: "na" as const, label: "N/A (stopped at raw_verdict ≠ TRUE_ALERT)" };
+    return { shortReason: null, evidenceRule: na, gating: na, anchoring: na };
+  }
+  if (a.downgraded_by_evidence_rule) {
+    const na = { status: "na" as const, label: "N/A (stopped at evidence rule)" };
+    return {
+      shortReason: "no evidence",
+      evidenceRule: { status: "downgraded", label: "downgraded" },
+      gating: na,
+      anchoring: na,
+    };
+  }
+  if (a.downgraded_by_gating) {
+    return {
+      shortReason: "C2 gate",
+      evidenceRule: { status: "passed", label: "passed (cited)" },
+      gating: { status: "downgraded", label: "downgraded" },
+      anchoring: { status: "na", label: "N/A (stopped at C2 gating)" },
+    };
+  }
+  if (a.verdict !== "TRUE_ALERT" && !a.downgraded_by_anchoring) {
+    const na = { status: "na" as const, label: "N/A (stopped at θ threshold)" };
+    return {
+      shortReason: "below θ",
+      evidenceRule: { status: "passed", label: "passed (cited)" },
+      gating: na,
+      anchoring: na,
+    };
+  }
+  if (a.downgraded_by_anchoring) {
+    return {
+      shortReason: "C3 anchor",
+      evidenceRule: { status: "passed", label: "passed (cited)" },
+      gating: { status: "passed", label: "passed threshold" },
+      anchoring: { status: "downgraded", label: "downgraded" },
+    };
+  }
+  return {
+    shortReason: null,
+    evidenceRule: { status: "passed", label: "passed (cited)" },
+    gating: { status: "passed", label: "passed threshold" },
+    anchoring: { status: "passed", label: "anchored" },
+  };
+}

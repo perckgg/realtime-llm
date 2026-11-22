@@ -1,19 +1,25 @@
 /**
- * Explicit hex tokens for SVG renderers (Recharts / React Flow), kept synchronized
- * with `src/index.css`.
+ * Token màu dùng cho SVG (Recharts / react-flow cần giá trị thật, không phải
+ * biến CSS). Giữ đồng bộ thủ công với `src/index.css` — hai file, một bảng màu.
+ *
+ * Bảng màu này đã qua kiểm định: chạy
+ *   node scripts/validate_palette.js "#2a78d6,#eb6834,#1baf7a,#eda100,#e87ba4" --mode light
+ * → ALL CHECKS PASS, kèm cảnh báo tương phản cho aqua/yellow/magenta. Vì vậy mọi
+ * biểu đồ dùng quá ba slot đều phải có nhãn trực tiếp hoặc bảng số đi kèm.
+ * Đổi màu thì phải chạy lại validator trước khi commit.
  */
 
 export const ink = {
-  primary: "#1f1b16",
-  secondary: "#524a3e",
-  muted: "#7a7062",
-  grid: "#e3dac8",
-  axis: "#c7bca6",
-  surface: "#faf6ed",
-  plane: "#f3ede0",
+  primary: "#0b0b0b",
+  secondary: "#52514e",
+  muted: "#898781",
+  grid: "#e1e0d9",
+  axis: "#c3c2b7",
+  surface: "#fcfcfb",
+  plane: "#f9f9f7",
 } as const;
 
-/** Fixed categorical palette — assigned by entity, never rotated. */
+/** Categorical — gán theo thứ tự cố định, không xoay vòng. */
 export const series = [
   "#2a78d6", // 1 blue
   "#eb6834", // 2 orange
@@ -22,10 +28,10 @@ export const series = [
   "#e87ba4", // 5 magenta
 ] as const;
 
-/** Sequential blue ramp for normalized scores. */
+/** Sequential một sắc (blue) cho độ lớn liên tục. */
 export const sequential = ["#86b6ef", "#3987e5", "#1c5cab", "#0d366b"] as const;
 
-/** Reserved status colors — always paired with a symbol and text label. */
+/** Status — dành riêng, luôn đi kèm icon + nhãn chữ, không bao giờ chỉ có màu. */
 export const status = {
   good: "#0ca30c",
   warning: "#fab219",
@@ -35,12 +41,18 @@ export const status = {
 
 import type { FaultType, RetrievalStrategy, Verdict } from "@/api/types";
 
+/**
+ * Verdict là *danh tính*, không phải mức độ nghiêm trọng, nên nó dùng ba slot
+ * categorical đầu tiên chứ không dùng bảng status. Ba slot này qua ngưỡng
+ * all-pairs ở cả hai chế độ, nên chúng an toàn kể cả trên biểu đồ phân tán.
+ */
 export const verdictColor: Record<Verdict, string> = {
   TRUE_ALERT: series[0],
   FALSE_POSITIVE: series[1],
   UNCERTAIN: series[2],
 };
 
+/** Ký hiệu phụ để danh tính không bao giờ chỉ nằm ở màu. */
 export const verdictGlyph: Record<Verdict, string> = {
   TRUE_ALERT: "●",
   FALSE_POSITIVE: "▲",
@@ -48,17 +60,12 @@ export const verdictGlyph: Record<Verdict, string> = {
 };
 
 export const verdictLabel: Record<Verdict, string> = {
-  TRUE_ALERT: "Confirmed Alert",
+  TRUE_ALERT: "True Alert",
   FALSE_POSITIVE: "False Positive",
-  UNCERTAIN: "Suppressed / Uncertain",
+  UNCERTAIN: "Uncertain",
 };
 
-export const verdictShortLabel: Record<Verdict, string> = {
-  TRUE_ALERT: "Confirmed",
-  FALSE_POSITIVE: "False Pos.",
-  UNCERTAIN: "Suppressed",
-};
-
+/** Thứ tự cố định — dùng cho legend, cột stack, và mọi bảng. */
 export const VERDICT_ORDER: Verdict[] = [
   "TRUE_ALERT",
   "FALSE_POSITIVE",
@@ -74,56 +81,43 @@ export const FAULT_TYPE_ORDER: FaultType[] = [
 ];
 
 export const faultTypeLabel: Record<FaultType, string> = {
-  network_delay: "Network Delay",
-  cpu_contention: "CPU Contention",
-  exception: "Unhandled Exception",
-  return: "Return Payload Fault",
-  cpu_consumed: "CPU Exhaustion",
+  network_delay: "network_delay",
+  cpu_contention: "cpu_contention",
+  exception: "exception",
+  return: "return",
+  cpu_consumed: "cpu_consumed",
 };
 
-export function formatFaultType(ft: string | null | undefined): string {
-  if (!ft) return "Normal Traffic";
-  if (ft in faultTypeLabel) return faultTypeLabel[ft as FaultType];
-  return ft;
-}
-
 /**
- * Fixed colors for the five evaluated validation architectures.
+ * Màu đi theo *thực thể* (biến thể retrieval), không đi theo thứ hạng. Lọc bớt
+ * biến thể trên màn hình so sánh không được sơn lại những biến thể còn lại.
  */
 export const STRATEGY_ORDER: RetrievalStrategy[] = [
-  "ctav",
-  "hybrid_bm25_graph",
   "bm25_hybrid",
-  "no_rag",
-  "detector_only",
+  "temporal",
+  "cross_modal",
+  "graph",
+  "hybrid_bm25_graph",
 ];
 
 export const strategyColor: Record<RetrievalStrategy, string> = {
-  ctav: series[2], // aqua — proposed CTAV pipeline
-  hybrid_bm25_graph: series[4], // magenta — uncalibrated topology RAG
-  bm25_hybrid: series[0], // blue — lexical RAG baseline
-  no_rag: series[3], // yellow — LLM judge without RAG
-  detector_only: series[1], // orange — unsupervised Isolation Forest
+  bm25_hybrid: series[0],
+  temporal: series[1],
+  cross_modal: series[2],
+  graph: series[3],
+  hybrid_bm25_graph: series[4],
 };
 
 export const strategyLabel: Record<RetrievalStrategy, string> = {
-  ctav: "CTAV (Calibrated Topology-Aware Validation)",
-  hybrid_bm25_graph: "Uncalibrated Topology RAG",
-  bm25_hybrid: "BM25 Lexical RAG (Baseline)",
-  no_rag: "LLM Judge without RAG",
-  detector_only: "Isolation Forest Detector Only",
-};
-
-export const strategyShortLabel: Record<RetrievalStrategy, string> = {
-  ctav: "CTAV (Proposed)",
-  hybrid_bm25_graph: "Topology RAG",
-  bm25_hybrid: "BM25 Baseline",
-  no_rag: "LLM (No RAG)",
-  detector_only: "IForest Only",
+  bm25_hybrid: "BM25 hybrid (baseline)",
+  temporal: "Temporal",
+  cross_modal: "Cross-modal",
+  graph: "Graph RAG",
+  hybrid_bm25_graph: "Hybrid BM25 + Graph",
 };
 
 export const modalityLabel: Record<"log" | "trace" | "metric", string> = {
-  log: "Log",
-  trace: "Trace",
-  metric: "Metric",
+  log: "log",
+  trace: "trace",
+  metric: "metric",
 };

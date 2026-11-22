@@ -1,0 +1,29 @@
+# M9-A: dry run of the whole RCA path (incidents -> ranking -> summarizer -> PostgreSQL) with the
+# mock summarizer backend. Not a thesis result: it only shows the path works before Gemini is called.
+kind: rca
+run_id: rca_mock_val_v1
+split: val
+input:
+  alerts_run: ctav_final_val_v1
+  evidence_run: h0_val_c1_k0_v1
+grouping:
+  t_group_seconds: 180
+propagation:
+  level: 1
+  sign: alert
+  sign_pad_seconds: 60
+labels:
+  window_seconds: 60
+  cascade_min_services: 2
+summarizer:
+  enabled: true
+  backend: mock
+  require_evidence: true
+  max_evidence: 12
+  excerpt_chars: 240
+  prompt_version: rca-summary-v1
+  prompt_fingerprint: 8c1d50e6ba757ee6
+postgres:
+  write: true
+n_boot: 1000
+seed: 42

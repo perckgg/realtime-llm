@@ -38,7 +38,7 @@ Mốc hiện tại: xem `docs/CURRENT-MILESTONE.md`. Kế hoạch tổ chức th
 1. **Không hardcode tham số thí nghiệm.** Mọi tham số đến từ `eval/configs/*.yaml`.
 2. **Không chạm `test` split trước mốc M8 (G-test)** và trước khi đăng ký giả thuyết ở M7. Tuning chỉ trên `val`, debug chỉ trên `dev`.
 3. **Không ghi đè `eval/results/`.** Chạy lại với tham số khác = `run_id` mới.
-4. **Mọi lời gọi LLM đi qua cache.** Key = `sha256(prompt + model + temperature + max_tokens + repeat)`, `repeat` mặc định 0 (QĐ-013). Judge duy nhất: `gemini-2.5-flash-lite` qua API — không local-first, không fallback sang model khác.
+4. **Mọi lời gọi LLM đi qua cache.** Key = `sha256(prompt + model + temperature + max_tokens + repeat)`, `repeat` mặc định 0 (QĐ-013). Judge duy nhất: `gemini-2.5-flash` qua API, temperature 0 (QĐ-021) — không local-first, không fallback sang model khác. `gemini-2.5-flash-lite` chỉ còn trong cache của bài báo (G-paper).
 5. **Không thêm gì ngoài danh sách phạm vi** trong `docs/06-scope-guard.md` §3.
 
 ---
@@ -100,6 +100,14 @@ Config: `eval/configs/gd1_phase4_parity.yaml`. Lệch quá 1 cửa sổ mỗi ô
 BM25 F1 0.703 / FP 7; Topology F1 0.476 / FP 137. Phải tái lập từ cache, cache hit 100%.
 
 Không dùng số mock (kể cả "F1 không RAG = 0.000", "F1 có Rescue = 0.781") làm kết luận khoa học.
+
+---
+
+## Khi viết luận văn
+
+Mọi văn bản đi vào luận văn (sườn, outline, nháp chương, LaTeX) theo `docs/drafts/style-guide-luan-van.md`:
+một đề tài thống nhất (không "giai đoạn"/"kế thừa"), bài báo ICAETM chỉ là trích dẫn, kết quả âm viết thẳng,
+không "tốt hơn" khi CI chứa 0, chỗ thiếu số ghi `[CHỜ M*]`.
 
 ---
 

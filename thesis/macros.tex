@@ -1,0 +1,23 @@
+% =============================================================================
+% Macro dung chung cho luan van (theo docs/drafts/style-guide-luan-van.md §6)
+% =============================================================================
+% Them cac goi sau vao main.tex tren Overleaf (neu template chua co):
+%   \usepackage[utf8]{inputenc}   % (bo qua neu dung XeLaTeX / LuaLaTeX)
+%   \usepackage[vietnamese]{babel} % hoac vntex / polyglossia
+%   \usepackage{amsmath,amssymb}
+%   \usepackage{booktabs}
+%   \usepackage{tabularx}
+%   \usepackage{array}
+%   \usepackage{graphicx}
+%   \usepackage{xcolor}
+%   \usepackage{icomma}           % dau phay thap phan trong moi truong toan
+%   \usepackage{hyperref}
+% =============================================================================
+
+\newcommand{\CTAV}{CTAV}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\splitname}[1]{\texttt{#1}}
+\newcommand{\CHO}[2]{\textcolor{red}{[CHỜ #1: #2]}}
+
+% Cot tu dong xuong dong can le trai cho tabularx
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}

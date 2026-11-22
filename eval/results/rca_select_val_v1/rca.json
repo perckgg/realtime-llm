@@ -1,0 +1,1608 @@
+{
+  "created_at": "2026-11-16T08:57:23.159409+00:00",
+  "config": {
+    "kind": "rca",
+    "run_id": "rca_select_val_v1",
+    "split": "val",
+    "input": {
+      "alerts_run": "ctav_final_val_v1",
+      "evidence_run": "h0_val_c1_k0_v1"
+    },
+    "grouping": {
+      "t_group_seconds": 300,
+      "sweep": [
+        180,
+        300,
+        600
+      ],
+      "apply_selection": true
+    },
+    "propagation": {
+      "level": 1,
+      "sign": "alert",
+      "sweep": [
+        "alert",
+        "candidate"
+      ],
+      "apply_selection": true,
+      "sign_pad_seconds": 60
+    },
+    "labels": {
+      "window_seconds": 60,
+      "cascade_min_services": 2
+    },
+    "summarizer": {
+      "enabled": false
+    },
+    "postgres": {
+      "write": false
+    },
+    "n_boot": 1000,
+    "seed": 42
+  },
+  "input": "ctav_final_val_v1 (decision == alert)",
+  "split": "val",
+  "alerts": 80,
+  "alerts_in_a_fault": 36,
+  "alerts_outside_any_fault": 44,
+  "alerted_services": 8,
+  "injections": 30,
+  "injections_by_fault_type": {
+    "cpu_consumed": 3,
+    "cpu_contention": 7,
+    "exception": 6,
+    "network_delay": 9,
+    "return": 5
+  },
+  "cascade_injections": 1,
+  "resampling_units": 13,
+  "n_boot": 1000,
+  "seed": 42,
+  "reduction": {
+    "all": {
+      "180": {
+        "alerts": 80,
+        "incidents": 26,
+        "arr": 0.675,
+        "arr_ci95": [
+          0.5428571428571429,
+          0.727787216828479
+        ]
+      },
+      "300": {
+        "alerts": 80,
+        "incidents": 19,
+        "arr": 0.7625,
+        "arr_ci95": [
+          0.5853150406504066,
+          0.8347826086956522
+        ],
+        "d_arr_vs_reference": 0.08749999999999991,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.11965811965811968
+        ]
+      },
+      "600": {
+        "alerts": 80,
+        "incidents": 17,
+        "arr": 0.7875,
+        "arr_ci95": [
+          0.5897435897435898,
+          0.8650835866261398
+        ],
+        "d_arr_vs_reference": 0.11249999999999993,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.1586286823475679
+        ]
+      }
+    },
+    "fault": {
+      "180": {
+        "alerts": 36,
+        "incidents": 12,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.5454545454545454,
+          0.7333333333333334
+        ]
+      },
+      "300": {
+        "alerts": 36,
+        "incidents": 11,
+        "arr": 0.6944444444444444,
+        "arr_ci95": [
+          0.5498863636363637,
+          0.7884868421052631
+        ],
+        "d_arr_vs_reference": 0.02777777777777768,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.06666666666666665
+        ]
+      },
+      "600": {
+        "alerts": 36,
+        "incidents": 11,
+        "arr": 0.6944444444444444,
+        "arr_ci95": [
+          0.5498863636363637,
+          0.7884868421052631
+        ],
+        "d_arr_vs_reference": 0.02777777777777768,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.06666666666666665
+        ]
+      }
+    },
+    "cascade": {
+      "180": {
+        "alerts": 6,
+        "incidents": 2,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ]
+      },
+      "300": {
+        "alerts": 6,
+        "incidents": 2,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "600": {
+        "alerts": 6,
+        "incidents": 2,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "type:cpu_consumed": {
+      "180": {
+        "alerts": 8,
+        "incidents": 2,
+        "arr": 0.75,
+        "arr_ci95": [
+          0.75,
+          0.75
+        ]
+      },
+      "300": {
+        "alerts": 8,
+        "incidents": 2,
+        "arr": 0.75,
+        "arr_ci95": [
+          0.75,
+          0.75
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "600": {
+        "alerts": 8,
+        "incidents": 2,
+        "arr": 0.75,
+        "arr_ci95": [
+          0.75,
+          0.75
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "type:cpu_contention": {
+      "180": {
+        "alerts": 21,
+        "incidents": 6,
+        "arr": 0.7142857142857143,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.7692307692307692
+        ]
+      },
+      "300": {
+        "alerts": 21,
+        "incidents": 6,
+        "arr": 0.7142857142857143,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.7692307692307692
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "600": {
+        "alerts": 21,
+        "incidents": 6,
+        "arr": 0.7142857142857143,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.7692307692307692
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "type:exception": {
+      "180": {
+        "alerts": 3,
+        "incidents": 1,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ]
+      },
+      "300": {
+        "alerts": 3,
+        "incidents": 1,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "600": {
+        "alerts": 3,
+        "incidents": 1,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "type:network_delay": {
+      "180": {
+        "alerts": 4,
+        "incidents": 3,
+        "arr": 0.25,
+        "arr_ci95": [
+          0.0,
+          0.5
+        ]
+      },
+      "300": {
+        "alerts": 4,
+        "incidents": 3,
+        "arr": 0.25,
+        "arr_ci95": [
+          0.0,
+          0.5
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "600": {
+        "alerts": 4,
+        "incidents": 3,
+        "arr": 0.25,
+        "arr_ci95": [
+          0.0,
+          0.5
+        ],
+        "d_arr_vs_reference": 0.0,
+        "d_arr_vs_reference_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "type:return": {
+      "180": {
+        "alerts": 0,
+        "incidents": 0,
+        "arr": null,
+        "arr_ci95": null
+      },
+      "300": {
+        "alerts": 0,
+        "incidents": 0,
+        "arr": null,
+        "arr_ci95": null
+      },
+      "600": {
+        "alerts": 0,
+        "incidents": 0,
+        "arr": null,
+        "arr_ci95": null
+      }
+    }
+  },
+  "t_group_selection": {
+    "grid": [
+      180.0,
+      300.0,
+      600.0
+    ],
+    "default": 300.0,
+    "reference": 180.0,
+    "ambiguous": {
+      "180": 1,
+      "300": 2,
+      "600": 2
+    },
+    "selected": 180.0,
+    "reason": "reference kept (smallest T among those with the fewest ambiguous incidents); no other T has d_ARR(fault) CI95 lower bound > 0",
+    "applied": true
+  },
+  "t_group_seconds": 180.0,
+  "by_t_group": {
+    "180": {
+      "incidents": 26,
+      "labelled": 11,
+      "ambiguous": 1,
+      "no_fault": 14,
+      "multi_service": 1,
+      "multi_alert": 19,
+      "max_alerts": 6,
+      "labelled_by_fault_type": {
+        "cpu_consumed": 2,
+        "cpu_contention": 6,
+        "network_delay": 3
+      },
+      "hit_alert": {
+        "n": 11,
+        "level1_hit1": 0.6363636363636364,
+        "level1_hit1_count": 7,
+        "level1_hit1_ci95": [
+          0.36363636363636365,
+          0.9090909090909091
+        ],
+        "level1_hit3": 0.6363636363636364,
+        "level1_hit3_count": 7,
+        "level1_hit3_ci95": [
+          0.36363636363636365,
+          0.9090909090909091
+        ],
+        "baseline_hit1": 0.6363636363636364,
+        "baseline_hit1_count": 7,
+        "baseline_hit1_ci95": [
+          0.36363636363636365,
+          0.9090909090909091
+        ],
+        "baseline_hit3": 0.6363636363636364,
+        "baseline_hit3_count": 7,
+        "baseline_hit3_ci95": [
+          0.36363636363636365,
+          0.9090909090909091
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        }
+      },
+      "per_injection_alert": {
+        "n": 30,
+        "level1_hit1": 0.2,
+        "level1_hit1_count": 6,
+        "level1_hit1_ci95": [
+          0.06666666666666667,
+          0.3333333333333333
+        ],
+        "level1_hit3": 0.2,
+        "level1_hit3_count": 6,
+        "level1_hit3_ci95": [
+          0.06666666666666667,
+          0.3333333333333333
+        ],
+        "baseline_hit1": 0.2,
+        "baseline_hit1_count": 6,
+        "baseline_hit1_ci95": [
+          0.06666666666666667,
+          0.3333333333333333
+        ],
+        "baseline_hit3": 0.2,
+        "baseline_hit3_count": 6,
+        "baseline_hit3_ci95": [
+          0.06666666666666667,
+          0.3333333333333333
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "injections": 30,
+        "with_labelled_incident": 10,
+        "only_in_ambiguous_incidents": 2,
+        "without_alert": 18,
+        "by_fault_type": {
+          "cpu_consumed": {
+            "injections": 3,
+            "with_labelled_incident": 2,
+            "level1_hit1": 2,
+            "baseline_hit1": 2
+          },
+          "cpu_contention": {
+            "injections": 7,
+            "with_labelled_incident": 5,
+            "level1_hit1": 4,
+            "baseline_hit1": 4
+          },
+          "exception": {
+            "injections": 6
+          },
+          "network_delay": {
+            "injections": 9,
+            "with_labelled_incident": 3,
+            "level1_hit1": 0,
+            "baseline_hit1": 0
+          },
+          "return": {
+            "injections": 5
+          }
+        }
+      },
+      "hit_candidate": {
+        "n": 11,
+        "level1_hit1": 0.7272727272727273,
+        "level1_hit1_count": 8,
+        "level1_hit1_ci95": [
+          0.45454545454545453,
+          1.0
+        ],
+        "level1_hit3": 0.7272727272727273,
+        "level1_hit3_count": 8,
+        "level1_hit3_ci95": [
+          0.45454545454545453,
+          1.0
+        ],
+        "baseline_hit1": 0.6363636363636364,
+        "baseline_hit1_count": 7,
+        "baseline_hit1_ci95": [
+          0.36363636363636365,
+          0.9090909090909091
+        ],
+        "baseline_hit3": 0.6363636363636364,
+        "baseline_hit3_count": 7,
+        "baseline_hit3_ci95": [
+          0.36363636363636365,
+          0.9090909090909091
+        ],
+        "d_hit1": 0.09090909090909091,
+        "d_hit1_ci95": [
+          0.0,
+          0.2727272727272727
+        ],
+        "discordant_hit1": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.09090909090909091,
+        "d_hit3_ci95": [
+          0.0,
+          0.2727272727272727
+        ],
+        "discordant_hit3": {
+          "level1_only": 1,
+          "baseline_only": 0
+        }
+      },
+      "per_injection_candidate": {
+        "n": 30,
+        "level1_hit1": 0.23333333333333334,
+        "level1_hit1_count": 7,
+        "level1_hit1_ci95": [
+          0.1,
+          0.4
+        ],
+        "level1_hit3": 0.23333333333333334,
+        "level1_hit3_count": 7,
+        "level1_hit3_ci95": [
+          0.1,
+          0.4
+        ],
+        "baseline_hit1": 0.2,
+        "baseline_hit1_count": 6,
+        "baseline_hit1_ci95": [
+          0.06666666666666667,
+          0.3333333333333333
+        ],
+        "baseline_hit3": 0.2,
+        "baseline_hit3_count": 6,
+        "baseline_hit3_ci95": [
+          0.06666666666666667,
+          0.3333333333333333
+        ],
+        "d_hit1": 0.03333333333333333,
+        "d_hit1_ci95": [
+          0.0,
+          0.1
+        ],
+        "discordant_hit1": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.03333333333333333,
+        "d_hit3_ci95": [
+          0.0,
+          0.1
+        ],
+        "discordant_hit3": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "injections": 30,
+        "with_labelled_incident": 10,
+        "only_in_ambiguous_incidents": 2,
+        "without_alert": 18,
+        "by_fault_type": {
+          "cpu_consumed": {
+            "injections": 3,
+            "with_labelled_incident": 2,
+            "level1_hit1": 2,
+            "baseline_hit1": 2
+          },
+          "cpu_contention": {
+            "injections": 7,
+            "with_labelled_incident": 5,
+            "level1_hit1": 4,
+            "baseline_hit1": 4
+          },
+          "exception": {
+            "injections": 6
+          },
+          "network_delay": {
+            "injections": 9,
+            "with_labelled_incident": 3,
+            "level1_hit1": 1,
+            "baseline_hit1": 0
+          },
+          "return": {
+            "injections": 5
+          }
+        }
+      }
+    },
+    "300": {
+      "incidents": 19,
+      "labelled": 9,
+      "ambiguous": 2,
+      "no_fault": 8,
+      "multi_service": 1,
+      "multi_alert": 14,
+      "max_alerts": 16,
+      "labelled_by_fault_type": {
+        "cpu_consumed": 1,
+        "cpu_contention": 5,
+        "network_delay": 3
+      },
+      "hit_alert": {
+        "n": 9,
+        "level1_hit1": 0.5555555555555556,
+        "level1_hit1_count": 5,
+        "level1_hit1_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "level1_hit3": 0.5555555555555556,
+        "level1_hit3_count": 5,
+        "level1_hit3_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "baseline_hit1": 0.5555555555555556,
+        "baseline_hit1_count": 5,
+        "baseline_hit1_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "baseline_hit3": 0.5555555555555556,
+        "baseline_hit3_count": 5,
+        "baseline_hit3_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        }
+      },
+      "per_injection_alert": {
+        "n": 30,
+        "level1_hit1": 0.13333333333333333,
+        "level1_hit1_count": 4,
+        "level1_hit1_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "level1_hit3": 0.13333333333333333,
+        "level1_hit3_count": 4,
+        "level1_hit3_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "baseline_hit1": 0.13333333333333333,
+        "baseline_hit1_count": 4,
+        "baseline_hit1_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "baseline_hit3": 0.13333333333333333,
+        "baseline_hit3_count": 4,
+        "baseline_hit3_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "injections": 30,
+        "with_labelled_incident": 8,
+        "only_in_ambiguous_incidents": 4,
+        "without_alert": 18,
+        "by_fault_type": {
+          "cpu_consumed": {
+            "injections": 3,
+            "with_labelled_incident": 1,
+            "level1_hit1": 1,
+            "baseline_hit1": 1
+          },
+          "cpu_contention": {
+            "injections": 7,
+            "with_labelled_incident": 4,
+            "level1_hit1": 3,
+            "baseline_hit1": 3
+          },
+          "exception": {
+            "injections": 6
+          },
+          "network_delay": {
+            "injections": 9,
+            "with_labelled_incident": 3,
+            "level1_hit1": 0,
+            "baseline_hit1": 0
+          },
+          "return": {
+            "injections": 5
+          }
+        }
+      },
+      "hit_candidate": {
+        "n": 9,
+        "level1_hit1": 0.6666666666666666,
+        "level1_hit1_count": 6,
+        "level1_hit1_ci95": [
+          0.3333333333333333,
+          1.0
+        ],
+        "level1_hit3": 0.6666666666666666,
+        "level1_hit3_count": 6,
+        "level1_hit3_ci95": [
+          0.3333333333333333,
+          1.0
+        ],
+        "baseline_hit1": 0.5555555555555556,
+        "baseline_hit1_count": 5,
+        "baseline_hit1_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "baseline_hit3": 0.5555555555555556,
+        "baseline_hit3_count": 5,
+        "baseline_hit3_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "d_hit1": 0.1111111111111111,
+        "d_hit1_ci95": [
+          0.0,
+          0.3333333333333333
+        ],
+        "discordant_hit1": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.1111111111111111,
+        "d_hit3_ci95": [
+          0.0,
+          0.3333333333333333
+        ],
+        "discordant_hit3": {
+          "level1_only": 1,
+          "baseline_only": 0
+        }
+      },
+      "per_injection_candidate": {
+        "n": 30,
+        "level1_hit1": 0.16666666666666666,
+        "level1_hit1_count": 5,
+        "level1_hit1_ci95": [
+          0.03333333333333333,
+          0.3
+        ],
+        "level1_hit3": 0.16666666666666666,
+        "level1_hit3_count": 5,
+        "level1_hit3_ci95": [
+          0.03333333333333333,
+          0.3
+        ],
+        "baseline_hit1": 0.13333333333333333,
+        "baseline_hit1_count": 4,
+        "baseline_hit1_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "baseline_hit3": 0.13333333333333333,
+        "baseline_hit3_count": 4,
+        "baseline_hit3_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "d_hit1": 0.03333333333333333,
+        "d_hit1_ci95": [
+          0.0,
+          0.1
+        ],
+        "discordant_hit1": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.03333333333333333,
+        "d_hit3_ci95": [
+          0.0,
+          0.1
+        ],
+        "discordant_hit3": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "injections": 30,
+        "with_labelled_incident": 8,
+        "only_in_ambiguous_incidents": 4,
+        "without_alert": 18,
+        "by_fault_type": {
+          "cpu_consumed": {
+            "injections": 3,
+            "with_labelled_incident": 1,
+            "level1_hit1": 1,
+            "baseline_hit1": 1
+          },
+          "cpu_contention": {
+            "injections": 7,
+            "with_labelled_incident": 4,
+            "level1_hit1": 3,
+            "baseline_hit1": 3
+          },
+          "exception": {
+            "injections": 6
+          },
+          "network_delay": {
+            "injections": 9,
+            "with_labelled_incident": 3,
+            "level1_hit1": 1,
+            "baseline_hit1": 0
+          },
+          "return": {
+            "injections": 5
+          }
+        }
+      }
+    },
+    "600": {
+      "incidents": 17,
+      "labelled": 9,
+      "ambiguous": 2,
+      "no_fault": 6,
+      "multi_service": 1,
+      "multi_alert": 13,
+      "max_alerts": 19,
+      "labelled_by_fault_type": {
+        "cpu_consumed": 1,
+        "cpu_contention": 5,
+        "network_delay": 3
+      },
+      "hit_alert": {
+        "n": 9,
+        "level1_hit1": 0.5555555555555556,
+        "level1_hit1_count": 5,
+        "level1_hit1_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "level1_hit3": 0.5555555555555556,
+        "level1_hit3_count": 5,
+        "level1_hit3_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "baseline_hit1": 0.5555555555555556,
+        "baseline_hit1_count": 5,
+        "baseline_hit1_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "baseline_hit3": 0.5555555555555556,
+        "baseline_hit3_count": 5,
+        "baseline_hit3_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        }
+      },
+      "per_injection_alert": {
+        "n": 30,
+        "level1_hit1": 0.13333333333333333,
+        "level1_hit1_count": 4,
+        "level1_hit1_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "level1_hit3": 0.13333333333333333,
+        "level1_hit3_count": 4,
+        "level1_hit3_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "baseline_hit1": 0.13333333333333333,
+        "baseline_hit1_count": 4,
+        "baseline_hit1_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "baseline_hit3": 0.13333333333333333,
+        "baseline_hit3_count": 4,
+        "baseline_hit3_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "injections": 30,
+        "with_labelled_incident": 8,
+        "only_in_ambiguous_incidents": 4,
+        "without_alert": 18,
+        "by_fault_type": {
+          "cpu_consumed": {
+            "injections": 3,
+            "with_labelled_incident": 1,
+            "level1_hit1": 1,
+            "baseline_hit1": 1
+          },
+          "cpu_contention": {
+            "injections": 7,
+            "with_labelled_incident": 4,
+            "level1_hit1": 3,
+            "baseline_hit1": 3
+          },
+          "exception": {
+            "injections": 6
+          },
+          "network_delay": {
+            "injections": 9,
+            "with_labelled_incident": 3,
+            "level1_hit1": 0,
+            "baseline_hit1": 0
+          },
+          "return": {
+            "injections": 5
+          }
+        }
+      },
+      "hit_candidate": {
+        "n": 9,
+        "level1_hit1": 0.6666666666666666,
+        "level1_hit1_count": 6,
+        "level1_hit1_ci95": [
+          0.3333333333333333,
+          1.0
+        ],
+        "level1_hit3": 0.6666666666666666,
+        "level1_hit3_count": 6,
+        "level1_hit3_ci95": [
+          0.3333333333333333,
+          1.0
+        ],
+        "baseline_hit1": 0.5555555555555556,
+        "baseline_hit1_count": 5,
+        "baseline_hit1_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "baseline_hit3": 0.5555555555555556,
+        "baseline_hit3_count": 5,
+        "baseline_hit3_ci95": [
+          0.2222222222222222,
+          0.8888888888888888
+        ],
+        "d_hit1": 0.1111111111111111,
+        "d_hit1_ci95": [
+          0.0,
+          0.3333333333333333
+        ],
+        "discordant_hit1": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.1111111111111111,
+        "d_hit3_ci95": [
+          0.0,
+          0.3333333333333333
+        ],
+        "discordant_hit3": {
+          "level1_only": 1,
+          "baseline_only": 0
+        }
+      },
+      "per_injection_candidate": {
+        "n": 30,
+        "level1_hit1": 0.16666666666666666,
+        "level1_hit1_count": 5,
+        "level1_hit1_ci95": [
+          0.03333333333333333,
+          0.3
+        ],
+        "level1_hit3": 0.16666666666666666,
+        "level1_hit3_count": 5,
+        "level1_hit3_ci95": [
+          0.03333333333333333,
+          0.3
+        ],
+        "baseline_hit1": 0.13333333333333333,
+        "baseline_hit1_count": 4,
+        "baseline_hit1_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "baseline_hit3": 0.13333333333333333,
+        "baseline_hit3_count": 4,
+        "baseline_hit3_ci95": [
+          0.03333333333333333,
+          0.26666666666666666
+        ],
+        "d_hit1": 0.03333333333333333,
+        "d_hit1_ci95": [
+          0.0,
+          0.1
+        ],
+        "discordant_hit1": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.03333333333333333,
+        "d_hit3_ci95": [
+          0.0,
+          0.1
+        ],
+        "discordant_hit3": {
+          "level1_only": 1,
+          "baseline_only": 0
+        },
+        "injections": 30,
+        "with_labelled_incident": 8,
+        "only_in_ambiguous_incidents": 4,
+        "without_alert": 18,
+        "by_fault_type": {
+          "cpu_consumed": {
+            "injections": 3,
+            "with_labelled_incident": 1,
+            "level1_hit1": 1,
+            "baseline_hit1": 1
+          },
+          "cpu_contention": {
+            "injections": 7,
+            "with_labelled_incident": 4,
+            "level1_hit1": 3,
+            "baseline_hit1": 3
+          },
+          "exception": {
+            "injections": 6
+          },
+          "network_delay": {
+            "injections": 9,
+            "with_labelled_incident": 3,
+            "level1_hit1": 1,
+            "baseline_hit1": 0
+          },
+          "return": {
+            "injections": 5
+          }
+        }
+      }
+    }
+  },
+  "sign_selection": {
+    "candidates": [
+      "alert",
+      "candidate"
+    ],
+    "default": "alert",
+    "paired_candidate_minus_alert": {
+      "n": 11,
+      "d_hit1": 0.09090909090909091,
+      "d_hit1_ci95": [
+        0.0,
+        0.2727272727272727
+      ]
+    },
+    "selected": "alert",
+    "reason": "default kept; d_Hit@1(candidate - alert) CI95 lower bound is not > 0",
+    "applied": true
+  },
+  "sign": "alert",
+  "main": {
+    "t_group_seconds": 180.0,
+    "sign": "alert",
+    "incidents": 26,
+    "labelled": 11,
+    "ambiguous": 1,
+    "no_fault": 14,
+    "multi_service": 1,
+    "multi_alert": 19,
+    "max_alerts": 6,
+    "labelled_by_fault_type": {
+      "cpu_consumed": 2,
+      "cpu_contention": 6,
+      "network_delay": 3
+    },
+    "hit_alert": {
+      "n": 11,
+      "level1_hit1": 0.6363636363636364,
+      "level1_hit1_count": 7,
+      "level1_hit1_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "level1_hit3": 0.6363636363636364,
+      "level1_hit3_count": 7,
+      "level1_hit3_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "baseline_hit1": 0.6363636363636364,
+      "baseline_hit1_count": 7,
+      "baseline_hit1_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "baseline_hit3": 0.6363636363636364,
+      "baseline_hit3_count": 7,
+      "baseline_hit3_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      }
+    },
+    "per_injection_alert": {
+      "n": 30,
+      "level1_hit1": 0.2,
+      "level1_hit1_count": 6,
+      "level1_hit1_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "level1_hit3": 0.2,
+      "level1_hit3_count": 6,
+      "level1_hit3_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "baseline_hit1": 0.2,
+      "baseline_hit1_count": 6,
+      "baseline_hit1_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "baseline_hit3": 0.2,
+      "baseline_hit3_count": 6,
+      "baseline_hit3_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "injections": 30,
+      "with_labelled_incident": 10,
+      "only_in_ambiguous_incidents": 2,
+      "without_alert": 18,
+      "by_fault_type": {
+        "cpu_consumed": {
+          "injections": 3,
+          "with_labelled_incident": 2,
+          "level1_hit1": 2,
+          "baseline_hit1": 2
+        },
+        "cpu_contention": {
+          "injections": 7,
+          "with_labelled_incident": 5,
+          "level1_hit1": 4,
+          "baseline_hit1": 4
+        },
+        "exception": {
+          "injections": 6
+        },
+        "network_delay": {
+          "injections": 9,
+          "with_labelled_incident": 3,
+          "level1_hit1": 0,
+          "baseline_hit1": 0
+        },
+        "return": {
+          "injections": 5
+        }
+      }
+    },
+    "hit_candidate": {
+      "n": 11,
+      "level1_hit1": 0.7272727272727273,
+      "level1_hit1_count": 8,
+      "level1_hit1_ci95": [
+        0.45454545454545453,
+        1.0
+      ],
+      "level1_hit3": 0.7272727272727273,
+      "level1_hit3_count": 8,
+      "level1_hit3_ci95": [
+        0.45454545454545453,
+        1.0
+      ],
+      "baseline_hit1": 0.6363636363636364,
+      "baseline_hit1_count": 7,
+      "baseline_hit1_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "baseline_hit3": 0.6363636363636364,
+      "baseline_hit3_count": 7,
+      "baseline_hit3_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "d_hit1": 0.09090909090909091,
+      "d_hit1_ci95": [
+        0.0,
+        0.2727272727272727
+      ],
+      "discordant_hit1": {
+        "level1_only": 1,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.09090909090909091,
+      "d_hit3_ci95": [
+        0.0,
+        0.2727272727272727
+      ],
+      "discordant_hit3": {
+        "level1_only": 1,
+        "baseline_only": 0
+      }
+    },
+    "per_injection_candidate": {
+      "n": 30,
+      "level1_hit1": 0.23333333333333334,
+      "level1_hit1_count": 7,
+      "level1_hit1_ci95": [
+        0.1,
+        0.4
+      ],
+      "level1_hit3": 0.23333333333333334,
+      "level1_hit3_count": 7,
+      "level1_hit3_ci95": [
+        0.1,
+        0.4
+      ],
+      "baseline_hit1": 0.2,
+      "baseline_hit1_count": 6,
+      "baseline_hit1_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "baseline_hit3": 0.2,
+      "baseline_hit3_count": 6,
+      "baseline_hit3_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "d_hit1": 0.03333333333333333,
+      "d_hit1_ci95": [
+        0.0,
+        0.1
+      ],
+      "discordant_hit1": {
+        "level1_only": 1,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.03333333333333333,
+      "d_hit3_ci95": [
+        0.0,
+        0.1
+      ],
+      "discordant_hit3": {
+        "level1_only": 1,
+        "baseline_only": 0
+      },
+      "injections": 30,
+      "with_labelled_incident": 10,
+      "only_in_ambiguous_incidents": 2,
+      "without_alert": 18,
+      "by_fault_type": {
+        "cpu_consumed": {
+          "injections": 3,
+          "with_labelled_incident": 2,
+          "level1_hit1": 2,
+          "baseline_hit1": 2
+        },
+        "cpu_contention": {
+          "injections": 7,
+          "with_labelled_incident": 5,
+          "level1_hit1": 4,
+          "baseline_hit1": 4
+        },
+        "exception": {
+          "injections": 6
+        },
+        "network_delay": {
+          "injections": 9,
+          "with_labelled_incident": 3,
+          "level1_hit1": 1,
+          "baseline_hit1": 0
+        },
+        "return": {
+          "injections": 5
+        }
+      }
+    },
+    "hit": {
+      "n": 11,
+      "level1_hit1": 0.6363636363636364,
+      "level1_hit1_count": 7,
+      "level1_hit1_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "level1_hit3": 0.6363636363636364,
+      "level1_hit3_count": 7,
+      "level1_hit3_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "baseline_hit1": 0.6363636363636364,
+      "baseline_hit1_count": 7,
+      "baseline_hit1_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "baseline_hit3": 0.6363636363636364,
+      "baseline_hit3_count": 7,
+      "baseline_hit3_ci95": [
+        0.36363636363636365,
+        0.9090909090909091
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      }
+    },
+    "per_injection": {
+      "n": 30,
+      "level1_hit1": 0.2,
+      "level1_hit1_count": 6,
+      "level1_hit1_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "level1_hit3": 0.2,
+      "level1_hit3_count": 6,
+      "level1_hit3_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "baseline_hit1": 0.2,
+      "baseline_hit1_count": 6,
+      "baseline_hit1_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "baseline_hit3": 0.2,
+      "baseline_hit3_count": 6,
+      "baseline_hit3_ci95": [
+        0.06666666666666667,
+        0.3333333333333333
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "injections": 30,
+      "with_labelled_incident": 10,
+      "only_in_ambiguous_incidents": 2,
+      "without_alert": 18,
+      "by_fault_type": {
+        "cpu_consumed": {
+          "injections": 3,
+          "with_labelled_incident": 2,
+          "level1_hit1": 2,
+          "baseline_hit1": 2
+        },
+        "cpu_contention": {
+          "injections": 7,
+          "with_labelled_incident": 5,
+          "level1_hit1": 4,
+          "baseline_hit1": 4
+        },
+        "exception": {
+          "injections": 6
+        },
+        "network_delay": {
+          "injections": 9,
+          "with_labelled_incident": 3,
+          "level1_hit1": 0,
+          "baseline_hit1": 0
+        },
+        "return": {
+          "injections": 5
+        }
+      }
+    },
+    "reduction": {
+      "all": {
+        "alerts": 80,
+        "incidents": 26,
+        "arr": 0.675,
+        "arr_ci95": [
+          0.5428571428571429,
+          0.727787216828479
+        ]
+      },
+      "fault": {
+        "alerts": 36,
+        "incidents": 12,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.5454545454545454,
+          0.7333333333333334
+        ]
+      },
+      "cascade": {
+        "alerts": 6,
+        "incidents": 2,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ]
+      },
+      "type:cpu_consumed": {
+        "alerts": 8,
+        "incidents": 2,
+        "arr": 0.75,
+        "arr_ci95": [
+          0.75,
+          0.75
+        ]
+      },
+      "type:cpu_contention": {
+        "alerts": 21,
+        "incidents": 6,
+        "arr": 0.7142857142857143,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.7692307692307692
+        ]
+      },
+      "type:exception": {
+        "alerts": 3,
+        "incidents": 1,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ]
+      },
+      "type:network_delay": {
+        "alerts": 4,
+        "incidents": 3,
+        "arr": 0.25,
+        "arr_ci95": [
+          0.0,
+          0.5
+        ]
+      },
+      "type:return": {
+        "alerts": 0,
+        "incidents": 0,
+        "arr": null,
+        "arr_ci95": null
+      }
+    },
+    "level1_top1_differs_from_baseline": 1,
+    "level1_top1_not_alerted": 0
+  },
+  "git_commit": "e455004e23b8937bd0058768dea97b8e23bcbbf4\nmodified tracked files at run time:\n  docs/ideas.md\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py",
+  "method_fingerprint": "baa7acb1380752cb"
+}

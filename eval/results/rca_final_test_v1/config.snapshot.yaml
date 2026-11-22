@@ -1,0 +1,36 @@
+# M9-B / H5 on test (registered at be2b985; V36 (a), QD-039): the frozen RCA method of rca_final.yaml (77786ec)
+# on the 78 CTAV alerts of ctav_final_test_v1. Only split / h5_test / input runs / run_id differ from
+# rca_final.yaml; the run must print method fingerprint b0c54fa68ef65535. Run once.
+kind: rca
+run_id: rca_final_test_v1
+split: test
+h5_test: true  # M9-B: rca_final.yaml committed at 77786ec, M8 closed (QD-039)
+input:
+  alerts_run: ctav_final_test_v1  # 78 CTAV alerts (14 TP, 64 FP), QD-038
+  evidence_run: h0_test_c1_k0_v1  # retrieval.jsonl holding the text of the cited evidence
+grouping:
+  t_group_seconds: 180
+propagation:
+  level: 1  # backward 1-hop, pure algorithm; level 2 was cut (QD-037)
+  sign: alert  # only CTAV-confirmed services count as abnormal
+  sign_pad_seconds: 60
+labels:
+  window_seconds: 60  # QD-003
+  cascade_min_services: 2  # a cascade fault = its alerts touch at least 2 services
+summarizer:
+  enabled: true
+  backend: gemini
+  model: gemini-2.5-flash  # the judge model (QD-021); temperature 0, thinking budget 0
+  max_output_tokens: 1024
+  max_calls_per_minute: 60
+  require_evidence: true
+  max_evidence: 12
+  excerpt_chars: 240
+  prompt_version: rca-summary-v1  # services/rca_agent/summarizer.py
+  prompt_fingerprint: 8c1d50e6ba757ee6  # the run stops if the prompt in code differs
+  budget_usd: 1.0  # M9 budget (CURRENT-MILESTONE.md); worst-case estimate must stay below
+  stop_usd: 2.0  # M9 stop threshold
+postgres:
+  write: true  # run_registry, incidents, diagnostic_reports, diagnostic_rejected (03 SS4)
+n_boot: 1000
+seed: 42

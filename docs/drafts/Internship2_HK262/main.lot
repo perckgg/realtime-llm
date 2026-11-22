@@ -1,0 +1,42 @@
+\contentsline {table}{\numberline {1}{\ignorespaces Ba loại tín hiệu quan sát trên Nezha và vai trò của chúng trong đề tài.}}{17}{table.caption.4}%
+\contentsline {table}{\numberline {2}{\ignorespaces Công nghệ nền tảng: vai trò trong hệ và lý do chọn.}}{25}{table.caption.7}%
+\contentsline {table}{\numberline {3}{\ignorespaces Đối chiếu các nền tảng AIOps thương mại và công cụ mã nguồn mở hiện có}}{32}{table.caption.8}%
+\contentsline {table}{\numberline {4}{\ignorespaces So sánh công trình liên quan, hệ thống hiện có và đề xuất}}{34}{table.caption.9}%
+\contentsline {table}{\numberline {5}{\ignorespaces Bốn giao diện (\texttt {Protocol}) lõi và ánh xạ sang các mô-đun hiện thực.}}{37}{table.caption.11}%
+\contentsline {table}{\numberline {6}{\ignorespaces Bảng ký hiệu toán học dùng trong phát biểu bài toán và thiết kế thuật toán.}}{39}{table.caption.12}%
+\contentsline {table}{\numberline {7}{\ignorespaces Vai trò hiện tại của từng thành phần trong không gian thiết kế CTAV{} và cổng cứu cảnh báo.}}{42}{table.caption.14}%
+\contentsline {table}{\numberline {8}{\ignorespaces Tổng hợp các điều kiện hạ bậc của chính sách quyết định và so sánh hai nguồn ngưỡng nền cho C3.}}{46}{table.caption.17}%
+\contentsline {table}{\numberline {9}{\ignorespaces Tổng hợp tham số cấu hình chốt của pipeline phát hiện và CTAV}}{48}{table.caption.18}%
+\contentsline {table}{\numberline {10}{\ignorespaces Lược đồ đầu ra \texttt {DiagnosticReport} và năm quy tắc kiểm duyệt tự động.}}{51}{table.caption.20}%
+\contentsline {table}{\numberline {11}{\ignorespaces Giả thuyết H0--H5 và tiêu chí chấp nhận đã đăng ký}}{55}{table.caption.21}%
+\contentsline {table}{\numberline {12}{\ignorespaces Kích thước các split và tỷ lệ cửa sổ có telemetry trên Nezha}}{56}{table.caption.23}%
+\contentsline {table}{\numberline {13}{\ignorespaces Tổng hợp chi phí gọi API LLM theo các hạng mục thực nghiệm}}{57}{table.caption.24}%
+\contentsline {table}{\numberline {14}{\ignorespaces Kết quả kiểm chứng hồi quy G-paper trên tập đối chiếu}}{59}{table.caption.26}%
+\contentsline {table}{\numberline {15}{\ignorespaces So sánh các phương pháp nền trên tập val}}{60}{table.caption.27}%
+\contentsline {table}{\numberline {16}{\ignorespaces Tỷ lệ TRUE\_ALERT thô theo điều kiện can thiệp H1 trên tập val}}{60}{table.caption.29}%
+\contentsline {table}{\numberline {17}{\ignorespaces So sánh hành vi bộ phát hiện đã đóng băng trên ba split}}{63}{table.caption.31}%
+\contentsline {table}{\numberline {18}{\ignorespaces So sánh tổng quan năm phương pháp trên test cạnh val}}{64}{table.caption.33}%
+\contentsline {table}{\numberline {19}{\ignorespaces Kiểm định giả thuyết H0 và giả thuyết chính H2 trên tập test}}{65}{table.caption.35}%
+\contentsline {table}{\numberline {20}{\ignorespaces Kiểm định giả thuyết H3 (ablation) và H4 (ngân sách 120) trên tập test}}{67}{table.caption.36}%
+\contentsline {table}{\numberline {21}{\ignorespaces Tổng hợp kết luận kiểm định H0--H5 trên test và val}}{67}{table.caption.37}%
+\contentsline {table}{\numberline {22}{\ignorespaces Bảng ablation thành phần quanh CTAV trên test cạnh val}}{69}{table.caption.39}%
+\contentsline {table}{\numberline {23}{\ignorespaces Phân tách C1 và CTAV theo độ phủ ngưỡng nền dev của service}}{69}{table.caption.41}%
+\contentsline {table}{\numberline {24}{\ignorespaces So sánh CTAV và CTAV + C5 một điểm trên val và test}}{71}{table.caption.43}%
+\contentsline {table}{\numberline {25}{\ignorespaces Kiểm định giả thuyết H5 trên tập test theo bản đăng ký}}{73}{table.caption.44}%
+\contentsline {table}{\numberline {26}{\ignorespaces So sánh tác tử RCA trên val, test đăng ký và dòng độ nhạy}}{73}{table.caption.45}%
+\contentsline {table}{\numberline {27}{\ignorespaces Tổng hợp bốn nhóm phát hiện thực nghiệm cốt lõi}}{74}{table.caption.46}%
+\contentsline {table}{\numberline {28}{\ignorespaces Các endpoint của API chỉ đọc và màn hình sử dụng}}{78}{table.caption.48}%
+\contentsline {table}{\numberline {29}{\ignorespaces Kịch bản demo năm phút}}{83}{table.caption.53}%
+\contentsline {table}{\numberline {30}{\ignorespaces Kiểm thử chạy ngoại tuyến của ba lượt chạy pipeline}}{84}{table.caption.54}%
+\contentsline {table}{\numberline {31}{\ignorespaces Năm khẳng định chính và mức độ tin cậy}}{86}{table.caption.55}%
+\contentsline {table}{\numberline {32}{\ignorespaces Mối đe doạ tính hợp lệ, biện pháp và rủi ro còn lại}}{89}{table.caption.56}%
+\contentsline {table}{\numberline {33}{\ignorespaces Phân loại ca sai của CTAV và tác tử RCA trên tập test}}{90}{table.caption.57}%
+\contentsline {table}{\numberline {34}{\ignorespaces Chất lượng nội dung báo cáo chẩn đoán trên mẫu 30 sự cố}}{93}{table.caption.58}%
+\contentsline {table}{\numberline {35}{\ignorespaces Các thành phần hiện thực hóa chính, lệnh vận hành và bộ tệp đầu ra bảo đảm tái lập.}}{101}{table.caption.59}%
+\contentsline {table}{\numberline {36}{\ignorespaces Hiệu ghép cặp và kiểm định McNemar cho H0 trên tập val}}{102}{table.caption.60}%
+\contentsline {table}{\numberline {37}{\ignorespaces Kết quả quét hạn ngạch k\_graph trên tập val}}{102}{table.caption.61}%
+\contentsline {table}{\numberline {38}{\ignorespaces So sánh các biến thể H3 quanh CTAV trên tập val}}{102}{table.caption.62}%
+\contentsfinish 
+\contentsline {table}{\numberline {39}{\ignorespaces Danh sách các lượt chạy kiểm định trên tập test}}{103}{table.caption.63}%
+\contentsline {table}{\numberline {40}{\ignorespaces Giá trị F1 theo ngân sách lần gọi LLM trên test}}{103}{table.caption.64}%
+\contentsline {table}{\numberline {41}{\ignorespaces Phân rã kết quả định vị RCA theo loại lỗi trên tập test}}{103}{table.caption.65}%

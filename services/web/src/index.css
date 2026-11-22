@@ -3,41 +3,42 @@
 /* ---------------------------------------------------------------------------
    Design tokens.
 
-   Color palette verified for color-vision deficiency (CVD) accessibility.
-   First three categorical slots (blue / orange / aqua) encode verdicts with
-   full all-pairs contrast. Five slots encode fault types and RAG variants;
-   charts using lighter slots include direct labels or companion numeric tables.
+   Bảng màu lấy nguyên từ bảng tham chiếu đã được kiểm định mù màu (CVD).
+   Ba slot đầu (blue / orange / aqua) dùng cho verdict — bộ ba này qua toàn bộ
+   ngưỡng all-pairs. Năm slot dùng cho loại lỗi và biến thể RAG (qua ngưỡng
+   adjacent-pairs; ba slot aqua/yellow/magenta dưới 3:1 tương phản nên MỌI biểu
+   đồ dùng chúng phải có nhãn trực tiếp hoặc bảng số kèm theo — quy tắc "relief").
 
-   Light theme only for high-contrast analytical readability.
+   Chỉ có light mode. docs/Final_Thesis_Phase2/06-scope-guard.md §4 cấm dark mode
+   trong Giai đoạn 2: nó tốn thời gian đánh bóng mà không đóng góp gì cho luận văn.
 --------------------------------------------------------------------------- */
 @theme {
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Surfaces & ink — warm eye-comfort paper-yellow theme */
-  --color-surface: #faf6ed;
-  --color-plane: #f3ede0;
-  --color-ink: #1f1b16;
-  --color-ink-2: #524a3e;
-  --color-ink-muted: #7a7062;
-  --color-grid: #e3dac8;
-  --color-axis: #c7bca6;
-  --color-hairline: rgb(68 52 28 / 0.13);
+  /* Bề mặt và mực */
+  --color-surface: #fcfcfb;
+  --color-plane: #f9f9f7;
+  --color-ink: #0b0b0b;
+  --color-ink-2: #52514e;
+  --color-ink-muted: #898781;
+  --color-grid: #e1e0d9;
+  --color-axis: #c3c2b7;
+  --color-hairline: rgb(11 11 11 / 0.1);
 
-  /* Categorical series — fixed assignment, never cycled */
+  /* Categorical — thứ tự cố định, không bao giờ xoay vòng */
   --color-series-1: #2a78d6; /* blue */
   --color-series-2: #eb6834; /* orange */
   --color-series-3: #1baf7a; /* aqua */
   --color-series-4: #eda100; /* yellow */
   --color-series-5: #e87ba4; /* magenta */
 
-  /* Sequential blue ramp */
+  /* Sequential (blue, nhạt → đậm) cho độ lớn liên tục */
   --color-seq-250: #86b6ef;
   --color-seq-400: #3987e5;
   --color-seq-550: #1c5cab;
   --color-seq-700: #0d366b;
 
-  /* Status semantics — reserved, paired with glyphs and text labels */
+  /* Status — dành riêng, không bao giờ tái sử dụng làm màu series */
   --color-good: #0ca30c;
   --color-warning: #fab219;
   --color-serious: #ec835a;
@@ -53,11 +54,10 @@ body,
 body {
   background: var(--color-plane);
   color: var(--color-ink);
-  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Recharts axes and grid stay visually quiet behind data marks. */
+/* Trục và lưới của Recharts phải lùi lại phía sau dữ liệu. */
 .recharts-cartesian-axis-line,
 .recharts-cartesian-axis-tick-line {
   stroke: var(--color-axis);
@@ -73,7 +73,7 @@ body {
   outline: none;
 }
 
-/* Clean flat attribution-free React Flow canvas. */
+/* react-flow: bỏ watermark, dùng nền phẳng của chúng ta. */
 .react-flow__attribution {
   display: none;
 }

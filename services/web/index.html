@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CTAV — AIOps Alert Validation &amp; Root Cause Analysis Platform</title>
+    <title>AIOps RCA — Experiment Dashboard</title>
     <script>
-      // Restore SPA route after GitHub Pages 404.html redirect.
+      // Restore SPA route redirected by public/404.html on GitHub Pages.
       (function (l) {
         if (l.search[1] === "/") {
           var decoded = l.search
@@ -15,7 +15,11 @@
               return s.replace(/~and~/g, "&");
             })
             .join("?");
-          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+          window.history.replaceState(
+            null,
+            null,
+            l.pathname.slice(0, -1) + decoded + l.hash,
+          );
         }
       })(window.location);
     </script>

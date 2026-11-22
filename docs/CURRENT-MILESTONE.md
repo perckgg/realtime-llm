@@ -6,7 +6,7 @@
 
 ---
 
-## Trạng thái — 2026-11-16
+## Trạng thái — 2026-11-17
 
 | Mốc | Trạng thái | Báo cáo / quyết định |
 |---|---|---|
@@ -18,8 +18,27 @@
 | M5 | QUA (đóng 2026-11-01; H1 giữ một phần, V28 (b)) | `docs/milestones/M5-h1.md`; QĐ-028, QĐ-029 |
 | M6 | QUA (đóng 2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a)) | `docs/milestones/M6-ctav.md`; QĐ-030..032, QĐ-037 |
 | M7 | QUA (đóng 2026-11-14; H0–H5 đã đăng ký, commit `be2b985`; V33 (a), V34 (b)) | `docs/milestones/M7-rescue-dang-ky.md`; QĐ-033, QĐ-034 |
-| M8 | ĐANG LÀM — G-test, mở 2026-11-14; V27 chấm toàn bộ candidate (BM25 + C1 xong, H0 đạt; `norag_v1` dở 2.917/3.287) | QĐ-034..037; báo cáo `docs/milestones/M8-g-test.md` (chưa viết) |
-| M10 (Pha 1) | ĐANG LÀM — **Pha 1 XONG** trên nhánh `demo/gh-pages` (Dashboard tĩnh dữ liệu thật + GitHub Pages); Pha 2 chờ M8/M9-B | QĐ-038; `docs/milestones/M10-platform.md` |
+| M8 | **QUA (đóng 2026-11-16; người dùng đã xem báo cáo, V36 (a) — QĐ-039; M8: xong phần API)** — hoàn tất 2026-11-16 (21.094 gọi mới, 0 lỗi, 15,85 USD theo token): **H0 đạt, H2 không đạt** (do 61% fault rơi vào 32 service thiếu ngưỡng `dev`; đối chứng `C3-trượt` đạt F1 0,120), **H3 & H4 đạt** | `docs/milestones/M8-g-test.md`; QĐ-034..039 |
+| M9 | **QUA — H5 không được chấp nhận** (đóng 2026-11-17, người dùng đã xem — QĐ-043): `test` Hit@1 = Hit@3 = 0,471 = baseline, ΔHit@1 = 0, 0 lỗi cascade; `val` ARR `network_delay` 0,25 < 0,30; 0,2772 USD theo token | `docs/milestones/M9-rca.md`; QĐ-037, QĐ-039..043 |
+| M10 | **QUA** (đóng 2026-11-17, người dùng đã xem — QĐ-049): platform end-to-end, API 7 endpoint, dashboard tiếng Anh 4 màn hình, `DEMO_OFFLINE=1` (`0` gọi API / `0,0000` USD), parity `val` 26/26 & `test` 38/38 & độ nhạy 114/114, `ch6-demo-platform.md` + 5 ảnh chụp, `253` pytest qua | `docs/milestones/M10-platform.md`; QĐ-045..049 |
+| M11 | **Đang làm** (mở 2026-11-17; **M11-A xong 2026-11-19**, chờ người dùng chấm tay **V50**) | QĐ-049, **QĐ-050**; bản nháp `docs/milestones/M11-danh-gia-nguoi.md` |
+
+M10 tóm tắt (QĐ-045..049): `services/rca_agent/pipeline.py` nạp ClickHouse/PostgreSQL và đối chiếu parity 100% với M9 (`pipeline_val_v2`: 26/26, `5.764,165 ms`; `pipeline_test_v2`: 38/38, `4.242,424 ms`, dấu vân tay `b0c54fa68ef65535`; V48 `(b')+(a')` `pipeline_sens_test_v1`: 114/114, `10.646,898 ms`), chế độ `DEMO_OFFLINE=1` xoá khoá API và đọc 100% từ cache. API FastAPI chỉ đọc 7 endpoint (`services/api/`), giao diện React/Vite 4 màn hình chuyển ngữ 100% tiếng Anh (bảng tĩnh `experiment_table.json` kiểm khớp Chương 5), chọn ca demo xác định `seed=42` (`demo_cases.json`), kiểm trình duyệt thật 5 bước (`0` lỗi console, `0` kết nối ngoài `localhost`) kèm 5 ảnh (`docs/drafts/figures/m10-*.png`), nháp Chương 6 (`docs/drafts/ch6-demo-platform.md`), tóm tắt GVHD (`2026-11-17-mail-gvhd-platform.md`), `253` pytest qua (`0` skipped). `0` USD chi phí API mới.
+
+M9 tóm tắt (QĐ-040..043): RCA Agent = grouping (`T_group` 180 s) + lan truyền ngược 1 bước (mức 1, dấu hiệu `alert`) +
+summarizer `gemini-2.5-flash`; mức 2 đã cắt. Cấu hình chốt `eval/configs/rca_final.yaml` (`77786ec`, dấu vân tay
+`b0c54fa68ef65535`). **H5 không được chấp nhận trên `test`** (`rca_final_test_v1`: 78 cảnh báo ở 5 service → 38 incident,
+17 có nhãn): Hit@1 = Hit@3 = 0,471 [0,235; 0,706] = baseline, ΔHit@1 0, không có lỗi cascade để đo ARR; 29 / 50 lần tiêm
+lỗi không có cảnh báo CTAV nào. Độ nhạy V36 (a) (438 cảnh báo, ngoài bản đăng ký): Hit@1 0,208 so với baseline 0,229, ARR
+cascade 0,704. `val`: Hit@1 0,636, ARR `network_delay` 0,25 (DoD ≥ 0,30 không đạt), JSON valid rate 26 / 26 (`test` 38 / 38).
+
+M8 tóm tắt (QĐ-038, QĐ-039): G-test trên `test` (11.985 cửa sổ telemetry, 346 fault), 21.094 lần gọi mới, 15,85 USD
+theo token, 0 lỗi judge. **H0 chấp nhận** (C1 − BM25: ΔRecall +0,179, ΔFPR +0,0744). **H2 không được chấp nhận**:
+CTAV 14 TP / 64 FP, F1 0,066 so với BM25 0,091 (ΔF1 −0,025 [−0,067; +0,014]); đạt vế FPR, không đạt vế F1 và vế
+recall (−0,237). Nguyên nhân: 32 / 42 service (61,0% fault) không có ngưỡng `dev` p90 nên C3 hạ trọn 67 / 67 TP của
+C1 ở đó (Phát hiện 11); ablation `c3_rolling_baseline` đạt 47 TP / 391 FP, F1 0,120 — chỉ là phân tích cơ chế.
+**H3 đạt** (C3 đóng góp; xác nhận bỏ C2, C4; C5 +0 TP / +1 FP), **H4 đạt** (120 lần gọi: 0,034 so với 0,017).
+V36 (a): H5 chính thức trên 78 cảnh báo `ctav_final_test_v1`, kèm dòng độ nhạy trên 438 cảnh báo C3-trượt.
 
 M7 tóm tắt (QĐ-033): Rescue Score tính offline với A = cảnh báo CTAV; 147/147 tổ hợp khả thi, hợp 1.459 cửa
 sổ chấm một lần (1,03 USD theo token). Quy tắc chọn η = (0; 0,4; 0,6), τ = 0,8 ⇒ công thức rút về 2 thành phần
@@ -45,38 +64,52 @@ chững lại từ 67% và tác động cả recall. Không chọn đặc trưng
 
 ---
 
-## Mốc hiện tại: M8 — Cổng chặn G-test (lần đầu chạm `test`)
-## Mở 2026-11-14 (QĐ-034)
+## Mốc hiện tại: M11 — Đánh giá bằng người + phân tích lỗi
+## Mở 2026-11-17 (QĐ-049)
 
-Chỉ chạy **đúng danh sách config đã đăng ký** (cuối `docs/experiment-log.md`, mục "Đăng ký giả thuyết H0–H5",
-commit `be2b985`). Không chỉnh tham số nào sau khi xem `test`; mọi lệch ghi thành QĐ mới.
+Prompt **P5** ở `docs/prompts/M8-M12-prompts.md`. Đọc thêm: `docs/Final_Thesis_Phase2/02-data-and-experiment-protocol.md` §4.4;
+báo cáo M8 (`docs/milestones/M8-g-test.md`) phần độ lệch detector; báo cáo M9 (`docs/milestones/M9-rca.md`);
+báo cáo M10 (`docs/milestones/M10-platform.md`, gồm danh sách lỗi demo còn lại). M11 dùng **QĐ-050..052**, **V50..V52**.
+Vùng file: `eval/manual/diagnostic_quality*`, `scripts/m11_*`, `docs/milestones/M11-*`, `docs/drafts/ch7-phan-tich-ca-sai.md`.
 
-### Việc (chi tiết ở `04` M8 và danh sách config đã đăng ký)
+### Việc
 
-1. - [x] Tạo config `test` #1–#8 (sao từ bản `val`, chỉ đổi `split: test`, `g_test: true`, `run_id`) — `30f3f92`, `e6a71cb`, `48ee7f5`
-2. - [x] Đếm candidate `test` (detector-only, 0 USD) ⇒ ước số lần gọi và chi phí trước khi gọi API — 13.699 candidate, ước 14,8–16,4 USD (QĐ-035, `a6d044f`)
-3. - [x] Chạy thử điều kiện đầu (`h0_test_bm25`), đọc `runtime.json` (`estimated_usd_by_tokens`) — quy tắc ngân sách 2 — `h0_test_bm25_v1` xong 15:20: 13.699 lần gọi API, 0 lỗi, **8,87 USD theo token** (`da2bb91`; ước 7,8; prompt có bằng chứng 0,00165 USD/lần thay vì 0,00121)
-4. - [ ] `h0_test_c1_k0`, `h0_test_norag`, ba bản `_b120` (100% cache) — `h0_test_c1_k0_v1` **xong** (`0c7689e`, 3.299 gọi mới, 0 lỗi, **4,71 USD** theo token; H0 đạt); `h0_test_norag_v1` **dừng ở 2.917/3.287** câu mới (0,97 USD trong cache, thư mục `_v1` rỗng ⇒ chạy tiếp `h0_test_norag_v2` cho 370 câu còn lại ≈ 0,12 USD); ba bản `_b120` chờ `norag_v2`
-5. - [ ] `m8_anchor_features_test`, `ctav_final_test` (replay + ablation +C2, bỏ C3, +C4, C3-trượt; 0 USD) — `m8_anchor_features_test_v1` **xong** (`cb191d5`, 0 USD); còn `ctav_final_test` và kiểm Phát hiện 11
-6. - [ ] C5 một điểm: `m8_rescue_{features,plan}_test`, `m8_rescue_test_c1`, `m8_rescue_test` (≈ 0,1–0,3 USD)
-7. - [ ] `repeat` 1, 2 trên tập con 200 cửa sổ telemetry (seed 42) của BM25, C1 (800 lần gọi ≈ 1,0 USD)
-8. - [ ] `py -m eval compare`; bảng H0–H4 có CI + McNemar; kết luận H2 viết ra dù kết quả là gì
-9. - [ ] Chấm context precision thủ công 50 cửa sổ → `eval/manual/` (V35)
-10. - [ ] Báo cáo `docs/milestones/M8-g-test.md` + tóm tắt 1 trang gửi GVHD (`04` §10) — đã có §5.7.1–5.7.3 trong `docs/drafts/ch5-ket-qua-test.md` (`cb191d5`) và dàn ý (`759fb2f`, `7198e2d`, `4f736aa`); còn §5.7.4–5.8, `M8-g-test.md` và mail GVHD
+| Mục tiêu / Việc (`04` §M11 & `P5`) | Đầu ra | Trạng thái |
+|---|---|---|
+| 1. `scripts/m11_sample_incidents.py`: lấy 30 incident `test` (`rca_final_test_v1`, `seed = 42`), xáo thứ tự sao cho 15 dòng đầu tự nó là mẫu ngẫu nhiên hợp lệ; xuất bảng chấm mù 3 tiêu chí theo `02` §4.4 + hướng dẫn chấm ≤ 1 trang (tách nhãn `root_cause` ra file riêng) | `eval/manual/diagnostic_quality.csv`, `.key.csv`, `README-diagnostic-quality.md` | **Đã làm (2026-11-19)** |
+| 2. Dừng báo người dùng chấm (tối thiểu 15 dòng đầu; song song làm việc 3) | Điểm người chấm (+ người thứ 2 trên 20% nếu có) | **Chờ người dùng chấm (`V50`)** |
+| 3. Phân tích ca sai trên `test` (chỉ mô tả, không đổi tham số): phân loại 64 FP còn lại & FN của CTAV (theo service, loại bằng chứng, có/không ngưỡng nền `dev`, verdict C1 gốc, độ lệch detector từ M8) và toàn bộ ca RCA sai kèm số đếm + `window_id` / `incident_id` | `scripts/m11_error_analysis.py` → `eval/results/m11_error_analysis_test_v1/`, `docs/drafts/ch7-phan-tich-ca-sai.md` | **Đã làm (2026-11-19)** |
+| 4. Tổng hợp kết quả chấm chất lượng báo cáo (CI bootstrap + độ đồng thuận nếu có, chỉ báo `n` thực chấm) | `scripts/m11_score_diagnostic_quality.py` (đã test logic; chờ CSV đã chấm) | **Đã có script; chờ CSV chấm (`V50`)** |
+| 5. Tổng duyệt demo lần 1 theo `08` §6, rà lại 3 lỗi mức thấp/thẩm mỹ từ M10-D | `docs/milestones/M11-danh-gia-nguoi.md` §1 (kèm kết quả rà `2af9480`, `538f8cc`) | **Đã làm (2026-11-19)** |
 
-**DoD M8:** bảng H0–H4 trên `test`; kết luận H2 viết ra **dù kết quả là gì**. Hạn 2026-12-20.
+**DoD M11** (`04` / `P5`): có `eval/manual/diagnostic_quality.csv` đã chấm (`n ≥ 15`), `docs/milestones/M11-danh-gia-nguoi.md` đủ 4 phần, và `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 mối đe doạ, §7.4 phân tích ca sai, và hạn chế cho §8.2.1, theo sườn cập nhật 2026-11-18). Hạn mục tiêu: `2027-01-17`.
+
+**Ngân sách API M11:** `0` USD (chỉ đọc kết quả & chạy script offline; ngưỡng dừng `1 USD`).
+
+**Rủi ro đã biết:** Người dùng cần trực tiếp chấm mù `diagnostic_quality.csv` (mẫu 15–30 incident) và vẫn còn **V35** (`eval/manual/context_precision_test_v1.csv`, 525 dòng, hạn trước M12).
 
 ### Vấn đề cần chốt
 
+*(Xem vấn đề từ trước và bảng dưới; **V50–V52** phát sinh ở M11-A.)*
+
 | # | Vấn đề | Khuyến nghị | Chặn gì |
 |---|---|---|---|
+| **V50** | Chấm mù `eval/manual/diagnostic_quality.csv` (không mở `.key.csv` trước) | **(a)** tối thiểu 15 dòng đầu (`sample_no = 1..15`); **(b)** đủ 30 dòng; kèm người chấm 2 trên 20% đầu nếu có | **Chặn đóng M11** |
+| **V51** | Cách rút mẫu `30/38` incident bằng SRS không phân tầng (`seed = 42`) — agent tự quyết | **(a)** giữ nguyên (15 dòng đầu: `6 labelled / 7 no_fault / 2 ambiguous`, đủ 30: `15 / 13 / 2`) | Không |
+| **V52** | Chụp lại Hình 6.2–6.4 sau `538f8cc` (tổng duyệt demo lần 1) | Chụp ở tổng duyệt lần 2 (M12) | Không chặn M11 |
 | ~~V26~~ | Billing chưa đối chiếu | Đóng (QĐ-034): người dùng báo billing đã reset, số dư ≈ 1.000.000 đ | |
 | ~~V27~~ | Phạm vi chấm `test` | Người dùng chốt **toàn bộ candidate** 2026-11-14 (QĐ-034) | |
 | ~~V29~~ | Báo GVHD V28 (b), bỏ C2/C4, kết quả C5 | Người dùng đã gửi 2026-11-14 (QĐ-034) và chốt tự giải quyết phần GVHD (QĐ-037); không chặn | |
 | ~~V33~~ | δ của H2 | Người dùng chốt (a) δ = 0,05 (QĐ-034) | |
 | ~~V34~~ | Vai trò C5 ở M8 | Người dùng chốt (b) chỉ ablation H3 một điểm (QĐ-034) | |
 | ~~V30~~ | Nguồn ngưỡng nền cho C3 | Người dùng chốt (c) 2026-11-16 (QĐ-037): dựng cả hai, quy tắc chọn `dev` p90 (QĐ-031) ⇒ M6 **QUA** | |
-| ~~V35~~ | Chấm context precision thủ công 50 cửa sổ (`04` M8) | Người dùng chốt (a) 2026-11-16 (QĐ-037): đo mô tả; agent xuất 50 cửa sổ có telemetry (`seed 42`, mù), người dùng chấm sau | Không chặn bảng H0–H4 / M9 |
+| ~~V35~~ | Chấm context precision thủ công 50 cửa sổ (`04` M8) | Người dùng chốt (a) 2026-11-16 (QĐ-037): đã xuất `eval/manual/context_precision_test_v1.csv` (mù, 525 dòng) + hướng dẫn; người dùng chấm sau | Không chặn bảng H0–H4 / M9 |
+| ~~V36~~ (chốt (a) 2026-11-16, QĐ-039) | Đầu vào cảnh báo cho H5 (RCA Agent) trên `test` ở M9-B: CTAV đóng băng chỉ phát 78 cảnh báo trên 10 service có ngưỡng `dev` (khuyết 11 service có fault) | Khuyến nghị **(a)** (báo cáo M8 §3): giữ chỉ số chính H5 trên 78 cảnh báo `ctav_final_test_v1` đúng cam kết `be2b985`, **kèm** dòng độ nhạy trên 438 cảnh báo của `c3_rolling_baseline` | Không chặn M9-A (`val`); chốt trước M9-B (`test`) |
+| ~~V40~~–~~V43~~ | M9-A, agent tự quyết: cascade = cảnh báo ở ≥ 2 service; `ambiguous` giữ nguyên văn `02` §4.3; `store.py` ở `services/rca_agent/`; ba file sửa ngoài vùng P2 | Giữ nguyên (QĐ-043) | |
+| ~~V44~~ | DoD ARR `network_delay` không đạt trên `val` | Người dùng cho sang M9-B 2026-11-17 (QĐ-042) | |
+| ~~V45~~ | **H5 không được chấp nhận** — cách trình bày trong luận văn | Người dùng chốt **(b) 2026-11-17 (QĐ-045):** báo đúng bảng kiểm định + dòng độ nhạy + nguyên nhân, nêu rõ nhánh B chỉ đạt phần gom cảnh báo và sinh báo cáo đúng lược đồ | |
+| ~~V46~~ | Đóng M9 | Người dùng chốt đóng 2026-11-17 (QĐ-043) | |
+| ~~V47~~–~~V49~~ | M10: vị trí `store.py`, ca demo cascade bước 4, service `web` | Người dùng chốt **2026-11-17 (QĐ-045):** V47 → (a), V48 → **(b') kèm (a')** *(chốt lại 2026-11-17 cho M10-D sau review M10-C)*, V49 → (a) | |
 | V3 | Q5: mốc bảo vệ tuần 2027-02-08 | | Không |
 | V4–V6 | File `legacy/` chưa commit; file rác gốc repo; câu "LLM không RAG thất bại" là số mock | | Không |
 
@@ -97,18 +130,20 @@ suy từ một lần đối chiếu, giá trong code và số dư credit chưa �
 | M5 (còn lại) | Xong: 753 lần gọi, 1,0093 USD **theo token** (billing thật chưa biết) | 1,5 USD | 3 USD |
 | M6 | Xong: 0 lần gọi (replay cache H0, QĐ-031) | 2 USD | 4 USD — đổi prompt judge = lập lại ngân sách trước khi chạy |
 | M7 | Xong phần Rescue: 1.459 lần gọi, 1,03 USD **theo token** (`m7_rescue_val_c1_v1`) | 4 USD | 6 USD |
-| M8 | `test` một lần, **toàn bộ candidate** (V27): đã tiêu **14,55 USD** theo token (`bm25` 8,87 + `c1_k0` 4,71 + `norag_v1` dở 0,97); còn thiếu `norag_v2` + C5 + `repeat` ước ≈ 1,2–1,5 USD theo token | 18 USD | 20 USD (người dùng đã duyệt vượt ở QĐ-037) |
-| M9 | Tóm tắt incident bằng LLM (vài trăm) | 1 USD | 2 USD |
+| M8 | **Xong phần API** (`test` một lần, toàn bộ candidate — V27): **15,85 USD theo token** / 21.094 câu mới (`bm25` 8,87 + `c1_k0` 4,71 + `norag` 1,10 + `C5` 0,09 + `repeat` 1,08) | 18 USD | 20 USD (người dùng đã duyệt vượt ở QĐ-037) |
+| M9 | **Xong: 178 lần gọi, 0,2772 USD theo token** (`val` 0,0436 / 26; `test` đăng ký 0,0495 / 38; độ nhạy 0,1841 / 114 — QĐ-041, QĐ-042) | 1 USD | 2 USD |
 | M10–M12 | Demo offline từ cache; đánh giá bằng người | 0 | 1 USD |
 | Dự phòng | Chạy lại do lỗi pipeline / đổi prompt | 8 USD | — |
-| **Tổng còn phải chi (M8–M12 + dự phòng)** | | **≈ 27 USD** trên số dư ≈ 38 USD (đã tiêu tại M8 ≈ 14,55 USD theo token) | |
+| **Tổng còn phải chi (M9–M12 + dự phòng)** | | **≈ 9 USD** (riêng M9 ≈ 1 USD; người dùng báo ngày 2026-11-16 trước đợt chạy cuối còn ≈ 300k đ, đợt cuối chỉ tiêu thêm **1,29 USD theo token** ≈ 35–44k đ) | |
 
 **Đã tiêu (ước tính theo token, không phải billing; không gồm request lỗi, retry, request bị ngắt):**
 M4 ≈ 8,6 USD; M5 ≈ 9,48 USD / 6.988 lần gọi: 2026-10-29 ≈ 8,47 USD (`ref_flat` 1,77, `order_rev` 1,77,
 `time_0/33/67` 0,80 / 0,75 / 0,76, `near_trace` 0,84, `near_log` 0,89, `neighbor_trace` 0,876 tính từ
 `usage` trong cache), 2026-11-01 1,0093 USD (`neighbor_trace` 0,0016, `repeat` 1 0,5022, `repeat` 2 0,5056);
-M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 tới 2026-11-16 = 14,55 USD / 19.915 lần gọi mới trong cache** (`h0_test_bm25_v1`
-8,87 / 13.699; `h0_test_c1_k0_v1` 4,71 / 3.299; `h0_test_norag_v1` dở 0,97 / 2.917).
+M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 (hoàn tất 2026-11-16) = 15,8464 USD / 21.094 lần gọi mới trong cache**
+(`h0_test_bm25_v1` 8,8715 / 13.699; `h0_test_c1_k0_v1` 4,7072 / 3.299; `h0_test_norag` `_v1 + _v2` 1,0976 / 3.287;
+`m8_rescue_test_c1_v1` 0,0897 / 61; 4 run `repeat` 1,0804 / 748); **M9 (2026-11-16..17) = 0,2772 USD / 178 lần gọi**
+(`rca_final_val_v1` 0,0436 / 26; `rca_final_test_v1` 0,0495 / 38; `rca_sens_test_c3rolling_v1` 0,1841 / 114; cache 40.429 dòng).
 
 **Quy tắc (áp cho mọi mốc):**
 1. Trước mỗi lần chạy có gọi API: ước số lần gọi mới (trừ phần trúng cache) × đơn giá theo **token của
@@ -121,13 +156,171 @@ M7 ≈ 1,03 USD / 1.459 lần gọi; **M8 tới 2026-11-16 = 14,55 USD / 19.915 
 
 ---
 
+## Ghi chú bàn giao — 2026-11-19 (M11-A xong, chờ người dùng chấm tay)
+
+**Trạng thái:** M11 vẫn **Đang làm** (chưa đóng mốc; chờ người dùng chấm mù **V50**). Đã hoàn tất 100% việc kỹ thuật 0 USD của M11 (`P5` việc 1, 3, 5 + script chấm điểm việc 4 + nháp Chương 7; **QĐ-050**). `0` lần gọi LLM, `0,0000` USD API.
+**Đã làm ở M11-A:**
+- `scripts/m11_sample_incidents.py`: rút mẫu SRS không hoàn lại (`seed = 42`, `30 / 38` incident `test` của `rca_final_test_v1`) → xuất `eval/manual/diagnostic_quality.csv` (30 dòng mù, 15 dòng đầu = SRS hợp lệ `6 labelled / 7 no_fault / 2 ambiguous`), `.key.csv` và `eval/manual/README-diagnostic-quality.md` (32 dòng).
+- `scripts/m11_score_diagnostic_quality.py`: sẵn sàng tính trung bình ± SD, CI 95% bootstrap, đối chiếu `.key.csv` và Cohen's $\kappa$ khi người dùng chấm xong.
+- `scripts/m11_error_analysis.py` → `eval/results/m11_error_analysis_test_v1/{error_analysis.json,tables.md}`: phân tích toàn bộ **64 FP** CTAV (`31` collateral trùng lỗi downstream + `33` dao động đuôi dài bình thường; 100% ở `frontend`/`ts-travel-service`, neo `span > dev_p90`), **332 FN** CTAV (`122` detector + `128` judge `FALSE_POSITIVE` + `82` C3 gồm `67` thiếu `dev`, `3` thiếu thao tác gồm 2 `WARN` > 1.000 ms, `12` span dưới `p90`), và toàn bộ ca RCA sai (`9/17` tập đăng ký + `29/50` không cảnh báo; `38/48` dòng độ nhạy gồm `33` thiếu cảnh báo gốc + `5` lỗi xếp hạng đa service).
+- Soạn `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 Bảng 7.2, §7.4 Bảng 7.3, §7.5 Kết chương, 6 hạn chế §8.2.1), bản nháp `docs/milestones/M11-danh-gia-nguoi.md` (gồm tổng duyệt demo lần 1 từ `2af9480`, `538f8cc` và 4 tồn đọng), thêm `tests/test_m11.py`.
+- Kiểm chứng: `py -m pytest tests/ -q` → `254 passed, 5 skipped` (5 test DB Docker bỏ qua do Docker tắt); `mypy` 43 file sạch; `ruff check` sạch trên code M11.
+**Việc đầu tiên phiên sau (M11-B):** Sau khi người dùng chấm xong `eval/manual/diagnostic_quality.csv` (`n ≥ 15`), chạy `scripts/m11_score_diagnostic_quality.py`, điền số vào `ch7-phan-tich-ca-sai.md` §7.4.4–§7.5, hoàn thiện `M11-danh-gia-nguoi.md`, ghi `QĐ-051` và đóng M11 sang **M12**.
+**Còn chờ người dùng:** Chấm mù `eval/manual/diagnostic_quality.csv` (**V50**, tối thiểu 15 dòng đầu, không mở `.key.csv`); xác nhận **V51** (SRS `seed = 42`); chấm **V35** (`context_precision_test_v1.csv`, `0 / 525`, hạn trước M12); chụp lại Hình 6.2–6.4 (**V52**, ở M12).
+
+## Ghi chú bàn giao — 2026-11-17 (đóng M10, mở M11)
+
+**Trạng thái:** Người dùng đã chốt kết quả và cho đóng M10 (**QĐ-049**): M10 **QUA** (sớm 54 ngày, `0` lần gọi API mới / `0,0000` USD cả mốc). M11 đã mở (`QĐ-049`); toàn bộ code + ảnh + tài liệu M10-D..E đã commit và push lên `origin/master`.
+**Đã hoàn tất ở M10-D & M10-E (`fa80590` + commit đóng M10-E):**
+- Chuyển 100% giao diện dashboard (`services/web/`) sang tiếng Anh; giữ `experiment_table.json` trên đĩa nguyên vẹn để bảo toàn kiểm khớp Ch5 (`ExperimentComparison.tsx` dịch nhãn và thập phân lúc hiển thị); rebuild `api` + `web`.
+- Mở rộng `pipeline.py` hỗ trợ `input.ctav_config` + `input.variant`, sửa tie-break parity trong `check_parity`, thêm `DEMO_OFFLINE=1` xoá `GEMINI_API_KEY`/`GOOGLE_API_KEY`; nạp `pipeline_sens_test_v1` (`114/114` parity, `13.699` / `19.794` / `114`, E2E `10.646,898 ms`, `0` API).
+- `scripts/m10_pick_demo_cases.py` (`seed=42`) xuất `eval/results/m10_demo_cases_v1/demo_cases.json`; kiểm trình duyệt thật 5 bước trên `http://localhost:5173` (`0` lỗi console, `0` request ngoài `localhost`) và lưu 5 ảnh vào `docs/drafts/figures/m10-*.png`.
+- Soạn nháp Chương 6 (`docs/drafts/ch6-demo-platform.md`), tóm tắt gửi GVHD (`docs/drafts/2026-11-17-mail-gvhd-platform.md`, tác giả Nguyễn Văn Hoàng Khang), hoàn tất `docs/milestones/M10-platform.md` (4 phần + Phụ lục), cập nhật `docs/milestones/README.md`, `04-implementation-roadmap.md` §1 và `docs/experiment-log.md` (`QĐ-048`, `QĐ-049`).
+- Kiểm tra cuối trước khi đóng M10: `npm.cmd --prefix services/web run check` (26/26 ok), `mypy` (43 file sạch), `ruff` sạch, `pytest tests/ -q` **`253 passed in 30.37s`** (`0` skipped).
+**Việc đầu tiên phiên sau:** Làm **M11** theo prompt **P5** trong `docs/prompts/M8-M12-prompts.md` (`scripts/m11_sample_incidents.py` lấy mẫu 30 incident từ `rca_final_test_v1`, `seed = 42`, xuất `eval/manual/diagnostic_quality.csv` cho người dùng chấm mù tối thiểu 15 incident đầu; phân tích ca sai CTAV & RCA cho Ch7; tổng duyệt demo lần 1).
+**Còn chờ người dùng:** ~~Sửa dòng H5 `"Chờ M9"` ở Bảng 5.18~~ (đã sửa 2026-11-18: H5 "Không được chấp nhận", cột `val` 2/4 vế); chấm `V35` (`eval/manual/context_precision_test_v1.csv`, 525 dòng, hạn trước M12); gửi mail `2026-11-17-mail-gvhd-platform.md` nếu muốn báo cáo Cô ngay.
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-C.1, chờ M10-D)
+
+**Trạng thái:** M10-C.1 hoàn tất (QĐ-047 bổ sung, 0 lần gọi API). Người dùng đã chốt **V48 mở lại → (b') kèm (a')** cho M10-D.
+**Đã làm:**
+- Sửa F1–F10 theo `M10-handoff.md` §7.2: bảng `eval/results/m10_experiment_table_v2/experiment_table.json` (`52.379` B) chuẩn hoá H1 `"partial"` / H5 4 vế Bảng 5.26 & thập phân dấu phẩy; hàm thuần `policySteps()` + thẻ C3 `"không áp dụng"` cho raw FP / bị chặn sớm; `_build_eval_row` đọc `cache_hit` thật & chạy `pipeline_val_v2` (**26/26**, E2E `5.764,165 ms`) và `pipeline_test_v2` (**38/38**, E2E `4.242,424 ms`, giữ nguyên `_v1`); `getAlert` truyền `?run_id=`; `Run.alert_count` + `<optgroup>` hộp chọn run + F7..F10.
+- Kiểm chứng: `npm.cmd --prefix services/web run check` sạch (26/26 kiểm SSR + 4 ca `policySteps`); `py -m mypy packages services` sạch (43 file); `py -m ruff check services scripts/m10_experiment_table.py tests` sạch; `py -m pytest tests/ -q` **`249 passed in 28.75s`**. Rebuild container `api` & `web`, cả 4 container `healthy`; probe proxy `:5173` và `docker compose stop api` / `start api` (error state `502` trên API trong khi `/compare` vẫn `200`, phục hồi `{"status":"ok"}`).
+- **Chưa kiểm:** thao tác click kiểm trực tiếp trên cửa sổ trình duyệt Chromium (subagent `browser` đã bị người dùng huỷ khi mở `/timeline`; khuyến nghị mở lại trong bước chụp ảnh M10-D).
+**Việc đầu tiên phiên sau:** làm **M10-D** theo prompt `P4-D` (`scripts/m10_pick_demo_cases.py`, triển khai **V48 (b')** nạp `pipeline_sens_test_v1` parity `114/114` kèm nhãn `"dòng độ nhạy, không phải kết quả H5"`, `DEMO_OFFLINE`, mở trình duyệt thật & chụp `docs/drafts/figures/m10-*.png`).
+**Còn chờ người dùng:** sửa dòng H5 `"Chờ M9"` ở Bảng 5.18 của `ch5-ket-qua-test.md`; V35 (chấm 525 dòng context precision, hạn trước M12).
+
+## Ghi chú bàn giao — 2026-11-17 (review M10-C, mở M10-C.1)
+
+**Trạng thái:** đã review code M10-A..C và mở dashboard thật. Kiểm tự động sạch, parity đúng, số TP / FP khớp M8; nhưng có
+2 lỗi mức cao (bảng Experiment ghi H5 "đạt nhánh B" với một vế không có trong đăng ký, H1 "Bác bỏ" thay vì "giữ một phần")
+và 4 lỗi mức trung bình. Phiên review không sửa code; chỉ thêm §7 vào `docs/prompts/M10-handoff.md` (danh sách F1..F11, DoD,
+prompt P4-C1). 0 lần gọi API.
+**Việc đầu tiên phiên sau:** prompt **P4-C1** trong `docs/prompts/M10-handoff.md` §7.6 (M10-C.1), trước M10-D.
+**Còn chờ người dùng:** chốt lại **V48** (`M10-handoff.md` §7.3 — phương án (a) không dùng được trên dữ liệu thật); sửa dòng
+H5 "Chờ M9" ở Bảng 5.18 của `ch5-ket-qua-test.md`; V35.
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-C, chờ M10-D)
+
+**Trạng thái:** M10-C hoàn tất (QĐ-047, 0 lần gọi API).
+**Đã làm:**
+- Viết `scripts/m10_experiment_table.py` sinh bảng thực nghiệm tĩnh `eval/results/m10_experiment_table_v1/experiment_table.json` và `services/web/src/data/experiment_table.json` (`52.004` B) từ 13 file JSON kết quả thật trong `eval/results/`, kiểm parity tự động với `tables.md` và `ch5-ket-qua-test.md`; thêm `tests/test_experiment_table.py`.
+- Cập nhật frontend `services/web/`: `client.ts` mặc định dùng `httpSource` (`globalThis.__USE_MOCK__ = true` cho SSR smoke), `vite.config.ts` cấu hình proxy `/api` cho cả `server` và `preview`, `App.tsx`/`runContext.ts` giữ shell & hiện đúng `split`/`seed`, `Timeline.tsx` thêm tier/nguồn gốc/lý do policy C3 + phân trang 200/trang, `AlertDetail.tsx` thêm thẻ chính sách CTAV & badge `origin`/`d_G`/`Δt`/`duration_ms`, `IncidentDetail.tsx` xử lý `ground_truth_service === null` và `<Empty>`, `ExperimentComparison.tsx` hiển thị bảng tĩnh H0–H5, 5 phương pháp, H3+C5, đường cong ngân sách H4 và H5 RCA (`val`/`test`/`C3-trượt`).
+- Tạo `infra/Dockerfile.web` và bật service `web` trong `docker-compose.yml` profile `dev`/`full` (cổng `5173`); cả 4 container (`web`, `api`, `clickhouse`, `postgres`) chạy `healthy`; probe `http://127.0.0.1:5173/`, `/api/health`, `/api/runs`, `/api/alerts/{id}`, `/api/incidents/{id}` đều `200 OK`.
+- Kiểm chứng sau sửa code: `npm.cmd --prefix services/web run check` (exit 0), `npm.cmd --prefix services/web run build` (exit 0), `py -m mypy packages services` (43 file sạch), `py -m ruff check services scripts/m10_experiment_table.py tests` (sạch), `py -m pytest tests/ -q` (`248 passed in 22.92s`, `0` skipped).
+**Việc đầu tiên phiên sau:** làm **M10-D** theo prompt P4-D trong `docs/prompts/M10-handoff.md` §6 (`scripts/m10_pick_demo_cases.py`, kiểm chứng chế độ offline `DEMO_OFFLINE` khi rút mạng, mở trình duyệt thật kiểm tra 4 màn hình & kịch bản `08` §6, chụp ảnh vào `docs/drafts/figures/`).
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12).
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-B, chờ M10-C)
+
+**Trạng thái:** M10-B hoàn tất (QĐ-046, 0 lần gọi API).
+**Đã làm:**
+- Thêm 6 trường policy CTAV (`raw_verdict`, `routing_tier`, `evidence_origin`, `threshold_applied`, `downgraded_by_gating`, `downgraded_by_anchoring`) vào `services/web/src/api/types.ts` + cập nhật `services/web/src/mock/fixtures.ts`; `npm run check` sạch.
+- Viết `services/api/{main,readers,schemas}.py` phục vụ 7 endpoint chỉ đọc tại `/` và `/api`. Thời gian thực đo `GET /alerts?run_id=pipeline_test_v1` (13.699 dòng): `0,561 s` (`<= 1,0 s`) ⇒ giữ mặc định `limit = None`, vẫn có `limit`/`offset` tuỳ chọn.
+- Tạo `infra/Dockerfile.api`, bật service `api` trong `docker-compose.yml`; container `internship1-api-1` đang `healthy` ở cổng `8000` (cùng `clickhouse` và `postgres`), probe HTTP trực tiếp cả 7 endpoint đều `200 OK`.
+- Viết `tests/test_api.py`: kiểm tra ca thật (`pipeline_val_v1`, `pipeline_test_v1`), ca `404`, ca run rỗng (`200 []`) và test hợp đồng khoá JSON ⊇ interface `types.ts`.
+**Việc đầu tiên phiên sau:** làm **M10-C** theo prompt P4-C trong `docs/prompts/M10-handoff.md` §6 (`VITE_DATA_SOURCE=http` trên 4 màn hình, hiện nguồn gốc bằng chứng & lý do policy ở `AlertDetail`, loading/empty/error, bảng tĩnh `ExperimentComparison` từ `scripts/m10_experiment_table.py`, bật service `web` trong `docker-compose.yml`).
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12).
+
+## Ghi chú bàn giao — 2026-11-17 (xong M10-A, chờ M10-B)
+
+**Trạng thái:** M10-A hoàn tất (QĐ-045, 0 lần gọi API). Người dùng đã chốt V45 → (b), V47 → (a), V48 → (a) kèm (b) dự phòng, V49 → (a).
+**Đã làm:** viết `services/rca_agent/pipeline.py` và `tests/test_pipeline.py`; chạy `pipeline_val_v1` (`val`) và `pipeline_test_v1` (`test`) với dấu vân tay `b0c54fa68ef65535`:
+- ClickHouse `fact_alert_evaluation`: `5.677` (`val`, 80 `TRUE_ALERT`) và `13.699` (`test`, 78 `TRUE_ALERT`); `fact_retrieval_trace`: `7.716` (`val`) và `19.794` (`test`, lưu thêm `content` trong `debug_json`).
+- PostgreSQL: `26` incident + `26` report (`pipeline_val_v1`) và `38` incident + `38` report (`pipeline_test_v1`), 0 rejected.
+- Parity so với `rca_final_{val,test}_v1`: **26/26** (`val`) và **38/38** (`test`) ở `alert_ids`, thứ hạng `level1`/`baseline` và hash JSON `DiagnosticReport`.
+- Độ trễ replay từ cache (`runtime.json`): E2E `5.031,03 ms` (`val`), `4.313,077 ms` (`test`); `100%` cache hit (`26/26`, `38/38`), `0` gọi API.
+**Việc đầu tiên phiên sau:** làm **M10-B** theo prompt P4-B trong `docs/prompts/M10-handoff.md` §6 (`services/api`, `types.ts`/`fixtures.ts`, `infra/Dockerfile.api`, `docker-compose.yml`, `tests/test_api.py`).
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12).
+
+## Ghi chú bàn giao — 2026-11-17 (bàn giao M10, chia mốc con)
+
+**Trạng thái:** M10 đã chia thành 5 mốc con M10-A..E, mỗi mốc con có cổng chặn, QĐ dành sẵn và prompt dán được
+(`docs/prompts/M10-handoff.md`). Phiên này chỉ đọc repo, kiểm DB, viết tài liệu; chưa viết code M10, 0 lần gọi API.
+**Kiểm thực tế:** Docker `clickhouse`, `postgres` đang chạy; PostgreSQL có 4 run RCA (26 / 38 / 26 / 114 incident, đủ báo cáo);
+ClickHouse `fact_alert_evaluation` **chỉ có 3 run smoke** — verdict CTAV `val` / `test` mới nằm ở
+`eval/results/ctav_final_{val,test}_v1/judged.jsonl` (5.677 / 13.699 candidate, đã có trường policy). `types.ts` thiếu trường
+policy CTAV; `services/api` chưa có code; `services/web` chuyển sang API thật bằng `VITE_DATA_SOURCE=http`.
+**Việc đầu tiên phiên sau:** prompt P4-A trong `docs/prompts/M10-handoff.md` §6.
+**Còn chờ người dùng:** V48 (trước M10-D); V45; V35.
+
+## Ghi chú bàn giao — 2026-11-17 (đóng M9, mở M10)
+
+**Trạng thái:** người dùng đã xem kết quả M9 và chốt đóng mốc (QĐ-043): M9 **QUA — H5 không được chấp nhận**. M10 mở; phiên
+này chỉ sửa tài liệu để đóng / mở mốc, chưa viết code M10, 0 lần gọi API.
+**Việc đầu tiên phiên sau:** M10 việc 1 theo prompt P4 — `services/rca_agent/pipeline.py`, dựng trên `val`, rồi kiểm parity
+với 38 incident của `rca_final_test_v1`. Bật Docker trước (`docker compose --profile dev up -d`).
+**Còn chờ người dùng:** V45 (trình bày H5 không đạt); V35 (chấm 525 dòng context precision, hạn trước M12).
+
+## Ghi chú bàn giao — 2026-11-17 (M9-B xong, M9 chờ người dùng xem)
+
+**Trạng thái:** người dùng cho chạy M9-B (V44 (a)). M9 xong mọi việc 1–11; báo cáo `docs/milestones/M9-rca.md` đủ 4
+phần; §5.9 đã thêm vào `docs/drafts/ch5-ket-qua-test.md`; QĐ-042. **Chưa chuyển file này sang M10**: chờ người dùng xem
+báo cáo M9 và chốt V46 (đóng M9), V45 (cách trình bày H5 không đạt).
+**Commit:** `7ebe57a` (hai config `test`, trước khi chạy) → commit kết quả `test` + tài liệu. Chưa push.
+`eval/configs/rca_final.yaml` không bị sửa sau `77786ec`; không có biến thể nào khác chạy trên `test`.
+**Số `test` (con số đăng ký):** Hit@1 = Hit@3 = 8 / 17 = 0,471 [0,235; 0,706], bằng baseline; ΔHit@1 0,000; ARR cascade
+không tính được (0 lỗi cascade); ARR chung 0,513 [0,362; 0,626]; JSON valid rate 38 / 38. **H5 không được chấp nhận.**
+Độ nhạy (438 cảnh báo, ngoài bản đăng ký): Hit@1 0,208 / baseline 0,229; Hit@3 0,313; ARR cascade 0,704.
+**Chi phí M9:** 178 lần gọi, 0,2772 USD theo token (ngân sách 1 USD).
+**Kiểm:** 239 test qua (gồm `tests/test_storage.py` và test ghi PostgreSQL thật); `mypy packages services` sạch;
+`ruff` chỉ còn E402 cũ ở `scripts/`. Chưa ai đọc nội dung các báo cáo chẩn đoán (M11); chưa đo E2E latency (M10).
+**Việc đầu tiên phiên sau:** người dùng xem `docs/milestones/M9-rca.md` (mục 1B, §3), chốt V45, V46 ⇒ đóng M9, cập
+nhật `04` §1, mở M10 (prompt P4). M10 phải tái lập đúng 38 incident của `rca_final_test_v1` (QĐ-042). Docker cần bật
+(`docker compose --profile dev up -d`); PostgreSQL đang giữ 4 run RCA (2 `val`, 2 `test`).
+
+## Ghi chú bàn giao — 2026-11-16 (M9-A xong, chờ M9-B)
+
+**Trạng thái:** M9-A việc 1–7 xong (QĐ-040, QĐ-041; bản nháp `docs/milestones/M9-rca.md`, `docs/drafts/ch5-rca-val.md`).
+Phiên này không đọc, không chạy, không tạo gì thuộc `test`. Commit: `e455004` (code + quy tắc chọn, trước số `val`) →
+`77786ec` (**chỉ** `eval/configs/rca_final.yaml`) → commit kết quả + tài liệu. Chưa push.
+**Cấu hình chốt (`rca_final.yaml`, dấu vân tay phương pháp `b0c54fa68ef65535`):** `T_group` 180 s; mức 1 với dấu hiệu
+`alert`, đệm 60 s; cascade = lần tiêm lỗi có cảnh báo ở ≥ 2 service; summarizer `gemini-2.5-flash`, prompt
+`rca-summary-v1` (`8c1d50e6ba757ee6`), `max_evidence` 12, `require_evidence`; bootstrap 1.000 mẫu, seed 42.
+**Số `val`:** 80 cảnh báo → 26 incident (11 có nhãn, 1 `ambiguous`, 14 không ứng với lỗi); Hit@1 = Hit@3 = 7 / 11 = 0,636
+[0,364; 0,909], **bằng baseline** (ΔHit@1 0,000 [0,000; 0,000]: 25 / 26 incident chỉ có một service); Hit@1 trên mọi
+lần tiêm lỗi 6 / 30; ARR 0,675 [0,600; 0,730] chung, 0,667 cascade (1 lần tiêm lỗi), **0,250 [0,000; 0,500] trên
+`network_delay` — DoD ≥ 0,30 không đạt** (chỉ 3 / 9 lần tiêm có cảnh báo, 4 cảnh báo → 3 incident là trần);
+JSON valid rate 26 / 26 = 1,000. Chi phí 0,0436 USD theo token (26 lần gọi).
+**Kiểm:** 239 test qua (gồm `tests/test_storage.py` và test ghi PostgreSQL thật — Docker đang bật); `mypy packages
+services` sạch; `ruff` chỉ còn E402 cũ ở `scripts/`.
+**Chưa làm / chưa kiểm:** mức 2 (cắt, QĐ-037); chưa có ai đọc nội dung 26 báo cáo (M11); `packages/storage/README.md`
+vẫn ghi "PostgreSQL client chưa có" (ngoài vùng file P2 — code ghi nằm ở `services/rca_agent/store.py`, V42); chưa đo
+E2E latency đúng nghĩa (M10; số 2,64 s / incident ở QĐ-041 chỉ là định vị + một lần gọi LLM).
+**Chờ người dùng trước M9-B:** V40 (định nghĩa cascade ≥ 2 service), V44 (đồng ý sang M9-B dù DoD ARR `network_delay`
+không đạt trên `val`); V41–V43 không chặn (báo cáo M9 §3).
+**Việc đầu tiên phiên M9-B (prompt P3):** bật Docker; tạo `eval/configs/rca_final_test.yaml` = `rca_final.yaml` chỉ đổi
+`split: test`, thêm `h5_test: true`, `input.alerts_run` / `input.evidence_run` sang run `test`, `run_id`; in diff, commit,
+chạy một lần, kiểm harness in `method fingerprint b0c54fa68ef65535`. Dòng độ nhạy V36 (a): cùng tham số với
+`input: {ctav_config: ..., variant: c3_rolling_baseline, evidence_run: ...}` và `run_id` riêng (đường này đã kiểm trên
+`val`: 289 cảnh báo = TP + FP của `ctav.json`). Harness tự ước chi phí và dừng nếu vượt 1 USD.
+
+## Ghi chú bàn giao — 2026-11-16 (đóng M8, mở M9)
+
+**Trạng thái:** người dùng đã xem báo cáo M8 và chốt **V36 (a)** ⇒ M8 đóng, M9 mở (QĐ-039). Phiên này chỉ sửa tài
+liệu (experiment-log, báo cáo M8, file này, `04` §1, `milestones/README.md`); chưa viết code M9, 0 lần gọi API.
+Code RCA hiện có: `services/rca_agent/grouping.py` + `tests/test_grouping.py`; chưa có `propagation.py`,
+`summarizer.py`, harness `eval/harness/rca*.py`, lệnh con `py -m eval rca`.
+**Việc đầu tiên phiên sau:** bật Docker, chạy M9-A theo prompt P2 (`docs/prompts/M8-M12-prompts.md`; điều kiện
+"M8 xong phần API" đã đạt nên summarizer được gọi Gemini thật, ngân sách 1 USD). Không chạm `test` trước khi
+`eval/configs/rca_final.yaml` được commit riêng.
+**Còn chờ người dùng:** V35 (chấm 525 dòng context precision, hạn trước M12); mail GVHD
+`docs/drafts/2026-11-16-mail-gvhd-gtest.md` mới soạn, chưa ghi nhận đã gửi.
+
+## Ghi chú bàn giao — hoàn tất M8 ngày 2026-11-16 (**M8: xong phần API**)
+
+**Trạng thái:**
+- **M8: xong phần API** (cache `data/llm_cache/gemini.jsonl` đạt 40.251 dòng = +1.179 dòng trong phiên này, **0 lỗi judge** ở tất cả các run). Phiên M9 đã được gỡ khóa hoàn toàn để gọi Gemini thật trong ngân sách M9 (1 USD).
+- **Toàn bộ việc 1–10 của M8 đã xong (QĐ-038):** `h0_test_norag_v2` (370 gọi mới = 0,12 USD), 3 bản `_b120_v1` (0 USD, khớp 100% đường ngân sách), `ctav_final_test_v1` + `m8_finding11_{test,val}_v1` (0 USD), chuỗi C5 một điểm `m8_rescue_*_test_v1` (61 gọi mới = 0,09 USD; +0 TP, +1 FP), 4 run tuần tự `h0_test_{bm25,c1_k0}_rep{1,2}_v1` (748 gọi mới = 1,08 USD; đồng thuận 99,0% và 99,5%), `h0_test_compare_{bm25ref,c1ref}_v1` + `m8_test_tables_v1`, mẫu mù `eval/manual/context_precision_test_v1.csv` + hướng dẫn, hoàn tất `docs/drafts/ch5-ket-qua-test.md` (§5.7.1–§5.8.6), báo cáo `docs/milestones/M8-g-test.md` và mail GVHD `docs/drafts/2026-11-16-mail-gvhd-gtest.md`.
+- **Chi phí phiên:** 1.179 câu mới = **1,2940 USD theo token** (≈ 35–44k đ trên số dư ≈ 300k đ của tháng). Tổng toàn mốc M8 = **15,8464 USD theo token** / 21.094 câu mới.
+- **Việc đầu tiên phiên sau:** Người dùng xem báo cáo `docs/milestones/M8-g-test.md`, chốt **V36** (báo kèm dòng độ nhạy `c3_rolling_baseline` cho H5 ở M9-B hay không) ⇒ chính thức chuyển `CURRENT-MILESTONE.md` sang **M9 (RCA Agent: `grouping.py`, `propagation.py` mức 1, `summarizer.py`)**.
+
 ## Ghi chú bàn giao — kiểm kê 2026-11-16 (M8 đang làm)
 
 **Trạng thái thực tế sau phiên 2026-11-14 (`da2bb91`..`4f736aa`, QĐ-037):**
 - **Đã xong:** `h0_test_bm25_v1` (8,87 USD, `da2bb91`), `h0_test_c1_k0_v1` (3.299 gọi mới, 4,71 USD, `0c7689e`), `m8_anchor_features_test_v1` (90,9 s, 0 USD, `cb191d5`), bản nháp §5.7.1–5.7.3 ở `docs/drafts/ch5-ket-qua-test.md` (**H0 đạt cả 4 vế trên `test`**), và các dàn ý luận văn (`759fb2f`, `7198e2d`, `4f736aa`).
 - **Đang dở:** `h0_test_norag_v1` bị ngắt lúc 16:18 ngày 2026-11-14; không còn tiến trình Python nào đang chạy. Thư mục `eval/results/h0_test_norag_v1/` đang rỗng (giữ nguyên, không ghi đè). Trong `data/llm_cache/gemini.jsonl` (39.072 dòng) đã lưu **2.917 / 3.287** câu mới của `norag` (0,97 USD theo token), chỉ còn **370 lần gọi API** (≈ 0,12 USD).
 - **Chưa xong phần API** (phiên song song như M9-A vẫn phải dùng backend `mock` cho tới khi xong `norag_v2`, C5 một điểm và `repeat` ×4).
-- **Nhánh `demo/gh-pages` (M10 Pha 1, QĐ-038):** Đã dựng dashboard MVP tĩnh đọc dữ liệu thật từ `eval/results/` (`val` + H0 `test`) qua `scripts/export_web_snapshot.py`, kèm workflow `.github/workflows/deploy-pages.yml` và báo cáo `docs/milestones/M10-platform.md` (nhánh `master` giữ nguyên để chạy M8).
 - **Quyết định người dùng chốt 2026-11-16 (QĐ-037):** V30 → (c) (M6 **QUA**); V35 → (a) (không chặn); V29 người dùng tự giải quyết; xác nhận 2 thiết kế Rescue M7/M8 ($A$ = cảnh báo CTAV không lan truyền dây chuyền, file `eval/results/m7_rescue_features_<split>_v1/rescue_features.parquet`); đồng ý 3 lựa chọn rút ngắn đường găng M8–M12 (chạy song song các làn, H5 tính ở M9-B + M10 parity, cắt `propagation` mức 2 / `ExperimentComparison` bảng tĩnh / M11 chấm tối thiểu 15/30 incident).
 - **Ngân sách:** đã tiêu tại M8 **14,55 USD theo token**; phần gọi API còn lại ước **≈ 1,2–1,5 USD theo token** (tổng ≈ 15,8–16,0 USD theo token; người dùng đã duyệt chạy tiếp dù quy đổi billing có thể vượt ngưỡng dừng 20 USD).
 - **Thứ tự chạy tiếp phiên sau (theo `P1b` trong `docs/prompts/M8-M12-prompts.md`):**

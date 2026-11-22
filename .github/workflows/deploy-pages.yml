@@ -41,7 +41,11 @@ jobs:
         working-directory: services/web
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_DATA_SOURCE: static
         run: npm run build
+
+      - name: Verify static API snapshot present
+        run: test -f services/web/dist/static-api/runs.json
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

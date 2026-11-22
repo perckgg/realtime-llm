@@ -1,0 +1,21 @@
+# M8 / G-test, config đăng ký #7 (QĐ-034, V34 (b)): đánh giá MỘT điểm C5 η = (0; 0,4; 0,6), τ = 0,8 trên
+# CTAV `test` (ablation H3: báo ΔRecall, ΔFPR, +lần gọi). 0 lần gọi LLM mới.
+# Chạy: py -m eval rescue --config eval/configs/m8_rescue_test.yaml
+kind: rescue
+run_id: m8_rescue_test_v1
+split: test
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+features: m8_rescue_features_test_v1
+ctav: eval/configs/ctav_final_test.yaml
+judged_run: m8_rescue_test_c1_v1
+anchor_features: m8_anchor_features_rescue_test_v1
+grid:  # một điểm đã chốt trên val (QĐ-033), không quét trên test
+  points:
+    - {eta: [0.0, 0.4, 0.6], tau: 0.8}
+max_call_increase: 0.5
+model: gemini-2.5-flash
+baselines:
+  bm25: h0_test_bm25_v1
+  c1: h0_test_c1_k0_v1
+n_boot: 1000
+seed: 42

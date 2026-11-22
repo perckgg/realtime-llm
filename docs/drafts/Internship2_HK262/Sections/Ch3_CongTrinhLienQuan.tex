@@ -1,0 +1,202 @@
+% =============================================================================
+% Chuong 3: Cong trinh lien quan
+% =============================================================================
+% Cach dung tren Overleaf:
+%   1. Bao dam da tai macros.tex, refs.bib va chapters/ch3.tex vao du an.
+%   2. Trong main.tex:
+%        \input{macros}
+%        ...
+%        \include{chapters/ch3}
+%        ...
+%        \bibliographystyle{IEEEtran}
+%        \bibliography{refs}
+%
+% Cac nhan lien chuong duoc tham chieu tu Chuong 3:
+%   Chuong: ch:mo-dau, ch:nen-tang, ch:de-xuat, ch:thuc-nghiem, ch:platform
+%   Chuong 2: sec:ch2-du-lieu, sec:ch2-truy-xuat, sec:ch2-judge, sec:ch2-rca,
+%             sec:ch2-dang-ky
+%   Chuong 4: sec:ch4-ctav, sec:ch4-c1, sec:ch4-policy, sec:ch4-c4, sec:ch4-rca
+%   Chuong 5: sec:ch5-hypotheses, sec:ch5-c5, sec:ch5-budget
+% =============================================================================
+
+\section{Công trình liên quan}
+\label{ch:cong-trinh-lien-quan}
+
+Chương này hệ thống hóa các hướng nghiên cứu và các hệ thống vận hành thực tế liên quan trực tiếp tới bài toán thẩm định cảnh báo có nhận biết topology và phân tích nguyên nhân gốc trên kiến trúc microservice. Nội dung được tổ chức xoay quanh hai câu hỏi: cộng đồng học thuật và công nghiệp đã giải quyết những khía cạnh nào của chuỗi xử lý từ phát hiện bất thường đến định vị nguyên nhân gốc, và còn những khoảng trống nào mà đề xuất của đề tài nhắm tới. Mục~\ref{sec:ch3-nghien-cuu} khảo sát bảy nhánh nghiên cứu học thuật từ phát hiện bất thường chuỗi thời gian, ứng dụng mô hình ngôn ngữ lớn trong phân tích log và nguyên nhân gốc, kiến trúc giám sát lai, phân tích nguyên nhân gốc dựa trên đồ thị, truy xuất dựa trên đồ thị, hiệu chỉnh độ tin cậy của \emph{LLM-as-a-Judge}, đến gom nhóm và phân loại cảnh báo. Mục~\ref{sec:ch3-he-thong} đối chiếu các nền tảng AIOps thương mại và công cụ mã nguồn mở hiện hành dựa trên tài liệu chính thức. Cuối cùng, Mục~\ref{sec:ch3-ket-chuong} tổng hợp các hướng tiếp cận trong Bảng~\ref{tab:ch3-so-sanh}, rút ra bốn khoảng trống nghiên cứu và định vị rõ phạm vi đóng góp của \CTAV{} cùng tác tử phân tích nguyên nhân gốc.
+
+% -----------------------------------------------------------------------------
+\subsection{Các nghiên cứu liên quan}
+\label{sec:ch3-nghien-cuu}
+
+Các công trình liên quan đến đề tài nằm ở giao điểm giữa giám sát chuỗi thời gian, phân tích dữ liệu quan sát đa phương thức, truy xuất bằng chứng theo đồ thị và hiệu chỉnh mô hình ngôn ngữ lớn đóng vai trò bộ thẩm định. Bảy tiểu mục dưới đây phân tích từng nhánh theo cùng một trục: cách tiếp cận của công trình, hạn chế đặt trong bài toán của đề tài và điểm khác biệt của đề tài.
+
+\subsubsection{Phát hiện bất thường trên chuỗi thời gian metric}
+\label{sec:ch3-tsad}
+
+Các phương pháp phát hiện bất thường chuỗi thời gian không giám sát chia thành hai nhóm chính. Nhóm cây phân tách ngẫu nhiên gồm Isolation Forest~\cite{isof} (cô lập điểm bất thường theo độ sâu cây, nhẹ và không cần nhãn) và Robust Random Cut Forest (RRCF)~\cite{guha2016robust} (cập nhật cây trực tuyến trên luồng dữ liệu biến đổi). Nhóm học sâu đồ thị như MTAD-GAT~\cite{zhao2020multivariate} (chú ý đồ thị song song theo đặc trưng và thời gian) và GDN~\cite{deng2021graph} (tự học đồ thị cảm biến để dự báo độ lệch) khai thác tốt tương quan đa biến, nhưng đòi hỏi huấn luyện lại khi topology thay đổi và tốn tài nguyên tính toán. Hạn chế chung của cả hai nhóm là chỉ dựa vào tín hiệu số mà bỏ qua ngữ cảnh văn bản từ log hay vết thực thi trace, nên dễ báo động giả trước dao động tải bình thường. Đề tài vì vậy giữ tầng lọc nhẹ bằng Isolation Forest để bảo đảm tốc độ và khả năng tái lập, rồi chuyển trọng tâm sang tầng thẩm định bằng bằng chứng đa phương thức phía sau.
+
+\subsubsection{Mô hình ngôn ngữ lớn trong phân tích log và nguyên nhân gốc}
+\label{sec:ch3-llm-log-rca}
+
+Ở tầng xử lý log phi cấu trúc, LogParser-LLM~\cite{zhong2024logparser} kết hợp cây tiền tố với truy vấn LLM chọn lọc để tách mẫu log linh hoạt, còn LogLLM~\cite{wang2024logllm} phối hợp bộ mã hóa ngữ nghĩa dạng BERT với bộ giải mã LLM để phát hiện bất thường trên chuỗi log; tuy nhiên cả hai chỉ làm việc trên log đơn lẻ mà chưa nối với luồng cảnh báo metric hay đồ thị phụ thuộc dịch vụ.
+
+Ở tầng phân tích nguyên nhân gốc cho sự cố đám mây, Ahmed và cộng sự~\cite{ahmed2023recommending} dùng dòng mô hình GPT để khuyến nghị nguyên nhân gốc và hướng khắc phục trên hơn 40.000 sự cố Microsoft, RCACopilot~\cite{chen2024rcacopilot} tự động hóa thu thập dữ liệu chẩn đoán theo loại sự cố, trong khi RCAgent~\cite{rcagent2023} và khảo sát tác tử ReAct của Roy và cộng sự~\cite{roy2024exploring} trang bị công cụ truy vấn log--metric để LLM tự điều tra sự cố. Hạn chế chung là phần lớn các công trình này giả định sự cố đầu vào đã được xác nhận sẵn và đánh giá trên dữ liệu nội bộ khó tái lập, bỏ qua khâu thẩm định luồng cảnh báo thô để chặn báo động giả trước khi gọi tác tử tốn kém. Đề tài đặt tầng thẩm định \CTAV{} có kiểm soát ngân sách ngay trước tác tử RCA trên bộ dữ liệu công khai tái lập được.
+
+\subsubsection{Kiến trúc giám sát lai và LLM-as-a-Judge}
+\label{sec:ch3-hybrid-judge}
+
+Để dung hòa chi phí gọi LLM với yêu cầu giám sát liên tục, nhiều công trình kết hợp mô hình nhẹ hoặc cơ chế truy xuất tăng cường sinh (\emph{Retrieval-Augmented Generation}, RAG)~\cite{lewis2020rag} với bộ phân xử LLM ở tầng sau. Về nguyên lý phân tầng chi phí, nền tảng lý thuyết bắt nguồn từ cơ chế đánh đổi sai số và quyền từ chối (\emph{reject option}) của Chow~\cite{chow1970reject} cùng mô hình chuỗi tầng gọi LLM tiết kiệm chi phí FrugalGPT của Chen và cộng sự~\cite{chen2024frugalgpt}, trong đó các mẫu rõ ràng được xử lý bởi mô hình rẻ hơn và chỉ vùng bất định mới chuyển lên mô hình đắt hơn.
+
+Trong miền phát hiện bất thường, một loạt công trình gần đây đưa kiến trúc lai vào thực nghiệm. Russell-Gilbert và cộng sự~\cite{raad-llm} đề xuất RAAD-LLM, tích hợp RAG vào LLM để thích nghi phát hiện bất thường chuỗi thời gian khi bối cảnh hệ thống thay đổi mà không cần tinh chỉnh trọng số. Gu và cộng sự~\cite{argos} giới thiệu ARGOS, một khuôn khổ tác tử cho phép LLM tự sinh và tinh chỉnh luật phát hiện bất thường trên chuỗi thời gian nhằm giảm phụ thuộc vào truy vấn trực tiếp trên từng mẫu. Devireddy và Huang~\cite{calm} đề xuất CALM, điều phối liên tục giữa phát hiện thời gian thực và cơ chế can thiệp thích nghi của LLM. Ở góc độ đánh giá năng lực thẩm định, Sivalingam và cộng sự~\cite{judge} xây dựng TSQueryBench để kiểm tra khả năng dùng \emph{LLM-as-a-Judge} đánh giá lời giải thích bất thường chuỗi thời gian.
+
+Hạn chế chung của các kiến trúc lai này khi áp vào microservice là chúng chủ yếu vận hành trên chuỗi thời gian đơn lẻ hoặc truy xuất ngữ cảnh văn bản phẳng, chưa kết nối tường minh với đồ thị phụ thuộc giữa các service sinh từ trace. Quan trọng hơn, các nghiên cứu này chưa khảo sát hệ quả ngược chiều khi mở rộng bằng chứng cho bộ thẩm định LLM: việc cấp thêm ngữ cảnh từ láng giềng có thể làm tăng tỷ lệ báo động giả do thiên lệch xác nhận. Đề tài này tập trung giải quyết trực tiếp bài toán kiểm soát ngân sách và kìm báo động giả trong kiến trúc lai detector nhẹ kết hợp \emph{LLM-as-a-Judge} cho hệ microservice.
+
+\subsubsection{Phân tích nguyên nhân gốc dựa trên topology, đồ thị và suy luận nhân quả}
+\label{sec:ch3-rca-graph}
+
+Định vị nguyên nhân gốc dựa trên đồ thị phụ thuộc và suy luận nhân quả là nhánh phát triển lâu đời nhất trong giám sát hệ phân tán. Kim và cộng sự~\cite{kim2013monitorrank} đề xuất MonitorRank, thực hiện bước đi ngẫu nhiên (\emph{random walk}) có trọng số tương quan metric trên đồ thị gọi dịch vụ để xếp hạng service nghi vấn trong kiến trúc hướng dịch vụ. Chen và cộng sự~\cite{chen2014causeinfer} xây dựng CauseInfer với đồ thị nhân quả hai tầng (tầng dịch vụ và tầng metric) bằng thuật toán kiểm định độc lập có điều kiện PC để lần ngược nút gốc gây suy giảm hiệu năng. Trên kiến trúc microservice, Wu và cộng sự~\cite{wu2020microrca} giới thiệu MicroRCA, gắn dữ liệu sử dụng tài nguyên máy chủ vào đồ thị dịch vụ bất thường và áp dụng Personalized PageRank để định vị service gây lỗi hiệu năng.
+
+Các công trình gần đây tiếp cận bài toán bằng mô hình nhân quả chặt chẽ hơn và dữ liệu đa phương thức. Li và cộng sự~\cite{li2022circa} đề xuất CIRCA, mô hình hóa lỗi như một can thiệp (\emph{intervention}) trên mạng Bayes nhân quả xây từ kiến trúc hệ thống và dùng điều kiện thay đổi phân bố có điều kiện để chỉ ra chỉ số gốc. Ikram và cộng sự~\cite{ikram2022rcd} đề xuất RCD, xem sự cố như can thiệp cục bộ và khám phá đồ thị nhân quả theo phân cấp để tránh chi phí tính toán lớn của thuật toán PC trên toàn bộ hệ thống. Kết hợp cả ba trụ cột dữ liệu quan sát, Yu và cộng sự~\cite{nezha} đề xuất Nezha, chuyển đổi metric, log và trace thành biểu diễn sự kiện đồng nhất và so sánh mẫu phân kỳ giữa trạng thái bình thường với trạng thái lỗi để định vị nguyên nhân gốc ở mức chi tiết, đồng thời công bố bộ dữ liệu microservice đa phương thức làm chuẩn đánh giá. Đáng lưu ý về tính bền vững của chuỗi xử lý, Pham và cộng sự~\cite{pham2024baro} đề xuất BARO bằng phát hiện điểm đổi Bayes đa biến kết hợp kiểm định phi tham số, đồng thời chỉ ra rằng sai số ở khâu phát hiện bất thường đầu vào có thể lan sang làm giảm mạnh độ chính xác định vị gốc; tiếp đó nhóm tác giả công bố bộ chuẩn RCAEval~\cite{pham2025rcaeval} tổng hợp 735 ca lỗi đa phương thức trên nhiều hệ microservice mã nguồn mở để thống nhất việc so sánh.
+
+Hạn chế của nhóm phương pháp đồ thị và nhân quả thuần túy gồm hai điểm. Thứ nhất, phần lớn mô hình chỉ xuất ra danh sách xếp hạng service hoặc metric gốc dưới dạng chỉ số toán học, thiếu báo cáo tường minh giải thích cơ chế lan truyền bằng chứng từ log và trace cho kỹ sư vận hành. Thứ hai, trừ những phân tích gần đây như BARO, đa số nghiên cứu RCA giả định cửa sổ thời gian sự cố đã được xác định sạch từ trước, tách rời khỏi bài toán lọc cảnh báo giả trực tuyến. Đề tài này nối trực tiếp hai khâu: dùng \CTAV{} để làm sạch luồng cảnh báo trước khi gom sự cố, rồi dùng tác tử RCA lần ngược chuỗi lan truyền trên đồ thị phụ thuộc và sinh báo cáo có cấu trúc kèm trích dẫn bằng chứng.
+
+\subsubsection{Truy xuất dựa trên đồ thị và GraphRAG cho vận hành hệ thống}
+\label{sec:ch3-graphrag}
+
+Trong lĩnh vực xử lý ngôn ngữ tự nhiên, Edge và cộng sự~\cite{edge2024graphrag} đề xuất GraphRAG nhằm khắc phục hạn chế của truy xuất văn bản phẳng khi cần tổng hợp thông tin phân tán trên nhiều tài liệu. Phương pháp xây dựng đồ thị tri thức thực thể--quan hệ từ kho văn bản, phân cụm cộng đồng đồ thị và sinh tóm tắt phân cấp để trả lời các truy vấn mang tính toàn cục. Tuy mở ra hướng truy xuất có cấu trúc, GraphRAG thiết kế cho kho tài liệu tĩnh với đồ thị trích xuất bằng LLM, nên vừa tốn chi phí lập chỉ mục vừa khác về bản chất so với đồ thị phụ thuộc động của hệ microservice được đo trực tiếp từ quan hệ gọi \code{SpanID}--\code{ParentID} trong trace.
+
+Khi áp dụng tư tưởng truy xuất theo cấu trúc đồ thị vào bài toán thẩm định cảnh báo microservice, một nghiên cứu tiền đề về truy xuất bằng chứng có nhận biết topology~\cite{icaetm2026} đã đề xuất kết hợp điểm từ khóa BM25 với độ gần về thời gian và khoảng cách bước nhảy trên đồ thị phụ thuộc service để cung cấp thêm bằng chứng từ các service láng giềng cho bộ thẩm định LLM (chi tiết công thức hợp nhất đã trình bày ở Mục~\ref{sec:ch2-truy-xuat}). Kết quả định tính của hướng tiếp cận này cho thấy một đánh đổi rõ rệt: việc mở rộng ngữ cảnh sang các service có liên kết gọi giúp cải thiện khả năng nhận diện các sự cố lan truyền mà bằng chứng cục bộ không đủ, nhưng khi đưa trực tiếp vào \emph{LLM-as-a-Judge} mà không có cơ chế kiểm soát chính sách, số báo động giả tăng lên mạnh do bộ thẩm định dễ diễn giải nhầm log nền từ láng giềng thành dấu hiệu bất thường. Đề tài này xuất phát trực tiếp từ đánh đổi đó để xây dựng cơ chế hiệu chỉnh theo nguồn gốc bằng chứng và kiểm định nghiêm ngặt hiệu quả kìm báo động giả trên dữ liệu ngoài tập tinh chỉnh.
+
+\subsubsection{Hiệu chỉnh độ tin cậy, thiên lệch của LLM-as-a-Judge và gắn bằng chứng}
+\label{sec:ch3-calibration}
+
+Dù \emph{LLM-as-a-Judge} đạt mức đồng thuận cao với người đánh giá trên nhiều tác vụ tổng quát~\cite{zheng2023judging}, hàng loạt nghiên cứu đã chứng minh mô hình ngôn ngữ mắc nhiều thiên lệch có hệ thống và thường tự tin thái quá. Wang và cộng sự~\cite{wang2024fair} chỉ ra rằng bộ thẩm định LLM chịu thiên lệch vị trí nghiêm trọng khi so sánh cặp câu trả lời, dẫn đến thứ hạng dễ bị thao túng chỉ bằng cách đảo thứ tự trình bày, và đề xuất khung FairEval hiệu chỉnh bằng cách buộc sinh bằng chứng trước khi chấm điểm kết hợp trung bình hóa vị trí. Sharma và cộng sự~\cite{sharma2024sycophancy} phân tích hiện tượng chiều lòng (\emph{sycophancy}), cho thấy mô hình đã qua tinh chỉnh theo phản hồi con người có xu hướng đồng thuận với giả định ngầm trong câu hỏi ngay cả khi giả định đó sai — một cơ chế tương đồng trực tiếp với thiên lệch xác nhận khi bộ thẩm định nhận thông báo rằng ``cảnh báo đang kích hoạt''.
+
+Về hiệu chỉnh xác suất và ước lượng độ bất định, Guo và cộng sự~\cite{guo2017calibration} chứng minh các mạng nơ-ron hiện đại tuy chính xác nhưng hiệu chỉnh kém và đề xuất phương pháp hiệu chỉnh hậu xử lý bằng tỉ lệ nhiệt độ (\emph{temperature scaling}). Trên LLM, Kadavath và cộng sự~\cite{kadavath2022mostly} khảo sát khả năng mô hình tự đánh giá xác suất đúng của phát biểu do chính nó sinh ra, cho thấy tín hiệu nội tại có thể hiệu chỉnh được trong câu hỏi trắc nghiệm nhưng khó khái quát khi chuyển phân bố tác vụ. Gần hơn với bài toán sử dụng API thương mại không truy cập được xác suất token thô, Xiong và cộng sự~\cite{xiong2024uncertainty} đánh giá thực nghiệm độ tin cậy bằng lời (\emph{verbalized confidence}) trên nhiều dòng LLM và chỉ ra mô hình thường gán điểm tin cậy quá cao, tập trung dày đặc ở vùng sát $1{,}0$. Song song đó, để hạn chế suy diễn vô căn cứ trong văn bản sinh ra, Gao và cộng sự~\cite{gao2023alce} đề xuất chuẩn đánh giá ALCE đo đồng thời tính đúng đắn và chất lượng trích dẫn nguồn bằng chứng trong câu trả lời của LLM.
+
+Khoảng trống còn lại trong nhánh nghiên cứu này là các kỹ thuật hiệu chỉnh hiện có chủ yếu thiết kế cho bài toán chấm điểm cặp câu trả lời, hỏi--đáp mở hoặc sinh văn bản có trích dẫn tổng quát. Chưa có cơ chế nào hiệu chỉnh trực tiếp quyết định của \emph{LLM-as-a-Judge} trong bài toán thẩm định cảnh báo microservice theo \emph{nguồn gốc bằng chứng} (nội bộ hay láng giềng trên đồ thị phụ thuộc) và theo \emph{mức độ bất thường nền đo trên tập phát triển}. Đề tài này cụ thể hóa ý tưởng hiệu chỉnh bằng chính sách neo bằng chứng và kiểm định tách biệt từng thành phần thiết kế (ngưỡng bất đối xứng theo nguồn bằng chứng, neo ngưỡng nền trên tập phát triển và định tuyến hai tầng) theo quy trình đăng ký giả thuyết trước ở Mục~\ref{sec:ch2-dang-ky}.
+
+\subsubsection{Gom nhóm, phân loại và cứu cảnh báo trong vận hành}
+\label{sec:ch3-alert-triage}
+
+Để giảm tải bão cảnh báo trong vận hành trực tuyến, Zhao và cộng sự~\cite{zhao2020alertstorm} phát hiện thời điểm bão và gom cảnh báo tương quan thời gian--ngữ nghĩa thành cụm sự cố; Chen và cộng sự~\cite{chen2019empirical,chen2019continuous} phân tích lỗi định tuyến sự cố và xây dựng cơ chế phân loại liên tục; còn Kuang và cộng sự~\cite{kuang2024knowledge} kết hợp đặc trưng văn bản với tri thức vận hành và topology để gom cảnh báo cùng gốc. Các công trình này chủ yếu nén cảnh báo \emph{sau khi phát sinh} mà không thẩm định lại bản thân cảnh báo metric có phải báo động giả hay không, cũng ít kiểm chứng xem liệu có thể ``cứu'' các cửa sổ dưới ngưỡng metric bằng log/topology mà không làm tăng FPR hay không. Đề tài tách rõ hai vai trò: dùng gom nhóm thời gian--topology ở đầu vào tác tử RCA trên các cảnh báo đã được \CTAV{} xác nhận, và kiểm chứng cơ chế cứu cảnh báo (\code{Rescue Score}, C5) như một phân tích loại trừ độc lập (Mục~\ref{sec:ch5-c5}).
+
+% -----------------------------------------------------------------------------
+\subsection{Các hệ thống và công cụ hiện có}
+\label{sec:ch3-he-thong}
+\label{sec:ch3-thuong-mai}
+\label{sec:ch3-ma-nguon-mo}
+
+Bên cạnh các nghiên cứu học thuật, Bảng~\ref{tab:ch3-he-thong} đối chiếu ba nền tảng AIOps thương mại và ba công cụ mã nguồn mở tiêu biểu dựa trên tài liệu chính thức của nhà phát triển.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Đối chiếu các nền tảng AIOps thương mại và công cụ mã nguồn mở hiện có]{Tóm tắt cơ chế chính và giới hạn của các nền tảng thương mại và công cụ mã nguồn mở tiêu biểu.}
+  \label{tab:ch3-he-thong}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}p{2.3cm} Y Y@{}}
+    \toprule
+    \textbf{Nhóm} & \textbf{Hệ thống} & \textbf{Cơ chế cốt lõi (theo tài liệu chính thức)} & \textbf{Giới hạn đối với bài toán đề tài} \\
+    \midrule
+    \multirow{3}{*}{Thương mại} & Datadog (Event Mgmt \& Bits AI)~\cite{datadog2026docs} & Gom cảnh báo theo topology, nhãn và thời gian; tác tử Bits AI kiểm định song song nhiều giả thuyết trên metric, log, trace. & Kiến trúc đóng kín; không công bố hiệu chỉnh LLM theo nguồn bằng chứng hay đánh giá độc lập tác động topology lên FP. \\
+     & Dynatrace (Davis AI \& Smartscape)~\cite{dynatrace2026docs} & Bản đồ phụ thuộc Smartscape thời gian thực từ OneAgent; Davis AI phân tích cây lỗi tất định tách nút gốc và nút ảnh hưởng. & Gắn chặt hạ tầng thu thập độc quyền, chi phí cao; không giải bài toán hiệu chỉnh \emph{LLM-as-a-Judge} dưới ngân sách giới hạn. \\
+     & PagerDuty AIOps~\cite{pagerduty2026docs} & Gom cảnh báo bằng học máy (\emph{Intelligent Alert Grouping}), gợi ý nguồn gốc theo lịch sử 6 tháng (\emph{Probable Origin}) và luật \emph{Event Orchestration}. & Phụ thuộc lịch sử sự cố tổ chức; không khai thác đồ thị trace từng cửa sổ để thẩm định tín hiệu thô hay kìm FP của LLM. \\
+    \midrule
+    \multirow{3}{*}{Mã nguồn mở} & Prometheus Alertmanager~\cite{prometheus2026alertmanager} & Định tuyến (\code{route}), gom nhóm (\code{group\_by}), ức chế (\code{inhibit\_rules}) và tắt tiếng (\code{silences}) khai báo bằng YAML. & Mọi luật gom/ức chế phải cấu hình tĩnh thủ công; không suy diễn topology từ trace, không đọc log và không thực hiện RCA. \\
+     & Keep~\cite{keep2026docs} & Khử trùng lặp bằng dấu vân tay, tương quan theo luật CEL, topology hoặc AI, kèm quy trình tự động hóa YAML. & Tập trung tổng hợp--điều phối cảnh báo; chưa có hiệu chỉnh \emph{LLM-as-a-Judge} theo nguồn bằng chứng hay khung đánh giá tái lập dưới ngân sách cố định. \\
+     & HolmesGPT~\cite{holmesgpt2026docs} & Tác tử CNCF Sandbox chạy vòng lặp ReAct chỉ đọc trong Kubernetes, gọi Prometheus/Loki/\code{kubectl} để điều tra nguyên nhân gốc. & Chỉ chạy sau khi cảnh báo đã gửi tới, tốn nhiều lượt gọi LLM mỗi cảnh báo; thiếu tầng thẩm định chặn FP phía trước và benchmark thống kê. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsubsection{Nhận xét về các hệ thống hiện có}
+\label{sec:ch3-nhan-xet}
+
+Qua đối chiếu ở Bảng~\ref{tab:ch3-he-thong}, hiện trạng công nghiệp bộc lộ hai điểm đứt gãy rõ rệt. Các nền tảng thương mại (Datadog, Dynatrace, PagerDuty) đã tích hợp gom cảnh báo theo topology và tác tử điều tra AI, nhưng là hệ thống hộp đen độc quyền nên không cho phép kiểm định độc lập tác động của truy xuất hay chính sách hiệu chỉnh lên tỷ lệ báo động giả. Ở mảng mã nguồn mở, tầng quản lý cảnh báo (Alertmanager, Keep) và tầng tác tử điều tra LLM (HolmesGPT) nằm tách rời, thiếu bộ lọc thẩm định hiệu chỉnh dưới ngân sách LLM cố định ở giữa. Vì vậy, nền tảng của đề tài được thiết kế gọn nhẹ, mã nguồn mở để đồng thời tái lập chặt chẽ thí nghiệm trên dữ liệu công khai và trình diễn trọn chuỗi từ phát lại dữ liệu, thẩm định \CTAV{} đến định vị gốc có bằng chứng.
+
+% -----------------------------------------------------------------------------
+\subsection{Kết chương}
+\label{sec:ch3-ket-chuong}
+
+Mục này tổng hợp các nghiên cứu học thuật ở Mục~\ref{sec:ch3-nghien-cuu} và các hệ thống thực tế ở Mục~\ref{sec:ch3-he-thong} trên cùng một hệ tiêu chí, qua đó chỉ rõ bốn khoảng trống nghiên cứu và định vị đóng góp của đề tài.
+
+\subsubsection{Bảng so sánh tổng hợp}
+\label{sec:ch3-bang-so-sanh}
+
+Bảng~\ref{tab:ch3-so-sanh} đối chiếu các nhóm công trình tiêu biểu và các hệ thống hiện có theo năm tiêu chí bám sát trực tiếp mục tiêu của đề tài: (1) khai thác đồ thị topology dịch vụ, (2) sử dụng LLM để thẩm định hoặc suy luận sự cố, (3) hiệu chỉnh quyết định theo nguồn gốc bằng chứng, (4) thực hiện phân tích nguyên nhân gốc (RCA), và (5) có đánh giá định lượng báo động giả (FP/FPR) trên quy trình mở tái lập được. Trong bảng, \emph{Có} biểu thị tiêu chí được đáp ứng trực tiếp; \emph{Một phần} biểu thị tiêu chí chỉ được đáp ứng gián tiếp hoặc ở phạm vi hẹp (chẳng hạn chỉ có luật ức chế tĩnh, chỉ học đồ thị cảm biến không phải topology dịch vụ, hoặc hệ thống thương mại đóng nguồn không công bố kiểm định FP độc lập); \emph{Không} biểu thị tiêu chí nằm ngoài phạm vi của công trình hoặc công cụ.
+
+\begin{table}[htbp]
+  \centering
+  \caption[So sánh công trình liên quan, hệ thống hiện có và đề xuất]{So sánh các nhóm nghiên cứu liên quan, hệ thống hiện có và đề xuất của đề tài.}
+  \label{tab:ch3-so-sanh}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{@{}Y >{\centering\arraybackslash}p{1.45cm} >{\centering\arraybackslash}p{1.45cm} >{\centering\arraybackslash}p{1.6cm} >{\centering\arraybackslash}p{1.2cm} >{\centering\arraybackslash}p{1.65cm}@{}}
+    \toprule
+    \textbf{Công trình / Hệ thống} &
+    \textbf{Topology} &
+    \textbf{LLM judge} &
+    \textbf{Hiệu chỉnh BC} &
+    \textbf{RCA} &
+    \textbf{Đánh giá FP \& tái lập} \\
+    \midrule
+    Isolation Forest~\cite{isof}, RRCF~\cite{guha2016robust} &
+      Không & Không & Không & Không & Một phần \\
+    MTAD-GAT~\cite{zhao2020multivariate}, GDN~\cite{deng2021graph} &
+      Một phần & Không & Không & Không & Một phần \\
+    LogParser-LLM~\cite{zhong2024logparser}, LogLLM~\cite{wang2024logllm} &
+      Không & Có & Không & Không & Một phần \\
+    RCACopilot~\cite{chen2024rcacopilot}, RCAgent~\cite{rcagent2023}, Roy~\cite{roy2024exploring} &
+      Không & Có & Không & Có & Không \\
+    RAAD-LLM~\cite{raad-llm}, ARGOS~\cite{argos}, CALM~\cite{calm} &
+      Không & Có & Không & Không & Một phần \\
+    MonitorRank~\cite{kim2013monitorrank}, MicroRCA~\cite{wu2020microrca}, CIRCA~\cite{li2022circa}, RCD~\cite{ikram2022rcd} &
+      Có & Không & Không & Có & Không \\
+    Nezha~\cite{nezha}, BARO~\cite{pham2024baro}, RCAEval~\cite{pham2025rcaeval} &
+      Có & Không & Không & Có & Một phần \\
+    GraphRAG~\cite{edge2024graphrag} &
+      Một phần & Có & Không & Không & Không \\
+    Truy xuất topology cho thẩm định LLM~\cite{icaetm2026} &
+      Có & Có & Không & Không & Có \\
+    FairEval~\cite{wang2024fair}, Xiong~\cite{xiong2024uncertainty}, ALCE~\cite{gao2023alce} &
+      Không & Có & Một phần & Không & Một phần \\
+    Alert Storm~\cite{zhao2020alertstorm}, Kuang~\cite{kuang2024knowledge} &
+      Một phần & Không & Không & Không & Một phần \\
+    \midrule
+    Datadog (Event Mgmt + Bits AI)~\cite{datadog2026docs} &
+      Có & Có & Không & Có & Không \\
+    Dynatrace (Davis AI + Smartscape)~\cite{dynatrace2026docs} &
+      Có & Không & Không & Có & Không \\
+    PagerDuty AIOps~\cite{pagerduty2026docs} &
+      Một phần & Không & Không & Một phần & Không \\
+    Prometheus Alertmanager~\cite{prometheus2026alertmanager} &
+      Không & Không & Không & Không & Một phần \\
+    Keep~\cite{keep2026docs} &
+      Có & Một phần & Không & Không & Một phần \\
+    HolmesGPT~\cite{holmesgpt2026docs} &
+      Một phần & Có & Không & Có & Không \\
+    \midrule
+    \textbf{Đề tài này (\CTAV{} + tác tử RCA)} &
+      \textbf{Có} & \textbf{Có} & \textbf{Có} & \textbf{Có} & \textbf{Có} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Bảng~\ref{tab:ch3-so-sanh} cho thấy bức tranh phân mảnh rõ rệt giữa các hướng hiện có. Nhóm phát hiện bất thường chuỗi thời gian và kiến trúc giám sát lai chưa khai thác cấu trúc đồ thị dịch vụ; nhóm RCA dựa trên đồ thị và nhân quả khai thác tốt topology nhưng không dùng LLM thẩm định luồng cảnh báo thô để kìm báo động giả; nhóm tác tử RCA dùng LLM bỏ qua khâu lọc cảnh báo giả có kiểm soát ngân sách; còn nhóm hiệu chỉnh \emph{LLM-as-a-Judge} mới xét bài toán ngôn ngữ tổng quát chứ chưa hiệu chỉnh theo nguồn gốc bằng chứng trên đồ thị phụ thuộc. Các hệ thống công nghiệp hoặc đóng nguồn không thể tái lập kiểm định FP, hoặc tách rời tầng quản lý cảnh báo với tầng điều tra LLM.
+
+\subsubsection{Khoảng trống nghiên cứu và định vị đề xuất}
+\label{sec:ch3-khoang-trong}
+
+Từ kết quả khảo sát và Bảng~\ref{tab:ch3-so-sanh}, đề tài xác định bốn khoảng trống nghiên cứu cụ thể:
+
+\begin{enumerate}
+  \item \textbf{Khoảng trống G1 — Khoảng cách giữa phát hiện tốc độ cao và thẩm định chính xác dưới ngân sách LLM hữu hạn.} Bộ phát hiện metric không giám sát chạy nhanh nhưng dễ tạo báo động giả hoặc bỏ sót lỗi ngữ nghĩa; ngược lại, tác tử LLM gọi nhiều công cụ trực tiếp quá tốn kém để chạy trên mọi cửa sổ thời gian. Cần một cơ chế kết nối có kiểm soát chặt số lượt gọi LLM mà vẫn bảo đảm chất lượng thẩm định.
+  \item \textbf{Khoảng trống G2 — Đánh đổi chưa được kiểm soát giữa thu hồi theo topology và báo động giả do thiên lệch xác nhận.} Mở rộng truy xuất bằng chứng sang láng giềng trên đồ thị phụ thuộc giúp nhận diện các lỗi lan truyền mà truy xuất từ khóa cục bộ bỏ lỡ, nhưng đồng thời khuếch đại xu hướng xác nhận nhầm của \emph{LLM-as-a-Judge} trên các cửa sổ bình thường nếu không có chính sách lọc và neo bằng chứng phù hợp.
+  \item \textbf{Khoảng trống G3 — Thiếu cơ chế hiệu chỉnh bộ thẩm định cảnh báo theo nguồn gốc bằng chứng và thiếu kiểm chứng loại trừ có đăng ký giả thuyết trước.} Các phương pháp hiệu chỉnh LLM hiện hành chưa mô hình hóa sự khác biệt giữa bằng chứng nội bộ và bằng chứng láng giềng hay tham chiếu ngưỡng nền từ tập phát triển. Đồng thời, trong thực nghiệm AIOps, nhiều thiết kế phức tạp được gộp chung vào một hệ thống mà không tách kiểm định từng thành phần trên tập kiểm tra giữ kín, dễ che giấu những thành phần không mang lại lợi ích thực tế.
+  \item \textbf{Khoảng trống G4 — Sự đứt gãy giữa thẩm định cảnh báo đã kiểm soát FP với phân tích nguyên nhân gốc có trích dẫn bằng chứng trên một nền tảng mở.} Phần lớn công trình hoặc dừng ở bước phát hiện/thẩm định cảnh báo, hoặc bắt đầu RCA từ danh sách sự cố đã xác nhận sẵn, và hiếm khi kết hợp cả hai trên một nền tảng mã nguồn mở có bộ nhớ đệm lời gọi LLM để tái lập thực nghiệm và trình diễn trực quan.
+\end{enumerate}
+
+Để lấp đầy bốn khoảng trống trên, đề tài đề xuất \textbf{\CTAV{}} (\emph{Calibrated Topology-Aware Alert Validation}) làm tầng thẩm định cảnh báo hiệu chỉnh theo bằng chứng đa phương thức và kết nối trực tiếp với \textbf{tác tử phân tích nguyên nhân gốc} trên một nền tảng mã nguồn mở thống nhất. Trong \CTAV{}, từng thành phần trong không gian thiết kế (truy xuất lai BM25--topology C1, neo bằng chứng C3, ngưỡng bất đối xứng C2, định tuyến hai tầng C4 và cổng cứu cảnh báo C5) được kiểm định tách biệt theo quy trình đăng ký giả thuyết trước để giữ lại cấu hình tối giản có hiệu quả thực chứng, làm đầu vào sạch cho bước gom sự cố, lần ngược đồ thị gọi và sinh báo cáo có trích dẫn của tác tử RCA. Toàn bộ kiến trúc, thuật toán và hiện thực hóa hệ thống được trình bày chi tiết trong Chương~\ref{ch:de-xuat}.

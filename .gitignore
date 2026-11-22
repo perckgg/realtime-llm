@@ -14,10 +14,12 @@ venv/
 env/
 
 # Local editor/runtime files
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 *.log
 *.tmp
+*.synctex.gz
 
 # Docker volumes (Phase 2 docker-compose)
 volumes/
@@ -38,3 +40,6 @@ archive/phase1_extra/data/
 *.egg-info/
 build/
 dist/
+
+# Generated static GitHub Pages API mirror (committed only on demo/gh-pages)
+services/web/public/static-api/

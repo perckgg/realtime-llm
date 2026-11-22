@@ -1,0 +1,20 @@
+kind: rescue_features
+run_id: m8_rescue_features_test_v1
+split: test
+g_test: true
+windows_run: h0_test_c1_k0_v1
+alerts_run: ctav_final_test_v1
+window_seconds: 60
+graph: data/graph/service_graph.json
+log:
+  k_log: 10
+  levels:
+  - ERROR
+  - FATAL
+  - CRITICAL
+  patterns:
+  - \b(?:status|code)\D{0,5}5\d\d\b
+  - exception|panic|traceback
+time:
+  sigma_seconds: 300
+  active_seconds: 300

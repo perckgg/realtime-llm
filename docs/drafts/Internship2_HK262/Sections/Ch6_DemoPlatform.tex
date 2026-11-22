@@ -1,0 +1,256 @@
+% =============================================================================
+% Chuong 6: Platform demo (chuan lop article cho Internship2_HK262)
+% Nguon noi dung: docs/drafts/ch6-demo-platform.md, outline-bao-cao-gd2.md (Ch6),
+%   eval/results/{pipeline_val_v2,pipeline_test_v2,pipeline_sens_test_v1}/runtime.json,
+%   eval/results/m10_demo_cases_v1/demo_cases.json, docs/milestones/M11-danh-gia-nguoi.md
+% Nhan dung tu chuong khac: ch:de-xuat, ch:thuc-nghiem, ch:thao-luan,
+%   sec:ch4-c1, sec:ch4-policy, sec:ch4-rca, sec:ch4-grouping, sec:ch4-propagation,
+%   sec:ch4-report, sec:ch4-impl, sec:ch2-cong-nghe, sec:ch5-rca-results,
+%   sec:ch5-finding11, tab:ch5-findings, tab:ch5-verdict-summary
+% =============================================================================
+
+\section{Platform demo}
+\label{ch:platform}
+
+Chương này trả lời một câu hỏi: toàn bộ chuỗi xử lý ở Chương~\ref{ch:de-xuat}, từ bộ phát hiện bất thường qua \CTAV{} tới tác tử RCA, có chạy được thành một hệ thống mà người vận hành dùng được hay không. Chương không đưa ra kết quả thực nghiệm mới; mọi con số đều lấy lại từ các lượt chạy đã kiểm định ở Chương~\ref{ch:thuc-nghiem}. Mục~\ref{sec:ch6-vai-tro} nêu vai trò và phạm vi của platform. Mục~\ref{sec:ch6-luong} mô tả luồng dữ liệu đầu--cuối và cách triển khai bằng Docker Compose. Mục~\ref{sec:ch6-dashboard} đi qua bốn màn hình theo góc nhìn người vận hành, Mục~\ref{sec:ch6-kich-ban} trình bày kịch bản demo năm phút, và Mục~\ref{sec:ch6-kiem-thu} báo cáo kiểm thử chạy ngoại tuyến cùng phương án dự phòng.
+
+% -----------------------------------------------------------------------------
+\subsection{Vai trò của platform}
+\label{sec:ch6-vai-tro}
+
+Mục này xác định platform được xây để làm gì và cố ý không làm gì. Platform là hiện thực chạy được của \CTAV{} và tác tử RCA: cùng một pipeline vừa sinh các kết quả kiểm định H0--H5, vừa nạp dữ liệu cho giao diện trình diễn. Nhờ vậy, ca nào hội đồng thấy trên màn hình cũng chính là một dòng trong các tệp kết quả của Chương~\ref{ch:thuc-nghiem}, không phải dữ liệu dựng riêng cho demo. Platform được tối ưu cho khả năng tái lập, không cho vận hành sản xuất. Vì vậy hệ thống không có xác thực người dùng, không phân quyền nhiều đơn vị thuê, không gửi thông báo ra ngoài và không tự thực thi runbook khắc phục.
+
+Ràng buộc thứ hai là demo phải chạy được khi không có Internet. Mọi phán quyết của judge \code{gemini-2.5-flash} và mọi báo cáo chẩn đoán đều được đọc lại từ \code{cache} trên đĩa, theo đúng cơ chế khoá cache ở Mục~\ref{sec:ch4-judge}. Ở chế độ demo ngoại tuyến (\code{DEMO\_OFFLINE=1}), pipeline gỡ các khoá API khỏi tiến trình ngay sau khi nạp cấu hình. Một lần hụt cache khi đó làm pipeline dừng với lỗi, thay vì âm thầm gọi mạng. Giao diện web cũng đóng gói toàn bộ mã và kiểu hiển thị cục bộ, không tải phông chữ hay thư viện từ máy chủ bên ngoài.
+
+% -----------------------------------------------------------------------------
+\subsection{Luồng end-to-end và triển khai}
+\label{sec:ch6-luong}
+
+Mục này cho thấy dữ liệu đi qua những khâu nào trước khi tới màn hình, và các khâu đó được triển khai ra sao trên một máy trình diễn. Luồng xử lý giữ đúng thứ tự ở Hình~\ref{fig:ch4-arch}. Bộ phát lại đưa cửa sổ \code{metric} vào bộ phát hiện Isolation Forest; các \code{candidate} đạt ngưỡng đi vào \CTAV{} gồm C1 (truy xuất lai BM25--topology), judge LLM và chính sách quyết định có C3 (neo bằng chứng theo ngưỡng nền $p_{90}$ của \splitname{dev}). Hai thành phần C2 (gating theo nguồn bằng chứng) và C4 (định tuyến hai tầng) đã bị loại ở Chương~\ref{ch:thuc-nghiem}, còn C5 (Rescue Score) chỉ là ablation, nên cả ba không chạy trong platform. Cảnh báo \code{TRUE\_ALERT} sau đó được tác tử RCA gom thành sự cố trong cửa sổ $T_{\text{group}} = 180\,\text{s}$, xếp hạng service gốc bằng lan truyền ngược một bước và tóm tắt thành báo cáo JSON (Mục~\ref{sec:ch4-rca}).
+
+Hình~\ref{fig:ch6-deploy} trình bày cách các khâu này được đặt lên máy trình diễn. Người đọc cần nhìn vào ranh giới nét đứt: chỉ bốn container nằm trong Docker Compose, còn pipeline chạy một lần trên máy chủ để nạp dữ liệu từ cache vào hai kho lưu trữ. ClickHouse giữ mọi \code{candidate} cùng phán quyết thô, phán quyết sau chính sách và danh sách bằng chứng kèm điểm Fusion Score; PostgreSQL giữ sự cố và báo cáo chẩn đoán. API FastAPI chỉ đọc từ hai kho này, còn dashboard React/Vite gọi API qua một proxy nội bộ. Các container khởi động theo thứ tự kiểm tra sức khoẻ: API chỉ lên khi hai cơ sở dữ liệu đã sẵn sàng, và dashboard chỉ lên khi API trả lời. Cách lắp ráp ở mức mã nguồn đã trình bày ở Mục~\ref{sec:ch4-impl}.
+
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    box/.style={draw=black!75, rounded corners=2pt, align=center, text width=23mm,
+                minimum height=13mm, inner sep=2pt, line width=0.6pt, fill=white},
+    ctr/.style={box, draw=blue!55!black},
+    flow/.style={-{Stealth[length=2mm]}, line width=0.7pt, draw=black!75},
+    lab/.style={font=\scriptsize, text=black!60, align=center},
+  ]
+    % Phia may chu
+    \node[box] (res)   at (0,1.7)  {\textbf{Kết quả đã khoá}\\[1pt]\scriptsize\texttt{eval/results/}};
+    \node[box] (cache) at (0,-1.7) {\textbf{Cache LLM}\\[1pt]\scriptsize\texttt{data/llm\_cache/}\\ 0 lần gọi API};
+    \node[box] (pipe)  at (3.5,0)  {\textbf{Pipeline}\\[1pt]\scriptsize nạp lại từ cache\\ \texttt{DEMO\_OFFLINE=1}};
+    % Docker Compose
+    \node[ctr] (ch)  at (7.1,1.7)  {\textbf{ClickHouse}\\[1pt]\scriptsize candidate, bằng chứng\\ cổng 8123};
+    \node[ctr] (pg)  at (7.1,-1.7) {\textbf{PostgreSQL}\\[1pt]\scriptsize sự cố, báo cáo\\ cổng 5432};
+    \node[ctr] (api) at (10.5,0)   {\textbf{API FastAPI}\\[1pt]\scriptsize 7 endpoint chỉ đọc\\ cổng 8000};
+    \node[ctr] (web) at (13.9,0)   {\textbf{Dashboard}\\[1pt]\scriptsize React/Vite\\ cổng 5173};
+    \node[box] (br)  at (17.3,0)   {\textbf{Trình duyệt}\\[1pt]\scriptsize người vận hành,\\ hội đồng};
+    \draw[dashed, draw=blue!55!black, line width=0.7pt, rounded corners=3pt]
+      (5.45,-2.75) rectangle (15.55,3.25);
+    \node[font=\footnotesize\bfseries, text=blue!55!black, anchor=north west]
+      at (5.55,3.2) {Docker Compose, hồ sơ \texttt{dev}};
+    % Luong
+    \draw[flow] (res) -- (pipe);
+    \draw[flow] (cache) -- (pipe);
+    \draw[flow] (pipe) -- node[lab, above, sloped]{ghi} (ch);
+    \draw[flow] (pipe) -- node[lab, below, sloped]{ghi} (pg);
+    \draw[flow] (ch) -- node[lab, above, sloped]{đọc} (api);
+    \draw[flow] (pg) -- node[lab, below, sloped]{đọc} (api);
+    \draw[flow] (api) -- node[lab, above]{\texttt{/api}} (web);
+    \draw[flow] (web) -- node[lab, above]{HTTP} (br);
+    \draw[flow, dashed] (res.north) -- ++(0,1.75) -| node[lab, above, pos=0.25]{bảng H0--H5 tĩnh, đóng gói khi dựng giao diện} (web.north);
+  \end{tikzpicture}}
+  \vspace{0.2cm}
+  \caption[Triển khai platform bằng Docker Compose]{Triển khai platform trên một máy trình diễn: pipeline đọc cảnh báo đã chốt và cache LLM, ghi vào ClickHouse và PostgreSQL; bốn container trong Docker Compose (hồ sơ \code{dev}) phục vụ dashboard qua API chỉ đọc, không cần kết nối Internet. \emph{(Nguồn: tác giả vẽ, có hỗ trợ AI.)}}
+  \label{fig:ch6-deploy}
+\end{figure}
+
+Bảng~\ref{tab:ch6-endpoints} liệt kê bảy endpoint của API và màn hình dùng từng endpoint. Điểm cần đọc ở bảng là màn hình so sánh thực nghiệm không gọi API: bảng H0--H5 được sinh bằng script từ cùng các tệp kết quả với Chương~\ref{ch:thuc-nghiem} rồi đóng gói tĩnh vào giao diện, nên số trên màn hình không thể lệch khỏi số trong luận văn do một truy vấn sai. Trên lượt chạy \code{pipeline\_test\_v2}, mọi endpoint trả lời dưới một giây, kể cả khi \code{GET /alerts} trả đủ $13.699$ \code{candidate} của \splitname{test}. % src: pipeline_test_v2, tests/test_api.py
+
+\begin{table}[htbp]
+  \centering
+  \caption[Các endpoint của API chỉ đọc và màn hình sử dụng]{Bảy endpoint của API chỉ đọc, dữ liệu trả về và màn hình dashboard sử dụng.}
+  \label{tab:ch6-endpoints}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.6cm} Y >{\raggedright\arraybackslash}p{3.4cm}@{}}
+    \toprule
+    \textbf{Endpoint} & \textbf{Dữ liệu trả về} & \textbf{Màn hình dùng} \\
+    \midrule
+    \code{GET /health} & Trạng thái sống của API & Kiểm tra sức khoẻ container \\
+    \code{GET /runs} & Danh sách lượt chạy đã nạp & Bộ chọn lượt chạy (mọi màn hình) \\
+    \code{GET /runs/\{run\_id\}/metrics} & Chỉ số tổng hợp của một lượt chạy, khớp tệp \code{metrics.json} & Kiểm thử tự động, tra cứu \\
+    \code{GET /alerts} & Danh sách \code{candidate} kèm phán quyết thô và cuối & Timeline \\
+    \code{GET /alerts/\{alert\_id\}} & Chuỗi điểm bất thường, lời giải thích của judge, các bước chính sách, bằng chứng và điểm thành phần Fusion Score & Alert Detail \\
+    \code{GET /incidents} & Danh sách sự cố của một lượt chạy & Timeline (thẻ sự cố) \\
+    \code{GET /incidents/\{incident\_id\}} & Cảnh báo thành viên, đồ thị service lân cận, thứ hạng service gốc, báo cáo JSON & Incident Detail \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% -----------------------------------------------------------------------------
+\subsection{Dashboard bốn màn hình}
+\label{sec:ch6-dashboard}
+
+Mục này đi qua bốn màn hình theo thứ tự một người vận hành thường dùng: nhìn tổng quan, mở một cảnh báo, mở một sự cố, rồi đối chiếu với kết quả thực nghiệm. Giao diện dùng tiếng Anh để giữ thuật ngữ trùng với mã nguồn và tệp kết quả; phần mô tả dưới đây dùng tiếng Việt. Trên mỗi màn hình, người đọc nên chú ý ba lớp thông tin: bộ chọn lượt chạy ở góc trên bên phải, vùng biểu đồ hoặc đồ thị ở giữa, và các thẻ giải thích chính sách ở phía dưới. Mỗi màn hình được trình bày bằng một ảnh chụp, câu hỏi mà nó trả lời, và thành phần tương ứng ở Chương~\ref{ch:de-xuat}.
+
+\subsubsection{Timeline: cảnh báo theo thời gian}
+\label{sec:ch6-timeline}
+
+Hình~\ref{fig:ch6-timeline} là màn hình Timeline của lượt chạy chính thức trên \splitname{test}. Các cột xếp chồng gom \code{candidate} theo khoảng 10 phút và tô màu theo phán quyết cuối (xanh dương: \code{TRUE\_ALERT}, cam: \code{FALSE\_POSITIVE}, xanh lục: \code{UNCERTAIN}); đường liền màu nâu sẫm đánh dấu các khoảng tiêm lỗi theo nhãn của Nezha. Người đọc nên so phần xanh dương rất mỏng ở chân cột (cảnh báo được giữ) với vị trí các đỉnh của đường tiêm lỗi.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{Images/C1/figures/m10-timeline.png}
+  \caption[Màn hình Timeline trên tập test]{Màn hình Timeline của \code{pipeline\_test\_v2} trên \splitname{test}: $13.699$ \code{candidate} gom theo khoảng 10 phút, tô theo phán quyết cuối, còn lại $78$ \code{TRUE\_ALERT} và $38$ sự cố; đường liền đánh dấu khoảng tiêm lỗi của Nezha.}
+  \label{fig:ch6-timeline}
+\end{figure}
+
+Màn hình trả lời câu hỏi đầu tiên của người vận hành: \emph{trong khoảng thời gian đang xem, detector đã bật bao nhiêu cảnh báo, và bao nhiêu trong số đó thật sự cần người xem?} Trên \splitname{test}, detector sinh $13.699$ \code{candidate}, còn \CTAV{} chỉ giữ lại $78$ \code{TRUE\_ALERT}, trong đó $14$ khớp nhãn lỗi và $64$ là báo động giả. Chính sách quyết định hạ bậc tổng cộng $2.223$ phán quyết của judge thô; $1.253$ lần trong số đó do C3. % src: pipeline_test_v2 (ctav_final_test_v1), the KPI tren Hinh
+
+Người vận hành lọc được theo phán quyết hoặc theo service, và chuyển giữa danh sách cảnh báo (phân trang 200 dòng) và danh sách sự cố.
+
+Về phương pháp, bốn thẻ số liệu ở đầu trang là hiệu ứng gộp của ngưỡng detector, tầng truy xuất C1 và chính sách C3 ở Mục~\ref{sec:ch4-policy}. Màn hình cũng làm lộ ra giới hạn của \CTAV{} mà Chương~\ref{ch:thuc-nghiem} đã đo: nhiều đỉnh của đường tiêm lỗi không có phần xanh dương nào bên dưới. Phần lớn các khoảng này rơi vào service không có ngưỡng nền \splitname{dev}, nơi C3 không có căn cứ để neo và vì thế hạ mọi cảnh báo (Phát hiện 11, Mục~\ref{sec:ch5-finding11}). Demo không che phần này; nó được nhắc lại ở bước 5 của kịch bản.
+
+\subsubsection{Alert Detail: vì sao giữ hay hạ một cảnh báo}
+\label{sec:ch6-alert}
+
+Hình~\ref{fig:ch6-alert} là màn hình Alert Detail của một cửa sổ bình thường trên \code{productcatalogservice}. Người đọc nên nhìn theo thứ tự từ trên xuống: chuỗi điểm bất thường quanh cửa sổ, lời giải thích của judge, rồi thẻ chính sách ghi phán quyết thô, phán quyết cuối và bước đã làm thay đổi phán quyết.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{Images/C1/figures/m10-alert-c3-downgrade.png}
+  \caption[Màn hình Alert Detail cho một cảnh báo sai bị C3 hạ]{Màn hình Alert Detail của \code{cand-ad327c0b162f6198} (\code{productcatalogservice}, cửa sổ bình thường, \code{pipeline\_test\_v2}): điểm bất thường $0{,}99$ vượt ngưỡng $0{,}85$, judge thô trả \code{TRUE\_ALERT} với độ tin cậy $0{,}90$, nhưng thẻ chính sách ghi C3 hạ phán quyết cuối xuống \code{UNCERTAIN}.}
+  \label{fig:ch6-alert}
+\end{figure}
+
+Màn hình trả lời câu hỏi: \emph{cùng là một điểm bất thường cao, vì sao hệ thống giữ cảnh báo này mà hạ cảnh báo kia?} Trên cùng một khung nhìn, người vận hành thấy chuỗi điểm Isolation Forest, lời giải thích nguyên văn của \code{gemini-2.5-flash} kèm trạng thái đọc từ cache, bảng từng bước chính sách (ngưỡng tin cậy $\theta = 0{,}80$, kiểm tra C3, luật bắt buộc có bằng chứng) và danh sách bằng chứng. Mỗi bằng chứng ghi điểm liên quan, khoảng cách đồ thị $d_G$ tới service đang xét và dấu cho biết judge có trích dẫn nó hay không. Ở ca trong Hình~\ref{fig:ch6-alert}, judge viện dẫn hai span trace của chính service để nói độ trễ tăng; C3 đối chiếu các span được trích với ngưỡng $p_{90}$ của \splitname{dev}, thấy chúng vẫn nằm trong vùng bình thường và hạ phán quyết. % src: m10_demo_cases_v1 step2
+
+Màn hình này là nơi cơ chế hiệu chỉnh ở Mục~\ref{sec:ch4-policy} hiện ra trực tiếp. Judge không bị bác vì thiếu tự tin; nó bị bác vì bằng chứng nó trích không đủ bất thường so với ngưỡng nền. Đây đúng là thiên lệch xác nhận mà Phát hiện 7 (Bảng~\ref{tab:ch5-findings}) mô tả: trace cục bộ sát thời điểm cảnh báo khiến judge xác nhận, dù cửa sổ không có lỗi. Ca ngược lại, một lỗi \code{network\_delay} trên \code{cartservice} được giữ vì span \code{CartService/GetCart} vượt ngưỡng $p_{90}$ của \splitname{dev}, được dùng ở bước 3 của kịch bản demo thay vì chèn thêm ảnh.
+
+Sau lần tổng duyệt demo thứ nhất, màn hình được bổ sung thẻ \emph{How C1 built this context} đặt ngay trên danh sách bằng chứng. Bên trái thẻ là vùng tìm của C1 chia theo khoảng cách $d = 0, 1, 2$ trên đồ thị gọi, kèm số bằng chứng được chọn ở mỗi dải. Bên phải là Fusion Score của từng bằng chứng, tách thành ba phần $0{,}35 \times \mathrm{BM25}$, $0{,}25 \times$ độ gần thời gian và $0{,}40 \times 1/(1+d)$ theo Công thức~\eqref{eq:ch4-fusion}, lấy từ dữ liệu đã lưu chứ không tính lại. Thẻ cố ý không dựng cảnh ``service lân cận cứu cảnh báo'', vì trên \code{pipeline\_test\_v2} chỉ $75/19.794$ bằng chứng ($0{,}38\%$) đến từ service lân cận, thuộc $15/3.299$ cảnh báo có ngữ cảnh. % src: scripts/m11_graph_evidence_share.py --run-id pipeline_test_v2
+\CHO{M12}{chụp lại Hình~\ref{fig:ch6-alert} để có thẻ How C1 built this context}
+
+\subsubsection{Incident Detail: service nào là gốc}
+\label{sec:ch6-incident}
+
+Hình~\ref{fig:ch6-incident} là màn hình Incident Detail của một sự cố nhiều service. Sự cố này lấy từ dòng độ nhạy ngoài đăng ký \code{pipeline\_sens\_test\_v1} (biến thể C3 dùng ngưỡng nền trượt 60 phút), vì lượt chạy chính thức trên \splitname{test} không tạo ra sự cố nhiều service nào. Người đọc nên chú ý hai dải cảnh báo màu vàng ở đầu trang và trên thẻ sự cố: chúng ghi rõ dữ liệu này nằm ngoài kiểm định H5.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{Images/C1/figures/m10-incident-cascade.png}
+  \caption[Màn hình Incident Detail cho một sự cố cascade]{Màn hình Incident Detail của \code{inc-46289ea526eaa3f3} (\code{pipeline\_sens\_test\_v1}, ngoài đăng ký H5, xem dải vàng): ba cảnh báo trên hai service được gom qua cạnh gọi \code{ts-preserve-service} $\to$ \code{ts-basic-service}; đồ thị lan truyền tô đỏ \code{ts-basic-service}, khớp service gốc theo nhãn Nezha, kèm báo cáo chẩn đoán JSON.}
+  \label{fig:ch6-incident}
+\end{figure}
+
+Màn hình trả lời câu hỏi: \emph{khi nhiều cảnh báo nổ cùng lúc, lỗi bắt đầu từ service nào, và tác tử RCA khuyến nghị gì dựa trên bằng chứng nào?} Phần giữa là đồ thị có hướng gồm service gốc được chọn, các service có cảnh báo và các service lân cận không có cảnh báo để đối chiếu; người dùng kéo, phóng to được đồ thị. Phần dưới là thẻ báo cáo chẩn đoán với các trường \code{root\_cause\_service}, \code{fault\_type}, \code{propagation\_path}, các trích đoạn bằng chứng (ít nhất một) và ba hành động khuyến nghị theo mức ưu tiên. Ở ca trong Hình~\ref{fig:ch6-incident}, ba cảnh báo của \code{ts-preserve-service} và \code{ts-basic-service} trong cùng một phút được gom thành một sự cố, và phiếu lan truyền dồn về \code{ts-basic-service}. % src: m10_demo_cases_v1 step4
+
+Màn hình vẽ lại đúng ba bước của tác tử RCA ở Mục~\ref{sec:ch4-rca}: gom các service có cảnh báo trong $T_{\text{group}} = 180\,\text{s}$ thành thành phần liên thông (Mục~\ref{sec:ch4-grouping}), bỏ phiếu lan truyền ngược một bước theo dấu hiệu cảnh báo (Mục~\ref{sec:ch4-propagation}) và sinh báo cáo đã qua bộ kiểm duyệt (Mục~\ref{sec:ch4-report}). Ca này cho thấy cơ chế gom và định vị chạy đúng khi đầu vào có đủ cảnh báo ở cả service gọi lẫn service bị gọi. Nó không chứng minh H5: trên lượt chạy đăng ký, toàn bộ $38$ sự cố chỉ có một service và H5 không được chấp nhận (Mục~\ref{sec:ch5-rca-results}). % src: rca_final_test_v1
+
+Sau lần tổng duyệt thứ nhất, màn hình có thêm thẻ \emph{How the RCA agent localized the root cause}, kể lại phép định vị thành ba bước có nút bấm. Bước 1 là trục thời gian các cảnh báo trong cửa sổ 180 giây. Bước 2 là sơ đồ chỉ gồm các service có cảnh báo, mũi tên xám chỉ chiều gọi trong trace và mũi tên đỏ đứt chỉ chiều lỗi lan. Bước 3 là bảng phiếu: mỗi service có cảnh báo đổ lỗi cho service nó gọi trực tiếp nếu service đó cũng có cảnh báo, nếu không thì tự nhận lỗi. Phiếu được tính lại từ dữ liệu cạnh mà API trả về; nếu khác báo cáo đã lưu, thẻ ghi rõ và hiển thị báo cáo đã lưu. Với các sự cố một service của lượt chạy đăng ký, bước 2 ghi rõ không có lời gọi nào để lần theo. \CHO{M12}{chụp lại Hình~\ref{fig:ch6-incident} để có thẻ How the RCA agent localized the root cause}
+
+\subsubsection{Experiment Comparison: giả thuyết nào đạt}
+\label{sec:ch6-compare}
+
+Hình~\ref{fig:ch6-compare} là màn hình so sánh thực nghiệm, mặc định hiển thị \splitname{test} và có nút chuyển sang \splitname{val} để tham chiếu. Màn hình gồm bảng tổng hợp H0--H5, biểu đồ cột năm phương pháp kèm râu CI95 bootstrap, bảng hiệu ghép cặp, bảng ablation H3 kèm C5, đường F1 theo ngân sách của H4 và bảng H5 có cả dòng chính thức lẫn dòng độ nhạy. Người đọc nên nhìn cột trạng thái của bảng H0--H5 trước.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{Images/C1/figures/m10-experiment-comparison.png}
+  \caption[Màn hình Experiment Comparison trên tập test]{Màn hình Experiment Comparison trên \splitname{test}: H0, H3, H4 được chấp nhận, H1 đạt một phần (chỉ kiểm trên \splitname{val}), H2 và H5 không được chấp nhận; mỗi dòng in từng vế tiêu chí kèm CI95.}
+  \label{fig:ch6-compare}
+\end{figure}
+
+Màn hình trả lời câu hỏi của người đánh giá hơn là của người vận hành: \emph{đặt \CTAV{} cạnh các phương pháp khác theo đúng tiêu chí đã đăng ký trên \splitname{test}, giả thuyết nào đạt và giả thuyết nào không?} Mỗi dòng giả thuyết in từng vế định lượng, CI95 và một nhãn trạng thái cố định ba màu, nên người xem không thể đọc một giả thuyết ``đạt một phần'' thành ``đạt''. Bảng được sinh bằng script từ các tệp kết quả của Chương~\ref{ch:thuc-nghiem} và có kiểm thử đối chiếu, không nhập số tay. Màn hình này nối với toàn bộ Chương~\ref{ch:thuc-nghiem} chứ không với một thành phần riêng ở Chương~\ref{ch:de-xuat}; nó là bản tương tác của Bảng~\ref{tab:ch5-verdict-summary}.
+
+% -----------------------------------------------------------------------------
+\subsection{Kịch bản demo năm phút}
+\label{sec:ch6-kich-ban}
+
+Mục này cố định kịch bản trình diễn trước hội đồng, gồm năm bước trong khoảng năm phút. Các ca trong kịch bản không được chọn tay. Một script chọn ca theo quy tắc từ các tệp kết quả đã khoá của \splitname{test} và \splitname{val} (\code{seed = 42}); ví dụ, ca ở bước 2 được rút từ $1.171$ cửa sổ bình thường trên \splitname{test} mà judge thô xác nhận còn C3 hạ. % src: m10_demo_cases_v1
+Kiểm thử tự động xác nhận chạy lại script cho ra đúng bộ ca đã lưu.
+
+Hai bước của kịch bản phải điều chỉnh khi chuyển từ thiết kế sang dữ liệu thật, và cả hai được nói thẳng trong lúc trình diễn. Bước 3 ban đầu dự kiến dùng một ca \code{network\_delay} mà \CTAV{} bắt được còn BM25 bỏ sót. Trên \splitname{val}, \CTAV{} mất cả $10$ ca \code{network\_delay} mà C1 bắt được, nên bước này chỉ được giữ sau khi có kết quả \splitname{test}: ở đó có đúng $2$ ca như vậy (\code{cartservice} và \code{ts-travel-service}). % src: ctav_final_val_v1, ctav_final_test_v1
+Cả hai ca đều được giữ nhờ bằng chứng của chính service ($d_G = 0$), không nhờ service lân cận; vì vậy thông điệp của bước 3 là C1 chọn đúng span bất thường trong service và C3 neo được nó, không phải ``topology cứu cảnh báo''. Bước 4 cần một sự cố nhiều service, nhưng lượt chạy đăng ký trên \splitname{test} không có sự cố nào như vậy. Lần tiêm \code{cascade} \code{2023-01-30\#009} trên \splitname{val} lại bị tách thành hai sự cố một service, vì service trung gian không có cảnh báo để bắc cầu. Kịch bản vì thế dùng dòng độ nhạy \code{pipeline\_sens\_test\_v1} có dải cảnh báo vàng, rồi mở ca bị tách trên \splitname{val} để chỉ ra giới hạn đã khiến H5 không được chấp nhận. Bảng~\ref{tab:ch6-kich-ban} mô tả năm bước.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Kịch bản demo năm phút]{Kịch bản demo năm phút trên bộ ca chọn tự động (\code{seed = 42}), chạy ở chế độ ngoại tuyến \code{DEMO\_OFFLINE=1}.}
+  \label{tab:ch6-kich-ban}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.2}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.9cm} >{\raggedright\arraybackslash}p{3.3cm} Y >{\raggedright\arraybackslash}p{3.3cm}@{}}
+    \toprule
+    \textbf{Bước (thời lượng)} & \textbf{Thao tác} & \textbf{Người xem thấy} & \textbf{Thông điệp} \\
+    \midrule
+    1. Khởi động và Timeline ($\approx 60$~s) & \code{docker compose --profile dev up -d}; mở Timeline của \code{pipeline\_test\_v2} & $13.699$ \code{candidate} nạp trong $4{,}24$~s từ cache, $0$ lần gọi API; còn $78$ \code{TRUE\_ALERT}, $1.253$ cảnh báo bị C3 hạ & Platform chạy trọn chuỗi xử lý, ngoại tuyến; \CTAV{} nén cảnh báo mạnh \\
+    2. Cảnh báo sai bị C3 chặn ($\approx 60$~s) & Mở Alert Detail của \code{cand-ad327c0b162f6198} & \code{productcatalogservice}, cửa sổ bình thường, điểm bất thường $0{,}99$; judge thô \code{TRUE\_ALERT}, C3 hạ xuống \code{UNCERTAIN} & Neo bằng chứng chặn thiên lệch xác nhận trên trace cục bộ \\
+    3. Ca \code{network\_delay} BM25 bỏ sót ($\approx 60$~s) & Mở Alert Detail của \code{cand-fa85e82f02f08574} & \code{cartservice}: BM25 trả \code{FALSE\_POSITIVE} (độ tin cậy $0{,}90$); \CTAV{} giữ \code{TRUE\_ALERT} nhờ span \code{CartService/GetCart} vượt ngưỡng \splitname{dev}; thẻ C1 cho thấy cả 6 bằng chứng ở $d_G = 0$ & C1 chọn đúng bằng chứng trong service, C3 neo được; chỉ $2$ ca như vậy trên \splitname{test} \\
+    4. Sự cố cascade và giới hạn H5 ($\approx 75$~s) & Mở Incident Detail của \code{inc-46289ea526eaa3f3} (\code{pipeline\_sens\_test\_v1}); sau đó mở hai sự cố bị tách của lần tiêm \code{2023-01-30\#009} trên \code{pipeline\_val\_v2} & Dải vàng ngoài đăng ký; 3 cảnh báo, 2 service, gốc \code{ts-basic-service} đúng nhãn; báo cáo JSON hợp lệ; trên \splitname{val} cùng kiểu lỗi bị tách đôi & Tác tử RCA gom và định vị đúng khi đủ cảnh báo; H5 trượt vì cảnh báo đầu vào thưa \\
+    5. Bảng kiểm định ($\approx 45$~s) & Mở Experiment Comparison & Bảng H0--H5 trên \splitname{test}, chuyển sang \splitname{val} để đối chiếu & C3 là đóng góp chính; C2, C4 bị loại, C5 không đóng góp; H2 và H5 không được chấp nhận, báo cáo đúng như đã đăng ký \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% -----------------------------------------------------------------------------
+\subsection{Kiểm thử demo và dự phòng}
+\label{sec:ch6-kiem-thu}
+
+Mục này kiểm chứng ba cam kết của platform: chạy được khi không có mạng, dữ liệu trên màn hình khớp kết quả kiểm định, và thời gian khởi động đủ ngắn cho một buổi bảo vệ. Bảng~\ref{tab:ch6-kiem-thu} tổng hợp số đo của ba lượt chạy pipeline được nạp vào platform. Người đọc nên lưu ý rằng thời gian trong bảng là thời gian nạp lại từ cache và ghi cơ sở dữ liệu, không phải độ trễ gọi LLM trực tiếp; độ trễ gốc của từng lần gọi judge vẫn được lưu trong ClickHouse và hiển thị ở Alert Detail.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Kiểm thử chạy ngoại tuyến của ba lượt chạy pipeline]{Kiểm thử chạy ngoại tuyến của ba lượt chạy pipeline: số bản ghi, đối chiếu với kết quả kiểm định, tỷ lệ trúng cache và thời gian đầu--cuối khi nạp lại từ cache.}
+  \label{tab:ch6-kiem-thu}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.15}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}Y >{\raggedright\arraybackslash}p{2.9cm} >{\raggedright\arraybackslash}p{2.9cm} >{\raggedright\arraybackslash}p{3.1cm}@{}}
+    \toprule
+    \textbf{Chỉ số} & \textbf{\code{pipeline\_val\_v2} (\splitname{val})} & \textbf{\code{pipeline\_test\_v2} (\splitname{test})} & \textbf{\code{pipeline\_sens\_test\_v1} (\splitname{test}, độ nhạy ngoài ĐK)} \\
+    \midrule
+    \code{candidate} nạp / \code{TRUE\_ALERT} & $5.677$ / $80$ & $13.699$ / $78$ & $13.699$ / $438$ \\
+    Dòng bằng chứng trong ClickHouse & $7.716$ & $19.794$ & $19.794$ \\
+    Sự cố / báo cáo hợp lệ (bị từ chối) & $26$ / $26$ ($0$) & $38$ / $38$ ($0$) & $114$ / $114$ ($0$) \\
+    Đối chiếu sự cố, thứ hạng, báo cáo với lượt kiểm định & $26/26$ & $38/38$ & $114/114$ \\
+    Lần gọi API mới / tỷ lệ trúng cache & $0$ / $100\%$ & $0$ / $100\%$ & $0$ / $100\%$ \\
+    Token judge trong cache (prompt / completion) & $5.173.670$ / $691.941$ & $12.736.820$ / $1.734.808$ & $12.736.820$ / $1.734.808$ \\
+    Nạp cảnh báo và chính sách & $0{,}62$~s & $1{,}25$~s & $5{,}28$~s \\
+    Ghi ClickHouse & $2{,}90$~s & $1{,}27$~s & $2{,}79$~s \\
+    Gom sự cố và lan truyền & $4$~ms & $6$~ms & $19$~ms \\
+    Tóm tắt báo cáo (đọc cache) & $0{,}42$~s & $0{,}44$~s & $0{,}71$~s \\
+    Ghi PostgreSQL & $0{,}33$~s & $0{,}19$~s & $0{,}35$~s \\
+    \textbf{Tổng thời gian đầu--cuối} & $\mathbf{5{,}76}$~\textbf{s} & $\mathbf{4{,}24}$~\textbf{s} & $\mathbf{10{,}65}$~\textbf{s} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+% src: eval/results/{pipeline_val_v2,pipeline_test_v2,pipeline_sens_test_v1}/runtime.json
+% Doi chieu: rca_final_val_v1, rca_final_test_v1, rca_sens_test_c3rolling_v1
+
+Đọc theo hàng, cả ba lượt chạy đều khớp tuyệt đối với lượt kiểm định tương ứng ở Chương~\ref{ch:thuc-nghiem}: từng mã sự cố, thứ hạng service gốc và mã băm nội dung báo cáo JSON. Không lượt nào phát sinh lần gọi API mới. Lượt chạy chính thức trên \splitname{test} sẵn sàng sau $4{,}24$~s, đủ để khởi động ngay trong bước 1 của kịch bản. Lượt độ nhạy chậm hơn chủ yếu ở khâu nạp cảnh báo và chính sách ($5{,}28$~s so với $1{,}25$~s); lượt này có số \code{TRUE\_ALERT} lớn gấp khoảng $5{,}6$ lần ($438$ so với $78$). Khâu gom và lan truyền của tác tử RCA không đáng kể ở cả ba lượt, dưới $20$~ms.
+
+Kiểm thử ngoại tuyến được làm ở hai lớp. Lớp thứ nhất là kiểm thử tự động: đặt \code{DEMO\_OFFLINE=1} cùng hai khoá API giả, chạy lại pipeline với cấu hình RCA đã chốt trên \splitname{val}; pipeline tự gỡ cả hai khoá, khớp $26/26$ sự cố với tỷ lệ trúng cache $1{,}0$, $0$ lần gọi API và ghi cờ chế độ ngoại tuyến vào tệp \code{runtime.json}. Một kiểm thử khác quét mã giao diện và xác nhận không có đường dẫn \code{http://} hay \code{https://} nào ra ngoài. Lớp thứ hai là tự kiểm bằng trình duyệt Chromium thật ở độ phân giải $1440 \times 900$, đi đủ năm bước của Bảng~\ref{tab:ch6-kich-ban}. Cả năm màn hình tải xong với $0$ lỗi console, mọi yêu cầu mạng chỉ tới \code{localhost} và trả mã HTTP 200, và nút chuyển \splitname{test}/\splitname{val} ở màn hình so sánh hoạt động.
+
+Lần tổng duyệt demo thứ nhất (ngày 18/11/2026) tìm ra một lỗi trải nghiệm đã sửa ngay: trang chủ mặc định mở lượt chạy độ nhạy thay vì lượt chính thức, vì danh sách lượt chạy sắp theo thời điểm chạy. Giao diện nay đọc \code{run\_id} trên URL và mặc định chọn \code{pipeline\_test\_v2}. Bốn tồn đọng còn lại, xếp theo mức độ, không ảnh hưởng kịch bản chính:
+\begin{enumerate}[nosep]
+  \item \emph{Trung bình (tài liệu):} Hình~\ref{fig:ch6-alert} và Hình~\ref{fig:ch6-incident} chụp trước khi có hai thẻ giải thích mới, cần chụp lại.
+  \item \emph{Thấp (giao diện):} trục thời gian của Timeline chỉ ghi ngày ở cột đầu, chưa nhắc lại khi qua nửa đêm.
+  \item \emph{Thấp (thẻ RCA):} thẻ lan truyền khớp phiếu đã lưu ở $177/178$ sự cố của ba lượt chạy; sự cố còn lại hoà điểm $0{,}50$ và được phá hoà bằng điểm bất thường, thẻ gắn nhãn ``Tie'' cho ca này.
+  \item \emph{Thẩm mỹ (đóng gói):} gói JavaScript của giao diện (khoảng $916$~kB trước nén, $275$~kB sau gzip) vượt ngưỡng cảnh báo $500$~kB mặc định của Vite do chưa tách theo màn hình.
+\end{enumerate}
+\CHO{M12}{kết quả tổng duyệt demo lần 2 và trạng thái bốn tồn đọng}
+
+Phương án dự phòng khi trình diễn gồm hai mức. Ở mức một, nếu API hoặc giao diện treo, chạy lại \code{docker compose --profile dev up -d}; lệnh này dựng lại container mà không động tới dữ liệu đã nạp. Ở mức hai, nếu máy trình diễn mất hẳn Docker, người trình bày mở các tệp tĩnh đã chuẩn bị: bộ ca demo dạng JSON, bảng kiểm định H0--H5 dạng JSON và năm ảnh chụp màn hình đã lưu. Mức hai mất phần tương tác nhưng giữ nguyên mọi con số và ca được nói tới trong Bảng~\ref{tab:ch6-kich-ban}.
+
+% -----------------------------------------------------------------------------
+\subsection{Kết chương}
+\label{sec:ch6-ket-chuong}
+
+Chương này đã trình bày platform hiện thực toàn bộ chuỗi xử lý của đề tài, từ \code{candidate} của detector qua \CTAV{} và tác tử RCA tới bốn màn hình cho người vận hành. Platform dùng chung pipeline với thực nghiệm, nên mọi ca trên màn hình đều là kết quả đã kiểm định ở Chương~\ref{ch:thuc-nghiem}. Ba lượt chạy được nạp lại hoàn toàn từ cache, khớp $100\%$ với lượt kiểm định, không gọi API mới, và sẵn sàng sau $4{,}24$--$10{,}65$~s. Mỗi màn hình trả lời một câu hỏi vận hành và nối với một thành phần của Chương~\ref{ch:de-xuat}: Timeline với tác động gộp của C1 và C3, Alert Detail với cơ chế neo bằng chứng, Incident Detail với ba bước của tác tử RCA. Kịch bản demo năm bước dùng ca chọn theo quy tắc và trình bày cả giới hạn: \CTAV{} mất cảnh báo ở service thiếu ngưỡng \splitname{dev}, và sự cố nhiều service chỉ xuất hiện ở dòng độ nhạy. Chương~\ref{ch:thao-luan} sẽ phân tích các ca sai đứng sau những giới hạn này.

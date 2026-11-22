@@ -25,10 +25,10 @@ vào context. Không nạp cả file, để agent không tự nhảy sang việc
 | M5 | H1 — cơ chế thiên lệch xác nhận (trục thời gian / loại bằng chứng, QĐ-027) | | 2026-11-22 | **Xong** (2026-11-01; H1 giữ một phần, V28 (b), QĐ-028, QĐ-029) — `docs/milestones/M5-h1.md` |
 | M6 | CTAV: C2 + C3 + C4, ablation trên `val`, chốt cấu hình | | 2026-12-06 | **Xong** (2026-11-11; H3 bỏ C2, C4; V30 (c), V31 (a), V32 (a) — QĐ-031, QĐ-032, QĐ-037) — `docs/milestones/M6-ctav.md` |
 | M7 | Rescue Score (C5) + đăng ký giả thuyết | | 2026-12-13 | **Xong** (2026-11-14; H0–H5 đã đăng ký, V33 (a), V34 (b) — QĐ-033, QĐ-034) — `docs/milestones/M7-rescue-dang-ky.md` |
-| M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | **Đang làm** (mở 2026-11-14; V27 chấm toàn bộ candidate — QĐ-034) |
-| M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | |
-| M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | **Đang làm (Pha 1 xong 2026-11-16 trên `demo/gh-pages`, QĐ-038)** — `docs/milestones/M10-platform.md` |
-| M11 | Đánh giá bằng người + phân tích lỗi | | 2027-01-17 | |
+| M8 | Chạy `test` một lần | **Cổng chặn G-test** | 2026-12-20 | **Xong** (2026-11-16; H0, H3, H4 đạt, H2 không được chấp nhận; V36 (a) — QĐ-035..039) — `docs/milestones/M8-g-test.md` |
+| M9 | RCA Agent: grouping, propagation, summary | | 2027-01-03 | **QUA — H5 không được chấp nhận** (đóng 2026-11-17, QĐ-043; mở 2026-11-16, QĐ-039; M9-A trên `val` → M9-B trên `test`, propagation mức 2 đã cắt — QĐ-037; H5 không được chấp nhận — QĐ-042) |
+| M10 | Platform end-to-end + dashboard dữ liệu thật | | 2027-01-10 | **QUA** (đóng 2026-11-17, QĐ-045..049 — `docs/milestones/M10-platform.md`; `0` USD API, dashboard tiếng Anh, `DEMO_OFFLINE=1`, `253/253` pytest) |
+| M11 | Đánh giá bằng người + phân tích lỗi | | 2027-01-17 | **Đang làm** (mở 2026-11-17, QĐ-049) |
 | M12 | Đóng gói: số liệu, luận văn, repo, bảo vệ | | Bảo vệ tuần 2027-02-08 | |
 
 Không có thời gian đệm. Trễ ở mốc nào thì quyết định ngay theo §9, không đợi.
@@ -253,8 +253,6 @@ vượt BM25" cũng là kết quả hợp lệ, phải báo cáo trung thực.
 
 **DoD M10:** `docker compose --profile dev up -d` + replay → 4 màn hình hiển thị dữ liệu thật,
 có loading/empty state; chạy được khi rút mạng; kịch bản demo `08` §6 chạy trọn.
-
-> **Tiến độ Pha 1 (2026-11-16, QĐ-038, nhánh `demo/gh-pages`):** Đã hoàn tất dashboard tĩnh 4 màn hình nối dữ liệu thực nghiệm thật từ `eval/results/` (`val` + H0 `test`) qua `scripts/export_web_snapshot.py` kèm GitHub Actions deploy lên GitHub Pages. Phần Pha 2 (`pipeline.py`, `services/api`, nạp kết quả `test` đầy đủ và kiểm parity H5) tiếp tục sau M8 và M9-B.
 
 ---
 

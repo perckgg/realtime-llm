@@ -1,0 +1,13 @@
+# M8 / G-test, config đăng ký #7 (QĐ-034, V34 (b)): danh sách cửa sổ được cứu của MỘT điểm
+# η = (0; 0,4; 0,6), τ = 0,8 (chốt trên val, QĐ-033) trên CTAV `test`. 0 LLM.
+# Chạy: py -m eval rescue --config eval/configs/m8_rescue_plan_test.yaml
+kind: rescue
+run_id: m8_rescue_plan_test_v1
+split: test
+g_test: true  # M8: giả thuyết đã đăng ký (commit be2b985)
+features: m8_rescue_features_test_v1
+ctav: eval/configs/ctav_final_test.yaml
+grid:  # một điểm đã chốt trên val (QĐ-033), không quét trên test
+  points:
+    - {eta: [0.0, 0.4, 0.6], tau: 0.8}
+max_call_increase: 0.5

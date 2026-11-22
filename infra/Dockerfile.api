@@ -1,0 +1,26 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+RUN pip install --no-cache-dir \
+    "fastapi>=0.110" \
+    "uvicorn>=0.29" \
+    "pydantic>=2.6" \
+    "pyyaml>=6.0" \
+    "networkx>=3.2" \
+    "clickhouse-connect>=0.7" \
+    "psycopg[binary]>=3.1" \
+    "python-dotenv>=1.0"
+
+COPY pyproject.toml ./
+COPY packages ./packages
+COPY services/api ./services/api
+COPY services/replayer ./services/replayer
+
+EXPOSE 8000
+
+CMD ["uvicorn", "services.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

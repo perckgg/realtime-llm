@@ -1,0 +1,56 @@
+% Hình 1.1 — Tổng quan hệ thống: từ cảnh báo thô đến dịch vụ gốc.
+% Dùng: \input{figures/ch1/fig-tong-quan} trong môi trường figure. Cần: \usepackage{tikz},
+% \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc,decorations.pathreplacing}.
+% Không chứa số liệu (quy tắc Chương 1).
+\begingroup
+\colorlet{fgBox}{black!75}
+\colorlet{fgCtav}{blue!55!black}
+\colorlet{bgCtav}{blue!6}
+\colorlet{fgNote}{black!55}
+\begin{tikzpicture}[
+  font=\small,
+  blk/.style={draw=fgBox, rounded corners=2pt, align=center, text width=22mm,
+              minimum height=21mm, inner sep=2pt, line width=0.6pt},
+  sub/.style={draw=fgCtav, rounded corners=1.5pt, fill=white, align=center,
+              text width=25mm, minimum height=5.5mm, inner sep=1.5pt, font=\footnotesize},
+  q/.style={font=\footnotesize\itshape, text=fgNote, align=center, text width=24mm, anchor=north},
+  flow/.style={-{Stealth[length=2.2mm]}, line width=0.7pt, draw=fgBox},
+  lab/.style={font=\scriptsize, text=fgNote, align=center},
+]
+% Toạ độ cố định theo cột (cm)
+\node[blk] (tel) at (0,0) {\textbf{Telemetry}\\[3pt] metric\\ log\\ trace};
+\node[blk] (det) at (3.35,0) {\textbf{Bộ phát hiện bất thường}\\[3pt]\footnotesize Isolation Forest\\ trên metric};
+
+\node[sub] (ret) at (7.25,0.55) {Truy xuất bằng chứng\\(BM25 + đồ thị)};
+\node[sub, below=1.6mm of ret] (jud) {Judge LLM};
+\node[sub, below=1.6mm of jud] (pol) {Chính sách quyết định};
+\begin{scope}[on background layer]
+  \node[draw=fgCtav, fill=bgCtav, rounded corners=2pt, line width=0.8pt,
+        fit=(ret)(jud)(pol), inner xsep=2mm, inner ysep=2mm, yshift=2.2mm,
+        minimum height=25mm] (ctav) {};
+\end{scope}
+\node[font=\small\bfseries, text=fgCtav, anchor=south] at ([yshift=-0.4mm]ret.north) {CTAV};
+\draw[-{Stealth[length=1.5mm]}, draw=fgCtav] (ret) -- (jud);
+\draw[-{Stealth[length=1.5mm]}, draw=fgCtav] (jud) -- (pol);
+
+\node[blk] (rca) at (11.15,0) {\textbf{Tác tử RCA}\\[3pt]\footnotesize gom sự cố\\ lan truyền ngược\\ báo cáo chẩn đoán};
+\node[blk] (ui)  at (14.5,0) {\textbf{Dashboard}\\[3pt]\footnotesize người vận hành\\ xem và kiểm chứng};
+
+% Luồng và nhãn (nhãn đặt trên mũi tên, trong khe giữa hai khối)
+\draw[flow] (tel) -- (det);
+\draw[flow] (det.east) -- node[lab, above=1pt]{candidate} (det.east -| ctav.west);
+\draw[flow] (ctav.east |- rca.west) -- node[lab, above=1pt]{cảnh báo} (rca.west);
+\draw[flow] (rca) -- (ui);
+
+% Câu hỏi của người vận hành, cùng một hàng
+\path (0,-1.75) coordinate (qrow);
+\foreach \n/\t in {tel/{Hệ thống\\đang ra sao?}, det/{Có gì\\bất thường?}, ctav/{Có phải\\sự cố thật?},
+                   rca/{Dịch vụ nào\\là gốc?}, ui/{Xử lý\\thế nào?}}
+  \node[q] at (\n |- qrow) {\t};
+
+% Khoảng trống ngữ nghĩa: ngoặc phía trên, giữa detector và CTAV
+\draw[decorate, decoration={brace, amplitude=4pt}, draw=fgNote]
+  ([yshift=3mm]det.north west) -- ([yshift=3mm]det.north west -| ctav.east)
+  node[midway, above=5pt, lab, text width=75mm]{khoảng trống ngữ nghĩa: điểm bất thường cao chưa cho biết có sự cố hay không};
+\end{tikzpicture}
+\endgroup

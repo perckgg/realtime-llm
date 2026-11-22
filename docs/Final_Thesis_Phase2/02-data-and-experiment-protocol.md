@@ -10,7 +10,9 @@ Tài liệu này quy định cách dùng dữ liệu và cách chạy thực ngh
 
 Nezha (Yu và cs., 2023) là dataset multi-modal observability thu từ hai hệ microservices mẫu (TrainTicket và OnlineBoutique) với lỗi được tiêm có chủ đích. Ba nguồn: metric, log, trace.
 
-Loại lỗi chính dùng trong đề tài: `network_delay`, `cpu_contention`, cùng các cửa sổ `normal`.
+Đề tài dùng cả năm loại lỗi có trong dữ liệu (`docs/label-audit.md`): `network_delay` (30 lần tiêm), `cpu_contention` (23),
+`exception` (20), `return` (18), `cpu_consumed` (10), cùng các cửa sổ `normal`. Hai hệ: OnlineBoutique (2022-08-22, 23)
+và TrainTicket (2023-01-29, 30). (Sửa 2026-11-16: bản cũ ghi chỉ hai loại `network_delay`, `cpu_contention`.)
 
 ### 1.2 Việc bắt buộc làm ở Tuần 1: kiểm tra nhãn
 
@@ -66,7 +68,8 @@ Kết quả đo ghi vào `docs/graph-coverage.md` ở mốc M3. Nếu graph quá
 
 ### 2.2 Cách chia
 
-Stratified theo loại lỗi, đảm bảo mỗi split có đủ `network_delay`, `cpu_contention`, `normal` theo cùng tỷ lệ.
+Stratified theo loại lỗi (năm loại ở §1.1), seed 42, tỷ lệ 20/30/50; nhóm theo lần tiêm lỗi và có vùng đệm thời gian
+(QĐ-004, `docs/experiment-log.md`).
 
 ```python
 # scripts/make_splits.py

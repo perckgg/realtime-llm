@@ -1,0 +1,676 @@
+{
+  "created_at": "2026-11-17T06:22:50.922719+00:00",
+  "config": {
+    "kind": "rca",
+    "run_id": "pipeline_test_v2",
+    "split": "test",
+    "h5_test": true,
+    "input": {
+      "alerts_run": "ctav_final_test_v1",
+      "evidence_run": "h0_test_c1_k0_v1"
+    },
+    "grouping": {
+      "t_group_seconds": 180
+    },
+    "propagation": {
+      "level": 1,
+      "sign": "alert",
+      "sign_pad_seconds": 60
+    },
+    "labels": {
+      "window_seconds": 60,
+      "cascade_min_services": 2
+    },
+    "summarizer": {
+      "enabled": true,
+      "backend": "gemini",
+      "model": "gemini-2.5-flash",
+      "max_output_tokens": 1024,
+      "max_calls_per_minute": 60,
+      "require_evidence": true,
+      "max_evidence": 12,
+      "excerpt_chars": 240,
+      "prompt_version": "rca-summary-v1",
+      "prompt_fingerprint": "8c1d50e6ba757ee6",
+      "budget_usd": 1.0,
+      "stop_usd": 2.0
+    },
+    "postgres": {
+      "write": true
+    },
+    "n_boot": 1000,
+    "seed": 42
+  },
+  "input": "ctav_final_test_v1 (decision == alert)",
+  "split": "test",
+  "alerts": 78,
+  "alerts_in_a_fault": 45,
+  "alerts_outside_any_fault": 33,
+  "alerted_services": 5,
+  "injections": 50,
+  "injections_by_fault_type": {
+    "cpu_consumed": 5,
+    "cpu_contention": 11,
+    "exception": 10,
+    "network_delay": 15,
+    "return": 9
+  },
+  "cascade_injections": 0,
+  "resampling_units": 37,
+  "n_boot": 1000,
+  "seed": 42,
+  "reduction": {
+    "all": {
+      "180": {
+        "alerts": 78,
+        "incidents": 38,
+        "arr": 0.5128205128205128,
+        "arr_ci95": [
+          0.3620689655172413,
+          0.6262923351158646
+        ]
+      }
+    },
+    "fault": {
+      "180": {
+        "alerts": 45,
+        "incidents": 20,
+        "arr": 0.5555555555555556,
+        "arr_ci95": [
+          0.3820533769063181,
+          0.6744186046511628
+        ]
+      }
+    },
+    "cascade": {
+      "180": {
+        "alerts": 0,
+        "incidents": 0,
+        "arr": null,
+        "arr_ci95": null
+      }
+    },
+    "type:cpu_consumed": {
+      "180": {
+        "alerts": 3,
+        "incidents": 1,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ]
+      }
+    },
+    "type:cpu_contention": {
+      "180": {
+        "alerts": 13,
+        "incidents": 7,
+        "arr": 0.46153846153846156,
+        "arr_ci95": [
+          0.0,
+          0.6875538793103447
+        ]
+      }
+    },
+    "type:exception": {
+      "180": {
+        "alerts": 6,
+        "incidents": 4,
+        "arr": 0.33333333333333337,
+        "arr_ci95": [
+          0.0,
+          0.5
+        ]
+      }
+    },
+    "type:network_delay": {
+      "180": {
+        "alerts": 22,
+        "incidents": 10,
+        "arr": 0.5454545454545454,
+        "arr_ci95": [
+          0.2727272727272727,
+          0.7027821939586644
+        ]
+      }
+    },
+    "type:return": {
+      "180": {
+        "alerts": 1,
+        "incidents": 1,
+        "arr": 0.0,
+        "arr_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    }
+  },
+  "t_group_seconds": 180.0,
+  "by_t_group": {
+    "180": {
+      "incidents": 38,
+      "labelled": 17,
+      "ambiguous": 3,
+      "no_fault": 18,
+      "multi_service": 0,
+      "multi_alert": 17,
+      "max_alerts": 9,
+      "labelled_by_fault_type": {
+        "cpu_contention": 5,
+        "exception": 3,
+        "network_delay": 8,
+        "return": 1
+      },
+      "hit_alert": {
+        "n": 17,
+        "level1_hit1": 0.47058823529411764,
+        "level1_hit1_count": 8,
+        "level1_hit1_ci95": [
+          0.23529411764705882,
+          0.7058823529411765
+        ],
+        "level1_hit3": 0.47058823529411764,
+        "level1_hit3_count": 8,
+        "level1_hit3_ci95": [
+          0.23529411764705882,
+          0.7058823529411765
+        ],
+        "baseline_hit1": 0.47058823529411764,
+        "baseline_hit1_count": 8,
+        "baseline_hit1_ci95": [
+          0.23529411764705882,
+          0.7058823529411765
+        ],
+        "baseline_hit3": 0.47058823529411764,
+        "baseline_hit3_count": 8,
+        "baseline_hit3_ci95": [
+          0.23529411764705882,
+          0.7058823529411765
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        }
+      },
+      "per_injection_alert": {
+        "n": 50,
+        "level1_hit1": 0.16,
+        "level1_hit1_count": 8,
+        "level1_hit1_ci95": [
+          0.06,
+          0.28
+        ],
+        "level1_hit3": 0.16,
+        "level1_hit3_count": 8,
+        "level1_hit3_ci95": [
+          0.06,
+          0.28
+        ],
+        "baseline_hit1": 0.16,
+        "baseline_hit1_count": 8,
+        "baseline_hit1_ci95": [
+          0.06,
+          0.28
+        ],
+        "baseline_hit3": 0.16,
+        "baseline_hit3_count": 8,
+        "baseline_hit3_ci95": [
+          0.06,
+          0.28
+        ],
+        "d_hit1": 0.0,
+        "d_hit1_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit1": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "d_hit3": 0.0,
+        "d_hit3_ci95": [
+          0.0,
+          0.0
+        ],
+        "discordant_hit3": {
+          "level1_only": 0,
+          "baseline_only": 0
+        },
+        "injections": 50,
+        "with_labelled_incident": 17,
+        "only_in_ambiguous_incidents": 4,
+        "without_alert": 29,
+        "by_fault_type": {
+          "cpu_consumed": {
+            "injections": 5
+          },
+          "cpu_contention": {
+            "injections": 11,
+            "with_labelled_incident": 5,
+            "level1_hit1": 3,
+            "baseline_hit1": 3
+          },
+          "exception": {
+            "injections": 10,
+            "with_labelled_incident": 3,
+            "level1_hit1": 3,
+            "baseline_hit1": 3
+          },
+          "network_delay": {
+            "injections": 15,
+            "with_labelled_incident": 8,
+            "level1_hit1": 2,
+            "baseline_hit1": 2
+          },
+          "return": {
+            "injections": 9,
+            "with_labelled_incident": 1,
+            "level1_hit1": 0,
+            "baseline_hit1": 0
+          }
+        }
+      }
+    }
+  },
+  "sign": "alert",
+  "main": {
+    "t_group_seconds": 180.0,
+    "sign": "alert",
+    "incidents": 38,
+    "labelled": 17,
+    "ambiguous": 3,
+    "no_fault": 18,
+    "multi_service": 0,
+    "multi_alert": 17,
+    "max_alerts": 9,
+    "labelled_by_fault_type": {
+      "cpu_contention": 5,
+      "exception": 3,
+      "network_delay": 8,
+      "return": 1
+    },
+    "hit_alert": {
+      "n": 17,
+      "level1_hit1": 0.47058823529411764,
+      "level1_hit1_count": 8,
+      "level1_hit1_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "level1_hit3": 0.47058823529411764,
+      "level1_hit3_count": 8,
+      "level1_hit3_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "baseline_hit1": 0.47058823529411764,
+      "baseline_hit1_count": 8,
+      "baseline_hit1_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "baseline_hit3": 0.47058823529411764,
+      "baseline_hit3_count": 8,
+      "baseline_hit3_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      }
+    },
+    "per_injection_alert": {
+      "n": 50,
+      "level1_hit1": 0.16,
+      "level1_hit1_count": 8,
+      "level1_hit1_ci95": [
+        0.06,
+        0.28
+      ],
+      "level1_hit3": 0.16,
+      "level1_hit3_count": 8,
+      "level1_hit3_ci95": [
+        0.06,
+        0.28
+      ],
+      "baseline_hit1": 0.16,
+      "baseline_hit1_count": 8,
+      "baseline_hit1_ci95": [
+        0.06,
+        0.28
+      ],
+      "baseline_hit3": 0.16,
+      "baseline_hit3_count": 8,
+      "baseline_hit3_ci95": [
+        0.06,
+        0.28
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "injections": 50,
+      "with_labelled_incident": 17,
+      "only_in_ambiguous_incidents": 4,
+      "without_alert": 29,
+      "by_fault_type": {
+        "cpu_consumed": {
+          "injections": 5
+        },
+        "cpu_contention": {
+          "injections": 11,
+          "with_labelled_incident": 5,
+          "level1_hit1": 3,
+          "baseline_hit1": 3
+        },
+        "exception": {
+          "injections": 10,
+          "with_labelled_incident": 3,
+          "level1_hit1": 3,
+          "baseline_hit1": 3
+        },
+        "network_delay": {
+          "injections": 15,
+          "with_labelled_incident": 8,
+          "level1_hit1": 2,
+          "baseline_hit1": 2
+        },
+        "return": {
+          "injections": 9,
+          "with_labelled_incident": 1,
+          "level1_hit1": 0,
+          "baseline_hit1": 0
+        }
+      }
+    },
+    "hit": {
+      "n": 17,
+      "level1_hit1": 0.47058823529411764,
+      "level1_hit1_count": 8,
+      "level1_hit1_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "level1_hit3": 0.47058823529411764,
+      "level1_hit3_count": 8,
+      "level1_hit3_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "baseline_hit1": 0.47058823529411764,
+      "baseline_hit1_count": 8,
+      "baseline_hit1_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "baseline_hit3": 0.47058823529411764,
+      "baseline_hit3_count": 8,
+      "baseline_hit3_ci95": [
+        0.23529411764705882,
+        0.7058823529411765
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      }
+    },
+    "per_injection": {
+      "n": 50,
+      "level1_hit1": 0.16,
+      "level1_hit1_count": 8,
+      "level1_hit1_ci95": [
+        0.06,
+        0.28
+      ],
+      "level1_hit3": 0.16,
+      "level1_hit3_count": 8,
+      "level1_hit3_ci95": [
+        0.06,
+        0.28
+      ],
+      "baseline_hit1": 0.16,
+      "baseline_hit1_count": 8,
+      "baseline_hit1_ci95": [
+        0.06,
+        0.28
+      ],
+      "baseline_hit3": 0.16,
+      "baseline_hit3_count": 8,
+      "baseline_hit3_ci95": [
+        0.06,
+        0.28
+      ],
+      "d_hit1": 0.0,
+      "d_hit1_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit1": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "d_hit3": 0.0,
+      "d_hit3_ci95": [
+        0.0,
+        0.0
+      ],
+      "discordant_hit3": {
+        "level1_only": 0,
+        "baseline_only": 0
+      },
+      "injections": 50,
+      "with_labelled_incident": 17,
+      "only_in_ambiguous_incidents": 4,
+      "without_alert": 29,
+      "by_fault_type": {
+        "cpu_consumed": {
+          "injections": 5
+        },
+        "cpu_contention": {
+          "injections": 11,
+          "with_labelled_incident": 5,
+          "level1_hit1": 3,
+          "baseline_hit1": 3
+        },
+        "exception": {
+          "injections": 10,
+          "with_labelled_incident": 3,
+          "level1_hit1": 3,
+          "baseline_hit1": 3
+        },
+        "network_delay": {
+          "injections": 15,
+          "with_labelled_incident": 8,
+          "level1_hit1": 2,
+          "baseline_hit1": 2
+        },
+        "return": {
+          "injections": 9,
+          "with_labelled_incident": 1,
+          "level1_hit1": 0,
+          "baseline_hit1": 0
+        }
+      }
+    },
+    "reduction": {
+      "all": {
+        "alerts": 78,
+        "incidents": 38,
+        "arr": 0.5128205128205128,
+        "arr_ci95": [
+          0.3620689655172413,
+          0.6262923351158646
+        ]
+      },
+      "fault": {
+        "alerts": 45,
+        "incidents": 20,
+        "arr": 0.5555555555555556,
+        "arr_ci95": [
+          0.3820533769063181,
+          0.6744186046511628
+        ]
+      },
+      "cascade": {
+        "alerts": 0,
+        "incidents": 0,
+        "arr": null,
+        "arr_ci95": null
+      },
+      "type:cpu_consumed": {
+        "alerts": 3,
+        "incidents": 1,
+        "arr": 0.6666666666666667,
+        "arr_ci95": [
+          0.6666666666666667,
+          0.6666666666666667
+        ]
+      },
+      "type:cpu_contention": {
+        "alerts": 13,
+        "incidents": 7,
+        "arr": 0.46153846153846156,
+        "arr_ci95": [
+          0.0,
+          0.6875538793103447
+        ]
+      },
+      "type:exception": {
+        "alerts": 6,
+        "incidents": 4,
+        "arr": 0.33333333333333337,
+        "arr_ci95": [
+          0.0,
+          0.5
+        ]
+      },
+      "type:network_delay": {
+        "alerts": 22,
+        "incidents": 10,
+        "arr": 0.5454545454545454,
+        "arr_ci95": [
+          0.2727272727272727,
+          0.7027821939586644
+        ]
+      },
+      "type:return": {
+        "alerts": 1,
+        "incidents": 1,
+        "arr": 0.0,
+        "arr_ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "level1_top1_differs_from_baseline": 0,
+    "level1_top1_not_alerted": 0
+  },
+  "summarizer": {
+    "backend": "gemini-2.5-flash",
+    "prompt_version": "rca-summary-v1",
+    "prompt_fingerprint": "8c1d50e6ba757ee6",
+    "incidents": 38,
+    "llm_calls": 38,
+    "not_called": 0,
+    "valid": 38,
+    "json_valid_rate": 1.0,
+    "json_valid_rate_ci95": [
+      1.0,
+      1.0
+    ],
+    "rejected_by_reason": {},
+    "suspicious": 0,
+    "reports_with_invented_evidence_ids": 1,
+    "fault_type_reported": {
+      "cpu_contention": 35,
+      "network_delay": 2,
+      "unknown": 1
+    },
+    "new_api_calls": 0,
+    "cache_hits": 38,
+    "prompt_tokens_new": 0,
+    "completion_tokens_new": 0,
+    "prompt_tokens_cached": 74151,
+    "completion_tokens_cached": 10887,
+    "estimated_usd_by_tokens": 0.0,
+    "cached_equivalent_usd_by_tokens": 0.0494628,
+    "latency_ms_median": 0.17155008390545845
+  },
+  "git_commit": "55228a7a468c45880413df9e864e3ef34728b289\nmodified tracked files at run time:\n  docs/CURRENT-MILESTONE.md\n  docs/ideas.md\n  docs/prompts/M10-handoff.md\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py\n  scripts/m10_experiment_table.py\n  services/api/readers.py\n  services/api/schemas.py\n  services/rca_agent/pipeline.py\n  services/web/src/data/experiment_table.json\n  services/web/src/screens/ExperimentComparison.tsx\n  tests/test_experiment_table.py",
+  "method_fingerprint": "b0c54fa68ef65535",
+  "ctav_run": "ctav_final_test_v1",
+  "evidence_run": "h0_test_c1_k0_v1",
+  "reference_run_id": "rca_final_test_v1",
+  "parity": {
+    "reference_run_id": "rca_final_test_v1",
+    "incidents_expected": 38,
+    "incidents_matched": 38,
+    "rankings_matched": 38,
+    "reports_matched": 38,
+    "all_matched": true
+  },
+  "postgres_rows": {
+    "incidents": 38,
+    "diagnostic_reports": 38,
+    "diagnostic_rejected": 0
+  }
+}

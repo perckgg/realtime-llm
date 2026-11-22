@@ -67,3 +67,23 @@ cd services/web && npm install && npm run dev    # http://localhost:5173
 ```
 
 Việc tiếp theo là mốc M1 — xem `docs/CURRENT-MILESTONE.md` và `docs/Final_Thesis_Phase2/04-implementation-roadmap.md`.
+
+## Biên soạn báo cáo LaTeX trên VS Code (SyncTeX)
+
+Mã nguồn báo cáo nằm ở `docs/drafts/Internship2_HK262/` (`main.tex`, các chương trong `Sections/`).
+
+1. **Cài đặt công cụ (làm một lần trên máy mới):**
+   - Cài **MiKTeX** (Windows) có `pdflatex` trên `PATH` (hoặc ở `%LOCALAPPDATA%\Programs\MiKTeX\miktex\bin\x64`).
+   - Cài extension **LaTeX Workshop** (`James-Yu.latex-workshop`) trong VS Code.
+   - Mở repo bằng VS Code: cấu hình SyncTeX double-click đã được lưu sẵn tại `.vscode/settings.json` (`"latex-workshop.view.pdf.internal.synctex.keybinding": "double-click"`).
+2. **Biên dịch PDF kèm SyncTeX (`-synctex=1`):**
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File docs\drafts\Internship2_HK262\build.ps1
+   # Hoặc double-click / chạy: docs\drafts\Internship2_HK262\build.bat
+   ```
+   Script tự chạy 2 pass `pdflatex -shell-escape -synctex=1`, xuất `main.pdf` và `main.synctex.gz` cùng thư mục (không xóa `*.synctex.gz`).
+3. **Nhảy qua lại hai chiều giữa PDF và `.tex`:**
+   - Mở `docs/drafts/Internship2_HK262/main.pdf` bằng **LaTeX Workshop Internal PDF Viewer** (tổ hợp `Ctrl+Alt+V` từ `main.tex`).
+   - **PDF → `.tex`:** **double-click** vào bất kỳ dòng nào trên PDF để nhảy thẳng về đúng file và dòng trong `Sections/`.
+   - **`.tex` → PDF:** nhấn `Ctrl+Alt+J` tại dòng đang soạn.
+   - *Lưu ý:* đóng `main.pdf` trên trình đọc ngoài (Acrobat/Edge) trước khi chạy `build.ps1` để tránh lỗi khóa file; dùng Internal PDF Viewer của VS Code thì không bị khóa.

@@ -1,0 +1,158 @@
+\usepackage{a4wide,amssymb,latexsym,multicol,array,hhline,fancyhdr}
+\usepackage[utf8]{vietnam}
+% \usepackage[english,vietnam]{babel}
+% \usepackage{vntex}
+\usepackage{enumerate}
+\usepackage{lastpage}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{tabularx, caption}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor,colortbl}
+\usepackage{minted} 
+\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
+\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{afterpage}
+\usepackage{geometry}
+    \geometry{
+    a4paper,
+    left=30mm,
+    top=20mm,
+    right=20mm,
+    bottom=20mm
+}
+\usepackage{pdflscape}
+\usepackage{scrextend}
+\usepackage{cite}
+\changefontsizes{13pt}
+\usepackage{pdfpages}
+\usepackage{longtable}
+\usepackage{pifont}
+%\setlength{\headheight}{20pt}
+\usepackage{tipa}
+\usepackage{multirow}
+\usepackage{subcaption}
+\definecolor{Gray}{gray}{0.85}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.2em}
+
+\DeclareUnicodeCharacter{0284}{c}
+
+\usepackage{titlesec}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\newcommand\longunderline[1]{\underline{\hspace{#1}}}
+%\renewcommand{\thesection}{\Roman{section}} 
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+%\everymath{\displaystyle \color{blue}}
+\usepackage{times}
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\usepackage{tocloft}
+\setlength{\cftfigindent}{0pt} % left aligned fig entries
+\renewcommand{\cftfigpresnum}{Hình } % put before the number
+\addtolength{\cftfignumwidth}{2em} % extra space for \cftpresnum
+\setlength{\cfttabindent}{0pt}
+\renewcommand{\cfttabpresnum}{Bảng }
+\addtolength{\cfttabnumwidth}{2em}
+\usepackage{tikz}
+\usetikzlibrary{arrows,snakes,backgrounds,calc}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{rotating}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{setspace}
+\usepackage{epsfig}
+\usepackage{tikz}
+\usepackage{xhfill}
+\usepackage{wrapfig}
+\usepackage{multimedia}
+\usepackage{indentfirst}
+\usepackage{listings}
+\usepackage{minitoc}
+\usepackage{float}
+\usetikzlibrary{arrows,snakes,backgrounds}
+% \usepackage{fontspec}
+
+\usepackage[first=0,last=9]{lcg}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+}
+
+
+\lstset{style=mystyle}
+
+
+\def\thesislayout{	% A4: 210 × 297
+	\geometry{
+		a4paper,
+		total={160mm,240mm},  % fix over page
+		left=30mm,
+		top=30mm,
+            bottom=25mm,
+	}
+}
+
+
+\thesislayout
+
+\setlength{\headheight}{40pt}
+
+\pagestyle{fancy}
+\fancyhead{} % clear all header fields
+\fancyhead[L]{
+ \begin{tabular}{rl}
+    \begin{picture}(25,15)(0,0)
+    \put(0,-8){\includegraphics[scale = 0.05]{Images/hcmut.png} }
+    %\put(0,-8){\epsfig{width=10mm,figure=hcmut.eps}}
+   \end{picture}&
+	%\includegraphics[width=8mm, height=8mm]{hcmut.png} & %
+	\begin{tabular}{l}
+		\text{\changefontsizes{8pt} \bf \ttfamily Đại học Bách Khoa Thành phố Hồ Chí Minh}\\
+		\text{\changefontsizes{8pt} \bf \ttfamily Khoa Khoa học và kỹ thuật máy tính}\\
+	\end{tabular} 	
+ \end{tabular}
+}
+\fancyhead[R]{
+	\begin{tabular}{l}
+		\tiny \bf \\
+		\tiny \bf 
+	\end{tabular}  }
+\fancyfoot{} % clear all footer fields
+\fancyfoot[L]{\scriptsize \ttfamily Đồ án Chuyên ngành}
+\fancyfoot[R]{\scriptsize \ttfamily Trang {\thepage} của \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0.3pt}

@@ -1,0 +1,54 @@
+% Hình 1.2 — Đánh đổi của ngữ cảnh topology (sơ đồ khái niệm, không số liệu).
+% Dùng: \input{figures/ch1/fig-danh-doi} trong môi trường figure. Cần: \usepackage{tikz},
+% \usetikzlibrary{positioning,arrows.meta,calc}.
+\begingroup
+\colorlet{fgBox}{black!75}
+\colorlet{fgEv}{blue!55!black}
+\colorlet{bgEv}{blue!12}
+\colorlet{fgBad}{red!65!black}
+\colorlet{fgGood}{green!40!black}
+\colorlet{fgNote}{black!55}
+\begin{tikzpicture}[
+  font=\small,
+  svc/.style={circle, draw=fgBox, minimum size=6.5mm, inner sep=0pt, font=\scriptsize, line width=0.5pt},
+  alert/.style={svc, line width=1.2pt, draw=fgBad},
+  got/.style={fill=bgEv, draw=fgEv},
+  edge/.style={draw=black!45, line width=0.5pt},
+  cell/.style={font=\footnotesize, align=left, text width=44mm, anchor=north west},
+  hdr/.style={font=\small\bfseries, align=center},
+]
+\newcommand{\minigraph}[4]{% #1 tên, #2 x, #3 style 1-hop, #4 style 2-hop
+  \node[alert, got] (s0#1) at (#2,0) {$s_0$};
+  \node[svc, #3] (a#1) at ($(s0#1)+(-1.1,0.8)$) {};
+  \node[svc, #3] (b#1) at ($(s0#1)+(1.1,0.8)$) {};
+  \node[svc, #4] (c#1) at ($(a#1)+(0,1.0)$) {};
+  \node[svc, #4] (d#1) at ($(b#1)+(0,1.0)$) {};
+  \draw[edge] (s0#1)--(a#1) (s0#1)--(b#1) (a#1)--(c#1) (b#1)--(d#1);
+}
+\minigraph{L}{0}{}{}
+\minigraph{R}{8}{got}{got}
+\node[hdr, above=2mm of $(cL)!0.5!(dL)$] {(a) Truy xuất cục bộ (BM25)};
+\node[hdr, above=2mm of $(cR)!0.5!(dR)$] {(b) Mở rộng theo đồ thị (2-hop)};
+
+% Chú giải
+\node[font=\scriptsize, text=fgNote] at (4,0.9) {%
+  \tikz[baseline=-0.6ex]\node[svc,alert,got,minimum size=3.5mm]{};~dịch vụ phát cảnh báo};
+\node[font=\scriptsize, text=fgNote] at (4,0.35) {%
+  \tikz[baseline=-0.6ex]\node[svc,got,minimum size=3.5mm]{};~nơi lấy bằng chứng};
+
+% Bảng hai hàng × hai cột
+\node[cell] (a1) at (-2.2,-0.9) {\textbf{Cửa sổ có sự cố:} ít bằng chứng ngay tại $s_0$\\
+  \textcolor{fgBad}{$\Rightarrow$ dễ bỏ sót sự cố lan truyền}};
+\node[cell, below=3mm of a1.south west, anchor=north west] (a2) {\textbf{Cửa sổ bình thường:} ngữ cảnh gần như rỗng\\
+  \textcolor{fgGood}{$\Rightarrow$ judge bác bỏ đúng}};
+\node[cell] (b1) at (5.8,-0.9) {\textbf{Cửa sổ có sự cố:} thấy được chuỗi lan truyền\\
+  \textcolor{fgGood}{$\Rightarrow$ bắt thêm sự cố}};
+\node[cell, below=3mm of b1.south west, anchor=north west] (b2) {\textbf{Cửa sổ bình thường:} nhiều bằng chứng nền vô hại\\
+  \textcolor{fgBad}{$\Rightarrow$ judge dễ xác nhận nhầm}};
+
+% Kết luận
+\node[font=\footnotesize\bfseries, align=center, draw=fgNote, rounded corners=2pt, inner sep=4pt,
+      below=5mm of $(a2.south east)!0.5!(b2.south west)$]
+  {Mở rộng ngữ cảnh: recall tăng, nhưng báo động giả cũng tăng};
+\end{tikzpicture}
+\endgroup

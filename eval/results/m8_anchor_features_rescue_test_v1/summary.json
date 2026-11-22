@@ -1,0 +1,31 @@
+{
+  "config": {
+    "kind": "anchor_features",
+    "run_id": "m8_anchor_features_rescue_test_v1",
+    "runs": [
+      "m8_rescue_test_c1_v1"
+    ],
+    "rolling": {
+      "lookback_minutes": 60,
+      "guard_seconds": 60,
+      "min_spans": 30
+    },
+    "percentiles": [
+      90,
+      95,
+      99
+    ],
+    "dev_baseline": "data/span_baseline.parquet"
+  },
+  "index_seconds": 76.8,
+  "runs": {
+    "m8_rescue_test_c1_v1": {
+      "trace": 340,
+      "trace_rolling_covered": 304,
+      "trace_dev_covered": 40,
+      "log": 26
+    }
+  },
+  "wall_seconds": 77.9,
+  "git_commit": "a5e74bd0aad7ba880d1802aebeb51aae762d915d\nmodified tracked files at run time:\n  eval/configs/ctav_final_test.yaml\n  eval/configs/h0_test_norag.yaml\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py"
+}

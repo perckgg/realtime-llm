@@ -1,0 +1,93 @@
+{
+  "created_at": "2026-11-16T07:22:00.118410+00:00",
+  "split": "test",
+  "git_commit": "a5e74bd0aad7ba880d1802aebeb51aae762d915d\nmodified tracked files at run time:\n  eval/configs/ctav_final_test.yaml\n  eval/configs/h0_test_norag.yaml\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py",
+  "inputs": {
+    "compare_bm25": "h0_test_compare_bm25ref_v1",
+    "compare_c1": "h0_test_compare_c1ref_v1",
+    "ctav": "ctav_final_test_v1",
+    "rescue": "m8_rescue_test_v1"
+  },
+  "delta": 0.05,
+  "alpha": 0.05,
+  "verdicts": {
+    "H0": {
+      "clauses": [
+        {
+          "clause": "CI ΔRecall(C1 − BM25) có cận dưới > 0",
+          "met": true,
+          "detail": "+0,179 [+0,138; +0,226]"
+        },
+        {
+          "clause": "CI ΔFPR(C1 − BM25) có cận dưới > 0",
+          "met": true,
+          "detail": "+0,0744 [+0,0694; +0,0798]"
+        },
+        {
+          "clause": "McNemar fault p < 0,05",
+          "met": true,
+          "detail": "p < 0,001"
+        },
+        {
+          "clause": "McNemar normal p < 0,05",
+          "met": true,
+          "detail": "p < 0,001"
+        }
+      ],
+      "accepted": true
+    },
+    "H2": {
+      "clauses": [
+        {
+          "clause": "(i) CI ΔF1(CTAV − BM25) cận dưới > 0 và McNemar p < 0,05",
+          "met": false,
+          "detail": "ΔF1 −0,025 [−0,067; +0,014]; McNemar p < 0,001"
+        },
+        {
+          "clause": "(ii) CI ΔFPR(CTAV − BM25) không có cận dưới > 0",
+          "met": true,
+          "detail": "ΔFPR −0,0262 [−0,0297; −0,0229]"
+        },
+        {
+          "clause": "(iii) ΔRecall(CTAV − C1) ≥ −0,05 (ước lượng điểm)",
+          "met": false,
+          "detail": "ΔRecall −0,237 [−0,281; −0,193]"
+        }
+      ],
+      "accepted": false,
+      "label": "không đạt"
+    },
+    "H3": {
+      "C3": {
+        "clause": "bỏ C3 ⇒ CI ΔPrecision cận trên < 0 (C3 đóng góp)",
+        "met": true,
+        "detail": "ΔPrecision −0,107 [−0,197; −0,030]"
+      },
+      "C2": {
+        "clause": "thêm C2 (θ_topo 0,85): xác nhận bỏ nếu CI ΔFPR chứa 0 hoặc > 0",
+        "met": true,
+        "detail": "ΔFPR +0,0000 [+0,0000; +0,0000]"
+      },
+      "C4": {
+        "clause": "thêm C4: xác nhận bỏ nếu chi phí tăng và CI ΔF1 không có cận dưới > 0",
+        "met": true,
+        "detail": "ΔF1 −0,001 [−0,001; +0,000]; chi phí 13,56 so với 8,16 USD"
+      },
+      "C3-trượt": {
+        "clause": "báo ΔF1, ΔFPR (không có tiêu chí đạt / không đạt)",
+        "met": null,
+        "detail": "ΔF1 +0,054 [+0,017; +0,091]; ΔFPR +0,0281 [+0,0247; +0,0315]; ΔRecall +0,095 [+0,061; +0,133]"
+      },
+      "C5": {
+        "clause": "báo ΔRecall, ΔFPR, +lần gọi (không có tiêu chí đạt / không đạt)",
+        "met": null,
+        "detail": "điểm eta=(0,0.4,0.6)|tau=0.8: ΔRecall +0,000 [+0,000; +0,000]; ΔFPR +0,0001 [+0,0000; +0,0003]; ΔF1 −0,000 [−0,001; +0,000]; +61 lần gọi"
+      }
+    },
+    "H4": {
+      "clause": "F1(CTAV) ≥ F1(LLM-không-RAG) ở ngân sách 120 lần gọi (ước lượng điểm)",
+      "met": true,
+      "detail": "CTAV 0,034 [0,011; 0,064]; không-RAG 0,017 [0,000; 0,038]"
+    }
+  }
+}

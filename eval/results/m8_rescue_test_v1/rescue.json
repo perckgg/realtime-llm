@@ -1,0 +1,760 @@
+{
+  "created_at": "2026-11-16T07:21:55.528893+00:00",
+  "config": {
+    "kind": "rescue",
+    "run_id": "m8_rescue_test_v1",
+    "split": "test",
+    "g_test": true,
+    "features": "m8_rescue_features_test_v1",
+    "ctav": "eval/configs/ctav_final_test.yaml",
+    "judged_run": "m8_rescue_test_c1_v1",
+    "anchor_features": "m8_anchor_features_rescue_test_v1",
+    "grid": {
+      "points": [
+        {
+          "eta": [
+            0.0,
+            0.4,
+            0.6
+          ],
+          "tau": 0.8
+        }
+      ]
+    },
+    "max_call_increase": 0.5,
+    "model": "gemini-2.5-flash",
+    "baselines": {
+      "bm25": "h0_test_bm25_v1",
+      "c1": "h0_test_c1_k0_v1"
+    },
+    "n_boot": 1000,
+    "seed": 42
+  },
+  "windows": 11985,
+  "fault_windows": 346,
+  "ctav_variant": {
+    "mode": "topology_only",
+    "theta_local": 0.8,
+    "theta_topo": 0.85,
+    "gating": false,
+    "anchoring": true,
+    "fp_confidence": 0.95,
+    "escalate_on": [
+      "no_context",
+      "uncertain",
+      "weak_fp"
+    ],
+    "baseline": "dev",
+    "percentile": 90
+  },
+  "judged_rescue_windows": 61,
+  "judged_rescue_alerts": 1,
+  "max_added_calls": 6849.5,
+  "off": {
+    "name": "off",
+    "eta": null,
+    "tau": null,
+    "nonzero_eta": 0,
+    "rescued": 0,
+    "rescued_in_subset": 0,
+    "rescued_alerts_in_subset": 0,
+    "feasible": true,
+    "metrics": {
+      "tp": 14,
+      "fp": 64,
+      "fn": 332,
+      "tn": 11575,
+      "precision": 0.1794871794871795,
+      "recall": 0.04046242774566474,
+      "f1": 0.0660377358490566,
+      "fpr": 0.005498754188504167,
+      "precision_ci95": [
+        0.10255681818181818,
+        0.26833139759969027
+      ],
+      "recall_ci95": [
+        0.021973742768135292,
+        0.061498354586589886
+      ],
+      "f1_ci95": [
+        0.036267671676083746,
+        0.0995850622406639
+      ],
+      "fpr_ci95": [
+        0.004211005801475529,
+        0.006866481350636622
+      ]
+    },
+    "cost": {
+      "llm_calls": 13699,
+      "added_calls": 0,
+      "estimated_cost_usd": 8.158066
+    }
+  },
+  "points": [
+    {
+      "name": "eta=(0,0.4,0.6)|tau=0.8",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.8,
+      "nonzero_eta": 2,
+      "rescued": 61,
+      "rescued_in_subset": 61,
+      "rescued_alerts_in_subset": 1,
+      "feasible": true,
+      "metrics": {
+        "tp": 14,
+        "fp": 65,
+        "fn": 332,
+        "tn": 11574,
+        "precision": 0.17721518987341772,
+        "recall": 0.04046242774566474,
+        "f1": 0.06588235294117648,
+        "fpr": 0.005584672222699544,
+        "precision_ci95": [
+          0.09458267090620032,
+          0.26967810507136347
+        ],
+        "recall_ci95": [
+          0.02127659574468085,
+          0.06233201902361691
+        ],
+        "f1_ci95": [
+          0.03569424652654079,
+          0.10089149504195268
+        ],
+        "fpr_ci95": [
+          0.004300640618394177,
+          0.006959420583841657
+        ]
+      },
+      "cost": {
+        "llm_calls": 13760,
+        "added_calls": 61,
+        "estimated_cost_usd": 8.2477498
+      }
+    }
+  ],
+  "selected": {
+    "name": "off",
+    "eta": null,
+    "tau": null,
+    "nonzero_eta": 0,
+    "rescued": 0,
+    "rescued_in_subset": 0,
+    "rescued_alerts_in_subset": 0,
+    "feasible": true,
+    "metrics": {
+      "tp": 14,
+      "fp": 64,
+      "fn": 332,
+      "tn": 11575,
+      "precision": 0.1794871794871795,
+      "recall": 0.04046242774566474,
+      "f1": 0.0660377358490566,
+      "fpr": 0.005498754188504167,
+      "precision_ci95": [
+        0.10255681818181818,
+        0.26833139759969027
+      ],
+      "recall_ci95": [
+        0.021973742768135292,
+        0.061498354586589886
+      ],
+      "f1_ci95": [
+        0.036267671676083746,
+        0.0995850622406639
+      ],
+      "fpr_ci95": [
+        0.004211005801475529,
+        0.006866481350636622
+      ]
+    },
+    "cost": {
+      "llm_calls": 13699,
+      "added_calls": 0,
+      "estimated_cost_usd": 8.158066
+    }
+  },
+  "best_point": {
+    "name": "eta=(0,0.4,0.6)|tau=0.8",
+    "eta": [
+      0.0,
+      0.4,
+      0.6
+    ],
+    "tau": 0.8,
+    "nonzero_eta": 2,
+    "rescued": 61,
+    "rescued_in_subset": 61,
+    "rescued_alerts_in_subset": 1,
+    "feasible": true,
+    "metrics": {
+      "tp": 14,
+      "fp": 65,
+      "fn": 332,
+      "tn": 11574,
+      "precision": 0.17721518987341772,
+      "recall": 0.04046242774566474,
+      "f1": 0.06588235294117648,
+      "fpr": 0.005584672222699544,
+      "precision_ci95": [
+        0.09458267090620032,
+        0.26967810507136347
+      ],
+      "recall_ci95": [
+        0.02127659574468085,
+        0.06233201902361691
+      ],
+      "f1_ci95": [
+        0.03569424652654079,
+        0.10089149504195268
+      ],
+      "fpr_ci95": [
+        0.004300640618394177,
+        0.006959420583841657
+      ]
+    },
+    "cost": {
+      "llm_calls": 13760,
+      "added_calls": 61,
+      "estimated_cost_usd": 8.2477498
+    }
+  },
+  "c5_kept": false,
+  "formula_components": [],
+  "faces": {
+    "without_lambda_log": {
+      "name": "eta=(0,0.4,0.6)|tau=0.8",
+      "eta": [
+        0.0,
+        0.4,
+        0.6
+      ],
+      "tau": 0.8,
+      "nonzero_eta": 2,
+      "rescued": 61,
+      "rescued_in_subset": 61,
+      "rescued_alerts_in_subset": 1,
+      "feasible": true,
+      "metrics": {
+        "tp": 14,
+        "fp": 65,
+        "fn": 332,
+        "tn": 11574,
+        "precision": 0.17721518987341772,
+        "recall": 0.04046242774566474,
+        "f1": 0.06588235294117648,
+        "fpr": 0.005584672222699544,
+        "precision_ci95": [
+          0.09458267090620032,
+          0.26967810507136347
+        ],
+        "recall_ci95": [
+          0.02127659574468085,
+          0.06233201902361691
+        ],
+        "f1_ci95": [
+          0.03569424652654079,
+          0.10089149504195268
+        ],
+        "fpr_ci95": [
+          0.004300640618394177,
+          0.006959420583841657
+        ]
+      },
+      "cost": {
+        "llm_calls": 13760,
+        "added_calls": 61,
+        "estimated_cost_usd": 8.2477498
+      }
+    }
+  },
+  "face_pairs": {
+    "windows": 11985,
+    "fault_windows": 346,
+    "reference": "best",
+    "methods": {
+      "best": {
+        "tp": 14,
+        "fp": 65,
+        "fn": 332,
+        "tn": 11574,
+        "precision": 0.17721518987341772,
+        "recall": 0.04046242774566474,
+        "f1": 0.06588235294117648,
+        "fpr": 0.005584672222699544,
+        "precision_ci95": [
+          0.09458267090620032,
+          0.26967810507136347
+        ],
+        "recall_ci95": [
+          0.02127659574468085,
+          0.06233201902361691
+        ],
+        "f1_ci95": [
+          0.03569424652654079,
+          0.10089149504195268
+        ],
+        "fpr_ci95": [
+          0.004300640618394177,
+          0.006959420583841657
+        ]
+      },
+      "off": {
+        "tp": 14,
+        "fp": 64,
+        "fn": 332,
+        "tn": 11575,
+        "precision": 0.1794871794871795,
+        "recall": 0.04046242774566474,
+        "f1": 0.0660377358490566,
+        "fpr": 0.005498754188504167,
+        "precision_ci95": [
+          0.10255681818181818,
+          0.26833139759969027
+        ],
+        "recall_ci95": [
+          0.021973742768135292,
+          0.061498354586589886
+        ],
+        "f1_ci95": [
+          0.036267671676083746,
+          0.0995850622406639
+        ],
+        "fpr_ci95": [
+          0.004211005801475529,
+          0.006866481350636622
+        ]
+      },
+      "without_lambda_log": {
+        "tp": 14,
+        "fp": 65,
+        "fn": 332,
+        "tn": 11574,
+        "precision": 0.17721518987341772,
+        "recall": 0.04046242774566474,
+        "f1": 0.06588235294117648,
+        "fpr": 0.005584672222699544,
+        "precision_ci95": [
+          0.09458267090620032,
+          0.26967810507136347
+        ],
+        "recall_ci95": [
+          0.02127659574468085,
+          0.06233201902361691
+        ],
+        "f1_ci95": [
+          0.03569424652654079,
+          0.10089149504195268
+        ],
+        "fpr_ci95": [
+          0.004300640618394177,
+          0.006959420583841657
+        ]
+      }
+    },
+    "pairs": {
+      "off - best": {
+        "d_precision": 0.0022719896137617657,
+        "d_recall": 0.0,
+        "d_f1": 0.00015538290788012776,
+        "d_fpr": -8.591803419537736e-05,
+        "d_precision_ci95": [
+          0.0,
+          0.008772303147303132
+        ],
+        "d_recall_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_f1_ci95": [
+          0.0,
+          0.0005669086789014597
+        ],
+        "d_fpr_ci95": [
+          -0.0003429671378708733,
+          0.0
+        ],
+        "mcnemar_all": {
+          "n": 11985,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 1,
+          "p_value": 1.0
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_normal": {
+          "n": 11639,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 1,
+          "p_value": 1.0
+        }
+      },
+      "without_lambda_log - best": {
+        "d_precision": 0.0,
+        "d_recall": 0.0,
+        "d_f1": 0.0,
+        "d_fpr": 0.0,
+        "d_precision_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_recall_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_f1_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_fpr_ci95": [
+          0.0,
+          0.0
+        ],
+        "mcnemar_all": {
+          "n": 11985,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_normal": {
+          "n": 11639,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        }
+      }
+    }
+  },
+  "tau_curve": {
+    "eta": [
+      0.0,
+      0.4,
+      0.6
+    ],
+    "points": [
+      {
+        "tau": 0.8,
+        "recall": 0.04046242774566474,
+        "f1": 0.06588235294117648,
+        "fpr": 0.005584672222699544,
+        "llm_calls": 13760,
+        "rescued": 61
+      }
+    ]
+  },
+  "comparison": {
+    "windows": 11985,
+    "fault_windows": 346,
+    "reference": "ctav",
+    "methods": {
+      "ctav": {
+        "tp": 14,
+        "fp": 64,
+        "fn": 332,
+        "tn": 11575,
+        "precision": 0.1794871794871795,
+        "recall": 0.04046242774566474,
+        "f1": 0.0660377358490566,
+        "fpr": 0.005498754188504167,
+        "precision_ci95": [
+          0.10255681818181818,
+          0.26833139759969027
+        ],
+        "recall_ci95": [
+          0.021973742768135292,
+          0.061498354586589886
+        ],
+        "f1_ci95": [
+          0.036267671676083746,
+          0.0995850622406639
+        ],
+        "fpr_ci95": [
+          0.004211005801475529,
+          0.006866481350636622
+        ]
+      },
+      "ctav_rescue": {
+        "tp": 14,
+        "fp": 64,
+        "fn": 332,
+        "tn": 11575,
+        "precision": 0.1794871794871795,
+        "recall": 0.04046242774566474,
+        "f1": 0.0660377358490566,
+        "fpr": 0.005498754188504167,
+        "precision_ci95": [
+          0.10255681818181818,
+          0.26833139759969027
+        ],
+        "recall_ci95": [
+          0.021973742768135292,
+          0.061498354586589886
+        ],
+        "f1_ci95": [
+          0.036267671676083746,
+          0.0995850622406639
+        ],
+        "fpr_ci95": [
+          0.004211005801475529,
+          0.006866481350636622
+        ]
+      },
+      "ctav_rescue_best_point": {
+        "tp": 14,
+        "fp": 65,
+        "fn": 332,
+        "tn": 11574,
+        "precision": 0.17721518987341772,
+        "recall": 0.04046242774566474,
+        "f1": 0.06588235294117648,
+        "fpr": 0.005584672222699544,
+        "precision_ci95": [
+          0.09458267090620032,
+          0.26967810507136347
+        ],
+        "recall_ci95": [
+          0.02127659574468085,
+          0.06233201902361691
+        ],
+        "f1_ci95": [
+          0.03569424652654079,
+          0.10089149504195268
+        ],
+        "fpr_ci95": [
+          0.004300640618394177,
+          0.006959420583841657
+        ]
+      },
+      "bm25": {
+        "tp": 34,
+        "fp": 369,
+        "fn": 312,
+        "tn": 11270,
+        "precision": 0.08436724565756824,
+        "recall": 0.09826589595375723,
+        "f1": 0.09078771695594125,
+        "fpr": 0.03170375461809434,
+        "precision_ci95": [
+          0.05817023602717767,
+          0.11112459546925564
+        ],
+        "recall_ci95": [
+          0.06963304704425875,
+          0.13018065268065268
+        ],
+        "f1_ci95": [
+          0.06393295123661895,
+          0.11905070318282752
+        ],
+        "fpr_ci95": [
+          0.02848928735024051,
+          0.03496688674119867
+        ]
+      },
+      "c1": {
+        "tp": 96,
+        "fp": 1235,
+        "fn": 250,
+        "tn": 10404,
+        "precision": 0.07212622088655146,
+        "recall": 0.2774566473988439,
+        "f1": 0.11449016100178891,
+        "fpr": 0.10610877223129135,
+        "precision_ci95": [
+          0.05850828740575989,
+          0.08533351236458381
+        ],
+        "recall_ci95": [
+          0.22950443675740714,
+          0.32121505917904813
+        ],
+        "f1_ci95": [
+          0.09318864642631247,
+          0.13483302644269915
+        ],
+        "fpr_ci95": [
+          0.10067926483637177,
+          0.1118373856897794
+        ]
+      }
+    },
+    "pairs": {
+      "ctav_rescue - ctav": {
+        "d_precision": 0.0,
+        "d_recall": 0.0,
+        "d_f1": 0.0,
+        "d_fpr": 0.0,
+        "d_precision_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_recall_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_f1_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_fpr_ci95": [
+          0.0,
+          0.0
+        ],
+        "mcnemar_all": {
+          "n": 11985,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_normal": {
+          "n": 11639,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        }
+      },
+      "ctav_rescue_best_point - ctav": {
+        "d_precision": -0.0022719896137617657,
+        "d_recall": 0.0,
+        "d_f1": -0.00015538290788012776,
+        "d_fpr": 8.591803419537736e-05,
+        "d_precision_ci95": [
+          -0.008772303147303137,
+          0.0
+        ],
+        "d_recall_ci95": [
+          0.0,
+          0.0
+        ],
+        "d_f1_ci95": [
+          -0.0005669086789014597,
+          0.0
+        ],
+        "d_fpr_ci95": [
+          0.0,
+          0.0003429671378708733
+        ],
+        "mcnemar_all": {
+          "n": 11985,
+          "a_right_b_wrong": 1,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        },
+        "mcnemar_normal": {
+          "n": 11639,
+          "a_right_b_wrong": 1,
+          "a_wrong_b_right": 0,
+          "p_value": 1.0
+        }
+      },
+      "bm25 - ctav": {
+        "d_precision": -0.09511993382961124,
+        "d_recall": 0.05780346820809249,
+        "d_f1": 0.024749981106884644,
+        "d_fpr": 0.026205000429590175,
+        "d_precision_ci95": [
+          -0.1872360387619362,
+          -0.017081045675678867
+        ],
+        "d_recall_ci95": [
+          0.022527386541471052,
+          0.09311425061425059
+        ],
+        "d_f1_ci95": [
+          -0.018394638680641257,
+          0.06299602234118311
+        ],
+        "d_fpr_ci95": [
+          0.022984191487653745,
+          0.029648297088115012
+        ],
+        "mcnemar_all": {
+          "n": 11985,
+          "a_right_b_wrong": 371,
+          "a_wrong_b_right": 86,
+          "p_value": 3.1590355679716463e-43
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 12,
+          "a_wrong_b_right": 32,
+          "p_value": 0.003657766827927844
+        },
+        "mcnemar_normal": {
+          "n": 11639,
+          "a_right_b_wrong": 359,
+          "a_wrong_b_right": 54,
+          "p_value": 2.3420564334606065e-56
+        }
+      },
+      "c1 - ctav": {
+        "d_precision": -0.10736095860062803,
+        "d_recall": 0.23699421965317916,
+        "d_f1": 0.048452425152732306,
+        "d_fpr": 0.10061001804278719,
+        "d_precision_ci95": [
+          -0.19664705974484897,
+          -0.02979743121135619
+        ],
+        "d_recall_ci95": [
+          0.192546137645463,
+          0.28090057367867205
+        ],
+        "d_f1_ci95": [
+          0.012975535189955862,
+          0.07941306723137204
+        ],
+        "d_fpr_ci95": [
+          0.09552239407519714,
+          0.10608482384847792
+        ],
+        "mcnemar_all": {
+          "n": 11985,
+          "a_right_b_wrong": 1171,
+          "a_wrong_b_right": 82,
+          "p_value": 2.0893122595940454e-247
+        },
+        "mcnemar_fault": {
+          "n": 346,
+          "a_right_b_wrong": 0,
+          "a_wrong_b_right": 82,
+          "p_value": 4.1359030627651384e-25
+        },
+        "mcnemar_normal": {
+          "n": 11639,
+          "a_right_b_wrong": 1171,
+          "a_wrong_b_right": 0,
+          "p_value": 0.0
+        }
+      }
+    }
+  },
+  "git_commit": "a5e74bd0aad7ba880d1802aebeb51aae762d915d\nmodified tracked files at run time:\n  eval/configs/ctav_final_test.yaml\n  eval/configs/h0_test_norag.yaml\n  legacy/outputs/phase2/input_freeze.json\n  legacy/outputs/phase2/input_freeze.md\n  legacy/scripts/phase2/generate_paper_outputs.py\n  legacy/scripts/phase2/run_step9_quality_gate.py"
+}

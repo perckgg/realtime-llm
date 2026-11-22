@@ -1,0 +1,221 @@
+{
+  "main": {
+    "id": "1f49f10f9ac06a69",
+    "type": "split",
+    "children": [
+      {
+        "id": "f10e1ff1395d643d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6b57f620e619b617",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Final_Thesis_Phase2/00-INDEX.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "00-INDEX"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "3bc241f18958f0bc",
+    "type": "split",
+    "children": [
+      {
+        "id": "7e16809a99e5de68",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cdcee9167196304f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "995eeebc54ee0175",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "d0db5ecd6e55df48",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "d4ffcbf6b573b8da",
+    "type": "split",
+    "children": [
+      {
+        "id": "9e0a18a2a9bc1aa1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5686d92cdd927b2c",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Final_Thesis_Phase2/00-INDEX.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "59289d50edb0828b",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Final_Thesis_Phase2/00-INDEX.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "15fa7af997f7bf3a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "93e898f6b9beb324",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "f63ac24e177e6dcf",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Final_Thesis_Phase2/00-INDEX.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "6b57f620e619b617",
+  "lastOpenFiles": [
+    "drafts/chuong-bai-toan.md.tmp.45160.02de1e2fede3",
+    "CURRENT-MILESTONE.md.tmp.45160.a34b8150a666",
+    "milestones/M4-h0.md.tmp.45160.5c475bb3b6db",
+    "milestones/M4-h0.md.tmp.45160.13de11883c42",
+    "Final_Thesis_Phase2/01-architecture-design.md",
+    "Final_Thesis_Phase2/02-data-and-experiment-protocol.md",
+    "Final_Thesis_Phase2/06-scope-guard.md",
+    "Final_Thesis_Phase2/07-setup-guide.md",
+    "Final_Thesis_Phase2/08-research-direction.md",
+    "drafts/2026-10-29-mail-gvhd-h0.md",
+    "drafts/2026-10-29-mail-gvhd-h0.md.tmp.54872.12fe179a2d15",
+    "milestones/README.md",
+    "milestones/M4-h0.md",
+    "drafts/sedOMM30D",
+    "milestones/M3-graph-c1-gpaper.md",
+    "milestones/M2-harness-gport.md",
+    "milestones/M1-detector-bm25-judge.md",
+    "milestones/M0-nen-tang.md",
+    "CURRENT-MILESTONE.md",
+    "experiment-log.md",
+    "graph-coverage.md",
+    "ideas.md",
+    "label-audit.md",
+    "Final_Thesis_Phase2/sedodXl9q",
+    "Final_Thesis_Phase2/sedtJrwTS",
+    "drafts/chuong-bai-toan.md",
+    "Thesis_Phase1.pdf"
+  ]
+}
