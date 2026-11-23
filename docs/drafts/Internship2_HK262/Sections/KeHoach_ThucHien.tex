@@ -1,0 +1,44 @@
+% =============================================================================
+% Ke hoach thuc hien phan con lai (khong danh so chuong, dat truoc Tai lieu tham khao)
+% Theo outline-bao-cao-gd2.md muc 4 va style-guide-luan-van.md §3.1:
+%   - Khong danh so chuong, dat ngay sau Chuong 9, truoc Tai lieu tham khao.
+%   - Viet theo moc, khong dung "Giai doan 1-4".
+%   - Chi gom viec chua xong luc nop tien do; viec ngoai pham vi ghi la huong mo rong.
+% =============================================================================
+
+\phantomsection
+\addcontentsline{toc}{section}{Kế hoạch thực hiện phần còn lại}
+\section*{Kế hoạch thực hiện phần còn lại}
+\label{sec:ke-hoach}
+
+Tính đến thời điểm nộp báo cáo tiến độ, toàn bộ chuỗi thực nghiệm, kiểm định giả thuyết và xây dựng hệ thống của đề tài đã hoàn tất:
+\begin{itemize}[label=--]
+  \item \textbf{Pipeline phát hiện và thẩm định cảnh báo (\CTAV{}):} Đã vượt qua hai cổng kiểm chứng kỹ thuật G-port và G-paper ($100\%$ trúng cache), hoàn tất thí nghiệm cơ chế \hyp{H1}, tinh chỉnh cấu hình và khảo sát cổng cứu cảnh báo \comp{C5} trên tập \splitname{val}, đăng ký trước sáu giả thuyết \hyp{H0}--\hyp{H5} (commit \code{be2b985}) và hoàn tất kiểm định một lần duy nhất trên tập \splitname{test} niêm phong (Chương~\ref{ch:de-xuat}, Chương~\ref{ch:thuc-nghiem}).
+  \item \textbf{Tác tử \term{RCA}{RCA} và platform trình diễn ngoại tuyến:} Đã hoàn thành gom nhóm sự cố, lan truyền ngược một bước, bộ tóm tắt JSON có kiểm duyệt năm quy tắc, nạp đồng bộ ClickHouse/PostgreSQL khớp $100\%$ với harness kiểm định, xây dựng API chỉ đọc bảy endpoint và dashboard bốn màn hình chạy ở chế độ ngoại tuyến \code{DEMO\_OFFLINE=1} với $0$ lượt gọi API mới (Chương~\ref{ch:platform}).
+  \item \textbf{Phân tích ca sai và đánh giá chất lượng nội dung chẩn đoán:} Đã phân loại toàn bộ $64$ báo động giả, $332$ sự cố bị bỏ sót của \CTAV{}, toàn bộ ca sai định vị của tác tử \term{RCA}{RCA}, rà soát chất lượng $30$ báo cáo chẩn đoán lấy mẫu mù và hoàn thành tổng duyệt kịch bản demo lần thứ nhất (Chương~\ref{ch:thao-luan}).
+\end{itemize}
+
+Phần công việc còn lại trước mốc bảo vệ chỉ gồm các hạng mục hoàn thiện trình diễn, cập nhật hình chụp giao diện sau tổng duyệt và chuẩn bị hồ sơ bảo vệ cuối cùng (mốc \textbf{M12}), tuyệt đối không phát sinh lượt gọi API \term{LLM}{LLM} mới và không thay đổi bất kỳ con số kiểm định nào trên tập \splitname{test}. Bảng~\ref{tab:ke-hoach-m12} trình bày chi tiết lộ trình, đầu ra và tiêu chí hoàn thành của từng hạng mục. Các hướng nghiên cứu cần dữ liệu hoặc mô hình mới ngoài phạm vi đã đóng băng (như ước lượng ngưỡng nền trực tuyến có đăng ký lại giả thuyết, kiểm chứng trên bộ dữ liệu microservice thứ hai hoặc họ mô hình \term{LLM}{LLM} thứ hai) đã được tách riêng thành hướng mở rộng ở Bảng~\ref{tab:ch8-huong} (Mục~\ref{sec:ch8-huong-phat-trien}).
+
+\begin{table}[H]
+  \centering
+  \caption[Kế hoạch thực hiện phần việc còn lại trước bảo vệ]{Lộ trình thực hiện các hạng mục hoàn thiện cuối cùng ở mốc M12 trước khi nộp quyển chính thức và bảo vệ.}
+  \label{tab:ke-hoach-m12}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.7cm}|Y|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}p{3.4cm}|}
+    \hline
+    \rowcolor{gray!15}
+    \textbf{Hạng mục (Mốc)} & \textbf{Nội dung công việc cụ thể} & \textbf{Đầu ra bàn giao} & \textbf{Tiêu chí hoàn thành (DoD)} \\
+    \hline
+    \textbf{M12-1.} Xử lý tồn đọng giao diện & Rà soát bốn tồn đọng mức thấp và thẩm mỹ ghi nhận từ tổng duyệt lần 1 (nhãn ngày qua nửa đêm trên trục Timeline, nhãn phá hòa \code{Tie} ở thẻ phiếu \term{RCA}{RCA}, tách gói JavaScript theo màn hình). & Mã nguồn giao diện \code{services/web/} và bản dựng container \code{web} cập nhật. & \code{npm run check} và \code{pytest} đạt $100\%$; không còn cảnh báo kích thước gói khi build. \\
+    \hline
+    \textbf{M12-2.} Cập nhật ảnh chụp Chương~\ref{ch:platform} & Chụp lại Hình~\ref{fig:ch6-alert} (Alert Detail) và Hình~\ref{fig:ch6-incident} (Incident Detail) trên trình duyệt ở độ phân giải $1440 \times 900$ để thể hiện trực quan hai thẻ giải thích mới (\emph{How \comp{C1} built this context} và \emph{How the \term{RCA}{RCA} agent localized the root cause}). & Bộ tệp ảnh PNG 300~dpi cập nhật trong thư mục hình Chương~\ref{ch:platform}. & Ảnh rõ nét, khớp đúng mã ứng viên và mã sự cố trong kịch bản Bảng~\ref{tab:ch6-kich-ban}. \\
+    \hline
+    \textbf{M12-3.} Tổng duyệt demo lần 2 & Chạy thử toàn bộ kịch bản demo năm bước (Bảng~\ref{tab:ch6-kich-ban}) trong điều kiện ngắt mạng hoàn toàn (\code{DEMO\_OFFLINE=1}), bấm giờ từng bước và kiểm tra phương án dự phòng hai mức. & Biên bản tổng duyệt demo lần 2 và bộ tệp tĩnh dự phòng. & Tổng thời lượng trình diễn $\le 5$ phút; $0$ lỗi console, $0$ kết nối ra ngoài \code{localhost}. \\
+    \hline
+    \textbf{M12-4.} Hoàn thiện quyển báo cáo cuối & Hoàn thiện các trang phần đầu (Lời cam đoan kèm khai báo AI hỗ trợ, Lời cảm ơn, Tóm tắt tiếng Việt và Abstract tiếng Anh), kiểm tra chéo toàn bộ bảng số, hình vẽ và định dạng in ấn theo quy định của Khoa. & Bản PDF quyển báo cáo cuối cùng và slide thuyết trình bảo vệ. & Biên dịch LaTeX $0$ lỗi, $0$ tham chiếu đứt; khớp $100\%$ số liệu với kho \code{eval/results/}. \\
+    \hline
+  \end{tabularx}
+\end{table}

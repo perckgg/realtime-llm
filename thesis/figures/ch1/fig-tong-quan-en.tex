@@ -2,6 +2,7 @@
 % Usage: \input{figures/ch1/fig-tong-quan-en} inside a figure environment. Requires: \usepackage{tikz},
 % \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc,decorations.pathreplacing}.
 % Contains no numeric results (Chapter 1 rule).
+% Layout: all positions are explicit (cm) so that boxes, labels and the brace never collide.
 \begingroup
 \colorlet{fgBox}{black!75}
 \colorlet{fgCtav}{blue!55!black}
@@ -9,48 +10,49 @@
 \colorlet{fgNote}{black!55}
 \begin{tikzpicture}[
   font=\small,
-  blk/.style={draw=fgBox, rounded corners=2pt, align=center, text width=22mm,
-              minimum height=21mm, inner sep=2pt, line width=0.6pt},
+  blk/.style={draw=fgBox, rounded corners=2pt, align=center, text width=25mm,
+              minimum height=22mm, inner sep=2pt, line width=0.6pt},
   sub/.style={draw=fgCtav, rounded corners=1.5pt, fill=white, align=center,
-              text width=25mm, minimum height=5.5mm, inner sep=1.5pt, font=\footnotesize},
-  q/.style={font=\footnotesize\itshape, text=fgNote, align=center, text width=24mm, anchor=north},
+              text width=28mm, minimum height=6mm, inner sep=2pt, font=\footnotesize},
+  q/.style={font=\footnotesize\itshape, text=fgNote, align=center, text width=28mm, anchor=north},
   flow/.style={-{Stealth[length=2.2mm]}, line width=0.7pt, draw=fgBox},
   lab/.style={font=\scriptsize, text=fgNote, align=center},
 ]
-% Fixed column coordinates (cm)
-\node[blk] (tel) at (0,0) {\textbf{Telemetry}\\[3pt] metric\\ log\\ trace};
-\node[blk] (det) at (3.35,0) {\textbf{Anomaly detector}\\[3pt]\footnotesize Isolation Forest\\ on metrics};
+% Main blocks (columns, cm)
+\node[blk] (tel) at (0,0)    {\textbf{Telemetry}\\[3pt]\footnotesize metric\\ log\\ trace};
+\node[blk] (det) at (3.8,0)  {\textbf{Anomaly detector}\\[3pt]\footnotesize Isolation Forest\\ on metrics};
+\node[blk] (rca) at (13.2,0) {\textbf{RCA agent}\\[3pt]\footnotesize incident grouping\\ back-propagation\\ diagnosis report};
+\node[blk] (ui)  at (16.8,0) {\textbf{Dashboard}\\[3pt]\footnotesize operators\\ inspect and verify};
 
-\node[sub] (ret) at (7.5,0.55) {Evidence retrieval\\(BM25 + graph)};
-\node[sub, below=1.6mm of ret] (jud) {Judge LLM};
-\node[sub, below=1.6mm of jud] (pol) {Decision policy};
+% CTAV container: title + three stacked stages, fitted with generous padding
+\node[font=\small\bfseries, text=fgCtav] (ctitle) at (8.5,1.62) {CTAV};
+\node[sub] (ret) at (8.5,0.78) {Evidence retrieval\\(BM25 + graph)};
+\node[sub, below=3.2mm of ret] (jud) {Judge LLM};
+\node[sub, below=3.2mm of jud] (pol) {Decision policy};
 \begin{scope}[on background layer]
   \node[draw=fgCtav, fill=bgCtav, rounded corners=2pt, line width=0.8pt,
-        fit=(ret)(jud)(pol), inner xsep=2mm, inner ysep=2.6mm, yshift=1.4mm,
-        minimum height=25mm] (ctav) {};
+        fit=(ctitle)(ret)(jud)(pol), inner xsep=3mm, inner ysep=2mm] (ctav) {};
 \end{scope}
-\node[font=\small\bfseries, text=fgCtav, anchor=south] at ([yshift=-0.4mm]ret.north) {CTAV};
 \draw[-{Stealth[length=1.5mm]}, draw=fgCtav] (ret) -- (jud);
 \draw[-{Stealth[length=1.5mm]}, draw=fgCtav] (jud) -- (pol);
 
-\node[blk] (rca) at (11.4,0) {\textbf{RCA agent}\\[3pt]\footnotesize incident grouping\\ propagation\\ diagnosis};
-\node[blk] (ui)  at (14.75,0) {\textbf{Dashboard}\\[3pt]\footnotesize operators\\ inspect and verify};
-
-% Flows and labels (labels sit above arrows, in the gap between blocks)
+% Flows; labels sit above the arrows in the gaps
 \draw[flow] (tel) -- (det);
 \draw[flow] (det.east) -- node[lab, above=1pt]{candidate} (det.east -| ctav.west);
 \draw[flow] (ctav.east |- rca.west) -- node[lab, above=1pt]{alert} (rca.west);
 \draw[flow] (rca) -- (ui);
 
-% Operator questions, one row
-\path (0,-1.75) coordinate (qrow);
+% Operator questions, one row, clear of every box
+\path (0,-2.1) coordinate (qrow);
 \foreach \n/\t in {tel/{How is the\\system doing?}, det/{Is anything\\abnormal?}, ctav/{Is it a\\real incident?},
                    rca/{Which service\\is the root?}, ui/{How to\\respond?}}
   \node[q] at (\n |- qrow) {\t};
 
-% Semantic gap: brace above, spanning detector to CTAV
-\draw[decorate, decoration={brace, amplitude=4pt}, draw=fgNote]
-  ([yshift=3mm]det.north west) -- ([yshift=3mm]det.north west -| ctav.east)
-  node[midway, above=5pt, lab, text width=75mm]{semantic gap: a high anomaly score does not tell whether a real incident exists};
+% Semantic gap: brace above everything, spanning detector -> CTAV
+\coordinate (bl) at (det.west |- 0,2.6);
+\coordinate (br) at (ctav.east |- 0,2.6);
+\draw[decorate, decoration={brace, amplitude=4pt}, draw=fgNote] (bl) -- (br)
+  node[midway, above=6pt, lab, text width=80mm]
+  {semantic gap: a high anomaly score does not tell whether a real incident exists};
 \end{tikzpicture}
 \endgroup

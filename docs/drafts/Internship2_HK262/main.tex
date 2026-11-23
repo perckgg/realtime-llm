@@ -195,7 +195,7 @@
 \sloppy
 \captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=-9pt}
 %space remove between caption, figure, and text
-\captionsetup[table]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=7pt}
+\captionsetup[table]{labelfont={small,bf},textfont={small,it},belowskip=5pt,aboveskip=8pt}
 %space remove between caption, table, and text
 
 %\floatplacement{figure}{H}%forced here float placement automatically for figures
@@ -211,17 +211,21 @@
 %\renewcommand{\textfraction}{0.1}
 \renewcommand{\listfigurename}{Danh sách hình}
 
-\setlength{\floatsep}{5pt plus 2pt minus 2pt}
-\setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
-\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 3pt minus 2pt}
+\setlength{\textfloatsep}{12pt plus 3pt minus 2pt}
+\setlength{\intextsep}{12pt plus 3pt minus 2pt}
 
 \thesislayout
 
-\newcommand{\CTAV}{CTAV}
+\input{macros_xref}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\splitname}[1]{\texttt{#1}}
 \newcommand{\CHO}[2]{\textcolor{red}{[CHỜ #1: #2]}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\tblsetup}{\renewcommand{\arraystretch}{1.28}\setlength{\extrarowheight}{2pt}}
+\newcommand{\tblfont}{\fontsize{10.5pt}{14.5pt}\selectfont}
+\newcommand{\tblfontwide}{\fontsize{9pt}{12.5pt}\selectfont}
+\newcommand{\rowsep}{\arrayrulecolor{black!35}\hline\arrayrulecolor{black}}
 
 \begin{document}
 
@@ -291,6 +295,109 @@
 \tableofcontents
 
 \cleardoublepage
+\phantomsection
+\addcontentsline{toc}{section}{Danh mục từ viết tắt}
+\section*{Danh mục từ viết tắt}
+
+\noindent\textit{\tblfont Lưu ý khi đọc bản PDF: các ký hiệu thành phần (C1--C5), giả thuyết (H0--H5), câu hỏi nghiên cứu (RQ1--RQ5) và thuật ngữ trong hai danh mục đầu báo cáo đều là liên kết bấm được để nhảy nhanh tới phần giải thích; dùng phím \texttt{Alt + $\leftarrow$} trên trình đọc PDF để quay lại đúng trang đang đọc.}
+
+\begin{center}
+\tblfont
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{|l|>{\raggedright\arraybackslash}p{5.5cm}|Y|}
+  \hline
+  \rowcolor{gray!15}
+  \textbf{Viết tắt} & \textbf{Viết đầy đủ} & \textbf{Nghĩa trong báo cáo} \\
+  \hline
+  \xtarget{term:API}API & Application Programming Interface & Giao diện lập trình ứng dụng (FastAPI chỉ đọc và gọi LLM) \\
+  \hline
+  \xtarget{term:ARR}ARR & Alert Reduction Ratio & Tỷ lệ giảm cảnh báo nhờ gom thành sự cố (Mục~\ref{sec:ch2-chi-so}) \\
+  \hline
+  \xtarget{term:BM25}BM25 & Best Matching 25 & Hàm xếp hạng truy xuất theo từ khóa cục bộ (Mục~\ref{sec:ch2-bm25}) \\
+  \hline
+  \xtarget{term:CI}CI, CI95 & Confidence Interval (95\%) & Khoảng tin cậy 95\% ước lượng bằng bootstrap (Mục~\ref{sec:ch2-thong-ke}) \\
+  \hline
+  \xtarget{term:CTAV}CTAV & Calibrated Topology-Aware Alert Validation & Phương pháp thẩm định cảnh báo hiệu chỉnh có nhận biết topology (Mục~\ref{sec:ch4-ctav}) \\
+  \hline
+  \xtarget{term:FN}FN & False Negative & Cửa sổ sự cố bị bỏ sót \\
+  \hline
+  \xtarget{term:FP}FP & False Positive & Báo động giả trên cửa sổ bình thường \\
+  \hline
+  \xtarget{term:FPR}FPR & False Positive Rate & Tỷ lệ báo động giả trên cửa sổ bình thường (Mục~\ref{sec:ch2-chi-so}) \\
+  \hline
+  \xtarget{term:HitK}Hit@$k$ & Hit Rate at $k$ & Tỷ lệ sự cố có service gốc thực tế nằm trong top-$k$ xếp hạng RCA (Mục~\ref{sec:ch2-hitk}) \\
+  \hline
+  \xtarget{term:IF}IF & Isolation Forest & Bộ phát hiện bất thường chuỗi thời gian đa biến không giám sát (Mục~\ref{sec:ch2-iforest}) \\
+  \hline
+  \xtarget{term:JSON}JSON & JavaScript Object Notation & Định dạng cấu trúc cho đầu ra thẩm định và báo cáo chẩn đoán RCA \\
+  \hline
+  \xtarget{term:LLM}LLM & Large Language Model & Mô hình ngôn ngữ lớn (\texttt{gemini-2.5-flash}, Mục~\ref{sec:ch2-judge}) \\
+  \hline
+  \xtarget{term:RAG}RAG & Retrieval-Augmented Generation & Sinh/thẩm định có tăng cường ngữ cảnh truy xuất (Mục~\ref{sec:ch2-rag}) \\
+  \hline
+  \xtarget{term:RCA}RCA & Root Cause Analysis & Phân tích và định vị service nguyên nhân gốc (Mục~\ref{sec:ch2-rca}) \\
+  \hline
+  \xtarget{term:TN}TN & True Negative & Cửa sổ bình thường được bác bỏ đúng \\
+  \hline
+  \xtarget{term:TP}TP & True Positive & Cửa sổ sự cố được phát hiện đúng \\
+  \hline
+\end{tabularx}
+\end{center}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{section}{Danh mục thành phần và thuật ngữ hệ thống}
+\section*{Danh mục thành phần và thuật ngữ hệ thống}
+
+\noindent\textbf{1. Năm thành phần thiết kế trong \CTAV{} và cổng cứu cảnh báo (C1--C5)}
+\begin{center}
+\tblfont
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{|l|Y|>{\raggedright\arraybackslash}p{3.1cm}|>{\raggedright\arraybackslash}p{2.3cm}|}
+  \hline
+  \rowcolor{gray!15}
+  \textbf{Ký hiệu} & \textbf{Tên chức năng và cơ chế tóm tắt} & \textbf{Vai trò chốt} & \textbf{Chi tiết} \\
+  \hline
+  \xtarget{comp:C1}\textbf{C1} & Truy xuất lai BM25--topology theo \hyperlink{term:FusionScore}{Fusion Score} mở rộng 2-hop trên đồ thị gọi dịch vụ & \textbf{Đang dùng} & Mục~\ref{sec:ch4-c1} \\
+  \hline
+  \xtarget{comp:C2}\textbf{C2} & Ngưỡng tin cậy bất đối xứng theo nguồn bằng chứng ($\theta_{\text{topo}} > \theta_{\text{local}}$) & \textbf{Đã loại} (trên \splitname{val}) & Mục~\ref{sec:ch4-policy} \\
+  \hline
+  \xtarget{comp:C3}\textbf{C3} & Neo bằng chứng bất thường tại chính service phát cảnh báo $s_0$ theo phân vị nền $p_{90}$ của \splitname{dev} & \textbf{Đang dùng} (đóng góp chính) & Mục~\ref{sec:ch4-policy} \\
+  \hline
+  \xtarget{comp:C4}\textbf{C4} & Định tuyến hai tầng thích nghi (BM25 tầng 1 $\to$ C1 tầng 2 khi bất định) & \textbf{Đã loại} (trên \splitname{val}) & Mục~\ref{sec:ch4-c4} \\
+  \hline
+  \xtarget{comp:C5}\textbf{C5} & Cổng cứu cảnh báo \hyperlink{term:RescueScore}{Rescue Score} kết hợp log lỗi, khoảng cách topology và độ gần thời gian & \textbf{Chỉ là ablation} & Mục~\ref{sec:ch4-detector} \\
+  \hline
+\end{tabularx}
+\end{center}
+
+\vspace{0.3cm}
+\noindent\textbf{2. Các khái niệm chuyên môn lõi và hệ thống giả thuyết}
+\begin{center}
+\tblfont
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{4.0cm}|Y|>{\raggedright\arraybackslash}p{2.6cm}|}
+  \hline
+  \rowcolor{gray!15}
+  \textbf{Thuật ngữ / Ký hiệu} & \textbf{Giải thích tóm tắt} & \textbf{Mục chi tiết} \\
+  \hline
+  \xtarget{term:FusionScore}\textbf{Fusion Score} & Điểm hợp nhất ba yếu tố (từ khóa BM25 chuẩn hóa, độ gần thời gian, độ gần đồ thị) để xếp hạng ngữ cảnh trong C1 & Mục~\ref{sec:ch2-fusion}, \ref{sec:ch4-c1} \\
+  \hline
+  \xtarget{term:RescueScore}\textbf{Rescue Score} & Điểm cứu các cửa sổ dưới ngưỡng Isolation Forest dựa trên log lỗi, topology và thời gian (C5) & Mục~\ref{sec:ch4-detector} \\
+  \hline
+  \xtarget{term:ConfirmationBias}\textbf{Thiên lệch xác nhận} & Xu hướng bộ thẩm định LLM xác nhận nhầm cảnh báo giả khi thấy bằng chứng nền vô hại sát thời điểm $t_0$ & Mục~\ref{sec:ch2-thien-lech}, \ref{sec:ch5-h1} \\
+  \hline
+  \xtarget{term:TelemetryWindow}\textbf{Cửa sổ có telemetry} & Tập con các cửa sổ có đủ tín hiệu quan sát (metric/log/trace) làm cơ sở tính chỉ số chính của nhánh thẩm định & Mục~\ref{sec:ch5-data} \\
+  \hline
+  \textbf{H0--H5} & Sáu giả thuyết đăng ký trước (commit \texttt{be2b985}) trước khi mở tập \splitname{test}; H2 là giả thuyết chính & Bảng~\ref{tab:h0-h5} \\
+  \hline
+  \textbf{RQ1--RQ5} & Năm câu hỏi nghiên cứu gắn với năm mục tiêu cụ thể của đề tài ở Chương~\ref{ch:mo-dau} & Mục~\ref{sec:ch1-rq}, Bảng~\ref{tab:ch1-rq} \\
+  \hline
+\end{tabularx}
+\end{center}
+\newpage
+
+\cleardoublepage
 \addcontentsline{toc}{section}{Danh sách hình}
 \listoffigures
 \newpage
@@ -299,33 +406,6 @@
 \addcontentsline{toc}{section}{Danh sách bảng}
 \listoftables
 \newpage
-
-% \phantomsection
-% \addcontentsline{toc}{section}{Danh mục viết tắt}
-% \section*{Danh mục viết tắt}
-
-% \begin{center}
-% \begin{tabular}{|c|c|c|}
-%   \hline
-%   \textbf{Số thứ tự} & \textbf{Ký hiệu viết tắt} & \textbf{Chữ viết đầy đủ} \\
-%   \hline
-%   1 & ITAM & Information Technology Asset Management \\
-%   \hline 
-%   2 & IT & Information Technology \\
-%   \hline 
-%   3 & DevOps & Development và Operations \\
-%   \hline 
-%   4 & SRE & Site Reliability Engineer \\
-%   \hline 
-%   5 & FDI & Foreign Direct Investment \\
-%   \hline
-%   6 & AI & Artificial Intelligence \\
-%   \hline
-%   7 & CNTT & Công nghệ thông tin \\
-%   \hline
-% \end{tabular}
-% \end{center}
-% \newpage
 
  \input{Sections/C1_TongQuanDeTai}
  \newpage
@@ -341,25 +421,11 @@
  \newpage
  \input{Sections/Ch7_ThaoLuan}
  \newpage
-% \input{Sections/C2_CoSoLyThuyet}
-% \newpage
-%  \input{Sections/C3_CacSanPhamLienQuanDeTai}
-%  \newpage
-% \input{Sections/C4_HeThongDeXuat}
-% \newpage
-%  \input{Sections/C5_PhantichThietKe}
-%  \newpage
-% \input{Sections/C6_HienThucVaKiemThu}
-% \newpage
-% \input{Sections/C7_DanhGiaHeThong}
-% \newpage
-% \input{Sections/C8_TrienKhaiHeThong}
-% \newpage
-% \input{Sections/C9_TongKet}
-
-% \newpage
-% \section*{Kế hoạch cho Đồ án Tốt nghiệp (Capstone Project)}
-% \input{Sections/DATN-Plan}
+ \input{Sections/Ch8_TongKet}
+ \newpage
+ \input{Sections/Ch9_CongBoKhoaHoc}
+ \newpage
+ \input{Sections/KeHoach_ThucHien}
 
 
 \renewcommand\refname{}
@@ -459,7 +525,7 @@ W. Guan, J. Cao, S. Qian, J. Gao, and C. Ouyang, ``LogLLM: Log-Based Anomaly Det
 Z. Wang \textit{et al.}, ``RCAgent: Cloud Root Cause Analysis by Autonomous Agents with Tool-Augmented Large Language Models,'' in \textit{Proc. 33rd ACM Int. Conf. Information and Knowledge Management (CIKM)}, 2024. DOI: 10.1145/3627673.3680016.
 
 \bibitem{icaetm2026}
-Nguyễn Văn Hoàng Khang, ``Topology-Aware Evidence Retrieval for Cost-Aware LLM Alert Validation in Microservices,'' \textit{Proceedings of ICAETM 2026 (Atlantis Press / Springer Nature)}, 2026.
+K. V. H. Nguyen and C. T. N. Vo, ``Topology-Guided Evidence Retrieval for Cost-Aware LLM Alert Validation in Microservices,'' in \textit{Proc. Int. Conf. Advances in Engineering, Technology \& Management (ICAETM 2026)}, Track~4: Computing, AI, Data \& Cyber Technologies, Paper~386, Pune, India, Oct.~29, 2026, 6~pp. (accepted and presented). Mã nguồn: \url{https://github.com/perckgg/topology-alert-validation-2026}.
 
 \bibitem{zhao2020alertstorm}
 N. Zhao \textit{et al.}, ``Understanding and Handling Alert Storm for Online Service Systems,'' in \textit{Proc. ACM/IEEE 42nd Int. Conf. Softw. Eng.: Softw. Eng. Pract. (ICSE-SEIP)}, 2020, pp. 162--171. DOI: 10.1145/3377813.3381363.

@@ -1,0 +1,54 @@
+% Figure 1.2 — Trade-off of topology context (conceptual diagram, no numbers). English version.
+% Usage: \input{figures/ch1/fig-danh-doi-en}. Requires: \usepackage{tikz},
+% \usetikzlibrary{positioning,arrows.meta,calc}.
+\begingroup
+\colorlet{fgBox}{black!75}
+\colorlet{fgEv}{blue!55!black}
+\colorlet{bgEv}{blue!12}
+\colorlet{fgBad}{red!65!black}
+\colorlet{fgGood}{green!40!black}
+\colorlet{fgNote}{black!55}
+\begin{tikzpicture}[
+  font=\small,
+  svc/.style={circle, draw=fgBox, minimum size=6.5mm, inner sep=0pt, font=\scriptsize, line width=0.5pt},
+  alert/.style={svc, line width=1.2pt, draw=fgBad},
+  got/.style={fill=bgEv, draw=fgEv},
+  edge/.style={draw=black!45, line width=0.5pt},
+  cell/.style={font=\footnotesize, align=left, text width=70mm, anchor=north west},
+  hdr/.style={font=\small\bfseries, align=center},
+]
+\newcommand{\minigraph}[4]{% #1 name, #2 x, #3 style hop-1, #4 style hop-2
+  \node[alert, got] (s0#1) at (#2,0) {$s_0$};
+  \node[svc, #3] (a#1) at ($(s0#1)+(-1.1,0.8)$) {};
+  \node[svc, #3] (b#1) at ($(s0#1)+(1.1,0.8)$) {};
+  \node[svc, #4] (c#1) at ($(a#1)+(0,1.0)$) {};
+  \node[svc, #4] (d#1) at ($(b#1)+(0,1.0)$) {};
+  \draw[edge] (s0#1)--(a#1) (s0#1)--(b#1) (a#1)--(c#1) (b#1)--(d#1);
+}
+\minigraph{L}{0}{}{}
+\minigraph{R}{9}{got}{got}
+\node[hdr] at (0,2.55) {(a) Local retrieval (BM25)};
+\node[hdr] at (9,2.55) {(b) Graph expansion (2-hop)};
+
+% Legend, centred between the two graphs
+\node[font=\scriptsize, text=fgNote, anchor=west] at (3.0,1.2)
+  {\tikz[baseline=-0.6ex]\node[svc,alert,got,minimum size=3.5mm]{};~alerting service};
+\node[font=\scriptsize, text=fgNote, anchor=west] at (3.0,0.5)
+  {\tikz[baseline=-0.6ex]\node[svc,got,minimum size=3.5mm]{};~evidence source};
+
+% 2 x 2 table under each graph
+\node[cell] (a1) at (-3.5,-0.9) {\textbf{Incident window:} little evidence at $s_0$ itself\\
+  \textcolor{fgBad}{$\Rightarrow$ propagated incidents are easily missed}};
+\node[cell, below=4mm of a1.south west, anchor=north west] (a2) {\textbf{Normal window:} context is nearly empty\\
+  \textcolor{fgGood}{$\Rightarrow$ judge correctly rejects}};
+\node[cell] (b1) at (5.5,-0.9) {\textbf{Incident window:} propagation chain is visible\\
+  \textcolor{fgGood}{$\Rightarrow$ catches more incidents}};
+\node[cell, below=4mm of b1.south west, anchor=north west] (b2) {\textbf{Normal window:} lots of harmless evidence\\
+  \textcolor{fgBad}{$\Rightarrow$ judge easily confirms by mistake}};
+
+% Takeaway
+\node[font=\footnotesize\bfseries, align=center, draw=fgNote, rounded corners=2pt, inner sep=4pt,
+      below=6mm of $(a2.south east)!0.5!(b2.south west)$]
+  {Wider context: recall rises, but false alarms rise too};
+\end{tikzpicture}
+\endgroup

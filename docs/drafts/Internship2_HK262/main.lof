@@ -1,23 +1,24 @@
-\contentsline {figure}{\numberline {1}{\ignorespaces Tổng quan hệ thống}}{10}{figure.caption.3}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Đồ thị phụ thuộc service dựng từ trace của Nezha}}{20}{figure.caption.5}%
-\contentsline {figure}{\numberline {3}{\ignorespaces Minh họa thiên lệch xác nhận của bộ thẩm định LLM}}{22}{figure.caption.6}%
-\contentsline {figure}{\numberline {4}{\ignorespaces Kiến trúc tổng thể bốn khâu của nền tảng ở cấu hình chốt}}{37}{figure.caption.10}%
-\contentsline {figure}{\numberline {5}{\ignorespaces So sánh kiến trúc CTAV ban đầu và cấu hình chốt}}{42}{figure.caption.13}%
-\contentsline {figure}{\numberline {6}{\ignorespaces Cơ chế truy xuất nhận biết topology C1 và Fusion Score}}{44}{figure.caption.15}%
-\contentsline {figure}{\numberline {7}{\ignorespaces Sơ đồ luồng chính sách quyết định CTAV}}{46}{figure.caption.16}%
-\contentsline {figure}{\numberline {8}{\ignorespaces Quy trình ba bước của tác tử RCA}}{49}{figure.caption.19}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Giao thức chia dữ liệu chống rò rỉ theo lần tiêm lỗi}}{56}{figure.caption.22}%
-\contentsline {figure}{\numberline {10}{\ignorespaces Ba cổng kiểm chứng kỹ thuật và luồng thực thi G-test}}{58}{figure.caption.25}%
-\contentsline {figure}{\numberline {11}{\ignorespaces Kết quả thí nghiệm H1 về độ gần thời gian trên tập val}}{61}{figure.caption.28}%
-\contentsline {figure}{\numberline {12}{\ignorespaces Tỷ lệ candidate của detector trên ba split dev, val và test}}{63}{figure.caption.30}%
-\contentsline {figure}{\numberline {13}{\ignorespaces Điểm vận hành Recall--FPR của năm phương pháp trên val và test}}{64}{figure.caption.32}%
-\contentsline {figure}{\numberline {14}{\ignorespaces Hiệu ghép cặp và khoảng tin cậy CI95 của các phương pháp}}{65}{figure.caption.34}%
-\contentsline {figure}{\numberline {15}{\ignorespaces Phễu quyết định của CTAV trên tập test}}{68}{figure.caption.38}%
-\contentsline {figure}{\numberline {16}{\ignorespaces Recall của C1 và CTAV theo nhóm service có và thiếu ngưỡng dev}}{69}{figure.caption.40}%
-\contentsline {figure}{\numberline {17}{\ignorespaces Đường F1 theo ngân sách lần gọi LLM trên val và test}}{70}{figure.caption.42}%
-\contentsline {figure}{\numberline {18}{\ignorespaces Triển khai platform bằng Docker Compose}}{77}{figure.caption.47}%
-\contentsline {figure}{\numberline {19}{\ignorespaces Màn hình Timeline trên tập test}}{78}{figure.caption.49}%
-\contentsline {figure}{\numberline {20}{\ignorespaces Màn hình Alert Detail cho một cảnh báo sai bị C3 hạ}}{79}{figure.caption.50}%
-\contentsline {figure}{\numberline {21}{\ignorespaces Màn hình Incident Detail cho một sự cố cascade}}{81}{figure.caption.51}%
-\contentsline {figure}{\numberline {22}{\ignorespaces Màn hình Experiment Comparison trên tập test}}{82}{figure.caption.52}%
+\contentsline {figure}{\numberline {1}{\ignorespaces Tổng quan hệ thống và khoảng trống ngữ nghĩa}}{13}{figure.caption.5}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Đánh đổi khi mở rộng ngữ cảnh truy xuất theo đồ thị}}{14}{figure.caption.6}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Đồ thị phụ thuộc service dựng từ trace của Nezha}}{27}{figure.caption.9}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Minh họa thiên lệch xác nhận của bộ thẩm định LLM}}{29}{figure.caption.10}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Kiến trúc tổng thể bốn khâu của nền tảng ở cấu hình chốt}}{44}{figure.caption.16}%
+\contentsline {figure}{\numberline {6}{\ignorespaces So sánh kiến trúc CTAV ban đầu và cấu hình chốt}}{50}{figure.caption.19}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Cơ chế truy xuất nhận biết topology C1 và Fusion Score}}{53}{figure.caption.21}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Sơ đồ luồng chính sách quyết định CTAV}}{54}{figure.caption.22}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Quy trình ba bước của tác tử RCA}}{58}{figure.caption.25}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Giao thức chia dữ liệu chống rò rỉ theo lần tiêm lỗi}}{65}{figure.caption.28}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Ba cổng kiểm chứng kỹ thuật và luồng thực thi G-test}}{68}{figure.caption.31}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Kết quả thí nghiệm H1 về độ gần thời gian trên tập val}}{71}{figure.caption.34}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Tỷ lệ candidate của detector trên ba split dev, val và test}}{74}{figure.caption.36}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Điểm vận hành Recall--FPR của năm phương pháp trên val và test}}{75}{figure.caption.38}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Hiệu ghép cặp và khoảng tin cậy CI95 của các phương pháp}}{77}{figure.caption.41}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Phễu quyết định của CTAV trên tập test}}{81}{figure.caption.46}%
+\contentsline {figure}{\numberline {17}{\ignorespaces Recall của C1 và CTAV theo nhóm service có và thiếu ngưỡng dev}}{82}{figure.caption.48}%
+\contentsline {figure}{\numberline {18}{\ignorespaces Đường F1 theo ngân sách lần gọi LLM trên val và test}}{84}{figure.caption.50}%
+\contentsline {figure}{\numberline {19}{\ignorespaces Triển khai platform bằng Docker Compose}}{91}{figure.caption.55}%
+\contentsline {figure}{\numberline {20}{\ignorespaces Màn hình Timeline trên tập test}}{93}{figure.caption.57}%
+\contentsline {figure}{\numberline {21}{\ignorespaces Màn hình Alert Detail cho một cảnh báo sai bị C3 hạ}}{94}{figure.caption.58}%
+\contentsline {figure}{\numberline {22}{\ignorespaces Màn hình Incident Detail cho một sự cố cascade}}{95}{figure.caption.59}%
+\contentsline {figure}{\numberline {23}{\ignorespaces Màn hình Experiment Comparison trên tập test}}{97}{figure.caption.60}%
 \contentsfinish 

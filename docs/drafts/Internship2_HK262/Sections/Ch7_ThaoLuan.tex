@@ -10,7 +10,7 @@
 \section{Thảo luận}
 \label{ch:thao-luan}
 
-Chương~\ref{ch:thuc-nghiem} đã trả lời giả thuyết nào đạt và giả thuyết nào không. Chương này trả lời ba câu hỏi tiếp theo: các kết quả đó có nghĩa gì, đáng tin tới đâu, và hệ thống sai ở những ca nào. Chương không lặp lại bảng số của Chương~\ref{ch:thuc-nghiem}; mỗi luận điểm chỉ trích một hai con số rồi giải thích nguyên nhân. Mục~\ref{sec:ch7-tong-hop} tổng hợp các kết quả chính cùng mức độ tin cậy của từng kết quả. Mục~\ref{sec:ch7-thao-luan} giải thích vì sao C3 có tác dụng còn C2, C4 và C5 thì không. Mục~\ref{sec:ch7-hop-le} rà soát các mối đe doạ tính hợp lệ, và Mục~\ref{sec:ch7-ca-sai} phân tích toàn bộ ca sai trên \splitname{test} của \CTAV{} và tác tử RCA. Hạn chế của hệ thống và hướng phát triển được để lại cho Chương~\ref{ch:tong-ket}.
+Chương~\ref{ch:thuc-nghiem} đã trả lời giả thuyết nào đạt và giả thuyết nào không. Chương này trả lời ba câu hỏi tiếp theo: các kết quả đó có nghĩa gì, đáng tin tới đâu, và hệ thống sai ở những ca nào. Chương không lặp lại bảng số của Chương~\ref{ch:thuc-nghiem}; mỗi luận điểm chỉ trích một hai con số rồi giải thích nguyên nhân. Mục~\ref{sec:ch7-tong-hop} tổng hợp các kết quả chính cùng mức độ tin cậy của từng kết quả. Mục~\ref{sec:ch7-thao-luan} giải thích vì sao \comp{C3} (neo bằng chứng) có tác dụng còn \comp{C2} (ngưỡng bất đối xứng), \comp{C4} (định tuyến hai tầng) và \comp{C5} (\term{RescueScore}{Rescue Score}) thì không. Mục~\ref{sec:ch7-hop-le} rà soát các mối đe doạ tính hợp lệ, và Mục~\ref{sec:ch7-ca-sai} phân tích toàn bộ ca sai trên \splitname{test} của \CTAV{} và tác tử \term{RCA}{RCA}. Hạn chế của hệ thống và hướng phát triển được để lại cho Chương~\ref{ch:tong-ket}.
 
 % -----------------------------------------------------------------------------
 \subsection{Tổng hợp kết quả chính}
@@ -18,131 +18,184 @@ Chương~\ref{ch:thuc-nghiem} đã trả lời giả thuyết nào đạt và gi
 
 Mục này gom kết quả của Chương~\ref{ch:thuc-nghiem} thành năm khẳng định và đánh giá mức tin cậy của từng khẳng định. Tiêu chí tin cậy ở đây gồm hai phần: kết quả có lặp lại cùng chiều giữa \splitname{val} và \splitname{test} hay không, và khoảng tin cậy có đủ hẹp để loại trừ giá trị $0$ hay không. Bảng~\ref{tab:ch7-tong-hop} trình bày năm khẳng định; người đọc nên nhìn cột cuối để biết khẳng định nào có thể dùng như kết luận và khẳng định nào chỉ nên đọc như giải thích cơ chế.
 
-\begin{table}[htbp]
+\begin{table}[H]
   \centering
-  \caption[Năm khẳng định chính và mức độ tin cậy]{Năm khẳng định chính rút ra từ Chương~\ref{ch:thuc-nghiem}, bằng chứng trên \splitname{test} (cửa sổ có telemetry: $11.985$ cửa sổ, $346$ lỗi), đối chiếu \splitname{val} ($7.636$ cửa sổ, $209$ lỗi) và mức độ tin cậy.}
+  \caption[Năm khẳng định chính và mức độ tin cậy]{Năm khẳng định chính rút ra từ Chương~\ref{ch:thuc-nghiem}, bằng chứng trên \splitname{test} (\term{TelemetryWindow}{cửa sổ có telemetry}: $11.985$ cửa sổ, $346$ lỗi), đối chiếu \splitname{val} ($7.636$ cửa sổ, $209$ lỗi) và mức độ tin cậy.}
   \label{tab:ch7-tong-hop}
-  \scriptsize
-  \renewcommand{\arraystretch}{1.2}
-  \setlength{\tabcolsep}{3pt}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.3cm} Y >{\raggedright\arraybackslash}p{2.6cm} >{\raggedright\arraybackslash}p{2.4cm}@{}}
-    \toprule
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.4cm}|Y|>{\raggedright\arraybackslash}p{2.7cm}|>{\raggedright\arraybackslash}p{2.6cm}|}
+    \hline
+    \rowcolor{gray!15}
     \textbf{Khẳng định} & \textbf{Bằng chứng chính trên \splitname{test}} & \textbf{Trên \splitname{val}} & \textbf{Mức tin cậy} \\
-    \midrule
-    (1) Thêm ngữ cảnh topology chưa hiệu chỉnh (C1) tăng cả recall lẫn báo động giả & $96$ so với $34$ TP; $1.235$ so với $369$ FP; McNemar $p < 0{,}001$ ở cả hai nhãn & Cùng chiều, biên độ nhỏ hơn & Cao: lặp lại, CI loại trừ $0$ \\
-    (2) Báo động giả của judge đến từ trace cục bộ sát thời điểm cảnh báo, không từ service lân cận & Chỉ $0{,}38\%$ bằng chứng của C1 đến từ service lân cận; $63/64$ FP còn lại của \CTAV{} dùng bằng chứng cục bộ & Thí nghiệm can thiệp H1 (chỉ chạy trên \splitname{val}) & Trung bình: cơ chế đo trên \splitname{val}, \splitname{test} chỉ có bằng chứng quan sát \\
-    (3) Neo bằng chứng (C3) giảm mạnh báo động giả & C3 cắt $1.171/1.235$ FP của C1 ($94{,}8\%$); FPR của \CTAV{} $0{,}0055$ so với $0{,}0317$ của BM25 & Cùng chiều (giảm FPR $8$ lần so với BM25) & Cao: lặp lại, CI loại trừ $0$ \\
-    (4) \CTAV{} với ngưỡng nền \splitname{dev} cố định không giữ được recall & Recall $0{,}040$; C3 hạ $82/96$ TP của C1, trong đó $67$ TP ở service thiếu ngưỡng \splitname{dev} & Recall thấp hơn C1, F1 vẫn cao nhất & Cao: nguyên nhân định lượng được (Phát hiện 11) \\
-    (5) Tác tử RCA chỉ định vị tốt bằng chất lượng cảnh báo đầu vào & $\text{Hit@1} = 0{,}471$, bằng baseline; $29/50$ lần tiêm không có cảnh báo & $\text{Hit@1} = 0{,}636$, bằng baseline & Thấp: chỉ $17$ sự cố có nhãn, CI rộng \\
-    \bottomrule
+    \hline
+    (1) Thêm ngữ cảnh topology chưa hiệu chỉnh (\comp{C1}) tăng cả recall lẫn báo động giả & $96$ so với $34$ TP; $1.235$ so với $369$ FP; McNemar $p < 0{,}001$ ở cả hai nhãn & Cùng chiều, biên độ nhỏ hơn & Cao: lặp lại, CI loại trừ $0$ \\
+    \hline
+    (2) Báo động giả của judge đến từ trace cục bộ sát thời điểm cảnh báo, không từ service lân cận & Chỉ $0{,}38\%$ bằng chứng của \comp{C1} đến từ service lân cận; $63/64$ FP còn lại của \CTAV{} dùng bằng chứng cục bộ & Thí nghiệm can thiệp \hyp{H1} (chỉ chạy trên \splitname{val}) & Trung bình: cơ chế đo trên \splitname{val}, \splitname{test} chỉ có bằng chứng quan sát \\
+    \hline
+    (3) Neo bằng chứng (\comp{C3}) giảm mạnh báo động giả & \comp{C3} cắt $1.171/1.235$ FP của \comp{C1} ($94{,}8\%$); \term{FPR}{FPR} của \CTAV{} $0{,}0055$ so với $0{,}0317$ của \term{BM25}{BM25} & Cùng chiều (giảm \term{FPR}{FPR} $8$ lần so với \term{BM25}{BM25}) & Cao: lặp lại, CI loại trừ $0$ \\
+    \hline
+    (4) \CTAV{} với ngưỡng nền \splitname{dev} cố định không giữ được recall & Recall $0{,}040$; \comp{C3} hạ $82/96$ TP của \comp{C1}, trong đó $67$ TP ở service thiếu ngưỡng \splitname{dev} & Recall thấp hơn \comp{C1}, F1 vẫn cao nhất & Cao: nguyên nhân định lượng được (Phát hiện 11) \\
+    \hline
+    (5) Tác tử \term{RCA}{RCA} chỉ định vị tốt bằng chất lượng cảnh báo đầu vào & $\text{Hit@1} = 0{,}471$, bằng baseline; $29/50$ lần tiêm không có cảnh báo & $\text{Hit@1} = 0{,}636$, bằng baseline & Thấp: chỉ $17$ sự cố có nhãn, CI rộng \\
+    \hline
   \end{tabularx}
 \end{table}
 % src: ctav_final_test_v1, h0_test_*, m8_finding11_test_v1, rca_final_test_v1, pipeline_test_v2 (graph evidence share)
 
-Khẳng định (1) và (3) là hai kết quả vững nhất của luận văn. Cả hai lặp lại cùng chiều trên hai split độc lập, và khoảng tin cậy không chứa $0$. Chúng cho thấy một đánh đổi rõ ràng: ngữ cảnh rộng hơn giúp judge thấy nhiều sự cố hơn, nhưng cũng khiến judge xác nhận nhiều cửa sổ bình thường hơn; và một chính sách quyết định có kiểm chứng bằng chứng gỡ được phần lớn báo động giả này. Khẳng định (4) là kết quả âm nhưng cũng là kết quả có giá trị. Nó đảo chiều kết luận H2 từ ``đạt một phần'' trên \splitname{val} thành ``không được chấp nhận'' trên \splitname{test}, và Chương~\ref{ch:thuc-nghiem} đã định lượng được nguyên nhân: $32/42$ service của \splitname{test} không có ngưỡng nền \splitname{dev}. % src: m8_finding11_test_v1
+Khẳng định (1) và (3) là hai kết quả vững nhất của luận văn. Cả hai lặp lại cùng chiều trên hai split độc lập, và khoảng tin cậy không chứa $0$. Chúng cho thấy một đánh đổi rõ ràng: ngữ cảnh rộng hơn giúp judge thấy nhiều sự cố hơn, nhưng cũng khiến judge xác nhận nhiều cửa sổ bình thường hơn; và một chính sách quyết định có kiểm chứng bằng chứng gỡ được phần lớn báo động giả này. Khẳng định (4) là kết quả âm nhưng cũng là kết quả có giá trị. Nó đảo chiều kết luận \hyp{H2} từ ``đạt một phần'' trên \splitname{val} thành ``không được chấp nhận'' trên \splitname{test}, và Chương~\ref{ch:thuc-nghiem} đã định lượng được nguyên nhân: $32/42$ service của \splitname{test} không có ngưỡng nền \splitname{dev}. % src: m8_finding11_test_v1
 Khẳng định (5) có độ tin cậy thấp nhất vì cỡ mẫu nhỏ, nên chỉ nên đọc như một quan sát về giới hạn của kiến trúc, không như một ước lượng chính xác về khả năng định vị.
 
 % -----------------------------------------------------------------------------
-\subsection{Thảo luận: vì sao C3 có tác dụng, vì sao C2, C4, C5 thì không}
+\subsection{Thảo luận: vì sao \comp{C3} có tác dụng, vì sao \comp{C2}, \comp{C4}, \comp{C5} thì không}
 \label{sec:ch7-thao-luan}
 
-Mục này giải thích cơ chế đứng sau kết quả ablation H3, thay vì chỉ ghi nhận thành phần nào được giữ. Năm thành phần được nhắc theo đúng chức năng đã định nghĩa ở Chương~\ref{ch:de-xuat}: C1 (truy xuất lai BM25--topology, đang dùng), C2 (gating theo nguồn bằng chứng, đã loại), C3 (neo bằng chứng, đang dùng), C4 (định tuyến hai tầng, đã loại) và C5 (Rescue Score, chỉ là ablation).
+Mục này giải thích cơ chế đứng sau kết quả ablation \hyp{H3}, thay vì chỉ ghi nhận thành phần nào được giữ. Năm thành phần được nhắc theo đúng chức năng đã định nghĩa ở Chương~\ref{ch:de-xuat}: \comp{C1} (truy xuất lai \term{BM25}{BM25}--topology, đang dùng), \comp{C2} (gating theo nguồn bằng chứng, đã loại), \comp{C3} (neo bằng chứng, đang dùng), \comp{C4} (định tuyến hai tầng, đã loại) và \comp{C5} (\term{RescueScore}{Rescue Score}, chỉ là ablation).
 
-\subsubsection{Vì sao C3 có tác dụng}
+\subsubsection{Vì sao \comp{C3} có tác dụng}
 \label{sec:ch7-c3}
 
-C3 có tác dụng vì nó kiểm đúng chỗ mà judge yếu. Thí nghiệm H1 trên \splitname{val} cho thấy judge rất nhạy với trace của chính service đang xét khi trace nằm sát thời điểm cảnh báo: chỉ đưa loại bằng chứng này vào ngữ cảnh làm tỷ lệ \code{TRUE\_ALERT} trên cửa sổ bình thường lên $60{,}8\%$, so với $18{,}1\%$ khi chỉ đưa log cục bộ. % src: h1_val (Mục ch5-h1)
-Judge không phân biệt ``có một span chậm'' với ``span đó chậm bất thường''. C3 bổ sung đúng phép so sánh còn thiếu: mỗi span được judge trích dẫn phải vượt ngưỡng $p_{90}$ của cùng thao tác trên \splitname{dev}, nếu không thì phán quyết bị hạ xuống \code{UNCERTAIN}. Nói cách khác, C3 không thay judge ra quyết định; nó buộc lý do của judge phải có cơ sở định lượng.
+\comp{C3} có tác dụng vì nó kiểm đúng chỗ mà judge yếu. Thí nghiệm \hyp{H1} trên \splitname{val} cho thấy judge rất nhạy với trace của chính service đang xét khi trace nằm sát thời điểm cảnh báo: chỉ đưa loại bằng chứng này vào ngữ cảnh làm tỷ lệ \code{TRUE\_ALERT} trên cửa sổ bình thường lên $60{,}8\%$, so với $18{,}1\%$ khi chỉ đưa log cục bộ. % src: h1_val (Mục ch5-h1)
+Judge không phân biệt ``có một span chậm'' với ``span đó chậm bất thường''. \comp{C3} bổ sung đúng phép so sánh còn thiếu: mỗi span được judge trích dẫn phải vượt ngưỡng $p_{90}$ của cùng thao tác trên \splitname{dev}, nếu không thì phán quyết bị hạ xuống \code{UNCERTAIN}. Nói cách khác, \comp{C3} không thay judge ra quyết định; nó buộc lý do của judge phải có cơ sở định lượng.
 
-Hai quan sát khác giải thích vì sao không thể thay C3 bằng một ngưỡng tin cậy chặt hơn. Thứ nhất, khi thiếu ngữ cảnh, độ tin cậy mà judge tự báo gần như chép lại \code{anomaly\_score} của detector (Phát hiện 2), và trên \splitname{val} nó chỉ nhận vài giá trị rời rạc như $0{,}80$, $0{,}85$, $0{,}90$. Trên \splitname{test}, cả $64/64$ báo động giả còn lại đều có độ tin cậy $0{,}9$, nên không ngưỡng $\theta$ nào tách được chúng khỏi cảnh báo thật. % src: m11_error_analysis_test_v1
-Thứ hai, trên Nezha, việc \emph{có} bằng chứng đã gần như trùng với việc ở gần sự cố: mọi cửa sổ lỗi đều có telemetry, trong khi chỉ khoảng $25\%$ cửa sổ bình thường có (Phát hiện 1). Một chính sách chỉ đòi ``có bằng chứng'' vì thế sẽ học nhầm quy luật thu thập dữ liệu thay vì học dấu hiệu lỗi; C3 đòi bằng chứng \emph{bất thường}, một điều kiện không phụ thuộc quy luật đó.
+Hai quan sát khác giải thích vì sao không thể thay \comp{C3} bằng một ngưỡng tin cậy chặt hơn. Thứ nhất, khi thiếu ngữ cảnh, độ tin cậy mà judge tự báo gần như chép lại \code{anomaly\_score} của detector (Phát hiện 2), và trên \splitname{val} nó chỉ nhận vài giá trị rời rạc như $0{,}80$, $0{,}85$, $0{,}90$. Trên \splitname{test}, cả $64/64$ báo động giả còn lại đều có độ tin cậy $0{,}9$, nên không ngưỡng $\theta$ nào tách được chúng khỏi cảnh báo thật. % src: m11_error_analysis_test_v1
+Thứ hai, trên Nezha, việc \emph{có} bằng chứng đã gần như trùng với việc ở gần sự cố: mọi cửa sổ lỗi đều có telemetry, trong khi chỉ khoảng $25\%$ cửa sổ bình thường có (Phát hiện 1). Một chính sách chỉ đòi ``có bằng chứng'' vì thế sẽ học nhầm quy luật thu thập dữ liệu thay vì học dấu hiệu lỗi; \comp{C3} đòi bằng chứng \emph{bất thường}, một điều kiện không phụ thuộc quy luật đó.
 
-Điểm yếu của C3 nằm ở nguồn ngưỡng, không nằm ở nguyên lý. Khi chỉ thay ngưỡng \splitname{dev} cố định bằng ngưỡng trượt 60 phút không cần nhãn (\code{C3-trượt}), F1 trên \splitname{test} tăng từ $0{,}066$ lên $0{,}120$, $\Delta\text{F1} = +0{,}054$ $[+0{,}017;\, +0{,}091]$. % src: h3_test c3_rolling_baseline
-Kết quả này là bằng chứng mạnh nhất cho thấy ý tưởng neo bằng chứng đúng, còn cách hiện thực ngưỡng nền thì quá mong manh trước độ lệch thành phần service giữa các split. Cần lưu ý \code{C3-trượt} là biến thể đối chứng trong H3, không phải cấu hình đã đăng ký cho H2, nên nó không thay đổi kết luận H2.
+Điểm yếu của \comp{C3} nằm ở nguồn ngưỡng, không nằm ở nguyên lý. Khi chỉ thay ngưỡng \splitname{dev} cố định bằng ngưỡng trượt 60 phút không cần nhãn (\code{C3-trượt}), F1 trên \splitname{test} tăng từ $0{,}066$ lên $0{,}120$, $\Delta\text{F1} = +0{,}054$ $[+0{,}017;\, +0{,}091]$. % src: h3_test c3_rolling_baseline
+Kết quả này là bằng chứng mạnh nhất cho thấy ý tưởng neo bằng chứng đúng, còn cách hiện thực ngưỡng nền thì quá mong manh trước độ lệch thành phần service giữa các split. Cần lưu ý \code{C3-trượt} là biến thể đối chứng trong \hyp{H3}, không phải cấu hình đã đăng ký cho \hyp{H2}, nên nó không thay đổi kết luận \hyp{H2}.
 
-\subsubsection{Vì sao C2 và C4 bị loại}
+\subsubsection{Vì sao \comp{C2} và \comp{C4} bị loại}
 \label{sec:ch7-c2-c4}
 
-C2 được thiết kế dựa trên giả thuyết ban đầu: báo động giả của C1 đến từ bằng chứng của service lân cận, nên cần ngưỡng tin cậy chặt hơn cho bằng chứng loại này. Thí nghiệm H1 bác bỏ giả thuyết đó (Phát hiện 7): báo động giả đến từ trace cục bộ, và trace lân cận còn ít gây xác nhận hơn ($27{,}7\%$ so với $60{,}8\%$ trên cửa sổ bình thường của \splitname{val}). Vì C2 nhắm vào một nguyên nhân không tồn tại, tác động của nó gần như bằng $0$. Trên \splitname{val}, C2 chỉ bớt $2$ FP với CI của $\Delta\text{FPR}$ chạm $0$; trên \splitname{test}, cả $54$ cảnh báo mà C2 hạ đều đã bị C3 chặn từ trước, nên không phán quyết cuối nào thay đổi. % src: h3_val, h3_test
+\comp{C2} được thiết kế dựa trên giả thuyết ban đầu: báo động giả của \comp{C1} đến từ bằng chứng của service lân cận, nên cần ngưỡng tin cậy chặt hơn cho bằng chứng loại này. Thí nghiệm \hyp{H1} bác bỏ giả thuyết đó (Phát hiện 7): báo động giả đến từ trace cục bộ, và trace lân cận còn ít gây xác nhận hơn ($27{,}7\%$ so với $60{,}8\%$ trên cửa sổ bình thường của \splitname{val}). Vì \comp{C2} nhắm vào một nguyên nhân không tồn tại, tác động của nó gần như bằng $0$. Trên \splitname{val}, \comp{C2} chỉ bớt $2$ FP với CI của $\Delta\text{FPR}$ chạm $0$; trên \splitname{test}, cả $54$ cảnh báo mà \comp{C2} hạ đều đã bị \comp{C3} chặn từ trước, nên không phán quyết cuối nào thay đổi. % src: h3_val, h3_test
 Đây là một ví dụ của nguyên tắc ``đổi hướng có ghi lại'': thành phần bị loại vì giả thuyết thiết kế của nó sai, và luận văn giữ lại bằng chứng của việc loại đó.
 
-C4 bị loại vì một lý do khác: chi phí. Thiết kế định tuyến hai tầng dựa trên giả định rằng tầng BM25 rẻ sẽ xử lý xong phần lớn \code{candidate} và chỉ chuyển lên C1 các ca khó. Giả định này không đúng trên Nezha, vì chính tầng BM25 sinh nhiều báo động giả và tỷ lệ leo thang lên tầng 2 cao (Phát hiện 9). Trên \splitname{test}, thêm C4 làm tăng $3.286$ lượt gọi LLM ($13{,}56$ so với $8{,}16$ USD quy đổi) và thêm $4$ FP mà không thêm TP nào. % src: h3_test add_c4
-Kết quả này nhất quán giữa \splitname{val} và \splitname{test}, nên quyết định loại C4 có độ tin cậy cao.
+\comp{C4} bị loại vì một lý do khác: chi phí. Thiết kế định tuyến hai tầng dựa trên giả định rằng tầng \term{BM25}{BM25} rẻ sẽ xử lý xong phần lớn \code{candidate} và chỉ chuyển lên \comp{C1} các ca khó. Giả định này không đúng trên Nezha, vì chính tầng \term{BM25}{BM25} sinh nhiều báo động giả và tỷ lệ leo thang lên tầng 2 cao (Phát hiện 9). Trên \splitname{test}, thêm \comp{C4} làm tăng $3.286$ lượt gọi LLM ($13{,}56$ so với $8{,}16$ USD quy đổi) và thêm $4$ FP mà không thêm TP nào. % src: h3_test add_c4
+Kết quả này nhất quán giữa \splitname{val} và \splitname{test}, nên quyết định loại \comp{C4} có độ tin cậy cao.
 
-\subsubsection{Vì sao C5 không thêm recall}
+\subsubsection{Vì sao \comp{C5} không thêm recall}
 \label{sec:ch7-c5}
 
-C5 nhắm vào một nguồn bỏ sót có thật: trên \splitname{test}, detector để lọt $122$ cửa sổ lỗi có telemetry dưới ngưỡng $0{,}85$. Tuy nhiên, cứu thêm \code{candidate} chỉ có ích khi các tầng phía sau xác nhận được chúng. Ở điểm tham số đã chốt, C5 vớt lên $61$ cửa sổ trên \splitname{test}, trong đó $3$ cửa sổ lỗi, và cả $3$ đều bị judge trả \code{FALSE\_POSITIVE} trước khi tới C3; kết quả cuối là $+0$ TP và $+1$ FP. % src: c5_test (Mục ch5-test-c5)
-Nút thắt của recall vì vậy không nằm ở cổng \code{candidate} mà nằm ở khả năng phân biệt của judge, như phân tích ca bỏ sót ở Mục~\ref{sec:ch7-fn} cho thấy: $128$ cửa sổ lỗi đã vào được tới judge với đủ sáu sự kiện ngữ cảnh nhưng vẫn bị bác. Phát hiện này đúng trên cả hai split (Phát hiện 12), nên C5 được giữ như một kết quả ablation âm, không bật trong cấu hình chính.
+\comp{C5} nhắm vào một nguồn bỏ sót có thật: trên \splitname{test}, detector để lọt $122$ cửa sổ lỗi có telemetry dưới ngưỡng $0{,}85$. Tuy nhiên, cứu thêm \code{candidate} chỉ có ích khi các tầng phía sau xác nhận được chúng. Ở điểm tham số đã chốt, \comp{C5} vớt lên $61$ cửa sổ trên \splitname{test}, trong đó $3$ cửa sổ lỗi, và cả $3$ đều bị judge trả \code{FALSE\_POSITIVE} trước khi tới \comp{C3}; kết quả cuối là $+0$ TP và $+1$ FP. % src: c5_test (Mục ch5-test-c5)
+Nút thắt của recall vì vậy không nằm ở cổng \code{candidate} mà nằm ở khả năng phân biệt của judge, như phân tích ca bỏ sót ở Mục~\ref{sec:ch7-fn} cho thấy: $128$ cửa sổ lỗi đã vào được tới judge với đủ sáu sự kiện ngữ cảnh nhưng vẫn bị bác. Phát hiện này đúng trên cả hai split (Phát hiện 12), nên \comp{C5} được giữ như một kết quả ablation âm, không bật trong cấu hình chính.
 
 % -----------------------------------------------------------------------------
 \subsection{Mối đe doạ tính hợp lệ}
 \label{sec:ch7-hop-le}
 
-Mục này rà soát các yếu tố có thể làm kết luận của Chương~\ref{ch:thuc-nghiem} sai lệch, theo bốn nhóm: tính hợp lệ nội tại, bên ngoài, cấu trúc phép đo và kết luận thống kê. Bảng~\ref{tab:ch7-hop-le} liệt kê từng mối đe doạ, biện pháp đã áp dụng và rủi ro còn lại. Hai yếu tố ảnh hưởng mạnh nhất tới việc đọc số giữa \splitname{val} và \splitname{test} là độ lệch tỷ lệ \code{candidate} của detector và việc ngưỡng nền của C3 được cố định trên \splitname{dev}; người đọc nên đọc hàng thứ ba của bảng trước.
+Mục này rà soát các yếu tố có thể làm kết luận của Chương~\ref{ch:thuc-nghiem} sai lệch, theo bốn nhóm: tính hợp lệ nội tại, bên ngoài, cấu trúc phép đo và kết luận thống kê. Bảng~\ref{tab:ch7-hop-le-noitai} trình bày nhóm mối đe doạ tính hợp lệ nội tại, còn Bảng~\ref{tab:ch7-hop-le-khac} tổng hợp ba nhóm còn lại kèm biện pháp kiểm soát và rủi ro còn lại. Hai yếu tố ảnh hưởng mạnh nhất tới việc đọc số giữa \splitname{val} và \splitname{test} là độ lệch tỷ lệ \code{candidate} của detector và việc ngưỡng nền của \comp{C3} được cố định trên \splitname{dev}; người đọc nên đọc hàng thứ ba của Bảng~\ref{tab:ch7-hop-le-noitai} trước.
 
-\begin{table}[htbp]
+\begin{table}[H]
   \centering
-  \caption[Mối đe doạ tính hợp lệ, biện pháp và rủi ro còn lại]{Mối đe doạ tính hợp lệ theo bốn nhóm, biện pháp kiểm soát đã áp dụng và rủi ro còn lại đối với kết luận.}
-  \label{tab:ch7-hop-le}
-  \scriptsize
-  \renewcommand{\arraystretch}{1.2}
-  \setlength{\tabcolsep}{3pt}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.5cm} >{\raggedright\arraybackslash}p{3.6cm} Y >{\raggedright\arraybackslash}p{3.6cm}@{}}
-    \toprule
+  \caption[Mối đe doạ tính hợp lệ nội tại, biện pháp và rủi ro còn lại]{Mối đe doạ tính hợp lệ nội tại (phần 1), biện pháp kiểm soát đã áp dụng và rủi ro còn lại đối với kết luận.}
+  \label{tab:ch7-hop-le-noitai}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{4.1cm}|Y|>{\raggedright\arraybackslash}p{4.2cm}|}
+    \hline
+    \rowcolor{gray!15}
+    \textbf{Mối đe doạ nội tại} & \textbf{Biện pháp đã áp dụng} & \textbf{Rủi ro còn lại} \\
+    \hline
+    Rò nhãn: truy vấn \term{BM25}{BM25} ban đầu chứa từ khoá loại lỗi; telemetry chỉ có ở khoảng $25\%$ cửa sổ bình thường so với $100\%$ cửa sổ lỗi & Xoá thẻ loại lỗi khỏi truy vấn \term{BM25}{BM25} và \comp{C1}, có kiểm thử tự động chặn; chấm chỉ số chính trên \term{TelemetryWindow}{cửa sổ có telemetry} & Cửa sổ bình thường có telemetry vẫn tập trung quanh các phút tiêm lỗi, khác lưu lượng sản xuất liên tục \\
+    \hline
+    Dữ liệu và mô hình: cột \code{PodSuccessRate(\%)} luôn bằng $0$ khiến judge hiểu nhầm; nhà cung cấp có thể đổi ngầm phiên bản mô hình & Loại cột lỗi khỏi bản tóm tắt metric; cố định \code{gemini-2.5-flash}, nhiệt độ $0$, kiểm \code{modelVersion} trong từng bản ghi cache & Quy tắc làm sạch đặc thù cho Nezha; kết quả gắn với một phiên bản mô hình thương mại \\
+    \hline
+    Chọn cấu hình sau hai lần nhìn \splitname{val}; detector lệch khi sang \splitname{test}: tỷ lệ \code{candidate} từ $19{,}6\%$ lên $29{,}2\%$ & Đăng ký \hyp{H0}--\hyp{H5} và khoá cấu hình (\code{be2b985}) trước khi chạy \splitname{test} đúng một lần; tách số \splitname{val} (chọn cấu hình) khỏi \splitname{test} (kiểm định) & $32/42$ service của \splitname{test} ($61{,}0\%$ cửa sổ lỗi) không có ngưỡng \splitname{dev}; đây là nguyên nhân trực tiếp làm \hyp{H2} không đạt \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption[Mối đe doạ tính hợp lệ bên ngoài, phép đo và thống kê]{Mối đe doạ tính hợp lệ bên ngoài, cấu trúc phép đo và kết luận thống kê (phần 2), biện pháp kiểm soát và rủi ro còn lại.}
+  \label{tab:ch7-hop-le-khac}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{1.8cm}|>{\raggedright\arraybackslash}p{3.6cm}|Y|>{\raggedright\arraybackslash}p{3.8cm}|}
+    \hline
+    \rowcolor{gray!15}
     \textbf{Nhóm} & \textbf{Mối đe doạ} & \textbf{Biện pháp đã áp dụng} & \textbf{Rủi ro còn lại} \\
-    \midrule
-    Nội tại & Rò nhãn: truy vấn BM25 ban đầu chứa từ khoá loại lỗi; telemetry chỉ có ở khoảng $25\%$ cửa sổ bình thường so với $100\%$ cửa sổ lỗi & Xoá thẻ loại lỗi khỏi truy vấn BM25 và C1, có kiểm thử tự động chặn; chấm chỉ số chính trên cửa sổ có telemetry & Cửa sổ bình thường có telemetry vẫn tập trung quanh các phút tiêm lỗi, khác lưu lượng sản xuất liên tục \\
-    Nội tại & Dữ liệu và mô hình: cột \code{PodSuccessRate(\%)} luôn bằng $0$ khiến judge hiểu nhầm; nhà cung cấp có thể đổi ngầm phiên bản mô hình & Loại cột lỗi khỏi bản tóm tắt metric; cố định \code{gemini-2.5-flash}, nhiệt độ $0$, kiểm \code{modelVersion} trong từng bản ghi cache & Quy tắc làm sạch đặc thù cho Nezha; kết quả gắn với một phiên bản mô hình thương mại \\
-    Nội tại & Chọn cấu hình sau hai lần nhìn \splitname{val}; detector lệch khi sang \splitname{test}: tỷ lệ \code{candidate} từ $19{,}6\%$ lên $29{,}2\%$ & Đăng ký H0--H5 và khoá cấu hình (\code{be2b985}) trước khi chạy \splitname{test} đúng một lần; tách số \splitname{val} (chọn cấu hình) khỏi \splitname{test} (kiểm định) & $32/42$ service của \splitname{test} ($61{,}0\%$ cửa sổ lỗi) không có ngưỡng \splitname{dev}; đây là nguyên nhân trực tiếp làm H2 không đạt \\
+    \hline
     Bên ngoài & Một bộ dữ liệu (Nezha, hai hệ), một judge, chạy phát lại từ cache & Ghi rõ phạm vi ở mọi kết luận; báo kết quả tách theo hệ và theo năm loại lỗi & Chưa kiểm chứng ngưỡng $\theta = 0{,}80$, ngưỡng $p_{90}$ hay hành vi của judge trên dữ liệu, lưu lượng hoặc họ LLM khác \\
-    Cấu trúc phép đo & Nhãn cửa sổ theo khoảng quanh thời điểm tiêm; Hit@$k$ chấm mức service trên nhãn gốc mức pod; ngưỡng $\delta = 0{,}05$ của H2 chọn sau khi xem \splitname{val}; nhãn chất lượng ngữ cảnh do quy tắc ngưỡng gán, nhãn chất lượng báo cáo do LLM chấm nháp & Chia split theo lần tiêm lỗi với vùng đệm $600$~s; công bố rõ việc chấm mức service dễ hơn mức pod; bảng chấm mù, tách khoá nhãn; báo kết quả nhạy theo ngưỡng; tác giả rà soát trước khi mở khoá & Cửa sổ bình thường sát sự cố có thể chịu lan truyền thật trên trace ($31/64$ FP còn lại của \CTAV{}); quy tắc ngưỡng thiên về C1; không có người chấm độc lập thứ hai, mẫu $30$ báo cáo cho CI rộng \\
-    Kết luận thống kê & Không hiệu chỉnh đa so sánh cho H0, H1, H3, H4; phương sai judge chỉ đo trên $200$ cửa sổ; H5 chỉ có $17$ sự cố có nhãn & Bootstrap ghép cặp $1.000$ mẫu (\code{seed = 42}), McNemar chính xác trên cùng tập cửa sổ; không kết luận khác biệt khi CI chứa $0$ & Suy diễn cho các giả thuyết phụ và H5 có độ bất định lớn ($\text{Hit@1}$ CI95 $[0{,}235;\, 0{,}706]$) \\
-    \bottomrule
+    \hline
+    Cấu trúc phép đo & Nhãn cửa sổ theo khoảng quanh thời điểm tiêm; Hit@$k$ chấm mức service trên nhãn gốc mức pod; ngưỡng $\delta = 0{,}05$ của \hyp{H2} chọn sau khi xem \splitname{val}; nhãn chất lượng ngữ cảnh do quy tắc ngưỡng gán, nhãn chất lượng báo cáo do LLM chấm nháp & Chia split theo lần tiêm lỗi với vùng đệm $600$~s; công bố rõ việc chấm mức service dễ hơn mức pod; bảng chấm mù, tách khoá nhãn; báo kết quả nhạy theo ngưỡng; tác giả rà soát trước khi mở khoá & Cửa sổ bình thường sát sự cố có thể chịu lan truyền thật trên trace ($31/64$ FP còn lại của \CTAV{}); quy tắc ngưỡng thiên về \comp{C1}; không có người chấm độc lập thứ hai, mẫu $30$ báo cáo cho CI rộng \\
+    \hline
+    Kết luận thống kê & Không hiệu chỉnh đa so sánh cho \hyp{H0}, \hyp{H1}, \hyp{H3}, \hyp{H4}; phương sai judge chỉ đo trên $200$ cửa sổ; \hyp{H5} chỉ có $17$ sự cố có nhãn & Bootstrap ghép cặp $1.000$ mẫu (\code{seed = 42}), McNemar chính xác trên cùng tập cửa sổ; không kết luận khác biệt khi CI chứa $0$ & Suy diễn cho các giả thuyết phụ và \hyp{H5} có độ bất định lớn ($\text{Hit@1}$ CI95 $[0{,}235;\, 0{,}706]$) \\
+    \hline
   \end{tabularx}
 \end{table}
 % src: experiment-log (dang ky be2b985), m8_detector_shift_test_v1/shift.json, m8_finding11_test_v1/finding11.json, rca_final_test_v1
 
 Biện pháp quan trọng nhất trong bảng là việc đăng ký trước và chạy \splitname{test} đúng một lần. Nhờ đó, sự sụt giảm của \CTAV{} trên \splitname{test} được báo cáo như nó xảy ra, thay vì bị che đi bằng một lần chỉnh tham số nữa. Độ ổn định của judge cũng không phải mối lo chính: qua ba lần gọi độc lập trên $200$ \code{candidate} của \splitname{test}, tỷ lệ lật nhãn chỉ $0{,}005$--$0{,}010$ và không cửa sổ lỗi nào bị lật (Mục~\ref{sec:ch5-repeat}). % src: repeat_test_v1
-Hai phép đánh giá chất lượng ngoài kiểm định H0--H5 có giới hạn riêng về cách gán nhãn, và cần được đọc cùng giới hạn đó. Chỉ số chất lượng ngữ cảnh (Mục~\ref{sec:ch5-context-precision}) dùng nhãn do quy tắc ngưỡng gán, không do người chấm. Quy tắc thưởng cho span chậm gần cửa sổ, đúng thứ thành phần độ gần thời gian của C1 tối ưu ($76\%$ sự kiện của C1 nằm trong $\pm 180$~s so với $58\%$ của BM25), nên hiệu $+0{,}073$ giữa C1 và BM25 thiên về phía C1 và không được dùng làm bằng chứng so sánh. % src: m8_context_precision_v2
+Hai phép đánh giá chất lượng ngoài kiểm định \hyp{H0}--\hyp{H5} có giới hạn riêng về cách gán nhãn, và cần được đọc cùng giới hạn đó. Chỉ số chất lượng ngữ cảnh (Mục~\ref{sec:ch5-context-precision}) dùng nhãn do quy tắc ngưỡng gán, không do người chấm. Quy tắc thưởng cho span chậm gần cửa sổ, đúng thứ thành phần độ gần thời gian của \comp{C1} tối ưu ($76\%$ sự kiện của \comp{C1} nằm trong $\pm 180$~s so với $58\%$ của \term{BM25}{BM25}), nên hiệu $+0{,}073$ giữa \comp{C1} và \term{BM25}{BM25} thiên về phía \comp{C1} và không được dùng làm bằng chứng so sánh. % src: m8_context_precision_v2
 Chất lượng báo cáo chẩn đoán (Mục~\ref{sec:ch7-human}) do một LLM khác họ với judge chấm nháp trên bảng mù rồi tác giả rà soát, nên không phải đánh giá độc lập của con người và không có hệ số đồng thuận giữa hai người chấm.
 
 % -----------------------------------------------------------------------------
 \subsection{Phân tích ca sai}
 \label{sec:ch7-ca-sai}
 
-Mục này phân loại toàn bộ ca sai còn lại trên \splitname{test} của \CTAV{} (cấu hình đóng băng: C1, $\theta = 0{,}80$ và C3 với ngưỡng $p_{90}$ của \splitname{dev}) và của tác tử RCA, không chỉnh tham số nào sau khi xem kết quả. Bảng~\ref{tab:ch7-ca-sai} tổng hợp $64$ báo động giả, $332$ sự cố bị bỏ sót của \CTAV{} trên $11.985$ cửa sổ có telemetry, và các ca định vị sai của tác tử RCA. Người đọc nên chú ý cột cuối: mỗi nhóm ca sai gắn với một đặc điểm định lượng, và các đặc điểm này là cơ sở cho hạn chế cùng hướng phát triển ở Chương~\ref{ch:tong-ket}.
+Mục này phân loại toàn bộ ca sai còn lại trên \splitname{test} của \CTAV{} (cấu hình đóng băng: \comp{C1}, $\theta = 0{,}80$ và \comp{C3} với ngưỡng $p_{90}$ của \splitname{dev}) và của tác tử \term{RCA}{RCA}, không chỉnh tham số nào sau khi xem kết quả. Bảng~\ref{tab:ch7-ca-sai-ctav} tổng hợp $64$ báo động giả và $332$ sự cố bị bỏ sót của \CTAV{} trên $11.985$ \term{TelemetryWindow}{cửa sổ có telemetry}, còn Bảng~\ref{tab:ch7-ca-sai-rca} phân loại các ca định vị sai của tác tử \term{RCA}{RCA} ở cả lượt chạy đăng ký lẫn dòng độ nhạy. Người đọc nên chú ý cột cuối: mỗi nhóm ca sai gắn với một đặc điểm định lượng, và các đặc điểm này là cơ sở cho hạn chế cùng hướng phát triển ở Chương~\ref{ch:tong-ket}.
 
-\begin{table}[htbp]
+\begin{table}[H]
   \centering
-  \caption[Phân loại ca sai của CTAV và tác tử RCA trên tập test]{Phân loại ca sai trên \splitname{test} của \CTAV{} (cửa sổ có telemetry: $11.985$ cửa sổ, $346$ lỗi) và tác tử RCA (lượt chạy đăng ký và dòng độ nhạy ngoài đăng ký).}
-  \label{tab:ch7-ca-sai}
-  \scriptsize
-  \renewcommand{\arraystretch}{1.15}
-  \setlength{\tabcolsep}{3pt}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.1cm} >{\raggedright\arraybackslash}p{4.3cm} r r Y@{}}
-    \toprule
+  \caption[Phân loại ca sai của CTAV trên tập test]{Phân loại $64$ báo động giả và $332$ sự cố bị bỏ sót của \CTAV{} trên \splitname{test} (\term{TelemetryWindow}{cửa sổ có telemetry}: $11.985$ cửa sổ, $346$ lỗi).}
+  \label{tab:ch7-ca-sai-ctav}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{1.2cm}|>{\raggedright\arraybackslash}p{4.3cm}|r|r|Y|}
+    \hline
+    \rowcolor{gray!15}
     \textbf{Mã} & \textbf{Nhóm ca sai} & \textbf{Số ca} & \textbf{Tỷ lệ} & \textbf{Đặc điểm định lượng chính} \\
-    \midrule
-    \multicolumn{5}{@{}l}{\textbf{\CTAV{} --- $64$ báo động giả} (chỉ ở \code{frontend}: $39$, \code{ts-travel-service}: $25$)} \\
+    \hline
+    \multicolumn{5}{|l|}{\textbf{\CTAV{} --- $64$ báo động giả} (chỉ ở \code{frontend}: $39$, \code{ts-travel-service}: $25$)} \\
+    \hline
     FP-1 & Trùng thời gian với lỗi tiêm ở service phía sau & 31 & 48,4\% & Trung vị độ trễ span neo $= 3{,}02 \times p_{90}$ của \splitname{dev} (tối đa $68{,}78\times$) \\
+    \hline
     FP-2 & Ngoài mọi lần tiêm lỗi & 33 & 51,6\% & Trung vị $1{,}95 \times p_{90}$ (tối đa $7{,}60\times$) \\
-    \midrule
-    \multicolumn{5}{@{}l}{\textbf{\CTAV{} --- $332$ sự cố bị bỏ sót} ($346 - 14$ TP; recall $0{,}040$)} \\
+    \hline
+    \multicolumn{5}{|l|}{\textbf{\CTAV{} --- $332$ sự cố bị bỏ sót} ($346 - 14$ TP; recall $0{,}040$)} \\
+    \hline
     FN-1 & Detector không đưa lên \code{candidate} (điểm $< 0{,}85$) & 122 & 36,7\% & \code{network\_delay} $62$, \code{return} $27$, \code{exception} $23$, \code{cpu\_contention} $10$ \\
-    FN-2 & Judge trên ngữ cảnh C1 trả \code{FALSE\_POSITIVE} & 128 & 38,6\% & Cả $128$ ca đủ $6$ sự kiện ngữ cảnh; $64$ có / $64$ không có ngưỡng \splitname{dev} \\
-    FN-3a & C3 hạ: service không có ngưỡng \splitname{dev} & 67 & 20,2\% & Rơi vào $8$ service, nhiều nhất \code{checkoutservice} ($17$) \\
-    FN-3b & C3 hạ: thao tác không có ngưỡng \splitname{dev} & 3 & 0,9\% & Đều ở \code{ts-travel-service}; có $2$ span mức \code{WARN} trên $1.000$~ms \\
-    FN-3c & C3 hạ: span được trích nằm dưới $p_{90}$ & 12 & 3,6\% & Không có log \code{ERROR}/\code{WARN} cục bộ \\
-    \midrule
-    \multicolumn{5}{@{}l}{\textbf{Tác tử RCA, lượt chạy đăng ký} ($38$ sự cố, $17$ có nhãn; $9$ ca trượt Hit@1)} \\
+    \hline
+    FN-2 & Judge trên ngữ cảnh \comp{C1} trả \code{FALSE\_POSITIVE} & 128 & 38,6\% & Cả $128$ ca đủ $6$ sự kiện ngữ cảnh; $64$ có / $64$ không có ngưỡng \splitname{dev} \\
+    \hline
+    FN-3a & \comp{C3} hạ: service không có ngưỡng \splitname{dev} & 67 & 20,2\% & Rơi vào $8$ service, nhiều nhất \code{checkoutservice} ($17$) \\
+    \hline
+    FN-3b & \comp{C3} hạ: thao tác không có ngưỡng \splitname{dev} & 3 & 0,9\% & Đều ở \code{ts-travel-service}; có $2$ span mức \code{WARN} trên $1.000$~ms \\
+    \hline
+    FN-3c & \comp{C3} hạ: span được trích nằm dưới $p_{90}$ & 12 & 3,6\% & Không có log \code{ERROR}/\code{WARN} cục bộ \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption[Phân loại ca sai định vị của tác tử RCA trên tập test]{Phân loại ca định vị sai của tác tử \term{RCA}{RCA} trên \splitname{test} ở lượt chạy đăng ký và dòng độ nhạy ngoài đăng ký.}
+  \label{tab:ch7-ca-sai-rca}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{1.2cm}|>{\raggedright\arraybackslash}p{4.3cm}|r|r|Y|}
+    \hline
+    \rowcolor{gray!15}
+    \textbf{Mã} & \textbf{Nhóm ca sai} & \textbf{Số ca} & \textbf{Tỷ lệ} & \textbf{Đặc điểm định lượng chính} \\
+    \hline
+    \multicolumn{5}{|l|}{\textbf{Tác tử \term{RCA}{RCA}, lượt chạy đăng ký} ($38$ sự cố, $17$ có nhãn; $9$ ca trượt \term{HitK}{Hit@1})} \\
+    \hline
     R1 & Lỗi ở service bị gọi trực tiếp, chỉ service gọi có cảnh báo & 7 & 7/9 & \code{frontend} thay cho \code{checkoutservice}, \code{currencyservice}; \code{ts-travel-service} thay cho \code{ts-basic-service}, \code{ts-route-service} \\
+    \hline
     R2 & Lỗi cách từ hai bước trở lên hoặc không có cạnh gọi & 2 & 2/9 & \code{frontend} so với \code{paymentservice}; \code{ts-travel-service} so với \code{ts-security-service} \\
-    \midrule
-    \multicolumn{5}{@{}l}{\textbf{Tác tử RCA, dòng độ nhạy ngoài đăng ký} ($114$ sự cố, $48$ có nhãn; $38$ ca trượt Hit@1)} \\
+    \hline
+    \multicolumn{5}{|l|}{\textbf{Tác tử \term{RCA}{RCA}, dòng độ nhạy ngoài đăng ký} ($114$ sự cố, $48$ có nhãn; $38$ ca trượt \term{HitK}{Hit@1})} \\
+    \hline
     S1 & Service gốc không có cảnh báo trong sự cố & 33 & 33/38 & $21$ ở xa hoặc không có cạnh; $6$ là service bị gọi; $6$ là service gọi \\
-    S2 & Service gốc có cảnh báo nhưng bị xếp sau & 5 & 5/38 & Cả $5$ đều trúng Hit@3; $3$ do phiếu dồn về service bị gọi, $2$ do hoà phiếu \\
-    \bottomrule
+    \hline
+    S2 & Service gốc có cảnh báo nhưng bị xếp sau & 5 & 5/38 & Cả $5$ đều trúng \term{HitK}{Hit@3}; $3$ do phiếu dồn về service bị gọi, $2$ do hoà phiếu \\
+    \hline
   \end{tabularx}
 \end{table}
 % src: eval/results/m11_error_analysis_test_v1/error_analysis.json
@@ -150,27 +203,27 @@ Mục này phân loại toàn bộ ca sai còn lại trên \splitname{test} củ
 \subsubsection{Báo động giả còn lại của \CTAV{}}
 \label{sec:ch7-fp}
 
-Trên \splitname{test}, C1 sinh $1.235$ báo động giả và C3 loại được $1.171$, để lọt $64$. Cả $64$ ca có chung một kiểu kích hoạt: judge trả \code{TRUE\_ALERT} với độ tin cậy $0{,}9$, và ít nhất một span cục bộ được trích vượt $p_{90}$ của \splitname{dev}, nên C3 không có lý do để hạ. Không ca nào được neo bằng log \code{ERROR} hay \code{WARN}, và $63/64$ ca chỉ dùng bằng chứng của chính service. % src: m11_error_analysis_test_v1
+Trên \splitname{test}, \comp{C1} sinh $1.235$ báo động giả và \comp{C3} loại được $1.171$, để lọt $64$. Cả $64$ ca có chung một kiểu kích hoạt: judge trả \code{TRUE\_ALERT} với độ tin cậy $0{,}9$, và ít nhất một span cục bộ được trích vượt $p_{90}$ của \splitname{dev}, nên \comp{C3} không có lý do để hạ. Không ca nào được neo bằng log \code{ERROR} hay \code{WARN}, và $63/64$ ca chỉ dùng bằng chứng của chính service. % src: m11_error_analysis_test_v1
 Các báo động giả cũng chỉ rơi vào hai service cửa ngõ có ngưỡng \splitname{dev}: \code{frontend} và \code{ts-travel-service}. Điều này gắn trực tiếp với độ lệch của detector: trên \splitname{test}, detector đánh dấu \code{candidate} cho $100\%$ cửa sổ của \code{frontend} ($1.221/1.221$), một service không xuất hiện trong \splitname{val}. % src: m8_detector_shift_test_v1
-Khi hàng trăm cửa sổ bình thường của service cửa ngõ liên tục đi qua C1, chỉ cần một span gọi ra ngoài có đuôi dài là đủ để cả judge lẫn C3 coi đó là dấu hiệu sự cố.
+Khi hàng trăm cửa sổ bình thường của service cửa ngõ liên tục đi qua \comp{C1}, chỉ cần một span gọi ra ngoài có đuôi dài là đủ để cả judge lẫn \comp{C3} coi đó là dấu hiệu sự cố.
 
 Đối chiếu thời điểm với $50$ lần tiêm lỗi chia $64$ ca thành hai nhóm gần bằng nhau nhưng khác nguyên nhân. Nhóm FP-1 ($31$ ca) xảy ra trong lúc lỗi đang được tiêm ở một service phía sau, chủ yếu \code{network\_delay} ($20/31$). Ở đây span của service cửa ngõ thật sự chậm vì phải chờ phản hồi. Ví dụ, cửa sổ \code{f07889584e1176e6} của \code{frontend} có span \code{CartService/GetCart} $23{,}932$~ms so với $p_{90} = 7{,}689$~ms, trong lúc \code{checkoutservice} đang bị tiêm \code{network\_delay}. Theo quy ước nhãn chỉ gắn cho pod bị tiêm, các ca này là báo động giả; về nghiệp vụ, chúng là ảnh hưởng thật của sự cố và một người vận hành vẫn muốn biết. Nhóm FP-2 ($33$ ca) nằm ngoài mọi lần tiêm và có độ vượt ngưỡng thấp hơn hẳn (trung vị $1{,}95\times$). Đây là nhược điểm cấu trúc của ngưỡng phân vị đơn lẻ: theo định nghĩa, khoảng $10\%$ span bình thường đã vượt $p_{90}$, nên một luật chỉ đòi một span vượt ngưỡng sẽ luôn để lọt một phần dao động thường ngày.
 
 \subsubsection{Sự cố bị bỏ sót của \CTAV{}}
 \label{sec:ch7-fn}
 
-$332$ cửa sổ lỗi bị bỏ sót phân bố khá đều qua ba tầng nối tiếp: detector ($122$), judge ($128$) và C3 ($82$). Không ca nào bị loại bởi luật bắt buộc có bằng chứng hay ngưỡng tin cậy $\theta$. Phân bố này cho thấy không có một sửa đổi đơn lẻ nào nâng được recall đáng kể; mỗi tầng chặn khoảng một phần ba.
+$332$ cửa sổ lỗi bị bỏ sót phân bố khá đều qua ba tầng nối tiếp: detector ($122$), judge ($128$) và \comp{C3} ($82$). Không ca nào bị loại bởi luật bắt buộc có bằng chứng hay ngưỡng tin cậy $\theta$. Phân bố này cho thấy không có một sửa đổi đơn lẻ nào nâng được recall đáng kể; mỗi tầng chặn khoảng một phần ba.
 
-Ở tầng detector (FN-1), một nửa số ca bỏ sót là \code{network\_delay} ($62/122$). Lỗi độ trễ mạng và lỗi tầng ứng dụng (\code{return}, \code{exception}) ít để lại dấu vết trên các chỉ số tài nguyên mà Isolation Forest dùng; một số service như \code{ts-verification-code-service} bị bỏ sót toàn bộ $21/21$ cửa sổ lỗi. Ở tầng judge (FN-2), cả $128$ cửa sổ đều có đủ sáu sự kiện ngữ cảnh, nhưng judge vẫn kết luận metric bị nhiễu, thường vì các span \code{INFO} trong top-6 có độ dài bình thường. Ví dụ, cửa sổ \code{0731855dab245bad} của \code{frontend} có \code{anomaly\_score} $0{,}984$ khi đang bị tiêm \code{cpu\_contention}, nhưng judge trả \code{FALSE\_POSITIVE} với độ tin cậy $0{,}9$. Nguyên nhân có khả năng là Fusion Score xếp các span nhẹ của request khác lên đầu, và lỗi \code{return}, \code{exception} không phải lúc nào cũng ghi log \code{ERROR} trong sáu sự kiện đó.
+Ở tầng detector (FN-1), một nửa số ca bỏ sót là \code{network\_delay} ($62/122$). Lỗi độ trễ mạng và lỗi tầng ứng dụng (\code{return}, \code{exception}) ít để lại dấu vết trên các chỉ số tài nguyên mà Isolation Forest dùng; một số service như \code{ts-verification-code-service} bị bỏ sót toàn bộ $21/21$ cửa sổ lỗi. Ở tầng judge (FN-2), cả $128$ cửa sổ đều có đủ sáu sự kiện ngữ cảnh, nhưng judge vẫn kết luận metric bị nhiễu, thường vì các span \code{INFO} trong top-6 có độ dài bình thường. Ví dụ, cửa sổ \code{0731855dab245bad} của \code{frontend} có \code{anomaly\_score} $0{,}984$ khi đang bị tiêm \code{cpu\_contention}, nhưng judge trả \code{FALSE\_POSITIVE} với độ tin cậy $0{,}9$. Nguyên nhân có khả năng là \term{FusionScore}{Fusion Score} xếp các span nhẹ của request khác lên đầu, và lỗi \code{return}, \code{exception} không phải lúc nào cũng ghi log \code{ERROR} trong sáu sự kiện đó.
 
-Ở tầng C3, ba nguyên nhân con có quy mô rất khác nhau. Lớn nhất là FN-3a ($67$ ca): service không có ngưỡng \splitname{dev}, nên mọi phán quyết đúng của judge trên $8$ service này đều bị hạ; đây chính là Phát hiện 11. FN-3b chỉ có $3$ ca nhưng lộ ra một lỗ hổng của luật neo: hai span \code{WARN} của \code{ts-travel-service} dài $1.469{,}73$~ms và $2.037{,}95$~ms vẫn bị hạ, vì luật C3 chỉ xét cờ \code{WARN} trên log, còn với trace thì đòi cặp (service, thao tác) phải có mặt trong \splitname{dev}. FN-3c ($12$ ca) cho thấy một giới hạn khác: C3 chỉ kiểm span mà judge chọn trích, nên khi judge đúng hướng nhưng chọn span đại diện nằm dưới $p_{90}$, cảnh báo vẫn bị hạ dù cửa sổ có span khác bất thường hơn.
+Ở tầng \comp{C3}, ba nguyên nhân con có quy mô rất khác nhau. Lớn nhất là FN-3a ($67$ ca): service không có ngưỡng \splitname{dev}, nên mọi phán quyết đúng của judge trên $8$ service này đều bị hạ; đây chính là Phát hiện 11. FN-3b chỉ có $3$ ca nhưng lộ ra một lỗ hổng của luật neo: hai span \code{WARN} của \code{ts-travel-service} dài $1.469{,}73$~ms và $2.037{,}95$~ms vẫn bị hạ, vì luật \comp{C3} chỉ xét cờ \code{WARN} trên log, còn với trace thì đòi cặp (service, thao tác) phải có mặt trong \splitname{dev}. FN-3c ($12$ ca) cho thấy một giới hạn khác: \comp{C3} chỉ kiểm span mà judge chọn trích, nên khi judge đúng hướng nhưng chọn span đại diện nằm dưới $p_{90}$, cảnh báo vẫn bị hạ dù cửa sổ có span khác bất thường hơn.
 
-\subsubsection{Ca sai của tác tử RCA}
+\subsubsection{Ca sai của tác tử \term{RCA}{RCA}}
 \label{sec:ch7-rca-sai}
 
 Trên lượt chạy đăng ký, $78$ cảnh báo của \CTAV{} chỉ nằm trên $5$ service và tạo $38$ sự cố, tất cả đều chỉ có một service. Khi sự cố chỉ có một service, bước lan truyền ngược một bước không có cạnh nào để đi, nên luôn trả về chính service phát cảnh báo; vì vậy $\text{Hit@1} = \text{Hit@3}$ và bằng đúng baseline. Cả $9/17$ sự cố định vị sai đều cùng một dạng: service gốc không có cảnh báo. Trong $7$ ca (R1), lỗi nằm ở service bị gọi trực tiếp, còn cảnh báo chỉ bật ở service gọi phía trước do phải chờ phản hồi; đây chính là mặt bên kia của nhóm FP-1 ở Mục~\ref{sec:ch7-fp}. Hai ca còn lại (R2) có service gốc cách xa từ hai bước hoặc không có cạnh gọi trong đồ thị. Ngoài ra, $29/50$ lần tiêm lỗi hoàn toàn không có cảnh báo nào để định vị. % src: rca_final_test_v1, m11_error_analysis_test_v1
 
-Dòng độ nhạy ngoài đăng ký giúp tách ảnh hưởng của đầu vào khỏi thuật toán. Với $438$ cảnh báo trên $22$ service, số lần tiêm không có cảnh báo giảm từ $29$ xuống $1$, nhưng $38/48$ sự cố có nhãn vẫn trượt Hit@1. Trong đó $33$ ca (S1) vẫn do service gốc không nằm trong tập service có cảnh báo của sự cố; điều này đặt trần $15/48 = 0{,}313$ cho bất kỳ thuật toán nào chỉ xếp hạng trên tập đó. Chỉ $5$ ca (S2) là lỗi thật của thuật toán bỏ phiếu, và cả $5$ đều trúng Hit@3. Ba trong số đó lộ ra giả định một chiều của lan truyền ngược: khi lỗi ở service gọi làm cả service bị gọi cũng bật cảnh báo, phiếu dồn về service bị gọi. Ví dụ, trong sự cố \code{inc-bd062ac615eaf3d7}, \code{frontend} bị tiêm \code{cpu\_contention} nhưng nhận $0$ phiếu vì không service nào gọi tới nó. % src: rca_sens_test_c3rolling_v1
+Dòng độ nhạy ngoài đăng ký giúp tách ảnh hưởng của đầu vào khỏi thuật toán. Với $438$ cảnh báo trên $22$ service, số lần tiêm không có cảnh báo giảm từ $29$ xuống $1$, nhưng $38/48$ sự cố có nhãn vẫn trượt \term{HitK}{Hit@1}. Trong đó $33$ ca (S1) vẫn do service gốc không nằm trong tập service có cảnh báo của sự cố; điều này đặt trần $15/48 = 0{,}313$ cho bất kỳ thuật toán nào chỉ xếp hạng trên tập đó. Chỉ $5$ ca (S2) là lỗi thật của thuật toán bỏ phiếu, và cả $5$ đều trúng \term{HitK}{Hit@3}. Ba trong số đó lộ ra giả định một chiều của lan truyền ngược: khi lỗi ở service gọi làm cả service bị gọi cũng bật cảnh báo, phiếu dồn về service bị gọi. Ví dụ, trong sự cố \code{inc-bd062ac615eaf3d7}, \code{frontend} bị tiêm \code{cpu\_contention} nhưng nhận $0$ phiếu vì không service nào gọi tới nó. % src: rca_sens_test_c3rolling_v1
 
 Về tầng sinh báo cáo, mọi báo cáo đều hợp lệ về lược đồ JSON, nhưng nội dung có ba khiếm khuyết. Thứ nhất, mọi sự cố không ứng với lỗi nào ($18$ trên lượt đăng ký) vẫn được gán một loại lỗi cụ thể, vì bộ tóm tắt không có bước kiểm lại sự cố có thật hay không. Thứ hai, loại lỗi lệch nặng về \code{cpu\_contention} ($35/38$ báo cáo), nên chỉ đúng loại lỗi ở $5/17 = 29{,}4\%$ sự cố có nhãn; prompt tóm tắt có xu hướng diễn giải các đặc trưng CPU và syscall trong danh sách metric bất thường. Thứ ba, $1/38$ báo cáo đăng ký và $4/114$ báo cáo độ nhạy có chèn mã bằng chứng tự bịa, và bộ kiểm duyệt đã lọc bỏ toàn bộ. % src: m11_error_analysis_test_v1
 
@@ -181,20 +234,24 @@ Tỷ lệ JSON hợp lệ $1{,}000$ chỉ đo cấu trúc, không đo nội dung
 
 Quy trình chấm cần được nói rõ vì nó không phải đánh giá độc lập của con người. Một LLM khác họ với judge (\code{deepseek-flash}) chấm nháp cả $30$ dòng trên bảng mù. Tác giả rà soát toàn bộ bảng nháp, xem lại $10$ dòng có cách hiểu thang chấm chưa nhất quán và sửa điểm ở $9$ dòng, rồi mới mở tệp khoá để đối chiếu. Vì chỉ có một chuỗi chấm, luận văn không báo hệ số đồng thuận Cohen's $\kappa$. Bảng~\ref{tab:ch7-human} trình bày kết quả; người đọc nên so cột phân bố của tiêu chí gợi ý xử lý với hai tiêu chí còn lại.
 
-\begin{table}[htbp]
+\begin{table}[H]
   \centering
   \caption[Chất lượng nội dung báo cáo chẩn đoán trên mẫu 30 sự cố]{Chất lượng nội dung báo cáo chẩn đoán trên mẫu $30$ sự cố của \code{rca\_final\_test\_v1} (thang $0$--$2$; AI chấm nháp trên bảng mù, tác giả rà soát và hiệu chỉnh trước khi mở khoá đối chiếu).}
   \label{tab:ch7-human}
-  \scriptsize
-  \renewcommand{\arraystretch}{1.15}
-  \begin{tabularx}{\linewidth}{@{}Y c c c@{}}
-    \toprule
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabularx}{\linewidth}{|Y|c|c|c|}
+    \hline
+    \rowcolor{gray!15}
     \textbf{Tiêu chí} & \textbf{Trung bình $\pm$ SD} & \textbf{CI95 bootstrap} & \textbf{Phân bố $0 / 1 / 2$} \\
-    \midrule
+    \hline
     Đúng nguyên nhân gốc & $0{,}900 \pm 0{,}845$ & $[0{,}600;\, 1{,}200]$ & $12 / 9 / 9$ \\
+    \hline
     Bằng chứng hợp lệ & $1{,}133 \pm 0{,}937$ & $[0{,}800;\, 1{,}500]$ & $11 / 4 / 15$ \\
+    \hline
     Gợi ý xử lý dùng được & $1{,}167 \pm 0{,}379$ & $[1{,}033;\, 1{,}300]$ & $0 / 25 / 5$ \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 % src: eval/results/m11_diagnostic_quality_v1/summary.json
@@ -202,11 +259,11 @@ Quy trình chấm cần được nói rõ vì nó không phải đánh giá đ�
 Gợi ý xử lý là tiêu chí ổn định nhất nhưng ở mức trung bình: không gợi ý nào sai ngữ cảnh hay nguy hiểm, nhưng $25/30$ gợi ý là mẫu chung kiểu ``kiểm tra CPU và giới hạn tài nguyên của service X'', khớp với việc loại lỗi bị lệch về \code{cpu\_contention} ở trên. Hai tiêu chí còn lại phân cực: $12/30$ báo cáo có bằng chứng không chứng minh được sự cố tại service kết luận, trong khi $9/30$ báo cáo có bằng chứng cục bộ rõ ràng.
 
 Đối chiếu với tệp khoá cho thấy một báo cáo \emph{trông thuyết phục} chưa chắc đã \emph{đúng}. Trên $15$ sự cố có nhãn, điểm chấm khớp thang khách quan theo đồ thị ở $8/15$ ca, và điểm chấm trung bình ($1{,}000$) thấp hơn thang khách quan ($1{,}333$). Trong $9$ báo cáo được chấm $2$ về nguyên nhân gốc, chỉ $3$ chỉ đúng service gốc; $3$ báo cáo thuộc sự cố không ứng với lỗi nào, $2$ báo cáo chỉ vào service gọi trong khi lỗi nằm ở service bị gọi, và $1$ thuộc sự cố mơ hồ. Ngược lại, $2$ báo cáo chỉ đúng service gốc lại bị chấm $0$ vì bằng chứng trích dẫn không cho thấy bất thường. % src: m11_diagnostic_quality_v1 + diagnostic_quality.key.csv
-Kết quả này nhất quán với Mục~\ref{sec:ch7-rca-sai}: khi service gốc không phát cảnh báo, bằng chứng trong báo cáo chỉ mô tả triệu chứng ở service gọi, và người đọc chỉ dựa vào báo cáo sẽ bị dẫn sai. Trên $13$ sự cố không ứng với lỗi nào, $7$ báo cáo được chấm $0$, tức phần lớn các báo động giả lọt tới tác tử RCA có thể nhận ra từ chính bằng chứng của báo cáo.
+Kết quả này nhất quán với Mục~\ref{sec:ch7-rca-sai}: khi service gốc không phát cảnh báo, bằng chứng trong báo cáo chỉ mô tả triệu chứng ở service gọi, và người đọc chỉ dựa vào báo cáo sẽ bị dẫn sai. Trên $13$ sự cố không ứng với lỗi nào, $7$ báo cáo được chấm $0$, tức phần lớn các báo động giả lọt tới tác tử \term{RCA}{RCA} có thể nhận ra từ chính bằng chứng của báo cáo.
 
 % -----------------------------------------------------------------------------
 \subsection{Kết chương}
 \label{sec:ch7-ket-chuong}
 
-Chương này đã đặt các kết quả của Chương~\ref{ch:thuc-nghiem} vào bối cảnh: chúng có nghĩa gì, đáng tin tới đâu và sai ở đâu. Hai kết quả vững nhất là đánh đổi recall--báo động giả khi thêm ngữ cảnh topology và khả năng của C3 cắt $94{,}8\%$ báo động giả của C1; cả hai lặp lại trên \splitname{val} và \splitname{test}. C3 có tác dụng vì nó buộc lý do của judge phải có cơ sở định lượng; C2 bị loại vì nhắm vào một nguyên nhân không tồn tại, C4 vì chi phí, và C5 vì nút thắt nằm ở judge chứ không ở cổng \code{candidate}. Sự sụt recall của \CTAV{} trên \splitname{test} không do lỗi phần mềm mà do $32/42$ service thiếu ngưỡng \splitname{dev}, kết hợp với tỷ lệ \code{candidate} tăng từ $19{,}6\%$ lên $29{,}2\%$. Trong $64$ báo động giả còn lại, gần một nửa là ảnh hưởng thật của sự cố ở service phía sau, còn $332$ ca bỏ sót chia khá đều cho detector, judge và C3. Tác tử RCA không đạt H5 chủ yếu vì service gốc hiếm khi có cảnh báo, không phải vì thuật toán gom hay định dạng báo cáo. Đánh giá nội dung trên $30$ báo cáo cho điểm nguyên nhân gốc $0{,}900$ trên thang $2$ và gợi ý xử lý phần lớn là mẫu chung; quan trọng hơn, chỉ $3/9$ báo cáo trông thuyết phục nhất chỉ đúng service gốc.
+Chương này đã đặt các kết quả của Chương~\ref{ch:thuc-nghiem} vào bối cảnh: chúng có nghĩa gì, đáng tin tới đâu và sai ở đâu. Hai kết quả vững nhất là đánh đổi recall--báo động giả khi thêm ngữ cảnh topology và khả năng của \comp{C3} cắt $94{,}8\%$ báo động giả của \comp{C1}; cả hai lặp lại trên \splitname{val} và \splitname{test}. \comp{C3} có tác dụng vì nó buộc lý do của judge phải có cơ sở định lượng; \comp{C2} bị loại vì nhắm vào một nguyên nhân không tồn tại, \comp{C4} vì chi phí, và \comp{C5} vì nút thắt nằm ở judge chứ không ở cổng \code{candidate}. Sự sụt recall của \CTAV{} trên \splitname{test} không do lỗi phần mềm mà do $32/42$ service thiếu ngưỡng \splitname{dev}, kết hợp với tỷ lệ \code{candidate} tăng từ $19{,}6\%$ lên $29{,}2\%$. Trong $64$ báo động giả còn lại, gần một nửa là ảnh hưởng thật của sự cố ở service phía sau, còn $332$ ca bỏ sót chia khá đều cho detector, judge và \comp{C3}. Tác tử \term{RCA}{RCA} không đạt \hyp{H5} chủ yếu vì service gốc hiếm khi có cảnh báo, không phải vì thuật toán gom hay định dạng báo cáo. Đánh giá nội dung trên $30$ báo cáo cho điểm nguyên nhân gốc $0{,}900$ trên thang $2$ và gợi ý xử lý phần lớn là mẫu chung; quan trọng hơn, chỉ $3/9$ báo cáo trông thuyết phục nhất chỉ đúng service gốc.
 Các hạn chế rút ra từ phân tích này được hệ thống hoá thành hướng phát triển tương ứng ở Chương~\ref{ch:tong-ket}.

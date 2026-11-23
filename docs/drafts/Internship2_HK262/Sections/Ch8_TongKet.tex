@@ -1,0 +1,144 @@
+% =============================================================================
+% Chuong 8: Tong ket (chuan lop article cho Internship2_HK262)
+% Nguon noi dung: docs/drafts/suon-bao-cao-gd2.md (Chuong 8), outline-bao-cao-gd2.md,
+%   Ch5_ThucNghiemVaDanhGia.tex (H0--H5), Ch6_DemoPlatform.tex, Ch7_ThaoLuan.tex (7.3--7.4)
+% Cho bo sung: lien ket sang muc Ke hoach thuc hien (chua viet), ket qua tong duyet demo M12.
+% Theo style guide: khong y moi, khong hinh, khong co Ket chuong.
+% =============================================================================
+
+\section{Tổng kết}
+\label{ch:tong-ket}
+
+Chương này khép lại luận văn bằng hai câu hỏi: luận văn đã đạt được gì, và những gì chưa đạt sẽ được giải quyết theo hướng nào. Mục~\ref{sec:ch8-ket-qua} trả lời lần lượt năm câu hỏi nghiên cứu đặt ra ở Chương~\ref{ch:mo-dau}, nêu các đóng góp và tóm lại kết luận của sáu giả thuyết \hyp{H0}--\hyp{H5}. Mục~\ref{sec:ch8-han-che} liệt kê mọi hạn chế đã lộ ra trong Chương~\ref{ch:thuc-nghiem} và Chương~\ref{ch:thao-luan}, mỗi hạn chế nối với một hướng phát triển cụ thể. Chương không đưa thêm kết quả mới; mọi con số đều đã được trình bày và kiểm định ở các chương trước.
+
+% -----------------------------------------------------------------------------
+\subsection{Kết quả đạt được}
+\label{sec:ch8-ket-qua}
+
+Mục này đối chiếu những gì luận văn đặt ra ở Chương~\ref{ch:mo-dau} với bằng chứng thu được trên tập \splitname{test} niêm phong.
+
+\subsubsection{Trả lời câu hỏi nghiên cứu}
+\label{sec:ch8-rq}
+
+Bảng~\ref{tab:ch8-rq} tóm tắt câu trả lời cho năm câu hỏi nghiên cứu, ứng với năm mục tiêu cụ thể ở Chương~\ref{ch:mo-dau}. Mỗi đoạn sau bảng nêu câu trả lời, con số chính và giới hạn của câu trả lời đó.
+
+\begin{table}[H]
+  \centering
+  \caption[Câu trả lời cho năm câu hỏi nghiên cứu]{Câu trả lời cho năm câu hỏi nghiên cứu \rqref{RQ1}--\rqref{RQ5}, giả thuyết kiểm định tương ứng và mục chứa bằng chứng.}
+  \label{tab:ch8-rq}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.2cm}|Y|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{2.0cm}|}
+    \hline
+    \rowcolor{gray!15}
+    \textbf{Câu hỏi nghiên cứu} & \textbf{Câu trả lời ngắn} & \textbf{Giả thuyết} & \textbf{Bằng chứng} \\
+    \hline
+    \rqref{RQ1}: ngữ cảnh topology có tăng cả recall lẫn báo động giả không? & Có. \comp{C1} bắt thêm $62$ cửa sổ lỗi nhưng sinh thêm $866$ báo động giả so với \term{BM25}{BM25} & \hyp{H0}: được chấp nhận & Mục~\ref{sec:ch5-test-h0} \\
+    \hline
+    \rqref{RQ2}: vì sao judge xác nhận nhầm cửa sổ bình thường? & Do \term{ConfirmationBias}{thiên lệch xác nhận} trên trace cục bộ sát thời điểm cảnh báo, không do nhiễu từ service lân cận & \hyp{H1}: đạt một phần (chỉ \splitname{val}) & Mục~\ref{sec:ch5-h1} \\
+    \hline
+    \rqref{RQ3}: \CTAV{} có tốt hơn \term{BM25}{BM25} mà giữ được recall của \comp{C1} không? & Giảm báo động giả rõ rệt nhưng không giữ được recall; F1 không hơn \term{BM25}{BM25} trên \splitname{test} & \hyp{H2}: không được chấp nhận & Mục~\ref{sec:ch5-test-h2} \\
+    \hline
+    \rqref{RQ4}: thành phần nào cần, và hiệu quả theo ngân sách ra sao? & \comp{C3} cần; \comp{C2}, \comp{C4} không; \comp{C5} không thêm recall. Ở $120$ lần gọi, \CTAV{} không kém các baseline & \hyp{H3}, \hyp{H4}: được chấp nhận & Mục~\ref{sec:ch5-test-h3}, \ref{sec:ch5-h4} \\
+    \hline
+    \rqref{RQ5}: tác tử \term{RCA}{RCA} có định vị được service gốc không? & Chỉ ngang baseline, vì service gốc hiếm khi có cảnh báo; platform chạy được và tái lập được & \hyp{H5}: không được chấp nhận & Mục~\ref{sec:ch5-rca}, Chương~\ref{ch:platform} \\
+    \hline
+  \end{tabularx}
+\end{table}
+% src: tab:ch5-verdict-summary, tab:ch7-tong-hop
+
+\textbf{\rqref{RQ1} -- Đánh đổi của ngữ cảnh topology.}
+Trên giao thức chia split theo từng đợt tiêm lỗi, ngữ cảnh topology chưa hiệu chỉnh (\comp{C1}, truy xuất lai \term{BM25}{BM25}--topology) tăng cả recall lẫn báo động giả so với \term{BM25}{BM25}. Trên \splitname{test}, $\Delta\text{Recall} = +0{,}179$ $[+0{,}138;\, +0{,}226]$ và $\Delta\text{FPR} = +0{,}0744$ $[+0{,}0694;\, +0{,}0798]$, McNemar $p < 0{,}001$ trên cả cửa sổ lỗi lẫn cửa sổ bình thường. Hiện tượng lặp lại cùng chiều trên \splitname{val} nên \hyp{H0} được chấp nhận. Giới hạn của câu trả lời là F1 không đổi có ý nghĩa ($\Delta\text{F1}$ CI95 $[-0{,}001;\, +0{,}052]$), và kết quả chỉ được kiểm trên một bộ dữ liệu. % src: h0_test
+
+\textbf{\rqref{RQ2} -- Cơ chế báo động giả.}
+Thí nghiệm can thiệp trên mẫu cố định $1.749$ candidate của \splitname{val} cho thấy judge nhạy nhất với trace của chính service phát cảnh báo khi trace nằm sát thời điểm cảnh báo: loại bằng chứng này đẩy tỷ lệ \code{TRUE\_ALERT} trên cửa sổ bình thường lên $60{,}8\%$, so với $18{,}1\%$ khi chỉ có log cục bộ và $27{,}7\%$ khi chỉ có trace lân cận. Giả thuyết ban đầu về nhiễu từ service lân cận vì vậy không được ủng hộ. \hyp{H1} đạt một phần vì yếu tố này làm tăng tỷ lệ xác nhận trên cả hai nhãn, nên không cho một đặc trưng tách sạch cửa sổ bình thường khỏi cửa sổ lỗi. \hyp{H1} không được kiểm lại trên \splitname{test}; trên \splitname{test} chỉ có bằng chứng quan sát cùng chiều ($63/64$ báo động giả còn lại của \CTAV{} dùng bằng chứng cục bộ). % src: h1_val, m11_error_analysis_test_v1
+
+\textbf{\rqref{RQ3} -- Hiệu quả của \CTAV{}.}
+Neo bằng chứng (\comp{C3}) gỡ được phần lớn báo động giả do ngữ cảnh topology sinh ra: trên \splitname{test}, \CTAV{} chỉ còn $64$ báo động giả, \term{FPR}{FPR} $0{,}0055$ so với $0{,}0317$ của \term{BM25}{BM25}, và cắt $1.171/1.235$ báo động giả của \comp{C1}. Tuy nhiên, recall chỉ còn $0{,}040$ ($14$ TP) và $\Delta\text{F1}(\text{\CTAV}-\text{BM25}) = -0{,}025$ $[-0{,}067;\, +0{,}014]$, nên \hyp{H2} không được chấp nhận. Nguyên nhân đã được định lượng: $32/42$ service của \splitname{test} không có ngưỡng nền $p_{90}$ từ \splitname{dev}, và \comp{C3} hạ toàn bộ TP ở các service đó. Đối chứng \code{C3-trượt} với ngưỡng trượt $60$ phút nâng F1 lên $0{,}120$, nhưng đây là phân tích ngoài cấu hình đã đăng ký và không thay đổi kết luận \hyp{H2}. % src: ctav_final_test_v1, m8_finding11_test_v1
+
+\textbf{\rqref{RQ4} -- Vai trò từng thành phần và hiệu quả theo ngân sách.}
+Ablation một-thay-đổi-một-lần trên \splitname{test} xác nhận các quyết định đã đưa ra trên \splitname{val}, nên \hyp{H3} được chấp nhận: bỏ \comp{C3} làm Precision giảm $0{,}107$ $[-0{,}197;\, -0{,}030]$; thêm \comp{C2} (gating theo nguồn bằng chứng) không đổi một phán quyết cuối nào; thêm \comp{C4} (định tuyến hai tầng) tốn thêm $3.286$ lượt gọi mà không thêm TP; \comp{C5} (\term{RescueScore}{Rescue Score}) cho $+0$ TP và $+1$ FP. Ở ngân sách $120$ lần gọi, \CTAV{} bắt $6$ TP với $0$ FP so với $3$ TP và $3$ FP của \term{BM25}{BM25}, nên \hyp{H4} được chấp nhận. Giới hạn của \hyp{H4} là $120$ lần gọi chỉ bằng $0{,}9\%$ số candidate của \splitname{test}, nên khoảng tin cậy của các phương pháp chồng lên nhau. % src: h3_test, h4_test
+
+\textbf{\rqref{RQ5} -- Tác tử \term{RCA}{RCA} và platform.}
+Tác tử \term{RCA}{RCA} không đạt vế nào trong bốn vế của \hyp{H5}: trên $17$ sự cố có nhãn, $\text{Hit@1} = \text{Hit@3} = 0{,}471$ $[0{,}235;\, 0{,}706]$, bằng đúng baseline, và không có lỗi cascade nào để đo tỷ lệ giảm cảnh báo. Nguyên nhân nằm ở đầu vào chứ không ở thuật toán gom: $29/50$ lần tiêm lỗi không có cảnh báo nào, và mọi sự cố định vị sai đều có service gốc không phát cảnh báo. Ở tầng sinh báo cáo, tỷ lệ JSON hợp lệ đạt $38/38$, nhưng đánh giá nội dung trên $30$ báo cáo cho điểm đúng nguyên nhân gốc chỉ $0{,}900$ trên thang $2$. Phần platform đạt mục tiêu đề ra: toàn bộ pipeline chạy end-to-end trong $4{,}24$~s trên \splitname{test}, đọc $100\%$ từ \textit{cache} với $0$ lần gọi API và khớp $38/38$ báo cáo với lượt chạy kiểm định. % src: rca_final_test_v1, m11_diagnostic_quality_v1, pipeline_test_v2
+
+\subsubsection{Đóng góp}
+\label{sec:ch8-dong-gop}
+
+Luận văn có bốn đóng góp chính, mỗi đóng góp gắn với bằng chứng ở các chương trước.
+
+\begin{itemize}[label=--]
+  \item \textbf{Giao thức đánh giá chống rò rỉ và đăng ký trước.} Dữ liệu Nezha được chia theo từng đợt tiêm lỗi với vùng đệm $600$~s; chỉ số chính tính trên \term{TelemetryWindow}{cửa sổ có telemetry}; sáu giả thuyết và tiêu chí chấp nhận được đăng ký trước khi chạy \splitname{test} đúng một lần. Nhờ giao thức này, sự sụt giảm của \CTAV{} trên \splitname{test} được báo cáo đúng như nó xảy ra (Chương~\ref{ch:thuc-nghiem}).
+  \item \textbf{Giải thích cơ chế báo động giả của judge LLM.} Thí nghiệm can thiệp có kiểm soát chỉ ra nguồn báo động giả là \term{ConfirmationBias}{thiên lệch xác nhận} trên trace cục bộ sát thời điểm cảnh báo, bác bỏ giả thuyết nhiễu từ service lân cận và chuyển trọng tâm từ ``truy xuất gì'' sang ``quyết định thế nào với bằng chứng'' (Mục~\ref{sec:ch5-h1}).
+  \item \textbf{Phương pháp \CTAV{} cùng kết quả âm có bằng chứng.} \comp{C3} là thành phần duy nhất cắt mạnh báo động giả và lặp lại trên hai split; \comp{C2}, \comp{C4} bị loại và \comp{C5} giữ làm ablation, mỗi quyết định có số đi kèm. Phân tích nguyên nhân sụt recall chỉ ra hướng sửa trực tiếp là nguồn ngưỡng nền (Chương~\ref{ch:de-xuat}, Mục~\ref{sec:ch5-finding11}).
+  \item \textbf{Tác tử \term{RCA}{RCA} và platform tái lập được.} Tác tử gom cảnh báo thành sự cố, xếp hạng service gốc và sinh báo cáo JSON có kiểm duyệt; platform gồm API chỉ đọc và dashboard bốn màn hình, chạy ngoại tuyến hoàn toàn từ \textit{cache} (Chương~\ref{ch:platform}). Phân tích ca sai ở Chương~\ref{ch:thao-luan} cho thấy giới hạn của tác tử đến từ đầu vào cảnh báo, một kết luận hữu ích cho các thiết kế \term{RCA}{RCA} dựa trên cảnh báo.
+\end{itemize}
+
+\subsubsection{Kết quả kiểm định \hyp{H0}--\hyp{H5}}
+\label{sec:ch8-h0-h5}
+
+Trên tập \splitname{test}, ba giả thuyết được chấp nhận (\hyp{H0}, \hyp{H3}, \hyp{H4}), hai giả thuyết không được chấp nhận (\hyp{H2}, \hyp{H5}) và \hyp{H1} đạt một phần trên \splitname{val}; bảng đối chiếu đầy đủ từng vế nằm ở Bảng~\ref{tab:ch5-verdict-summary}. Hai giả thuyết không được chấp nhận có chung một nguyên nhân gốc: ngưỡng nền của \comp{C3} cố định trên \splitname{dev} không phủ được phần lớn service của \splitname{test}. Hệ quả là \CTAV{} mất recall (\hyp{H2}), và tác tử \term{RCA}{RCA} thiếu cảnh báo ở chính service gốc (\hyp{H5}). Các kết luận này được báo cáo đúng theo tiêu chí đã đăng ký, không chỉnh tham số sau khi xem \splitname{test}. Độ ổn định của judge không phải nguồn bất định chính: tỷ lệ lật nhãn qua ba lần gọi chỉ $0{,}005$--$0{,}010$, nhỏ hơn một bậc độ lớn so với các hiệu ứng được kiểm định. % src: repeat_test_v1
+
+\subsubsection{Ý nghĩa và kết luận chung}
+\label{sec:ch8-ket-luan}
+
+Kết luận chung của luận văn là: với judge LLM trong thẩm định cảnh báo, cách quyết định trên bằng chứng quan trọng hơn lượng ngữ cảnh đưa vào. Thêm ngữ cảnh topology giúp judge thấy nhiều sự cố hơn, nhưng judge xác nhận gần như mọi cửa sổ có trace cục bộ trông chậm. Một chính sách buộc bằng chứng phải bất thường so với ngưỡng nền gỡ được phần lớn báo động giả này, và cơ chế đó lặp lại trên hai split độc lập. Điểm yếu nằm ở cách ước lượng ngưỡng nền, không nằm ở nguyên lý neo bằng chứng; ngưỡng tĩnh lấy từ một split phát triển quá mong manh trước độ lệch thành phần service. Về mặt thực tiễn, báo động giả và chi phí gọi LLM là hai ràng buộc phải đo ngay từ đầu, và một tác tử \term{RCA}{RCA} dựa trên cảnh báo chỉ tốt bằng độ phủ cảnh báo ở service gốc. Các hạn chế cụ thể được trình bày ở Mục~\ref{sec:ch8-han-che}.
+
+% -----------------------------------------------------------------------------
+\subsection{Hạn chế và hướng phát triển}
+\label{sec:ch8-han-che}
+
+Mục này nêu mọi hạn chế đã lộ ra trong quá trình kiểm định, nói rõ mỗi hạn chế ảnh hưởng tới kết luận nào, rồi nối từng hạn chế với một hướng phát triển.
+
+\subsubsection{Hạn chế}
+\label{sec:ch8-han-che-list}
+
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{Ngưỡng nền tĩnh của \comp{C3}.} Ngưỡng $p_{90}$ lấy từ \splitname{dev} không có cho $32/42$ service của \splitname{test}, chiếm $61{,}0\%$ cửa sổ lỗi. Hạn chế này trực tiếp làm \hyp{H2} không được chấp nhận và làm tác tử \term{RCA}{RCA} thiếu cảnh báo ở service gốc (\hyp{H5}).
+  \item \textbf{Luật neo bằng chứng còn thô.} \comp{C3} chỉ kiểm span mà judge chọn trích ($12$ ca bỏ sót vì span đại diện nằm dưới $p_{90}$), chỉ đòi một span vượt ngưỡng nên để lọt dao động thường ngày ($33$ báo động giả ngoài mọi lần tiêm), và chưa xét span mức \code{WARN} trên trace ($3$ ca). Hạn chế này giới hạn cả precision lẫn recall của \CTAV{}.
+  \item \textbf{Detector bỏ sót lỗi không để lại dấu vết tài nguyên.} Isolation Forest để lọt $122$ cửa sổ lỗi có telemetry, một nửa là \code{network\_delay}; có service bị bỏ sót toàn bộ cửa sổ lỗi. Mọi tầng phía sau không thể cứu những cửa sổ này, như kết quả của \comp{C5} cho thấy.
+  \item \textbf{Judge bác cửa sổ lỗi dù có đủ ngữ cảnh.} $128$ cửa sổ lỗi tới được judge với đủ sáu sự kiện ngữ cảnh nhưng vẫn bị trả \code{FALSE\_POSITIVE}, thường vì top-6 gồm các span bình thường của request khác. Đây là nút thắt recall lớn nhất và là lý do \comp{C5} không thêm được TP.
+  \item \textbf{Tác tử \term{RCA}{RCA} giả định quá đơn giản.} Lan truyền ngược chỉ một bước và chỉ theo chiều từ service gọi sang service bị gọi; tác tử chỉ xếp hạng trên tập service đã phát cảnh báo, nên trần \term{HitK}{Hit@1} ở dòng độ nhạy là $15/48$. Bộ tóm tắt gán loại lỗi cho cả sự cố không ứng với lỗi nào và lệch về \code{cpu\_contention} ($35/38$ báo cáo).
+  \item \textbf{Một bộ dữ liệu, một judge.} Mọi kết luận được rút ra trên Nezha (hai hệ microservice mẫu, dữ liệu phát lại) với một mô hình \code{gemini-2.5-flash} qua API. Ngưỡng $\theta = 0{,}80$, ngưỡng $p_{90}$ và hành vi \term{ConfirmationBias}{thiên lệch xác nhận} chưa được kiểm trên dữ liệu, lưu lượng hay họ LLM khác; kết quả cũng gắn với một phiên bản mô hình thương mại.
+  \item \textbf{Cỡ mẫu và cách gán nhãn của các phép đánh giá phụ.} \hyp{H5} chỉ có $17$ sự cố có nhãn nên CI rộng; chất lượng báo cáo chẩn đoán do một LLM chấm nháp rồi tác giả rà soát trên $30$ báo cáo, không có người chấm độc lập thứ hai; chỉ số chất lượng ngữ cảnh dùng nhãn từ quy tắc ngưỡng thiên về \comp{C1}; các giả thuyết phụ không hiệu chỉnh đa so sánh.
+  \item \textbf{Phụ thuộc API và chưa chạy trực tuyến.} Kiểm định trên \splitname{test} tốn $15{,}85$~USD theo token và phụ thuộc một nhà cung cấp; platform chạy bằng phát lại dữ liệu và đọc \textit{cache}, chưa được đo độ trễ và chi phí trên luồng telemetry thật.
+\end{enumerate}
+
+\subsubsection{Hướng phát triển}
+\label{sec:ch8-huong-phat-trien}
+
+Bảng~\ref{tab:ch8-huong} nối mỗi hạn chế ở Mục~\ref{sec:ch8-han-che-list} với một hướng phát triển. Hướng có ưu tiên cao nhất là ước lượng ngưỡng nền trực tuyến không cần nhãn, vì nó nhắm vào nguyên nhân chung của hai giả thuyết không được chấp nhận và đã có bằng chứng ban đầu từ đối chứng \code{C3-trượt}. Các hướng cần dữ liệu hoặc mô hình khác với phạm vi hiện tại (bộ dữ liệu thứ hai, judge thứ hai, chạy trên luồng thật) được ghi là hướng mở rộng.
+
+\begin{table}[H]
+  \centering
+  \caption[Hạn chế và hướng phát triển tương ứng]{Mỗi hạn chế ở Mục~\ref{sec:ch8-han-che-list} và hướng phát triển tương ứng.}
+  \label{tab:ch8-huong}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.3cm}|Y|>{\raggedright\arraybackslash}p{2.6cm}|}
+    \hline
+    \rowcolor{gray!15}
+    \textbf{Hạn chế} & \textbf{Hướng phát triển} & \textbf{Phạm vi} \\
+    \hline
+    (1) Ngưỡng nền tĩnh của \comp{C3} & Ước lượng ngưỡng nền trực tuyến không cần nhãn (cửa sổ trượt theo từng cặp service--thao tác), đăng ký lại giả thuyết và kiểm trên dữ liệu chưa dùng & Hướng mở rộng \\
+    \hline
+    (2) Luật neo bằng chứng còn thô & Kiểm mọi span của service trong cửa sổ thay vì chỉ span được trích; đòi nhiều span vượt ngưỡng hoặc mức vượt tương đối; xét cả span mức \code{WARN} & Hướng phát triển \\
+    \hline
+    (3) Detector bỏ sót lỗi mạng và lỗi ứng dụng & Bổ sung đặc trưng từ trace (độ trễ, tỷ lệ lỗi theo thao tác) và log mức \code{ERROR} vào bộ phát hiện & Hướng phát triển \\
+    \hline
+    (4) Judge bác cửa sổ lỗi & Xếp hạng lại ngữ cảnh ưu tiên span bất thường so với ngưỡng nền trước khi đưa cho judge; thiết kế prompt yêu cầu đối chiếu với ngưỡng & Hướng phát triển \\
+    \hline
+    (5) Giả định đơn giản của tác tử \term{RCA}{RCA} & Lan truyền nhiều bước và hai chiều; dùng tín hiệu trace của service chưa phát cảnh báo; thêm bước kiểm sự cố có thật trước khi tóm tắt và cân bằng phân loại loại lỗi & Hướng phát triển \\
+    \hline
+    (6) Một bộ dữ liệu, một judge & Kiểm lại trên bộ dữ liệu thứ hai và với một judge khác họ, kể cả mô hình chạy cục bộ & Hướng mở rộng \\
+    \hline
+    (7) Cỡ mẫu và cách gán nhãn & Thêm người chấm độc lập để tính hệ số đồng thuận; gán nhãn chất lượng ngữ cảnh bằng người trên mẫu mù; mở rộng số sự cố có nhãn & Hướng mở rộng \\
+    \hline
+    (8) Phụ thuộc API, chưa chạy trực tuyến & Chạy platform trên luồng telemetry thật; đo độ trễ và chi phí theo thời gian; định tuyến sang mô hình cục bộ khi có phần cứng & Hướng mở rộng \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+Các công việc hoàn thiện cuối cùng nằm trong phạm vi của đề tài trước đợt bảo vệ (tổng duyệt kịch bản demo lần hai, cập nhật ảnh chụp giao diện sau tổng duyệt và hoàn thiện hồ sơ quyển báo cáo cuối) được trình bày tại mục Kế hoạch thực hiện phần còn lại ngay sau Chương~\ref{ch:cong-bo}.

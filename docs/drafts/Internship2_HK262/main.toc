@@ -1,134 +1,152 @@
-\contentsline {section}{Danh sách hình}{6}{table.caption.2}%
-\contentsline {section}{Danh sách bảng}{7}{table.caption.2}%
-\contentsline {section}{\numberline {1}Giới thiệu đề tài}{9}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Bối cảnh và bài toán nghiên cứu}{9}{subsection.1.1}%
-\contentsline {subsubsection}{\numberline {1.1.1}Vận hành AIOps trên hệ thống microservice và bài toán quá tải cảnh báo}{9}{subsubsection.1.1.1}%
-\contentsline {subsubsection}{\numberline {1.1.2}Khảo sát bước đầu về kiến trúc giám sát lai và đánh đổi ngữ cảnh đồ thị}{10}{subsubsection.1.1.2}%
-\contentsline {subsubsection}{\numberline {1.1.3}Những thách thức đặt ra cho giải pháp tổng thể}{11}{subsubsection.1.1.3}%
-\contentsline {subsection}{\numberline {1.2}Mục tiêu đề tài}{12}{subsection.1.2}%
-\contentsline {subsubsection}{\numberline {1.2.1}Mục tiêu tổng quát}{12}{subsubsection.1.2.1}%
-\contentsline {subsubsection}{\numberline {1.2.2}Mục tiêu cụ thể}{12}{subsubsection.1.2.2}%
-\contentsline {subsection}{\numberline {1.3}Đối tượng và phạm vi nghiên cứu}{13}{subsection.1.3}%
-\contentsline {subsubsection}{\numberline {1.3.1}Đối tượng nghiên cứu}{13}{subsubsection.1.3.1}%
-\contentsline {subsubsection}{\numberline {1.3.2}Phạm vi nghiên cứu}{13}{subsubsection.1.3.2}%
-\contentsline {subsection}{\numberline {1.4}Ý nghĩa của đề tài}{14}{subsection.1.4}%
-\contentsline {subsubsection}{\numberline {1.4.1}Ý nghĩa thực tiễn}{14}{subsubsection.1.4.1}%
-\contentsline {subsubsection}{\numberline {1.4.2}Ý nghĩa khoa học}{14}{subsubsection.1.4.2}%
-\contentsline {section}{\numberline {2}Kiến thức và công nghệ nền tảng}{16}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Dữ liệu quan sát trên hệ microservice}{16}{subsection.2.1}%
-\contentsline {subsubsection}{\numberline {2.1.1}Metric, log, trace và cửa sổ trượt}{16}{subsubsection.2.1.1}%
-\contentsline {subsubsection}{\numberline {2.1.2}Nezha và nhãn nguyên nhân gốc}{17}{subsubsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.2}Phát hiện bất thường và quá tải cảnh báo}{17}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}Bất thường, khoảng trống ngữ nghĩa và quá tải cảnh báo}{18}{subsubsection.2.2.1}%
-\contentsline {subsubsection}{\numberline {2.2.2}Isolation Forest}{18}{subsubsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.3}Truy xuất bằng chứng}{19}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}BM25 trên văn bản log và trace}{19}{subsubsection.2.3.1}%
-\contentsline {subsubsection}{\numberline {2.3.2}Đồ thị phụ thuộc service}{20}{subsubsection.2.3.2}%
-\contentsline {subsubsection}{\numberline {2.3.3}Hợp nhất đa phương thức (Fusion Score) và RAG trong giám sát}{21}{subsubsection.2.3.3}%
-\contentsline {subsection}{\numberline {2.4}LLM làm bộ thẩm định (LLM-as-a-Judge)}{21}{subsection.2.4}%
-\contentsline {subsubsection}{\numberline {2.4.1}LLM-as-a-Judge, đầu ra có cấu trúc và kiểm soát ngân sách}{21}{subsubsection.2.4.1}%
-\contentsline {subsubsection}{\numberline {2.4.2}Thiên lệch xác nhận, hiệu chỉnh ngưỡng và nguồn gốc bằng chứng}{22}{subsubsection.2.4.2}%
-\contentsline {subsection}{\numberline {2.5}Phân tích nguyên nhân gốc (RCA) trên microservice}{23}{subsection.2.5}%
-\contentsline {subsection}{\numberline {2.6}Tiêu chí và phương pháp đánh giá}{23}{subsection.2.6}%
-\contentsline {subsubsection}{\numberline {2.6.1}Thước đo phân loại cảnh báo và định vị RCA}{23}{subsubsection.2.6.1}%
-\contentsline {subsubsection}{\numberline {2.6.2}Bootstrap CI và kiểm định McNemar}{24}{subsubsection.2.6.2}%
-\contentsline {subsection}{\numberline {2.7}Giả thuyết nghiên cứu và đăng ký trước}{24}{subsection.2.7}%
-\contentsline {subsection}{\numberline {2.8}Công nghệ nền tảng}{24}{subsection.2.8}%
-\contentsline {subsection}{\numberline {2.9}Kết chương}{26}{subsection.2.9}%
-\contentsline {section}{\numberline {3}Công trình liên quan}{27}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Các nghiên cứu liên quan}{27}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}Phát hiện bất thường trên chuỗi thời gian metric}{27}{subsubsection.3.1.1}%
-\contentsline {subsubsection}{\numberline {3.1.2}Mô hình ngôn ngữ lớn trong phân tích log và nguyên nhân gốc}{28}{subsubsection.3.1.2}%
-\contentsline {subsubsection}{\numberline {3.1.3}Kiến trúc giám sát lai và LLM-as-a-Judge}{28}{subsubsection.3.1.3}%
-\contentsline {subsubsection}{\numberline {3.1.4}Phân tích nguyên nhân gốc dựa trên topology, đồ thị và suy luận nhân quả}{29}{subsubsection.3.1.4}%
-\contentsline {subsubsection}{\numberline {3.1.5}Truy xuất dựa trên đồ thị và GraphRAG cho vận hành hệ thống}{30}{subsubsection.3.1.5}%
-\contentsline {subsubsection}{\numberline {3.1.6}Hiệu chỉnh độ tin cậy, thiên lệch của LLM-as-a-Judge và gắn bằng chứng}{31}{subsubsection.3.1.6}%
-\contentsline {subsubsection}{\numberline {3.1.7}Gom nhóm, phân loại và cứu cảnh báo trong vận hành}{32}{subsubsection.3.1.7}%
-\contentsline {subsection}{\numberline {3.2}Các hệ thống và công cụ hiện có}{32}{subsection.3.2}%
-\contentsline {subsubsection}{\numberline {3.2.1}Nhận xét về các hệ thống hiện có}{32}{subsubsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.3}Kết chương}{33}{subsection.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.1}Bảng so sánh tổng hợp}{33}{subsubsection.3.3.1}%
-\contentsline {subsubsection}{\numberline {3.3.2}Khoảng trống nghiên cứu và định vị đề xuất}{33}{subsubsection.3.3.2}%
-\contentsline {section}{\numberline {4}Đề xuất: CTAV{} và tác tử RCA}{36}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Mô tả đề xuất}{36}{subsection.4.1}%
-\contentsline {subsubsection}{\numberline {4.1.1}Tổng quan về đề xuất}{36}{subsubsection.4.1.1}%
-\contentsline {subsubsection}{\numberline {4.1.2}Các vấn đề nghiên cứu}{38}{subsubsection.4.1.2}%
-\contentsline {subsubsection}{\numberline {4.1.3}Các thách thức và khó khăn}{39}{subsubsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.2}Isolation Forest và cổng Rescue (C5)}{40}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}CTAV{} — Thẩm định cảnh báo có nhận biết topology và hiệu chỉnh}{41}{subsection.4.3}%
-\contentsline {subsubsection}{\numberline {4.3.1}Tổng quan CTAV{}}{41}{subsubsection.4.3.1}%
-\contentsline {subsubsection}{\numberline {4.3.2}BM25 cục bộ và bộ thẩm định nền}{42}{subsubsection.4.3.2}%
-\contentsline {subsubsection}{\numberline {4.3.3}Truy xuất nhận biết topology C1}{43}{subsubsection.4.3.3}%
-\contentsline {subsubsection}{\numberline {4.3.4}Chính sách quyết định: neo bằng chứng (C3) và ngưỡng bất đối xứng (C2, đã loại)}{45}{subsubsection.4.3.4}%
-\contentsline {subsubsection}{\numberline {4.3.5}Định tuyến hai tầng thích nghi (C4, đã loại)}{47}{subsubsection.4.3.5}%
-\contentsline {subsubsection}{\numberline {4.3.6}Bộ thẩm định LLM: prompt, đầu ra có cấu trúc và cache}{47}{subsubsection.4.3.6}%
-\contentsline {subsection}{\numberline {4.4}Tác tử phân tích nguyên nhân gốc (RCA)}{48}{subsection.4.4}%
-\contentsline {subsubsection}{\numberline {4.4.1}Gom cảnh báo thành sự cố}{48}{subsubsection.4.4.1}%
-\contentsline {subsubsection}{\numberline {4.4.2}Lan truyền ngược và xếp hạng service gốc}{50}{subsubsection.4.4.2}%
-\contentsline {subsubsection}{\numberline {4.4.3}Báo cáo chẩn đoán có cấu trúc JSON}{51}{subsubsection.4.4.3}%
-\contentsline {subsection}{\numberline {4.5}Hiện thực hóa hệ thống và harness thực nghiệm}{51}{subsection.4.5}%
-\contentsline {subsection}{\numberline {4.6}Kết chương}{52}{subsection.4.6}%
-\contentsline {section}{\numberline {5}Thực nghiệm và đánh giá}{54}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Mục tiêu thực nghiệm và các giả thuyết H0--H5}{54}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Dữ liệu và giao thức chia split chống rò rỉ}{54}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Thiết lập thực nghiệm và chi phí}{56}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Thước đo đánh giá}{57}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Kiểm chứng tính đúng của pipeline và tái lập hồi quy}{57}{subsection.5.5}%
-\contentsline {subsubsection}{\numberline {5.5.1}Kiểm chứng pipeline cơ sở (G-port)}{58}{subsubsection.5.5.1}%
-\contentsline {subsubsection}{\numberline {5.5.2}Kiểm chứng hồi quy trên tập đối chiếu (G-paper)}{58}{subsubsection.5.5.2}%
-\contentsline {subsection}{\numberline {5.6}Tinh chỉnh và lựa chọn cấu hình trên tập \texttt {val}}{59}{subsection.5.6}%
-\contentsline {subsubsection}{\numberline {5.6.1}Kiểm chứng sơ bộ H0 trên \texttt {val}}{59}{subsubsection.5.6.1}%
-\contentsline {subsubsection}{\numberline {5.6.2}Tinh chỉnh truy xuất C1: hạn ngạch $k_{\text {graph}}$ và trọng số Fusion}{60}{subsubsection.5.6.2}%
-\contentsline {subsubsection}{\numberline {5.6.3}Kiểm chứng cơ chế thiên lệch xác nhận H1 trên \texttt {val}}{60}{subsubsection.5.6.3}%
-\contentsline {subsubsection}{\numberline {5.6.4}Chọn cấu hình CTAV{} (C3) và loại bỏ C2, C4 trên \texttt {val}}{61}{subsubsection.5.6.4}%
-\contentsline {subsubsection}{\numberline {5.6.5}Khảo sát cổng cứu cảnh báo C5 trên \texttt {val}}{62}{subsubsection.5.6.5}%
-\contentsline {subsection}{\numberline {5.7}Kết quả kiểm định trên tập \texttt {test} (G-test)}{62}{subsection.5.7}%
-\contentsline {subsubsection}{\numberline {5.7.1}Giao thức G-test và tổng hợp các lượt chạy}{62}{subsubsection.5.7.1}%
-\contentsline {subsubsection}{\numberline {5.7.2}Hành vi bộ phát hiện trên \texttt {test} và độ lệch giữa các split}{63}{subsubsection.5.7.2}%
-\contentsline {subsubsection}{\numberline {5.7.3}Bức tranh tổng quan các phương pháp trên \texttt {test}}{64}{subsubsection.5.7.3}%
-\contentsline {subsubsection}{\numberline {5.7.4}Kiểm định H0: topology chưa hiệu chỉnh tăng recall và FPR}{65}{subsubsection.5.7.4}%
-\contentsline {subsubsection}{\numberline {5.7.5}Kiểm định H2: CTAV{} so với BM25 và C1 (giả thuyết chính)}{65}{subsubsection.5.7.5}%
-\contentsline {subsubsection}{\numberline {5.7.6}Kiểm định H3: đóng góp của từng thành phần}{66}{subsubsection.5.7.6}%
-\contentsline {subsubsection}{\numberline {5.7.7}Kiểm định H4: hiệu quả ở ngân sách nhỏ 120 lần gọi}{66}{subsubsection.5.7.7}%
-\contentsline {subsubsection}{\numberline {5.7.8}Bảng tổng hợp kết quả kiểm định H0--H5}{66}{subsubsection.5.7.8}%
-\contentsline {subsection}{\numberline {5.8}Phân tích thành phần, cơ chế và đường cong trên \texttt {test}}{66}{subsection.5.8}%
-\contentsline {subsubsection}{\numberline {5.8.1}Phễu quyết định và ablation thành phần (\texttt {val} cạnh \texttt {test})}{68}{subsubsection.5.8.1}%
-\contentsline {subsubsection}{\numberline {5.8.2}Độ phủ ngưỡng nền \texttt {dev} và sự sụt giảm recall (Phát hiện 11)}{69}{subsubsection.5.8.2}%
-\contentsline {subsubsection}{\numberline {5.8.3}Đường F1 theo ngân sách gọi LLM}{70}{subsubsection.5.8.3}%
-\contentsline {subsubsection}{\numberline {5.8.4}Đánh giá C5 (Rescue) một điểm trên \texttt {test}}{71}{subsubsection.5.8.4}%
-\contentsline {subsubsection}{\numberline {5.8.5}Độ ổn định lặp lại của bộ thẩm định và đối chiếu chi phí}{71}{subsubsection.5.8.5}%
-\contentsline {subsubsection}{\numberline {5.8.6}Chỉ số gần đúng về chất lượng ngữ cảnh theo quy tắc ngưỡng}{71}{subsubsection.5.8.6}%
-\contentsline {subsection}{\numberline {5.9}Đánh giá tác tử RCA (H5)}{72}{subsection.5.9}%
-\contentsline {subsubsection}{\numberline {5.9.1}Chọn tham số trên \texttt {val} và thiết lập kiểm định H5}{72}{subsubsection.5.9.1}%
-\contentsline {subsubsection}{\numberline {5.9.2}Kết quả kiểm định H5 trên \texttt {test}}{72}{subsubsection.5.9.2}%
-\contentsline {subsubsection}{\numberline {5.9.3}Phân tích nguyên nhân và chất lượng báo cáo JSON}{73}{subsubsection.5.9.3}%
-\contentsline {subsection}{\numberline {5.10}Tổng hợp các phát hiện thực nghiệm cốt lõi}{74}{subsection.5.10}%
-\contentsline {subsection}{\numberline {5.11}Kết chương}{74}{subsection.5.11}%
-\contentsline {section}{\numberline {6}Platform demo}{76}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Vai trò của platform}{76}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Luồng end-to-end và triển khai}{76}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Dashboard bốn màn hình}{77}{subsection.6.3}%
-\contentsline {subsubsection}{\numberline {6.3.1}Timeline: cảnh báo theo thời gian}{78}{subsubsection.6.3.1}%
-\contentsline {subsubsection}{\numberline {6.3.2}Alert Detail: vì sao giữ hay hạ một cảnh báo}{79}{subsubsection.6.3.2}%
-\contentsline {subsubsection}{\numberline {6.3.3}Incident Detail: service nào là gốc}{80}{subsubsection.6.3.3}%
-\contentsline {subsubsection}{\numberline {6.3.4}Experiment Comparison: giả thuyết nào đạt}{82}{subsubsection.6.3.4}%
-\contentsline {subsection}{\numberline {6.4}Kịch bản demo năm phút}{83}{subsection.6.4}%
-\contentsline {subsection}{\numberline {6.5}Kiểm thử demo và dự phòng}{84}{subsection.6.5}%
-\contentsline {subsection}{\numberline {6.6}Kết chương}{85}{subsection.6.6}%
-\contentsline {section}{\numberline {7}Thảo luận}{86}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Tổng hợp kết quả chính}{86}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Thảo luận: vì sao C3 có tác dụng, vì sao C2, C4, C5 thì không}{87}{subsection.7.2}%
-\contentsline {subsubsection}{\numberline {7.2.1}Vì sao C3 có tác dụng}{87}{subsubsection.7.2.1}%
-\contentsline {subsubsection}{\numberline {7.2.2}Vì sao C2 và C4 bị loại}{88}{subsubsection.7.2.2}%
-\contentsline {subsubsection}{\numberline {7.2.3}Vì sao C5 không thêm recall}{88}{subsubsection.7.2.3}%
-\contentsline {subsection}{\numberline {7.3}Mối đe doạ tính hợp lệ}{89}{subsection.7.3}%
-\contentsline {subsection}{\numberline {7.4}Phân tích ca sai}{90}{subsection.7.4}%
-\contentsline {subsubsection}{\numberline {7.4.1}Báo động giả còn lại của CTAV{}}{90}{subsubsection.7.4.1}%
-\contentsline {subsubsection}{\numberline {7.4.2}Sự cố bị bỏ sót của CTAV{}}{91}{subsubsection.7.4.2}%
-\contentsline {subsubsection}{\numberline {7.4.3}Ca sai của tác tử RCA}{92}{subsubsection.7.4.3}%
-\contentsline {subsubsection}{\numberline {7.4.4}Đánh giá chất lượng nội dung báo cáo chẩn đoán}{93}{subsubsection.7.4.4}%
-\contentsline {subsection}{\numberline {7.5}Kết chương}{94}{subsection.7.5}%
-\contentsline {section}{Tài liệu tham khảo}{95}{subsection.7.5}%
-\contentsline {section}{\numberline {A}Phụ lục: Lệnh vận hành harness và cấu hình kỹ thuật}{101}{appendix.A}%
-\contentsline {section}{\numberline {B}Phụ lục: Các bảng thực nghiệm bổ trợ và danh sách lượt chạy}{102}{appendix.B}%
+\contentsline {section}{Danh mục từ viết tắt}{6}{section*.3}%
+\contentsline {section}{Danh mục thành phần và thuật ngữ hệ thống}{7}{section*.4}%
+\contentsline {section}{Danh sách hình}{8}{section*.4}%
+\contentsline {section}{Danh sách bảng}{9}{section*.4}%
+\contentsline {section}{\numberline {1}Giới thiệu đề tài}{11}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Bối cảnh và bài toán nghiên cứu}{11}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}Vận hành AIOps trên hệ thống microservice và bài toán quá tải cảnh báo}{11}{subsubsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.2}Khảo sát bước đầu về kiến trúc giám sát lai và đánh đổi ngữ cảnh đồ thị}{13}{subsubsection.1.1.2}%
+\contentsline {subsubsection}{\numberline {1.1.3}Những thách thức đặt ra cho giải pháp tổng thể}{14}{subsubsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.2}Mục tiêu, câu hỏi nghiên cứu và đóng góp của đề tài}{15}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Mục tiêu tổng quát}{15}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.2.2}Mục tiêu cụ thể}{16}{subsubsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.2.3}Câu hỏi nghiên cứu}{16}{subsubsection.1.2.3}%
+\contentsline {subsubsection}{\numberline {1.2.4}Đóng góp chính}{17}{subsubsection.1.2.4}%
+\contentsline {subsection}{\numberline {1.3}Đối tượng và phạm vi nghiên cứu}{18}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}Đối tượng nghiên cứu}{18}{subsubsection.1.3.1}%
+\contentsline {subsubsection}{\numberline {1.3.2}Phạm vi nghiên cứu}{19}{subsubsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.4}Ý nghĩa của đề tài}{19}{subsection.1.4}%
+\contentsline {subsubsection}{\numberline {1.4.1}Ý nghĩa thực tiễn}{19}{subsubsection.1.4.1}%
+\contentsline {subsubsection}{\numberline {1.4.2}Ý nghĩa khoa học}{20}{subsubsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.5}Cấu trúc báo cáo}{20}{subsection.1.5}%
+\contentsline {section}{\numberline {2}Kiến thức và công nghệ nền tảng}{22}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Dữ liệu quan sát trên hệ microservice}{22}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Metric, log, trace và cửa sổ trượt}{22}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}Nezha và nhãn nguyên nhân gốc}{23}{subsubsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.2}Phát hiện bất thường và quá tải cảnh báo}{24}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Bất thường, khoảng trống ngữ nghĩa và quá tải cảnh báo}{24}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Isolation Forest}{25}{subsubsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.3}Truy xuất bằng chứng}{25}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}\term {BM25}{BM25} trên văn bản log và trace}{25}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}Đồ thị phụ thuộc service}{26}{subsubsection.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.3.3}Hợp nhất đa phương thức (\term {FusionScore}{Fusion Score}) và \term {RAG}{RAG} trong giám sát}{26}{subsubsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.4}LLM làm bộ thẩm định (LLM-as-a-Judge)}{27}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}LLM-as-a-Judge, đầu ra có cấu trúc và kiểm soát ngân sách}{28}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}\term {ConfirmationBias}{Thiên lệch xác nhận}, hiệu chỉnh ngưỡng và nguồn gốc bằng chứng}{28}{subsubsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.5}Phân tích nguyên nhân gốc (\term {RCA}{RCA}) trên microservice}{29}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Tiêu chí và phương pháp đánh giá}{29}{subsection.2.6}%
+\contentsline {subsubsection}{\numberline {2.6.1}Thước đo phân loại cảnh báo và định vị \term {RCA}{RCA}}{29}{subsubsection.2.6.1}%
+\contentsline {subsubsection}{\numberline {2.6.2}Bootstrap CI và kiểm định McNemar}{30}{subsubsection.2.6.2}%
+\contentsline {subsection}{\numberline {2.7}Giả thuyết nghiên cứu và đăng ký trước}{30}{subsection.2.7}%
+\contentsline {subsection}{\numberline {2.8}Công nghệ nền tảng}{31}{subsection.2.8}%
+\contentsline {subsection}{\numberline {2.9}Kết chương}{32}{subsection.2.9}%
+\contentsline {section}{\numberline {3}Công trình liên quan}{33}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Các nghiên cứu liên quan}{33}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Phát hiện bất thường trên chuỗi thời gian metric}{33}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Mô hình ngôn ngữ lớn trong phân tích log và nguyên nhân gốc}{34}{subsubsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {3.1.3}Kiến trúc giám sát lai và LLM-as-a-Judge}{34}{subsubsection.3.1.3}%
+\contentsline {subsubsection}{\numberline {3.1.4}Phân tích nguyên nhân gốc dựa trên topology, đồ thị và suy luận nhân quả}{35}{subsubsection.3.1.4}%
+\contentsline {subsubsection}{\numberline {3.1.5}Truy xuất dựa trên đồ thị và GraphRAG cho vận hành hệ thống}{36}{subsubsection.3.1.5}%
+\contentsline {subsubsection}{\numberline {3.1.6}Hiệu chỉnh độ tin cậy, thiên lệch của LLM-as-a-Judge và gắn bằng chứng}{37}{subsubsection.3.1.6}%
+\contentsline {subsubsection}{\numberline {3.1.7}Gom nhóm, phân loại và cứu cảnh báo trong vận hành}{38}{subsubsection.3.1.7}%
+\contentsline {subsection}{\numberline {3.2}Các hệ thống và công cụ hiện có}{38}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Nhận xét về các hệ thống hiện có}{39}{subsubsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.3}Kết chương}{39}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Bảng so sánh tổng hợp}{39}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Khoảng trống nghiên cứu và định vị đề xuất}{41}{subsubsection.3.3.2}%
+\contentsline {section}{\numberline {4}Đề xuất: \CTAV {} và tác tử \term {RCA}{RCA}}{43}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Mô tả đề xuất}{43}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Tổng quan về đề xuất}{43}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Các vấn đề nghiên cứu}{45}{subsubsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.3}Các thách thức và khó khăn}{47}{subsubsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.2}Isolation Forest và cổng Rescue (\comp {C5})}{48}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}\CTAV {} — Thẩm định cảnh báo có nhận biết topology và hiệu chỉnh}{49}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Tổng quan \CTAV {}}{50}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}\term {BM25}{BM25} cục bộ và bộ thẩm định nền}{51}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3}Truy xuất nhận biết topology \comp {C1}}{51}{subsubsection.4.3.3}%
+\contentsline {subsubsection}{\numberline {4.3.4}Chính sách quyết định: neo bằng chứng (\comp {C3}) và ngưỡng bất đối xứng (\comp {C2}, đã loại)}{53}{subsubsection.4.3.4}%
+\contentsline {subsubsection}{\numberline {4.3.5}Định tuyến hai tầng thích nghi (\comp {C4}, đã loại)}{55}{subsubsection.4.3.5}%
+\contentsline {subsubsection}{\numberline {4.3.6}Bộ thẩm định LLM: prompt, đầu ra có cấu trúc và cache}{56}{subsubsection.4.3.6}%
+\contentsline {subsection}{\numberline {4.4}Tác tử phân tích nguyên nhân gốc (\term {RCA}{RCA})}{57}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}Gom cảnh báo thành sự cố}{57}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Lan truyền ngược và xếp hạng service gốc}{58}{subsubsection.4.4.2}%
+\contentsline {subsubsection}{\numberline {4.4.3}Báo cáo chẩn đoán có cấu trúc JSON}{59}{subsubsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.5}Hiện thực hóa hệ thống và harness thực nghiệm}{60}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}Kết chương}{61}{subsection.4.6}%
+\contentsline {section}{\numberline {5}Thực nghiệm và đánh giá}{63}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Mục tiêu thực nghiệm và các giả thuyết \hyp {H0}--\hyp {H5}}{63}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Dữ liệu và giao thức chia split chống rò rỉ}{64}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Thiết lập thực nghiệm và chi phí}{66}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Thước đo đánh giá}{67}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Kiểm chứng tính đúng của pipeline và tái lập hồi quy}{68}{subsection.5.5}%
+\contentsline {subsubsection}{\numberline {5.5.1}Kiểm chứng pipeline cơ sở (G-port)}{68}{subsubsection.5.5.1}%
+\contentsline {subsubsection}{\numberline {5.5.2}Kiểm chứng hồi quy trên tập đối chiếu (G-paper)}{69}{subsubsection.5.5.2}%
+\contentsline {subsection}{\numberline {5.6}Tinh chỉnh và lựa chọn cấu hình trên tập \texttt {val}}{69}{subsection.5.6}%
+\contentsline {subsubsection}{\numberline {5.6.1}Kiểm chứng sơ bộ \hyp {H0} trên \texttt {val}}{70}{subsubsection.5.6.1}%
+\contentsline {subsubsection}{\numberline {5.6.2}Tinh chỉnh truy xuất \comp {C1}: hạn ngạch $k_{\text {graph}}$ và trọng số Fusion}{70}{subsubsection.5.6.2}%
+\contentsline {subsubsection}{\numberline {5.6.3}Kiểm chứng cơ chế \term {ConfirmationBias}{thiên lệch xác nhận} \hyp {H1} trên \texttt {val}}{70}{subsubsection.5.6.3}%
+\contentsline {subsubsection}{\numberline {5.6.4}Chọn cấu hình \CTAV {} (\comp {C3}) và loại bỏ \comp {C2}, \comp {C4} trên \texttt {val}}{72}{subsubsection.5.6.4}%
+\contentsline {subsubsection}{\numberline {5.6.5}Khảo sát cổng cứu cảnh báo \comp {C5} trên \texttt {val}}{72}{subsubsection.5.6.5}%
+\contentsline {subsection}{\numberline {5.7}Kết quả kiểm định trên tập \texttt {test} (G-test)}{73}{subsection.5.7}%
+\contentsline {subsubsection}{\numberline {5.7.1}Giao thức G-test và tổng hợp các lượt chạy}{73}{subsubsection.5.7.1}%
+\contentsline {subsubsection}{\numberline {5.7.2}Hành vi bộ phát hiện trên \texttt {test} và độ lệch giữa các split}{73}{subsubsection.5.7.2}%
+\contentsline {subsubsection}{\numberline {5.7.3}Bức tranh tổng quan các phương pháp trên \texttt {test}}{75}{subsubsection.5.7.3}%
+\contentsline {subsubsection}{\numberline {5.7.4}Kiểm định \hyp {H0}: topology chưa hiệu chỉnh tăng recall và \term {FPR}{FPR}}{76}{subsubsection.5.7.4}%
+\contentsline {subsubsection}{\numberline {5.7.5}Kiểm định \hyp {H2}: \CTAV {} so với \term {BM25}{BM25} và \comp {C1} (giả thuyết chính)}{77}{subsubsection.5.7.5}%
+\contentsline {subsubsection}{\numberline {5.7.6}Kiểm định \hyp {H3}: đóng góp của từng thành phần}{78}{subsubsection.5.7.6}%
+\contentsline {subsubsection}{\numberline {5.7.7}Kiểm định \hyp {H4}: hiệu quả ở ngân sách nhỏ 120 lần gọi}{79}{subsubsection.5.7.7}%
+\contentsline {subsubsection}{\numberline {5.7.8}Bảng tổng hợp kết quả kiểm định \hyp {H0}--\hyp {H5}}{80}{subsubsection.5.7.8}%
+\contentsline {subsection}{\numberline {5.8}Phân tích thành phần, cơ chế và đường cong trên \texttt {test}}{80}{subsection.5.8}%
+\contentsline {subsubsection}{\numberline {5.8.1}Phễu quyết định và ablation thành phần (\texttt {val} cạnh \texttt {test})}{80}{subsubsection.5.8.1}%
+\contentsline {subsubsection}{\numberline {5.8.2}Độ phủ ngưỡng nền \texttt {dev} và sự sụt giảm recall (Phát hiện 11)}{82}{subsubsection.5.8.2}%
+\contentsline {subsubsection}{\numberline {5.8.3}Đường F1 theo ngân sách gọi LLM}{83}{subsubsection.5.8.3}%
+\contentsline {subsubsection}{\numberline {5.8.4}Đánh giá \comp {C5} (Rescue) một điểm trên \texttt {test}}{84}{subsubsection.5.8.4}%
+\contentsline {subsubsection}{\numberline {5.8.5}Độ ổn định lặp lại của bộ thẩm định và đối chiếu chi phí}{84}{subsubsection.5.8.5}%
+\contentsline {subsubsection}{\numberline {5.8.6}Chỉ số gần đúng về chất lượng ngữ cảnh theo quy tắc ngưỡng}{85}{subsubsection.5.8.6}%
+\contentsline {subsection}{\numberline {5.9}Đánh giá tác tử \term {RCA}{RCA} (\hyp {H5})}{85}{subsection.5.9}%
+\contentsline {subsubsection}{\numberline {5.9.1}Chọn tham số trên \texttt {val} và thiết lập kiểm định \hyp {H5}}{86}{subsubsection.5.9.1}%
+\contentsline {subsubsection}{\numberline {5.9.2}Kết quả kiểm định \hyp {H5} trên \texttt {test}}{86}{subsubsection.5.9.2}%
+\contentsline {subsubsection}{\numberline {5.9.3}Phân tích nguyên nhân và chất lượng báo cáo JSON}{87}{subsubsection.5.9.3}%
+\contentsline {subsection}{\numberline {5.10}Tổng hợp các phát hiện thực nghiệm cốt lõi}{88}{subsection.5.10}%
+\contentsline {subsection}{\numberline {5.11}Kết chương}{88}{subsection.5.11}%
+\contentsline {section}{\numberline {6}Platform demo}{90}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Vai trò của platform}{90}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Luồng end-to-end và triển khai}{90}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Dashboard bốn màn hình}{92}{subsection.6.3}%
+\contentsline {subsubsection}{\numberline {6.3.1}Timeline: cảnh báo theo thời gian}{92}{subsubsection.6.3.1}%
+\contentsline {subsubsection}{\numberline {6.3.2}Alert Detail: vì sao giữ hay hạ một cảnh báo}{93}{subsubsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.3}Incident Detail: service nào là gốc}{95}{subsubsection.6.3.3}%
+\contentsline {subsubsection}{\numberline {6.3.4}Experiment Comparison: giả thuyết nào đạt}{96}{subsubsection.6.3.4}%
+\contentsline {subsection}{\numberline {6.4}Kịch bản demo năm phút}{96}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Kiểm thử demo và dự phòng}{98}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Kết chương}{100}{subsection.6.6}%
+\contentsline {section}{\numberline {7}Thảo luận}{102}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Tổng hợp kết quả chính}{102}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Thảo luận: vì sao \comp {C3} có tác dụng, vì sao \comp {C2}, \comp {C4}, \comp {C5} thì không}{103}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}Vì sao \comp {C3} có tác dụng}{104}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}Vì sao \comp {C2} và \comp {C4} bị loại}{104}{subsubsection.7.2.2}%
+\contentsline {subsubsection}{\numberline {7.2.3}Vì sao \comp {C5} không thêm recall}{105}{subsubsection.7.2.3}%
+\contentsline {subsection}{\numberline {7.3}Mối đe doạ tính hợp lệ}{105}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Phân tích ca sai}{108}{subsection.7.4}%
+\contentsline {subsubsection}{\numberline {7.4.1}Báo động giả còn lại của \CTAV {}}{109}{subsubsection.7.4.1}%
+\contentsline {subsubsection}{\numberline {7.4.2}Sự cố bị bỏ sót của \CTAV {}}{110}{subsubsection.7.4.2}%
+\contentsline {subsubsection}{\numberline {7.4.3}Ca sai của tác tử \term {RCA}{RCA}}{110}{subsubsection.7.4.3}%
+\contentsline {subsubsection}{\numberline {7.4.4}Đánh giá chất lượng nội dung báo cáo chẩn đoán}{111}{subsubsection.7.4.4}%
+\contentsline {subsection}{\numberline {7.5}Kết chương}{112}{subsection.7.5}%
+\contentsline {section}{\numberline {8}Tổng kết}{114}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Kết quả đạt được}{114}{subsection.8.1}%
+\contentsline {subsubsection}{\numberline {8.1.1}Trả lời câu hỏi nghiên cứu}{114}{subsubsection.8.1.1}%
+\contentsline {subsubsection}{\numberline {8.1.2}Đóng góp}{116}{subsubsection.8.1.2}%
+\contentsline {subsubsection}{\numberline {8.1.3}Kết quả kiểm định \hyp {H0}--\hyp {H5}}{117}{subsubsection.8.1.3}%
+\contentsline {subsubsection}{\numberline {8.1.4}Ý nghĩa và kết luận chung}{117}{subsubsection.8.1.4}%
+\contentsline {subsection}{\numberline {8.2}Hạn chế và hướng phát triển}{118}{subsection.8.2}%
+\contentsline {subsubsection}{\numberline {8.2.1}Hạn chế}{118}{subsubsection.8.2.1}%
+\contentsline {subsubsection}{\numberline {8.2.2}Hướng phát triển}{119}{subsubsection.8.2.2}%
+\contentsline {section}{\numberline {9}Công bố khoa học}{121}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Bài báo đã công bố}{121}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Quan hệ với luận văn}{121}{subsection.9.2}%
+\contentsline {section}{Kế hoạch thực hiện phần còn lại}{124}{section*.73}%
+\contentsline {section}{Tài liệu tham khảo}{126}{table.caption.74}%
+\contentsline {section}{\numberline {A}Phụ lục: Lệnh vận hành harness và cấu hình kỹ thuật}{132}{appendix.A}%
+\contentsline {section}{\numberline {B}Phụ lục: Các bảng thực nghiệm bổ trợ và danh sách lượt chạy}{133}{appendix.B}%
 \contentsfinish 

@@ -1,0 +1,57 @@
+% =============================================================================
+% Chuong 9: Cong bo khoa hoc (chuan lop article cho Internship2_HK262)
+% Nguon: ban revised da duoc chap nhan cua bai ICAETM 2026 (Track 4, ma bai 386),
+%   docs/drafts/ch9-cong-bo-khoa-hoc-plan.md, style guide §1.2, §3.1.
+% Quy tac: khong lap so cua bai bao; bai bao la khao sat buoc dau, khong la truc so sanh.
+% Khong co Ket chuong, khong co hinh.
+% =============================================================================
+
+\section{Công bố khoa học}
+\label{ch:cong-bo}
+
+Chương này trình bày công bố khoa học của tác giả liên quan đến đề tài và vị trí của công bố đó trong luận văn. Mục~\ref{sec:ch9-bai-bao} nêu thông tin bài báo, trạng thái và nội dung chính. Mục~\ref{sec:ch9-quan-he} chỉ ra luận văn dùng bài báo ở đâu và đi xa hơn bài báo ở những điểm nào.
+
+% -----------------------------------------------------------------------------
+\subsection{Bài báo đã công bố}
+\label{sec:ch9-bai-bao}
+
+Bài báo \emph{Topology-Guided Evidence Retrieval for Cost-Aware LLM Alert Validation in Microservices}~\cite{icaetm2026} (dài 6 trang) của Nguyễn Văn Hoàng Khang (tác giả chính, tác giả liên hệ) và PGS.TS.~Võ Thị Ngọc Châu (giảng viên hướng dẫn), Khoa Khoa học và Kỹ thuật Máy tính, Trường Đại học Bách khoa -- ĐHQG-HCM, được gửi tới hội nghị quốc tế \emph{International Conference on Advances in Engineering, Technology \& Management} (ICAETM 2026, \url{https://icaetm.org/}), tổ chức tại Pune, Ấn Độ (ngày 29/10/2026), thuộc \emph{Track~4: Computing, AI, Data \& Cyber Technologies} (mã bài 386). Bài đã qua vòng phản biện, hoàn tất bản chỉnh sửa (\emph{Revision}) theo góp ý phản biện, \textbf{đã được chấp nhận} đăng trong kỷ yếu hội nghị và \textbf{đã được tác giả trình bày, trả lời phản biện tại hội nghị}. Mã nguồn, cấu hình split và \textit{cache} của bài được công khai tại \url{https://github.com/perckgg/topology-alert-validation-2026}.
+
+Bài báo khảo sát một pipeline thẩm định cảnh báo chi phí thấp cho hệ thống microservice: một bộ phát hiện bất thường nhẹ đánh dấu \code{candidate}, tầng truy xuất thu thập bằng chứng log và trace, và một judge LLM trả kết quả theo lược đồ JSON cố định. Đóng góp chính của bài là một điểm hợp nhất xếp hạng kết hợp độ liên quan từ khoá \term{BM25}{BM25}, độ gần thời gian và độ gần trên đồ thị gọi service; đây chính là \term{FusionScore}{Fusion Score} mà luận văn dùng cho \comp{C1}. Khác với nhiều nghiên cứu trước chỉ đánh giá trên các đợt lỗi, bài đánh giá cả trên cửa sổ bình thường và theo dõi số lần gọi API cùng chi phí. Kết quả cho thấy ngữ cảnh topology giúp bắt thêm sự cố, nhất là lỗi độ trễ mạng lan sang service khác, nhưng cũng khiến judge xác nhận nhiều cửa sổ bình thường hơn hẳn. Bài kết luận rằng tầng truy xuất và chính sách quyết định của LLM cần được thiết kế cùng nhau.
+
+% -----------------------------------------------------------------------------
+\subsection{Quan hệ với luận văn}
+\label{sec:ch9-quan-he}
+
+Bài báo là khảo sát thực nghiệm bước đầu cho riêng khâu truy xuất ngữ cảnh, trên tập mẫu \code{paper\_500}. Luận văn dùng nó ở bốn chỗ: làm hiện tượng xuất phát ở Mục~\ref{sec:ch1-khao-sat}; làm một công trình liên quan ở Mục~\ref{sec:ch3-graphrag}; lấy công thức và bộ trọng số \term{FusionScore}{Fusion Score} cho \comp{C1} (truy xuất lai \term{BM25}{BM25}--topology) ở Mục~\ref{sec:ch4-c1}; và làm mốc kiểm chứng tính đúng của pipeline ở cổng G-paper (Mục~\ref{sec:ch5-gpaper}), nơi pipeline của luận văn tái lập đúng các baseline đã công bố.
+
+Luận văn đi xa hơn bài báo ở hai hướng. Thứ nhất, ba hướng phát triển mà bài báo đề xuất ở phần kết luận được hiện thực thành ba thành phần của \CTAV{} và kiểm định bằng ablation. Thứ hai, các giới hạn mà bài báo tự nêu ở phần mối đe doạ tính hợp lệ được xử lý bằng giao thức đánh giá của luận văn. Bảng~\ref{tab:ch9-quan-he} tóm tắt từng điểm.
+
+\begin{table}[H]
+  \centering
+  \caption[Điểm mở của bài báo và cách luận văn xử lý]{Các điểm mở của bài báo~\cite{icaetm2026}, cách luận văn xử lý và kết cục.}
+  \label{tab:ch9-quan-he}
+  \tblfont
+  \tblsetup
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{4.4cm}|Y|>{\raggedright\arraybackslash}p{3.6cm}|}
+    \hline
+    \rowcolor{gray!15}
+    \textbf{Điểm mở của bài báo} & \textbf{Luận văn xử lý} & \textbf{Kết cục} \\
+    \hline
+    Hướng (1): ngưỡng tin cậy bất đối xứng, chặt hơn cho bằng chứng từ service xa & \comp{C2} (gating theo nguồn bằng chứng) & Đã loại sau ablation \hyp{H3} \\
+    \hline
+    Hướng (2): buộc bằng chứng nối với tín hiệu bất thường thay vì chỉ dựa vào khoảng cách trên đồ thị & \comp{C3} (neo bằng chứng): span được trích phải vượt ngưỡng nền $p_{90}$ & Đang dùng, đóng góp chính \\
+    \hline
+    Hướng (3): định tuyến nhiều tầng, chạy truy xuất từ khoá trước và chỉ mở rộng đồ thị cho ca chưa rõ & \comp{C4} (định tuyến hai tầng) & Đã loại vì tốn chi phí hơn mà F1 không tăng \\
+    \hline
+    \term{ConfirmationBias}{Thiên lệch xác nhận} mới là giả thuyết; chưa cô lập lượng, thứ tự hay loại bằng chứng & Thí nghiệm can thiệp \hyp{H1} trên \splitname{val} & Nguyên nhân là trace cục bộ sát thời điểm cảnh báo \\
+    \hline
+    Một lượt chạy; tập đánh giá chưa hoàn toàn độc lập với bước chọn trọng số; truy vấn \term{BM25}{BM25} chứa thẻ loại lỗi & Split \splitname{dev}/\splitname{val}/\splitname{test} theo đợt tiêm lỗi, đăng ký trước, chạy lặp, xoá thẻ loại lỗi kèm kiểm thử tự động & Kiểm định một lần trên \splitname{test} (Chương~\ref{ch:thuc-nghiem}) \\
+    \hline
+    Chỉ thẩm định cảnh báo, không định vị nguyên nhân gốc & Tác tử \term{RCA}{RCA} và platform end-to-end & \hyp{H5} không được chấp nhận; platform chạy được (Chương~\ref{ch:platform}) \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+Điểm khác biệt quan trọng nhất là một lần đổi hướng có ghi lại. Bài báo gợi ý dùng ngưỡng tin cậy chặt hơn cho bằng chứng đến từ service xa, vì giả định báo động giả bắt nguồn từ ngữ cảnh lân cận. Luận văn kiểm trực tiếp giả định này bằng thí nghiệm \hyp{H1} và thấy nó không đúng: judge xác nhận nhầm chủ yếu khi gặp trace của chính service phát cảnh báo nằm sát thời điểm cảnh báo, còn bằng chứng lân cận ít gây xác nhận hơn (Mục~\ref{sec:ch5-h1}). Vì vậy, trục thiết kế chuyển từ \comp{C2} sang \comp{C3}, và \comp{C2} được giữ lại như một kết quả âm có bằng chứng (Mục~\ref{sec:ch7-c2-c4}). Bài báo vì thế là điểm xuất phát của luận văn, còn các kết luận về \CTAV{}, cơ chế thiên lệch và tác tử \term{RCA}{RCA} chỉ dựa trên thực nghiệm của chính luận văn.

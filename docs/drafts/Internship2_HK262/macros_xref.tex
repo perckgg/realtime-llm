@@ -1,0 +1,41 @@
+% =============================================================================
+% macros_xref.tex — He thong macro hyperlink & tra cuu nhanh cho bao cao PDF
+% Chay thuan pdflatex + vntex (khong phu thuoc makeglossaries/Perl).
+% =============================================================================
+
+% Che do mau link: mac dinh xanh navy dam cho PDF doc online;
+% truyen \def\PRINTMODE{1} (qua build.bat --print) de chuyen toan bo ve mau den.
+\ifdefined\PRINTMODE
+  \hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=black
+  }
+\else
+  \hypersetup{
+    colorlinks=true,
+    linkcolor=blue!55!black,
+    citecolor=blue!45!black,
+    urlcolor=blue!65!black
+  }
+\fi
+
+% Neo dich nhay khong lam doi chieu cao dong trong bang / doan van.
+\newcommand{\xtarget}[1]{\raisebox{\ht\strutbox}[0pt][0pt]{\hypertarget{#1}{}}}
+
+% Thanh phan he thong C1..C5 -> nhay ve bang tom tat dau bao cao (comp:C1..C5).
+% (Neu muon nhay thang xuong muc chi tiet Chuong 4, doi comp:#1 thanh def:#1.)
+\DeclareRobustCommand{\comp}[1]{\texorpdfstring{\hyperlink{comp:#1}{#1}}{#1}}
+
+% Gia thuyet H0..H5 -> nhay ve dong tuong ung trong Bang tab:h0-h5 (Chuong 5).
+\DeclareRobustCommand{\hyp}[1]{\texorpdfstring{\hyperlink{def:#1}{#1}}{#1}}
+
+% Cau hoi / muc tieu nghien cuu RQ1..RQ5 -> nhay ve Muc tieu cu the (Chuong 1).
+\DeclareRobustCommand{\rqref}[1]{\texorpdfstring{\hyperlink{def:#1}{#1}}{#1}}
+
+% Tu viet tat va thuat ngu loi -> nhay ve bang tra cuu o dau bao cao.
+\DeclareRobustCommand{\term}[2]{\texorpdfstring{\hyperlink{term:#1}{#2}}{#2}}
+
+% Nang cap macro \CTAV co san thanh lien ket bam duoc.
+\DeclareRobustCommand{\CTAV}{\texorpdfstring{\hyperlink{term:CTAV}{CTAV}}{CTAV}}
