@@ -22,3 +22,21 @@ Chỉ điền vào cột **`relevance`** (cột `note` tùy chọn) cho mỗi d�
 - `window_no` (1..50): các dòng cùng `window_no` thuộc cùng một cảnh báo tại `(alert_service, alert_pod, window_start)` với điểm `anomaly_score` và 3 metric lệch mạnh nhất ở `top_features`. Nên đọc lướt toàn bộ sự kiện của một `window_no` rồi chấm từng dòng.
 - `seconds_from_window_start`: độ lệch thời gian (giây) của sự kiện so với đầu cửa sổ cảnh báo (`[0, 60]` là nằm ngay trong cửa sổ 1 phút; âm là trước cửa sổ).
 - Không sửa/xóa dòng hay đổi tên cột; lưu lại đúng định dạng CSV UTF-8. Nếu có người chấm thứ hai, giao độc lập 10 cửa sổ đầu (`window_no` 1..10, tức 20% mẫu) trên bản sao của file mù để tính hệ số đồng thuận Cohen's κ.
+
+## 4. Bản đã chấm bằng quy tắc (2026-11-22, QĐ-051)
+
+`context_precision_test_v1.ai_scores.csv` là bản nhãn do **quy tắc ngưỡng cố định** sinh ra, **không phải người chấm từng dòng**:
+
+- `1` (liên quan) nếu `severity` là `WARN`/`ERROR`, hoặc `content` có log mức `ERROR`/`FATAL`/`CRITICAL`, hoặc là span `BasicErrorController.error`, hoặc `duration_ms ≥ 200`, **và** `|seconds_from_window_start| ≤ 180` (đọc `content` từ bản vá 2026-11-22, vì cột `severity` của Nezha hầu như luôn `INFO`);
+- `?` (không chắc) nếu `100 ≤ duration_ms < 200` và `|seconds| ≤ 120`;
+- `0` còn lại (span nhanh, hoặc sự kiện ở xa cửa sổ — span chậm cách vài phút không giải thích cửa sổ này).
+
+Ngưỡng 200 ms chọn vì trong mẫu này 88 % span dưới 100 ms và p90 = 99,9 ms. Hai cột độ nhạy (`relevance_loose` 100 ms, `relevance_strict` 500 ms) đi kèm để báo cáo khoảng biến thiên. File mù `.csv` và file khoá `.key.csv` không bị sửa; tái lập bằng:
+
+```bash
+py scripts/m8_context_precision_rule_label.py --graded eval/manual/context_precision_test_v1.csv \
+    --out eval/manual/context_precision_test_v1.ai_scores.csv --force
+py scripts/m8_context_precision_score.py --out eval/results/m8_context_precision_v2
+```
+
+Kết quả (`m8_context_precision_v2`, sau bản vá): C1 `0,0867` `[0,0433; 0,1367]` so với BM25 `0,0133` `[0,0000; 0,0300]` (micro precision, `?` tính là không liên quan). **Lưu ý khi viết luận văn:** quy tắc thưởng cho "span chậm gần cửa sổ" — đúng thứ C1 tối ưu — nên chỉ số này không trung lập giữa hai phương pháp; phải ghi vào phần hạn chế.

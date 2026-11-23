@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | Ngày mở mốc | **2026-11-17** (QĐ-049) |
-| Ngày cập nhật bản nháp | 2026-11-19 (**M11-A xong; chờ người dùng chấm tay để đóng mốc**) |
+| Ngày cập nhật bản nháp | 2026-11-22 (**M11-A, V35 (vá luật, `m8_context_precision_v2`) và V50 (AI chấm nháp, tác giả duyệt, `m11_diagnostic_quality_v1`) xong**) |
 | Hạn mục tiêu | 2027-01-17 |
-| Kết luận | **ĐANG LÀM** — **chờ người dùng chấm mù `eval/manual/diagnostic_quality.csv` (`n ≥ 15`)** mới tổng hợp bước 4 và đóng mốc. Đã xong 100% việc kỹ thuật 0 USD (lấy mẫu mù `seed = 42`, script chấm điểm + Cohen's $\kappa$, phân tích toàn bộ ca sai `test` CTAV & RCA, tổng duyệt demo lần 1 và nháp Chương 7 §7.3–§7.5 + nguyên liệu §8.2.1). |
+| Kết luận | **ĐẠT phần kỹ thuật — chờ commit và đóng mốc.** V50 đã chấm 30/30 sự cố (AI `deepseek-flash` chấm nháp trên bảng mù, tác giả rà soát và sửa 9 dòng trước khi mở khoá), tổng hợp ở `eval/results/m11_diagnostic_quality_v1`; V35 vá luật đọc lỗi trong `content`, chấm lại ở `eval/results/m8_context_precision_v2`; số đã điền vào nháp Chương 7 và LaTeX §5.8.6, §7.3, §7.4.4, §7.5. |
 | Commit | *(M11-A đã tách commit riêng theo QĐ-050; hash đóng mốc bổ sung ở M11-B)* |
 | Quyết định liên quan | QĐ-037, QĐ-049, **QĐ-050** (M11-A) |
 
@@ -16,11 +16,11 @@
 | Việc / DoD (`04` §M11 & `P5`) | Đạt? | Bằng chứng (số liệu / lệnh tái lập / file) |
 |---|---|---|
 | 1. `scripts/m11_sample_incidents.py`: lấy mẫu ngẫu nhiên 30 incident `test` (`rca_final_test_v1`, `seed = 42`) sao cho 15 dòng đầu tự nó là mẫu ngẫu nhiên hợp lệ; xuất bảng chấm mù 3 tiêu chí + hướng dẫn ≤ 1 trang + tách khóa | **Đạt** (2026-11-19) | `scripts/m11_sample_incidents.py`, `eval/manual/diagnostic_quality.csv` (30 dòng, không chứa nhãn gốc hay `invalid_evidence_ids`), `eval/manual/diagnostic_quality.key.csv`, `eval/manual/README-diagnostic-quality.md` (32 dòng); 15 dòng đầu gồm `6 labelled / 7 no_fault / 2 ambiguous`, đủ 30 gồm `15 / 13 / 2`; `tests/test_m11.py` kiểm khớp tiền tố & tính mù |
-| 2. Người dùng chấm mù `diagnostic_quality.csv` (`n ≥ 15` dòng đầu; thêm người chấm thứ hai trên 20% nếu có) | **Chờ người dùng** | Đã xuất sẵn bảng chấm mù và hướng dẫn |
+| 2. Chấm mù `diagnostic_quality.csv` (`n ≥ 15` dòng đầu) | **Đạt** (2026-11-22, 30/30 dòng) | AI chấm nháp `diagnostic_quality.ai_scores.csv` + `ai_review.md`; tác giả duyệt đề xuất sửa 10 dòng (`diagnostic_quality.proposed.csv`, sửa thật 9 dòng: 1, 4, 11, 13, 17, 19, 22, 25, 30; dòng 18 giữ điểm, đổi lý do) **trước khi mở `.key.csv`**; điểm đã duyệt chép vào `diagnostic_quality.csv`, cột `note` ghi `[AI nháp, tác giả duyệt]`. Không có người chấm thứ hai ⇒ không tính Cohen's κ |
 | 3. Phân tích ca sai trên `test` (chỉ mô tả, không đổi tham số): toàn bộ 64 FP & 332 FN của CTAV + toàn bộ ca RCA sai (tập đăng ký và dòng độ nhạy), gắn độ lệch detector M8 | **Đạt** (2026-11-19) | `scripts/m11_error_analysis.py`, `eval/results/m11_error_analysis_test_v1/{error_analysis.json,tables.md}`; `0` USD API; kiểm bất biến số học với M8/M9 trong `tests/test_m11.py` |
-| 4. Script tổng hợp điểm chất lượng báo cáo (CI bootstrap + độ đồng thuận Cohen's $\kappa$, chỉ báo `n` thực chấm) | **Có script; chờ CSV đã chấm** | `scripts/m11_score_diagnostic_quality.py` (đã test logic tổng hợp & κ bằng `tests/test_m11.py`) |
+| 4. Script tổng hợp điểm chất lượng báo cáo (CI bootstrap, đối chiếu khoá) | **Đạt** (2026-11-22) | `eval/results/m11_diagnostic_quality_v1/{summary.json,tables.md}`: root cause `0,900 ± 0,845` [0,600; 1,200] (`12/9/9`), bằng chứng `1,133 ± 0,937` [0,800; 1,500] (`11/4/15`), gợi ý xử lý `1,167 ± 0,379` [1,033; 1,300] (`0/25/5`); trên 15 sự cố có nhãn, khớp thang khách quan `8/15`, trung bình chấm `1,000` vs khách quan `1,333`; trong 9 báo cáo chấm root cause = 2 chỉ 3 là `EXACT` |
 | 5. Tổng duyệt demo lần 1 theo `08` §6, rà lại 3 lỗi từ M10-D | **Đạt** (2026-11-19, tổng hợp đợt rà `2026-11-18`) | Commit sửa UX & giải thích cho hội đồng (`2af9480`, `538f8cc`), `scripts/m11_graph_evidence_share.py`, danh sách lỗi tổng duyệt lần 1 bên dưới |
-| **DoD:** `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 mối đe doạ, §7.4 phân tích ca sai, §7.5 kết chương, hạn chế §8.2.1) | **Đạt phần phân tích; chờ điền §7.4.4** | `docs/drafts/ch7-phan-tich-ca-sai.md` (đã gắn `[CHỜ M11]` cho phần chấm tay) |
+| **DoD:** `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 mối đe doạ, §7.4 phân tích ca sai, §7.5 kết chương, hạn chế §8.2.1) | **Đạt** (2026-11-22) | `docs/drafts/ch7-phan-tich-ca-sai.md` §7.4.4, §7.5 đã điền số; bản LaTeX `Sections/Ch7_ThaoLuan.tex` |
 
 ### Tóm tắt số liệu phân tích ca sai trên `test` (`eval/results/m11_error_analysis_test_v1/`)
 
@@ -42,6 +42,21 @@
 |---|---:|---:|---:|---:|---|
 | `rca_final_test_v1` (đăng ký) | 38 (`18` `no_fault`, `3` `ambiguous`) | 17 | 8 | **9** | **7** `callee` `1-hop` không có cảnh báo (`frontend` → `checkoutservice` ×2 / `currencyservice` ×2; `ts-travel-service` → `ts-basic-service` ×2 / `ts-route-service` ×1); **2** `≥2-hop` hoặc không cạnh (`inc-f3161a3992b92cda`, `inc-049cc7be85eeacb2`). Ngoài ra **29 / 50** lần tiêm không có cảnh báo CTAV. Tóm tắt: `35 / 38` gán `cpu_contention` (đúng loại lỗi `5 / 17 = 29,4%`), `1` ca có ID tự bịa bị lọc (`inc-a0589ae59b492c07`). |
 | `rca_sens_test_c3rolling_v1` (độ nhạy ngoài đăng ký) | 114 (`52` `no_fault`, `14` `ambiguous`) | 48 | 10 | **38** | **33** thiếu cảnh báo ở service gốc (`21` `≥2-hop`/không cạnh, `6` `callee` `1-hop`, `6` `caller` `1-hop`); **5** lỗi xếp hạng đa service (đều trúng `Hit@3`: `3` lỗi ở `caller` `1-hop` bị dồn phiếu về `callee` như `inc-bd062ac615eaf3d7`, `2` hòa phiếu thua tie-break như `inc-15b089daf856a2e2`). Tóm tắt: `96 / 114` gán `cpu_contention` (đúng `8 / 48 = 16,7%`), `4` ca có ID tự bịa bị lọc. |
+
+### V35 — Chỉ số gần đúng về chất lượng ngữ cảnh trên `test` (xong 2026-11-22, QĐ-051; vá luật cùng ngày)
+
+50 cửa sổ có telemetry × 2 phương pháp (mỗi phương pháp `top_k = 6`, 525 sự kiện phân biệt, trùng 75 sự kiện). Nhãn do quy tắc ngưỡng cố định (`scripts/m8_context_precision_rule_label.py`), **không phải người chấm từng dòng**: `1` nếu `WARN`/`ERROR` (cột `severity`), log có level `ERROR`/`FATAL`/`CRITICAL` trong `content`, span `BasicErrorController.error`, hoặc `duration_ms ≥ 200`, và nằm trong ±180 s; `?` nếu 100–200 ms trong ±120 s; còn lại `0`.
+
+**Vá 2026-11-22:** cột `severity` của Nezha hầu như luôn `INFO`, nên bản đầu bỏ sót `W49.E5` (log JSON `ERROR ... Failed!`), `W29.E2` và `W47.E3` (span `BasicErrorController.error` ~1 ms). Luật mới đọc thêm `content`; 8 test mới trong `tests/test_m8_context_precision.py` (27/27 qua). Kết quả cũ `m8_context_precision_v1` giữ nguyên để đối chiếu (thư mục kết quả bất biến), kết quả mới ở `m8_context_precision_v2`.
+
+| Phương pháp | Retrieval | Liên quan | `?` | Micro precision | CI 95 % | Cửa sổ có ≥ 1 liên quan |
+|---|---:|---:|---:|---:|---|---:|
+| BM25 | 300 | 4 | 2 | **0,0133** | [0,0000; 0,0300] | 3 / 50 |
+| C1 | 300 | 26 | 15 | **0,0867** | [0,0433; 0,1367] | 11 / 50 |
+
+Δ micro (C1 − BM25) = **+0,0733** [+0,0333; +0,1200]. Độ nhạy: `?` tính là liên quan +0,1167; loại `?` +0,0778; ngưỡng 100 ms +0,1200; ngưỡng 500 ms +0,0400.
+
+Giới hạn (đã ghi ở §5.8.6 và §7.3): nhãn do quy tắc, không do người; quy tắc thưởng cho "span chậm gần cửa sổ" — đúng thứ thành phần thời gian của C1 tối ưu (76 % sự kiện C1 trong ±180 s so với 58 % của BM25) — nên **không dùng để khẳng định C1 tốt hơn BM25**; ngưỡng tuyệt đối 200 ms bỏ qua mức nền từng thao tác (18/24 span bị gắn "liên quan" theo thời lượng không vượt 2 lần trung vị thao tác của chính nó trong mẫu); precision tuyệt đối vẫn ≤ 9 %.
 
 ### Danh sách lỗi tổng duyệt demo lần 1 (`08` §6, tổng hợp sau đợt rà `2026-11-18`)
 
@@ -70,17 +85,18 @@
 
 | # | Vấn đề | Phương án | Khuyến nghị | Chặn mốc sau? |
 |---|---|---|---|---|
-| **V50** | Chấm mù chất lượng báo cáo chẩn đoán trong `eval/manual/diagnostic_quality.csv` (tuyệt đối không mở `.key.csv` trước) | **(a)** Chấm tối thiểu `15` dòng đầu (`sample_no = 1..15`, đã là mẫu ngẫu nhiên hợp lệ theo `04` §9 ưu tiên 3); **(b)** Chấm đủ `30` dòng (`sample_no = 1..30`) để thu hẹp CI 95%; kèm người chấm thứ hai trên 20% đầu (`sample_no = 1..3` hoặc `1..6`) nếu thu xếp được | **(a)** nếu bận, **(b)** nếu có thời gian (khoảng 3–5 giờ); đọc hướng dẫn ở `eval/manual/README-diagnostic-quality.md` | **Có — chặn đóng M11** |
+| **V50** | Chấm mù chất lượng báo cáo chẩn đoán trong `eval/manual/diagnostic_quality.csv` | **Đã giải quyết 2026-11-22:** AI chấm nháp 30/30 dòng, tác giả duyệt đề xuất sửa 10 dòng trước khi mở khoá (QĐ-051) | Luận văn ghi: *"AI chấm nháp trên bảng mù, tác giả rà soát và hiệu chỉnh trước khi mở khóa đối chiếu"*; không báo Cohen's κ; mở rộng khai báo AI trong Lời cam đoan | Không |
 | **V51** | Cách lấy mẫu `30` trong `38` sự cố của `rca_final_test_v1` *(agent tự quyết, chờ người dùng xác nhận)* | **(a)** Lấy mẫu ngẫu nhiên đơn giản không hoàn lại (`seed = 42`) trên toàn bộ 38 sự cố (15 dòng đầu: `6 labelled / 7 no_fault / 2 ambiguous`; cả 30: `15 / 13 / 2`); **(b)** Phân tầng tỉ lệ theo `status` (khi đó 15 dòng đầu không còn tự động giữ phân tầng nếu cắt ngang không chia lô) | **(a)** — giữ đúng tỉ lệ tự nhiên trên `test` và đảm bảo cắt ở `n = 15` hay `n = 30` đều không thiên lệch | Không |
-| **V52** | Chụp lại Hình 6.2–6.4 sau cập nhật giao diện `538f8cc` và nhắc **V35** (`context_precision_test_v1.csv`, hiện `0 / 525` dòng) | **(a)** Chụp lại hình khi tổng duyệt demo lần 2 ở M12 và hoàn tất V35 trước khi đóng M12; **(b)** Làm ngay ở M11-B | **(a)** cho M12 (hoặc làm luôn khi chạy Docker chụp ảnh nếu tiện) | Không chặn M11; cần trước M12 |
+| **V52** | Chụp lại Hình 6.2–6.4 sau cập nhật giao diện `538f8cc` | **(a)** Chụp lại hình khi tổng duyệt demo lần 2 ở M12; **(b)** Làm ngay ở M11-B | **(a)** cho M12 (hoặc làm luôn khi chạy Docker chụp ảnh nếu tiện) | Không chặn M11; cần trước M12 |
 
 ---
 
 ## 4. Plan cho nửa cuối mốc (M11-B) và M12
 
-1. **M11-B (ngay sau khi người dùng gửi lại `eval/manual/diagnostic_quality.csv` đã chấm, 0 USD):**
-   - Chạy `py scripts/m11_score_diagnostic_quality.py --graded eval/manual/diagnostic_quality.csv --key eval/manual/diagnostic_quality.key.csv --out eval/results/m11_diagnostic_quality_v1` (kèm `--second-rater` nếu có).
-   - Điền số thực đo (`n`, trung bình ± SD, CI 95% bootstrap, đối chiếu `.key.csv`, Cohen's $\kappa$ nếu có) vào `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.4.4, §7.5), `docs/milestones/M11-danh-gia-nguoi.md` (§1), cập nhật `docs/experiment-log.md` (`QĐ-051`), đóng M11 trong `docs/CURRENT-MILESTONE.md`, `04` §1, `docs/milestones/README.md` và chuyển sang **M12 (P6 — đóng gói)**.
+1. **M11-B (còn lại, 0 USD):**
+   - Commit các thay đổi V35, V50 và cập nhật Chương 5–7; ghi QĐ-051 (AI chấm nháp + tác giả duyệt; vá luật V35) vào `docs/experiment-log.md`.
+   - Mở rộng khai báo AI trong Lời cam đoan (style guide §5.3): thêm việc dùng LLM `deepseek-flash` chấm nháp V50 và đề xuất quy tắc V35; thêm mục tài liệu tham khảo cho mô hình chấm.
+   - Đóng M11 trong `docs/CURRENT-MILESTONE.md`, `04` §1, `docs/milestones/README.md` và chuyển sang **M12 (P6 — đóng gói)**.
 2. **M12 (P6, sau khi đóng M11):** kiểm tra chéo toàn bộ số liệu luận văn với `eval/results/`, hoàn tất hình vẽ còn thiếu (kèm chụp lại H6.2–H6.4), ghép bản thảo hoàn chỉnh, dọn repo tái lập trên bản clone sạch, tổng duyệt demo lần 2 và chuẩn bị slide bảo vệ.
 
 ---
@@ -95,4 +111,15 @@
   py scripts/m11_sample_incidents.py --rca-run rca_final_test_v1 --ctav-run ctav_final_test_v1 --c1-run h0_test_c1_k0_v1 --n 30 --seed 42 --out eval/manual/diagnostic_quality
   py scripts/m11_error_analysis.py --out eval/results/m11_error_analysis_test_v1
   py -m pytest tests/test_m11.py -v
+  ```
+- **Lệnh tái lập V35 (0 USD API):**
+  ```bash
+  py scripts/m8_context_precision_rule_label.py --graded eval/manual/context_precision_test_v1.csv       --out eval/manual/context_precision_test_v1.ai_scores.csv --force
+  py scripts/m8_context_precision_score.py --out eval/results/m8_context_precision_v2
+  .venv/Scripts/python.exe -m pytest tests/test_m8_context_precision.py -q
+  ```
+  Ghi chú: trên máy này Windows chặn Python của `.venv` ghi vào `eval/`; chạy hai script bằng `py` hệ thống (chỉ dùng thư viện chuẩn).
+- **Lệnh tái lập V50 (0 USD API, sau khi điểm đã duyệt nằm trong `diagnostic_quality.csv`):**
+  ```bash
+  py scripts/m11_score_diagnostic_quality.py --graded eval/manual/diagnostic_quality.csv       --key eval/manual/diagnostic_quality.key.csv --out eval/results/m11_diagnostic_quality_v1
   ```

@@ -2473,3 +2473,25 @@ Nội dung QĐ-047 gốc không sửa. Sau review M10-C (`55228a7`), thực hi�
    - Soạn `docs/drafts/ch7-phan-tich-ca-sai.md` (§7.3 Bảng 7.2 mối đe doạ tính hợp lệ, §7.4 Bảng 7.3 phân tích ca sai CTAV & RCA, §7.5 Kết chương, 6 hạn chế cho §8.2.1; giữ `[CHỜ M11]` ở §7.4.4 và §7.5) và bản nháp làm việc `docs/milestones/M11-danh-gia-nguoi.md` (giữ trạng thái **ĐANG LÀM**, nêu rõ **V50** chờ người dùng chấm tay).
 
 **Kiểm chứng M11-A:** thêm `tests/test_m11.py` (5 test: determinism & tính mù SRS, từ chối ghi đè, phân loại đồ thị, bất biến số học đối chiếu M8/M9, tổng hợp điểm & Cohen's $\kappa$). Chạy `py -m pytest tests/ -q` → **`254 passed, 5 skipped`** (5 test DB Docker bỏ qua do Docker Desktop không bật); `py -m mypy packages services` → sạch (`43` file); `py -m ruff check` sạch trên toàn bộ code M11 (`scripts/m11_*.py`, `tests/test_m11.py`). Chưa đóng M11 cho tới khi có `n ≥ 15` dòng chấm tay của người dùng (**V50**).
+
+---
+
+## QĐ-051 — AI chấm nháp V50 (người dùng duyệt) và chấm V35 bằng quy tắc cố định (2026-11-22)
+
+**Quyết định của người dùng trong phiên 2026-11-22** (agent không tự chọn, đã hỏi trước): **V50** đi đường **(b)** "AI chấm nháp, người dùng duyệt"; **V35** đi đường **(a)** "AI chấm toàn bộ, ghi rõ là AI rater". Lý do: hạn nộp báo cáo đang gần, V50/V35 là hai việc chặn M11/M12, và cả hai đều không đòi hỏi thực nghiệm mới. Vì đây là thay đổi phương pháp so với `02` §4.2/§4.4 ("chấm thủ công"), luận văn **phải** ghi rõ người/ công cụ chấm ở §7.3; không được ghi là "hai người chấm độc lập".
+
+**V50 — bản nháp điểm chất lượng báo cáo chẩn đoán (0 USD):**
+- Chấm 30/30 dòng `eval/manual/diagnostic_quality.csv`, **không mở `.key.csv`** trong suốt quá trình; xuất `eval/manual/diagnostic_quality.ai_scores.csv` (3 điểm + độ tự tin + lý do từng dòng) và bảng duyệt `eval/manual/diagnostic_quality.ai_review.md`.
+- Phân bố nháp: root cause **1,067** (`0`: 6 / `1`: 16 / `2`: 8); bằng chứng **1,233** (7 / 9 / 14); gợi ý xử lý **1,267** (0 / 22 / 8); độ tự tin `high` 14, `medium` 15, `low` 1.
+- **Chưa phải số của luận văn**: `diagnostic_quality.csv` vẫn `0 / 30` cho tới khi người dùng duyệt. Quy tắc đọc đã ghi trong file duyệt (`root_cause_score = 1` gộp hai trường hợp "service liền kề" và "bằng chứng yếu/lệch thời gian").
+
+**V35 — context precision (`test`, 50 cửa sổ × 2 phương pháp, 525 dòng, 0 USD):**
+- Nhãn do **quy tắc ngưỡng cố định** (`scripts/m8_context_precision_rule_label.py`): `1` nếu `WARN`/`ERROR` hoặc `duration_ms ≥ 200` trong ±180 s; `?` nếu 100–200 ms trong ±120 s; còn lại `0`. Ngưỡng 200 ms được chọn vì 88 % span trong mẫu dưới 100 ms và p90 = 99,9 ms, nên 200 ms là "tăng vọt" rõ ràng.
+- Tổng hợp `scripts/m8_context_precision_score.py` → `eval/results/m8_context_precision_v1/{context_precision.json,tables.md}`: **C1 micro 0,0800 [0,0367; 0,1300] (24/300) so với BM25 0,0100 [0,0000; 0,0267] (3/300); Δ = +0,0700 [+0,0300; +0,1167]**; 15 nhãn `?` (5,0 % số retrieval) tính là không liên quan ở số chính.
+- Độ nhạy: `?` tính là liên quan → 0,1300 vs 0,0167 (Δ +0,1133); loại `?` khỏi mẫu số → 0,0842 vs 0,0101; ngưỡng 100 ms → 0,1333 vs 0,0167; ngưỡng 500 ms → 0,0400 vs 0,0033. Chiều kết luận không đổi ở cả 4 kịch bản.
+- Hai phương pháp phủ trùng 75/525 sự kiện (`bm25_only` 225, `c1_only` 225), nên 24 sự kiện "chậm" đều nằm trong tập của C1 (3 trong số đó cũng có trong BM25).
+- **Giới hạn phải ghi vào §7.3:** (i) nhãn do quy tắc AI đề xuất và người dùng duyệt, không phải người chấm từng dòng; (ii) quy tắc thưởng cho "span chậm gần cửa sổ" — chính là thứ C1 tối ưu (fusion có thời gian và đồ thị), nên chỉ số này **không trung lập** giữa hai phương pháp; (iii) độ chính xác tuyệt đối thấp (≤ 8 %): phần lớn context trả về vẫn là span bình thường.
+
+**Kiểm chứng:** thêm `tests/test_m8_context_precision.py` (19 test: quy tắc nhãn, ba chính sách `?`, micro/macro, bootstrap tất định, từ chối ghi đè, kiểm tra rank ngoài `top_k`). Máy này `py` **chưa cài `pytest`/`ruff`/`mypy`** (chỉ có `pip`), nên 19 test được chạy qua một shim tối giản và đều qua (`19 passed, 0 failed`); cần chạy lại `py -m pytest tests/test_m8_context_precision.py -q` trên môi trường có dev deps trước khi commit.
+
+**Việc còn lại của V50:** người dùng duyệt `eval/manual/diagnostic_quality.ai_scores.csv` (sửa trực tiếp hoặc trả lời trong chat) → chép sang `diagnostic_quality.csv` → chạy `py scripts/m11_score_diagnostic_quality.py --graded eval/manual/diagnostic_quality.csv --key eval/manual/diagnostic_quality.key.csv --out eval/results/m11_diagnostic_quality_v1` → điền §7.4.4 và đóng M11.
