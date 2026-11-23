@@ -7,11 +7,11 @@ hỏi backend, parse JSON 3 nhãn, áp luật quyết định → `JudgedAlert`.
 |---|---|
 | `prompt.py` | `compose_prompt` nguyên văn GĐ1; `alert_payload`, `context_payload` chuyển object GĐ2 sang dict GĐ1. `alert_payload(..., drop_metrics)` bỏ metric khỏi prompt (`judge.drop_metrics`, QĐ-023; mặc định rỗng = đúng prompt GĐ1) |
 | `cache.py` | Cache JSONL đọc thẳng được file cache GĐ1; key GĐ1 + `repeat` (`03` §6) |
-| `backends.py` | `GeminiBackend` (`gemini-2.5-flash-lite`, temperature 0, retry có trần, ghi `modelVersion`, an toàn đa luồng); `RateLimiter` dùng chung giữa các thread (mặc định 200 lần/phút, QĐ-019); `MockBackend` = mock GĐ1, chỉ cho G-port |
+| `backends.py` | `GeminiBackend` (`gemini-2.5-flash`, temperature 0, retry có trần, ghi `modelVersion`, an toàn đa luồng; QĐ-021 — `gemini-2.5-flash-lite` chỉ cho cache G-paper qua `PAPER_MODEL`); `RateLimiter` dùng chung giữa các thread (mặc định 200 lần/phút, QĐ-019); `MockBackend` = mock GĐ1, chỉ cho G-port |
 | `llm_judge.py` | Luật: lỗi ⇒ `UNCERTAIN`/`manual_review`; `require_evidence`; ngưỡng 0,80 đối xứng của GĐ1 (`03` §1.4) |
 | `registry.py` | `build_judge(config["judge"])`; từ chối model không phải Gemini và temperature ≠ 0 (QĐ-013) |
 
-Chưa có (theo lộ trình): `policy.py` C2/C3 (M6), `routing.py` C4 (M6).
+Đã có từ M6: `policy.py` (C2 gating + C3 anchoring) và `routing.py` (C4). C2/C4 bị cắt ở cấu hình chốt (QĐ-030/031/037); C3 giữ lại.
 
 **Chạy thế nào.**
 

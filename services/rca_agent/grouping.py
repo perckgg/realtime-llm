@@ -7,7 +7,7 @@
 3. Each connected component is one Incident. Alerts of the same service always share
    one; a service missing from the graph forms its own.
 
-`t_group_seconds` comes from the caller's config (01 SS6.5 default: 300 s).
+`t_group_seconds` comes from the caller's config (T_group = 180 s in `eval/configs/rca_final.yaml`).
 """
 
 from __future__ import annotations

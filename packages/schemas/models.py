@@ -152,7 +152,7 @@ class JudgedAlert(BaseModel):
     confidence: float  # 0.0 - 1.0
     reasoning: str
     evidence_event_ids: list[str]  # references ContextEvent.event_id
-    judge_backend: str  # gemini-2.5-flash-lite | mock (G-port only) -- QD-013
+    judge_backend: str  # gemini-2.5-flash | mock (G-port only) -- QD-021 (flash-lite only for G-paper cache)
     llm_latency_ms: float
     cache_hit: bool
     downgraded_by_evidence_rule: bool = False
