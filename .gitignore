@@ -17,9 +17,26 @@ env/
 .vscode/*
 !.vscode/settings.json
 .idea/
+.obsidian/
+graphify-out/
+pytest-of-*/
 *.log
 *.tmp
+
+# LaTeX build intermediates (keep main.pdf)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.nav
+*.out
+*.snm
 *.synctex.gz
+*.toc
+*.vrb
 
 # Docker volumes (Phase 2 docker-compose)
 volumes/
