@@ -84,7 +84,7 @@ Lõi được dùng qua package có phiên bản (tag `core-v*`, tạo ở M13 c
 
 | Việc | DoD |
 |---|---|
-| Ingest webhook Alertmanager (payload `alerts[]`: `labels`, `annotations`, `startsAt`, `fingerprint`) | Nhận, khử trùng theo `fingerprint`, trả 200 trong < 200 ms |
+| Ingest webhook Alertmanager (payload `alerts[]`: `labels`, `annotations`, `startsAt`, `fingerprint`) | Nhận, khử trùng theo `fingerprint`, đưa vào hàng đợi và trả `202 Accepted` trong < 150 ms |
 | Ánh xạ nhãn cảnh báo → service trên đồ thị (cấu hình YAML) | Cảnh báo không ánh xạ được vẫn đi qua (N1) |
 | Adapter Loki, Tempo, Prometheus | Lấy được bằng chứng trong cửa sổ quanh `startsAt` |
 | Ngưỡng nền trực tuyến theo service–thao tác | Cold start rõ ràng: chưa đủ dữ liệu ⇒ không hạ ưu tiên |

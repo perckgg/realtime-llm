@@ -1,4 +1,4 @@
-# 01 — Lộ trình Giai đoạn 3 (đồ án tốt nghiệp)
+# 01 — Lộ trình Giai đoạn 3 (Luận văn Thạc sĩ)
 
 > **Bản nháp 2026-11-23.** Viết sau khi GĐ2 xong phần kỹ thuật (M0–M11), trước M12. Chưa có QĐ; mọi mốc, giả thuyết
 > và ngân sách ở đây là **đề xuất**, cần người dùng và GVHD duyệt trước khi mở M13.
@@ -18,6 +18,10 @@
 
 **Ràng buộc quan trọng:** tập `test` của Nezha đã được mở ở M8. Mọi cải tiến mới chỉ được **phân tích thăm dò** trên
 Nezha; kết luận chính thức của GĐ3 phải dựa trên **một tập `test` mới, niêm phong** (§2).
+
+**Định vị giữa Luận văn và MVP thực tế (không đưa lên Production thật):**
+- Trong phạm vi luận văn (cả GĐ2 và GĐ3), hệ thống **không triển khai lên môi trường Production thương mại thật** của doanh nghiệp bên ngoài (không tích hợp hệ thống trực on-call thật, không multi-tenant/SSO, không phụ thuộc lưu lượng khách hàng không kiểm soát được) để đảm bảo tính tái lập thực nghiệm 100% và có nhãn lỗi gốc (`ground-truth`) chính xác phục vụ kiểm định giả thuyết.
+- Tuy nhiên, toàn bộ platform của luận văn (4 Protocol cắm-rút, pipeline CTAV + RCA có kiểm duyệt 5 quy tắc, ClickHouse/PostgreSQL, API và Dashboard 4 màn hình, cộng thêm Testbed trực tuyến + Stream mode ở GĐ3) được thiết kế để **thể hiện trực tiếp bản MVP (Minimum Viable Product) về mặt lõi kỹ thuật của hệ thống**. Chi tiết ánh xạ giữa MVP trong luận văn và nhánh sản phẩm thương mại riêng của tác giả xem tại `03-ke-hoach-ranh-gioi-luan-van-va-mvp.md`.
 
 ---
 
