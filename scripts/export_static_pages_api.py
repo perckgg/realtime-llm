@@ -34,6 +34,7 @@ from services.api.readers import (
     _normalize_origin,
     _normalize_verdict,
     _sanitize_debug,
+    assemble_topology,
     get_run_metrics,
 )
 from services.api.schemas import (
@@ -489,6 +490,44 @@ ALERT_TABLE_COLUMNS = (
 )
 
 
+def _build_topology(
+    run_id: str,
+    alerts: Sequence[AlertResponse],
+    incidents: Sequence[IncidentResponse],
+    graph: ServiceGraph,
+) -> dict[str, Any]:
+    """Per-service topology aggregates, mirroring `readers.get_topology` without a database."""
+    alert_stats: dict[str, tuple[int, int, int, float]] = {}
+    for a in alerts:
+        total, confirmed, suppressed, max_score = alert_stats.get(a.service, (0, 0, 0, 0.0))
+        alert_stats[a.service] = (
+            total + 1,
+            confirmed + (a.verdict == "TRUE_ALERT"),
+            suppressed
+            + (
+                a.downgraded_by_anchoring
+                or a.downgraded_by_gating
+                or a.downgraded_by_evidence_rule
+            ),
+            max(max_score, a.anomaly_score),
+        )
+    incident_counts: dict[str, int] = {}
+    root_cause_counts: dict[str, int] = {}
+    for inc in incidents:
+        for svc in inc.services:
+            incident_counts[svc] = incident_counts.get(svc, 0) + 1
+        if inc.root_cause_service:
+            rc = inc.root_cause_service
+            root_cause_counts[rc] = root_cause_counts.get(rc, 0) + 1
+    return assemble_topology(
+        run_id=run_id,
+        graph=graph,
+        alert_stats=alert_stats,
+        incident_counts=incident_counts,
+        root_cause_counts=root_cause_counts,
+    ).model_dump(mode="json")
+
+
 def _pack_alerts_table(alerts: Sequence[AlertResponse]) -> dict[str, Any]:
     """Pack alerts into a lossless {columns, rows} table to cut static JSON size by ~65%."""
     rows: list[list[Any]] = []
@@ -667,7 +706,11 @@ def export_static_api(
             out_dir / "incident_details" / f"{run_id}.json",
             {iid: det.model_dump(mode="json") for iid, det in inc_details.items()},
         )
-        run_bytes = b_metrics + b_alerts + b_adetails + b_incs + b_idetails
+        b_topo = _write_json(
+            out_dir / "topology" / f"{run_id}.json",
+            _build_topology(run_id, alerts, inc_summaries, graph),
+        )
+        run_bytes = b_metrics + b_alerts + b_adetails + b_incs + b_idetails + b_topo
         summary["total_bytes"] += run_bytes
         summary["runs"][run_id] = {
             "alerts": len(alerts),

@@ -29,7 +29,7 @@ const MODALITY_GLYPH: Record<ContextEvent["modality"], string> = {
 export default function AlertDetail() {
   const { alertId = "" } = useParams();
   const [searchParams] = useSearchParams();
-  const { runId: contextRunId } = useRuns();
+  const { runId: contextRunId, groundTruthOverlay } = useRuns();
   const requestedRunId = searchParams.get("run_id") ?? (contextRunId || undefined);
   const { data: a, loading, error } = useAsync(
     () => api.getAlert(alertId, requestedRunId),
@@ -42,54 +42,66 @@ export default function AlertDetail() {
   const evidence = new Set(a.evidence_event_ids);
   const alertTime = clockUTC(a.ts).slice(0, 5);
   const steps = policySteps(a);
-  const isPipelineReplay = a.run_id.startsWith("pipeline_");
   const llmSubtitle = `${a.judge_backend} · ${ms(a.llm_latency_ms)} · ${
-    a.cache_hit ? "judge M8: cache hit" : "judge M8: direct call"
-  }${isPipelineReplay ? " · replayed from judged.jsonl" : ""}`;
+    a.cache_hit ? "cached inference" : "live inference"
+  }`;
 
   return (
     <div className="space-y-4">
-      <Link to="/timeline" className="inline-block text-[11.5px] text-ink-muted hover:text-ink-2">
-        ← Timeline
-      </Link>
+      <div className="flex items-center gap-3 text-[11.5px] text-ink-muted">
+        <Link to="/timeline" className="hover:text-ink">
+          ← Alert Stream
+        </Link>
+        <span>·</span>
+        <Link to="/overview" className="hover:text-ink">
+          Operations
+        </Link>
+      </div>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-[19px] font-semibold tracking-tight text-ink">{a.service}</h1>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="font-mono text-[19px] font-semibold tracking-tight text-ink">{a.service}</h1>
             <VerdictBadge verdict={a.verdict} />
             {a.downgraded_by_anchoring && (
-              <Pill tone="warn">⚠ downgraded by C3 anchoring</Pill>
+              <Pill tone="warn">Downgraded by C3 anchoring</Pill>
             )}
             {a.downgraded_by_gating && (
-              <Pill tone="warn">⚠ downgraded by C2 gating</Pill>
+              <Pill tone="warn">Downgraded by C2 gating</Pill>
             )}
             {a.downgraded_by_evidence_rule && (
-              <span className="text-[11px]" style={{ color: status.serious }}>
-                ⚠ downgraded by evidence rule
-              </span>
+              <Pill tone="critical">Downgraded by evidence rule</Pill>
             )}
           </div>
           <p className="mt-1 font-mono text-[11px] text-ink-muted">
-            {a.alert_id} · window {a.window_id} · {stampUTC(a.ts)}
+            {a.alert_id} · window {a.window_id} · {stampUTC(a.ts)} UTC
           </p>
         </div>
         <div className="text-right text-[11px] text-ink-muted">
-          <div>{strategyLabel[a.retrieval_strategy]}</div>
+          <div className="font-medium text-ink-2">{strategyLabel[a.retrieval_strategy]}</div>
           <div className="font-mono">{a.run_id}</div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatTile label="Anomaly score" value={num(a.anomaly_score, 2)} hint={`threshold ${a.detector_threshold}`} />
-        <StatTile label="Confidence" value={num(a.confidence, 2)} hint={a.judge_backend} />
-        <StatTile label="Context" value={`${a.context_event_count}`} hint={`${a.context_tokens.toLocaleString("en-US")} tokens${a.retrieval_truncated ? " · truncated" : ""}`} />
-        <StatTile
-          label="Nezha label"
-          value={a.label.is_fault ? "Fault" : "Normal"}
-          hint={a.label.is_fault ? `${a.label.fault_type} @ ${a.label.root_cause_service}` : "no fault injection"}
-          accent={a.label.is_fault ? status.critical : undefined}
-        />
+        <StatTile label="Judge confidence" value={num(a.confidence, 2)} hint={a.judge_backend} />
+        <StatTile label="Context events" value={`${a.context_event_count}`} hint={`${a.context_tokens.toLocaleString("en-US")} tokens${a.retrieval_truncated ? " · truncated" : ""}`} />
+        {groundTruthOverlay ? (
+          <StatTile
+            label="Ground-Truth Label"
+            value={a.label.is_fault ? "Fault" : "Normal"}
+            hint={a.label.is_fault ? `${a.label.fault_type} @ ${a.label.root_cause_service}` : "no fault injection"}
+            accent={a.label.is_fault ? status.critical : status.good}
+          />
+        ) : (
+          <StatTile
+            label="Evidence Origin"
+            value={a.evidence_origin ?? "—"}
+            hint={a.routing_tier === 2 ? "Tier 2 · Topology Graph" : "Tier 1 · Local BM25"}
+            accent={a.downgraded_by_anchoring ? status.warning : "var(--color-accent)"}
+          />
+        )}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
@@ -252,21 +264,17 @@ export default function AlertDetail() {
             </dl>
           </Card>
 
-          <Card title="Metadata">
+          <Card title="Execution Metadata">
             <dl className="divide-y divide-[color:var(--color-hairline)]">
-              <KV k="candidate_id" v={<span className="font-mono">{a.candidate_id}</span>} />
-              <KV k="Candidate source" v={a.candidate_source} />
+              <KV k="Candidate ID" v={<span className="font-mono">{a.candidate_id}</span>} />
+              <KV k="Trigger source" v={a.candidate_source} />
               <KV k="Retrieval latency" v={ms(a.retrieval_latency_ms)} />
-              <KV k="LLM latency" v={ms(a.llm_latency_ms)} />
+              <KV k="Judge latency" v={ms(a.llm_latency_ms)} />
               <KV
-                k="Original judge cache"
-                v={
-                  a.cache_hit
-                    ? "hit (cached)"
-                    : `miss (direct API call${isPipelineReplay ? " in M8" : ""})`
-                }
+                k="Inference cache"
+                v={a.cache_hit ? "cache hit" : "direct inference"}
               />
-              <KV k="Truncated" v={a.retrieval_truncated ? "yes" : "no"} />
+              <KV k="Context truncated" v={a.retrieval_truncated ? "yes" : "no"} />
             </dl>
           </Card>
         </div>
@@ -276,7 +284,7 @@ export default function AlertDetail() {
 
       <Card
         title={`Retrieved RAG Evidence (${a.context_events.length})`}
-        subtitle="Sorted by descending retrieval score. Debug panel holds retrieval provenance & timing fields for context precision inspection (03 §1.3)."
+        subtitle="Sorted by descending fusion score. Expand debug fields to inspect graph distance, time proximity, and provenance."
       >
         {a.context_events.length === 0 ? (
           <Empty>No context events retrieved in this window.</Empty>

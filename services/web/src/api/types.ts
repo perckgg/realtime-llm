@@ -259,3 +259,30 @@ export interface TimelineBucket {
   /** Số cửa sổ thực sự là lỗi theo nhãn Nezha, để đối chiếu. */
   ground_truth_faults: number;
 }
+
+export type TopologyStatus = "critical" | "degraded" | "suppressed" | "healthy";
+
+export interface TopologyNode {
+  service: string;
+  subsystem: "online_boutique" | "train_ticket" | "other";
+  status: TopologyStatus;
+  confirmed_alerts: number;
+  suppressed_alerts: number;
+  total_candidates: number;
+  incident_count: number;
+  root_cause_count: number;
+  max_anomaly_score: number;
+}
+
+export interface TopologyEdge {
+  source: string;
+  target: string;
+  call_count: number;
+}
+
+/** `GET /topology?run_id=...` */
+export interface TopologyData {
+  run_id: string;
+  nodes: TopologyNode[];
+  edges: TopologyEdge[];
+}

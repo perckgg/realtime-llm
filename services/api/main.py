@@ -13,6 +13,7 @@ from services.api.schemas import (
     IncidentResponse,
     RunMetricsResponse,
     RunResponse,
+    TopologyResponse,
 )
 
 app = FastAPI(
@@ -82,6 +83,16 @@ def get_incident_detail(incident_id: str) -> IncidentDetailResponse:
     if detail is None:
         raise HTTPException(status_code=404, detail=f"Incident {incident_id!r} not found")
     return detail
+
+
+@router.get("/topology", response_model=TopologyResponse)
+def get_topology(
+    run_id: str = Query(..., description="Stream or pipeline run_id"),
+) -> TopologyResponse:
+    topology = readers.get_topology(run_id=run_id)
+    if topology is None:
+        raise HTTPException(status_code=404, detail=f"Run {run_id!r} not found")
+    return topology
 
 
 # Serve at both root (for Vite proxy rewrite & TestClient) and /api (for direct browser/nginx).

@@ -693,3 +693,53 @@ export function getIncidentDetail(incidentId: string): IncidentDetail | null {
   }
   return null;
 }
+
+export function getTopology(runId: string) {
+  const runAlerts = listAlerts(runId);
+  const runIncidents = listIncidents(runId);
+  const services = Array.from(
+    new Set([
+      ...CALL_EDGES.flatMap(([s, t]) => [s, t]),
+      ...runAlerts.map((a) => a.service),
+      ...runIncidents.flatMap((i) => i.services),
+    ]),
+  ).sort();
+
+  const nodes = services.map((service) => {
+    const svcAlerts = runAlerts.filter((a) => a.service === service);
+    const confirmed = svcAlerts.filter((a) => a.verdict === "TRUE_ALERT").length;
+    const suppressed = svcAlerts.filter(
+      (a) => a.downgraded_by_anchoring || a.downgraded_by_gating || a.downgraded_by_evidence_rule,
+    ).length;
+    const incCount = runIncidents.filter((i) => i.services.includes(service)).length;
+    const rcCount = runIncidents.filter((i) => i.root_cause_service === service).length;
+    const maxScore = svcAlerts.reduce((m, a) => Math.max(m, a.anomaly_score), 0);
+    const status =
+      rcCount > 0
+        ? ("critical" as const)
+        : confirmed > 0 || incCount > 0
+          ? ("degraded" as const)
+          : suppressed > 0
+            ? ("suppressed" as const)
+            : ("healthy" as const);
+    return {
+      service,
+      subsystem: service.startsWith("ts-") ? ("train_ticket" as const) : ("online_boutique" as const),
+      status,
+      confirmed_alerts: confirmed,
+      suppressed_alerts: suppressed,
+      total_candidates: svcAlerts.length,
+      incident_count: incCount,
+      root_cause_count: rcCount,
+      max_anomaly_score: maxScore,
+    };
+  });
+
+  const edges = CALL_EDGES.map(([source, target], idx) => ({
+    source,
+    target,
+    call_count: 180 + idx * 45,
+  }));
+
+  return { run_id: runId, nodes, edges };
+}

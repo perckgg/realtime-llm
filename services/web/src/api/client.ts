@@ -16,6 +16,7 @@ import type {
   IncidentDetail,
   Run,
   RunMetrics,
+  TopologyData,
   Verdict,
 } from "./types";
 import * as fixtures from "@/mock/fixtures";
@@ -29,6 +30,7 @@ export interface DataSource {
   getAlert(alertId: string, runId?: string): Promise<AlertDetail>;
   listIncidents(runId: string): Promise<Incident[]>;
   getIncident(incidentId: string): Promise<IncidentDetail>;
+  getTopology(runId: string): Promise<TopologyData>;
 }
 
 /** Trễ giả để giao diện lộ ra trạng thái loading ngay từ bản MVP. */
@@ -60,6 +62,7 @@ const mockSource: DataSource = {
     if (!i) throw new Error(`Incident ${incidentId} not found`);
     return delay(i);
   },
+  getTopology: async (runId) => delay(fixtures.getTopology(runId)),
 };
 
 async function get<T>(path: string): Promise<T> {
@@ -84,6 +87,7 @@ const httpSource: DataSource = {
   },
   listIncidents: (runId) => get(`/incidents?run_id=${encodeURIComponent(runId)}`),
   getIncident: (incidentId) => get(`/incidents/${encodeURIComponent(incidentId)}`),
+  getTopology: (runId) => get(`/topology?run_id=${encodeURIComponent(runId)}`),
 };
 
 // ---------------------------------------------------------------------------
@@ -248,6 +252,8 @@ const staticSource: DataSource = {
   },
   listIncidents: (runId) =>
     fetchStaticJson<Incident[]>(`incidents/${encodeURIComponent(runId)}.json`),
+  getTopology: (runId) =>
+    fetchStaticJson<TopologyData>(`topology/${encodeURIComponent(runId)}.json`),
   getIncident: async (incidentId) => {
     const idx = await fetchStaticJson<Record<string, string>>("incident_index.json");
     const runId = idx[incidentId];

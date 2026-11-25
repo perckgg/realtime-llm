@@ -3,8 +3,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-// Dev server proxies /api to services/api (FastAPI, doc 01 §6.6). Until that
-// service exists the app runs on fixtures — see src/api/client.ts.
 const apiProxy = {
   "/api": {
     target: process.env.VITE_API_TARGET ?? "http://localhost:8000",
@@ -16,11 +14,27 @@ const apiProxy = {
 export default defineConfig({
   base: process.env.VITE_BASE_PATH ?? "/",
   plugins: [react(), tailwindcss()],
-  // Alias `@/` phải khai ở CẢ hai nơi: tsconfig `paths` chỉ dạy TypeScript,
-  // còn Vite phân giải import lúc chạy hoàn toàn độc lập với nó.
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {
+            return "vendor-charts";
+          }
+          if (id.includes("node_modules/@xyflow")) {
+            return "vendor-graph";
+          }
+          if (id.includes("node_modules/react") || id.includes("node_modules/react-router")) {
+            return "vendor-react";
+          }
+          return undefined;
+        },
+      },
     },
   },
   server: {

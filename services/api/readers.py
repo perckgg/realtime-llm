@@ -40,6 +40,10 @@ from services.api.schemas import (
     RunMetricsResponse,
     RunResponse,
     SearchScopeEntryResponse,
+    TopologyEdgeResponse,
+    TopologyNodeResponse,
+    TopologyResponse,
+    TopologyStatus,
     Verdict,
     WindowLabelResponse,
 )
@@ -857,3 +861,147 @@ def get_incident_detail(incident_id: str) -> IncidentDetailResponse | None:
         rejected_reason=str(row["reject_reason"]) if row["reject_reason"] else None,
         alerts=alerts,
     )
+
+
+_ONLINE_BOUTIQUE_SERVICES = frozenset(
+    {
+        "frontend",
+        "adservice",
+        "cartservice",
+        "checkoutservice",
+        "currencyservice",
+        "emailservice",
+        "paymentservice",
+        "productcatalogservice",
+        "recommendationservice",
+        "shippingservice",
+        "redis-cart",
+        "loadgenerator",
+    }
+)
+
+
+def _service_subsystem(service: str) -> Literal["online_boutique", "train_ticket", "other"]:
+    if service.startswith("ts-"):
+        return "train_ticket"
+    if service in _ONLINE_BOUTIQUE_SERVICES or service.endswith("service"):
+        return "online_boutique"
+    return "other"
+
+
+def get_topology(run_id: str) -> TopologyResponse | None:
+    if not _run_known(run_id):
+        return None
+
+    graph = _cached_graph()
+
+    alert_stats: dict[str, tuple[int, int, int, float]] = {}
+    ch = clickhouse.get_client()
+    try:
+        res = ch.query(
+            "SELECT service, "
+            "count() AS total_candidates, "
+            "countIf(verdict = 'TRUE_ALERT') AS confirmed_alerts, "
+            "countIf(downgraded_anchoring = 1 OR downgraded_gating = 1 OR downgraded = 1) AS suppressed_alerts, "
+            "max(anomaly_score) AS max_anomaly_score "
+            "FROM fact_alert_evaluation "
+            "WHERE run_id = {run_id:String} "
+            "GROUP BY service",
+            parameters={"run_id": run_id},
+        )
+        for row in res.result_rows:
+            svc = str(row[0])
+            alert_stats[svc] = (
+                int(row[1]),
+                int(row[2]),
+                int(row[3]),
+                float(row[4]) if row[4] is not None else 0.0,
+            )
+    finally:
+        ch.close()
+
+    incident_counts: dict[str, int] = {}
+    root_cause_counts: dict[str, int] = {}
+    with pg_connect() as conn:
+        rows = conn.execute(
+            "SELECT i.services, dr.report->>'root_cause_service' AS root_cause_service "
+            "FROM incidents i "
+            "LEFT JOIN diagnostic_reports dr ON dr.incident_id = i.incident_id "
+            "WHERE i.run_id = %s",
+            (run_id,),
+        ).fetchall()
+    for r in rows:
+        for svc in r["services"] or []:
+            s = str(svc)
+            incident_counts[s] = incident_counts.get(s, 0) + 1
+        rc = r["root_cause_service"]
+        if rc:
+            rc_str = str(rc)
+            root_cause_counts[rc_str] = root_cause_counts.get(rc_str, 0) + 1
+
+    return assemble_topology(
+        run_id=run_id,
+        graph=graph,
+        alert_stats=alert_stats,
+        incident_counts=incident_counts,
+        root_cause_counts=root_cause_counts,
+    )
+
+
+def assemble_topology(
+    *,
+    run_id: str,
+    graph: ServiceGraph,
+    alert_stats: Mapping[str, tuple[int, int, int, float]],
+    incident_counts: Mapping[str, int],
+    root_cause_counts: Mapping[str, int],
+) -> TopologyResponse:
+    """Build the topology payload from per-service aggregates.
+
+    `alert_stats` maps service -> (total_candidates, confirmed, suppressed, max_anomaly_score).
+    Shared by the live `/topology` endpoint and the static GitHub Pages export.
+    """
+    directed = graph.directed
+    all_services = sorted(
+        set(directed.nodes)
+        | set(alert_stats.keys())
+        | set(incident_counts.keys())
+        | set(root_cause_counts.keys())
+    )
+    nodes: list[TopologyNodeResponse] = []
+    for svc in all_services:
+        total_cand, confirmed, suppressed, max_score = alert_stats.get(svc, (0, 0, 0, 0.0))
+        inc_cnt = incident_counts.get(svc, 0)
+        rc_cnt = root_cause_counts.get(svc, 0)
+        status: TopologyStatus
+        if rc_cnt > 0:
+            status = "critical"
+        elif confirmed > 0 or inc_cnt > 0:
+            status = "degraded"
+        elif suppressed > 0:
+            status = "suppressed"
+        else:
+            status = "healthy"
+        nodes.append(
+            TopologyNodeResponse(
+                service=svc,
+                subsystem=_service_subsystem(svc),
+                status=status,
+                confirmed_alerts=confirmed,
+                suppressed_alerts=suppressed,
+                total_candidates=total_cand,
+                incident_count=inc_cnt,
+                root_cause_count=rc_cnt,
+                max_anomaly_score=max_score,
+            )
+        )
+
+    edges = [
+        TopologyEdgeResponse(
+            source=str(u),
+            target=str(v),
+            call_count=int(data.get("weight", 1)),
+        )
+        for u, v, data in sorted(directed.edges(data=True))
+    ]
+    return TopologyResponse(run_id=run_id, nodes=nodes, edges=edges)

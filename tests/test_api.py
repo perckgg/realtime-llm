@@ -247,6 +247,15 @@ def test_api_endpoints_real_data_and_contract() -> None:
         assert set(inc_detail["report"]["suggested_actions"][0].keys()) >= ifaces["SuggestedAction"]
         assert len(inc_detail["alerts"]) == len(incidents[0]["alert_ids"])
 
+        topo_res = client.get(f"/topology?run_id={run_id}")
+        assert topo_res.status_code == 200
+        topo = topo_res.json()
+        assert set(topo.keys()) >= ifaces["TopologyData"]
+        assert len(topo["nodes"]) >= 10
+        assert set(topo["nodes"][0].keys()) >= ifaces["TopologyNode"]
+        if topo["edges"]:
+            assert set(topo["edges"][0].keys()) >= ifaces["TopologyEdge"]
+
 
 def test_api_404_and_empty_run() -> None:
     _require_dbs()
@@ -258,6 +267,7 @@ def test_api_404_and_empty_run() -> None:
     assert client.get("/alerts/cand-missing_window_404:hybrid_bm25_graph:r0").status_code == 404
     assert client.get("/incidents?run_id=missing_run_404").status_code == 404
     assert client.get("/incidents/inc-missing_404").status_code == 404
+    assert client.get("/topology?run_id=missing_run_404").status_code == 404
 
     # Empty run present in run_registry with 0 alerts and 0 incidents -> 200 []
     empty_run_id = f"pytest-empty-{uuid.uuid4().hex[:12]}"

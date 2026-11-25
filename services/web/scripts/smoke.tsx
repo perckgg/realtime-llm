@@ -71,6 +71,16 @@ const { RunContext } = await import("@/lib/runContext");
 const { runs, listAlerts, listIncidents } = await import("@/mock/fixtures");
 const { policySteps } = await import("@/lib/util");
 const { resolveRunId } = await import("@/lib/runContext");
+const {
+  computeNeighborhoodFocus,
+  edgeWidthFromCalls,
+  formatCallCount,
+  layoutIncidentNeighborhood,
+  layoutServiceTopology,
+} = await import("@/lib/graphLayout");
+const { getTopology, getIncidentDetail } = await import("@/mock/fixtures");
+const Overview = (await import("@/screens/Overview")).default;
+const Incidents = (await import("@/screens/Incidents")).default;
 const Timeline = (await import("@/screens/Timeline")).default;
 const AlertDetail = (await import("@/screens/AlertDetail")).default;
 const IncidentDetail = (await import("@/screens/IncidentDetail")).default;
@@ -83,13 +93,28 @@ const firstIncident = listIncidents(firstRun.run_id)[0]!;
 const c1Run = runs.find((r) => r.retrieval_strategy === "hybrid_bm25_graph")!;
 const c1Alert = listAlerts(c1Run.run_id)[0]!;
 
-async function render(path: string, routePath: string, element: React.ReactElement): Promise<string> {
+async function render(
+  path: string,
+  routePath: string,
+  element: React.ReactElement,
+  groundTruthOverlay = false,
+): Promise<string> {
   const container = dom.window.document.createElement("div");
   dom.window.document.body.appendChild(container);
   const root = createRoot(container);
   await act(async () => {
     root.render(
-      <RunContext.Provider value={{ runs, runId: firstRun.run_id, setRunId: () => {} }}>
+      <RunContext.Provider
+        value={{
+          runs,
+          runId: firstRun.run_id,
+          setRunId: () => {},
+          groundTruthOverlay,
+          setGroundTruthOverlay: () => {},
+          theme: "light",
+          toggleTheme: () => {},
+        }}
+      >
         <MemoryRouter initialEntries={[path]}>
           <Routes>
             <Route path={routePath} element={element} />
@@ -115,18 +140,61 @@ const CASES: {
   path: string;
   routePath: string;
   element: React.ReactElement;
+  groundTruthOverlay?: boolean;
   expect: [string, (html: string) => boolean][];
 }[] = [
   {
-    name: "Timeline",
+    name: "Operations overview",
+    path: "/overview",
+    routePath: "/overview",
+    element: <Overview />,
+    expect: [
+      ["renders command center header", (h) => h.includes("Operations Command Center")],
+      ["renders Active Faults preset", (h) => h.includes("Active Faults")],
+      ["renders Expand fullscreen control", (h) => h.includes("Expand")],
+      ["renders service topology nodes", (h) => countOf(h, "react-flow__node") >= 3],
+      ["renders priority incident feed", (h) => h.includes("Priority Incident Feed")],
+      ["renders live replay CTA", (h) => h.includes("Simulate Live Replay")],
+      ["not stuck loading", (h) => !h.includes("Connecting to telemetry")],
+    ],
+  },
+  {
+    name: "Incident queue",
+    path: "/incidents",
+    routePath: "/incidents",
+    element: <Incidents />,
+    expect: [
+      ["renders incident queue header", (h) => h.includes("Incident Queue")],
+      ["renders incident table rows", (h) => countOf(h, "<tr") >= 2],
+      ["hides ground truth in ops mode", (h) => !h.includes("Ground Truth")],
+      ["not stuck loading", (h) => !h.includes("Loading incident")],
+    ],
+  },
+  {
+    name: "Timeline (ops mode)",
     path: "/timeline",
     routePath: "/timeline",
     element: <Timeline />,
+    groundTruthOverlay: false,
+    expect: [
+      ["renders stacked bar chart", (h) => countOf(h, "recharts-bar-rectangle") > 10],
+      ["renders live replay bar", (h) => h.includes("Simulate Live Replay")],
+      ["hides ground-truth curve in ops mode", (h) => !h.includes("recharts-line-curve")],
+      ["renders alert rows", (h) => countOf(h, "<tr") > 20],
+      ["not stuck loading", (h) => !h.includes("Loading")],
+    ],
+  },
+  {
+    name: "Timeline (eval overlay)",
+    path: "/timeline",
+    routePath: "/timeline",
+    element: <Timeline />,
+    groundTruthOverlay: true,
     expect: [
       ["renders stacked bar chart", (h) => countOf(h, "recharts-bar-rectangle") > 10],
       ["renders ground-truth curve", (h) => h.includes("recharts-line-curve")],
+      ["renders precision KPI", (h) => h.includes("Precision (Eval Overlay)")],
       ["renders alert rows", (h) => countOf(h, "<tr") > 20],
-      ["not stuck loading", (h) => !h.includes("Loading")],
     ],
   },
   {
@@ -163,6 +231,8 @@ const CASES: {
     expect: [
       ["renders graph nodes", (h) => countOf(h, "react-flow__node") >= 3],
       ["renders graph edges", (h) => h.includes("react-flow__edge")],
+      ["renders Propagation Focus toggle", (h) => h.includes("Propagation Focus") && h.includes("Full 1-Hop")],
+      ["renders Expand fullscreen control", (h) => h.includes("Expand")],
       ["renders diagnostic report", (h) => h.includes("root_cause_service")],
       ["renders table fallback", (h) => h.includes("View as table")],
       ["renders RCA story card", (h) => h.includes("How the RCA agent localized the root cause")],
@@ -204,7 +274,7 @@ let failed = 0;
 for (const c of CASES) {
   let html = "";
   try {
-    html = await render(c.path, c.routePath, c.element);
+    html = await render(c.path, c.routePath, c.element, c.groundTruthOverlay ?? false);
   } catch (e) {
     failed += 1;
     console.error(`  FAIL  ${c.name} — error during render\n        ${e instanceof Error ? e.stack : e}`);
@@ -300,6 +370,54 @@ for (const [label, url, chosen, want] of runCases) {
   } else {
     failed += 1;
     console.error(`  FAIL  resolveRunId           ${label}: got "${got}", want "${want}"`);
+  }
+}
+
+// Unit checks for `graphLayout.ts` (log edge scaling, focus/dimming, subsystem & horizontal fan layout).
+const wMin = edgeWidthFromCalls(126, 126, 369044);
+const wMid = edgeWidthFromCalls(541, 126, 369044);
+const wMax = edgeWidthFromCalls(369044, 126, 369044);
+const layoutChecks: [string, boolean][] = [
+  ["edgeWidthFromCalls monotonic in [1.25, 3.5]", wMin === 1.25 && wMid > wMin && wMid < wMax && wMax === 3.5],
+  ["formatCallCount compact labels", formatCallCount(541) === "541" && formatCallCount(12400) === "12k" && formatCallCount(3200) === "3.2k"],
+  [
+    "computeNeighborhoodFocus upstream/downstream",
+    (() => {
+      const f = computeNeighborhoodFocus("svc-b", [
+        { source: "svc-a", target: "svc-b" },
+        { source: "svc-b", target: "svc-c" },
+        { source: "svc-x", target: "svc-y" },
+      ]);
+      return Boolean(f && f.upstream.has("svc-a") && f.downstream.has("svc-c") && !f.relatedNodes.has("svc-x"));
+    })(),
+  ],
+  [
+    "layoutServiceTopology unique positions",
+    (() => {
+      const topo = getTopology(firstRun.run_id);
+      const res = layoutServiceTopology(topo, { scope: "all" });
+      const coords = new Set(res.nodes.map((n) => `${n.x},${n.y}`));
+      return res.nodes.length > 0 && coords.size === res.nodes.length;
+    })(),
+  ],
+  [
+    "layoutIncidentNeighborhood spine on y=0",
+    (() => {
+      const det = getIncidentDetail(firstIncident.incident_id);
+      if (!det) return false;
+      const focusRes = layoutIncidentNeighborhood(det, "focus");
+      const fullRes = layoutIncidentNeighborhood(det, "full");
+      const spineOnZero = focusRes.nodes.filter((n) => n.pathIndex !== null).every((n) => n.y === 0);
+      return spineOnZero && fullRes.nodes.length >= focusRes.nodes.length;
+    })(),
+  ],
+];
+for (const [label, ok] of layoutChecks) {
+  if (ok) {
+    console.log(`  ok    graphLayout            ${label}`);
+  } else {
+    failed += 1;
+    console.error(`  FAIL  graphLayout            ${label}`);
   }
 }
 

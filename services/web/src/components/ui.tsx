@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { cx } from "@/lib/util";
 import { USING_FIXTURES, USING_STATIC_SNAPSHOT } from "@/api/client";
 import type { Verdict } from "@/api/types";
+import { AlertTriangleIcon } from "@/components/icons";
 import { verdictColor, verdictGlyph, verdictLabel } from "@/theme/tokens";
 
 export function Card({
@@ -21,19 +22,15 @@ export function Card({
   return (
     <section
       className={cx(
-        "rounded-xl border border-[color:var(--color-hairline)] bg-surface shadow-[0_1px_2px_rgba(15,23,42,0.03)]",
+        "rounded-xl border border-[color:var(--color-hairline)] bg-surface shadow-[0_1px_2px_rgb(15_23_42/0.04)]",
         className,
       )}
     >
       {(title || right) && (
-        <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[color:var(--color-hairline)] px-5 py-3.5">
+        <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[color:var(--color-hairline)] px-4 py-3">
           <div>
-            {title && (
-              <h2 className="text-[13.5px] font-semibold tracking-tight text-ink">{title}</h2>
-            )}
-            {subtitle && (
-              <p className="mt-0.5 text-[11.5px] leading-relaxed text-ink-muted">{subtitle}</p>
-            )}
+            {title && <h2 className="text-[13px] font-semibold tracking-tight text-ink">{title}</h2>}
+            {subtitle && <p className="mt-0.5 text-[11.5px] text-ink-muted">{subtitle}</p>}
           </div>
           {right}
         </header>
@@ -44,48 +41,53 @@ export function Card({
 }
 
 /**
- * Single KPI stat tile with optional series accent dot.
+ * Operational KPI tile with clean typographic hierarchy and optional status accent bar.
  */
 export function StatTile({
   label,
   value,
   hint,
   accent,
+  icon,
 }: {
   label: string;
   value: string;
   hint?: string;
   accent?: string;
+  icon?: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-[color:var(--color-hairline)] bg-surface px-4 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.025)]">
-      <div className="flex items-center gap-1.5">
-        {accent && (
-          <span
-            aria-hidden
-            className="h-2 w-2 shrink-0 rounded-full"
-            style={{ background: accent }}
-          />
-        )}
-        <span className="text-[10.5px] font-semibold tracking-wider text-ink-muted uppercase">
+    <div
+      className="relative overflow-hidden rounded-xl border border-[color:var(--color-hairline)] bg-surface px-4 py-3.5 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-colors"
+    >
+      {accent && (
+        <span
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-[3px]"
+          style={{ background: accent }}
+        />
+      )}
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-medium tracking-wider text-ink-muted uppercase">
           {label}
         </span>
+        {icon && <span style={{ color: accent ?? "var(--color-ink-muted)" }}>{icon}</span>}
       </div>
-      <div className="mt-1.5 text-[25px] leading-tight font-semibold tracking-tight tabular-nums text-ink">
+      <div className="mt-2 font-mono text-[24px] leading-none font-semibold tracking-tight text-ink">
         {value}
       </div>
-      {hint && <div className="mt-1 text-[11px] leading-snug text-ink-2">{hint}</div>}
+      {hint && <div className="mt-1.5 text-[11.5px] text-ink-2">{hint}</div>}
     </div>
   );
 }
 
-/** Verdict badge combining shape glyph and descriptive text label. */
+/** Verdict badge pairing color, shape glyph, and explicit text label. */
 export function VerdictBadge({ verdict, compact }: { verdict: Verdict; compact?: boolean }) {
   const color = verdictColor[verdict];
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium whitespace-nowrap text-ink-2"
-      style={{ borderColor: `${color}66`, background: `${color}12` }}
+      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium text-ink"
+      style={{ borderColor: color, background: `${color}18` }}
       title={verdictLabel[verdict]}
     >
       <span aria-hidden style={{ color }}>
@@ -101,19 +103,23 @@ export function Pill({
   tone = "neutral",
 }: {
   children: ReactNode;
-  tone?: "neutral" | "warn" | "good" | "info";
+  tone?: "neutral" | "warn" | "good" | "critical" | "accent" | "info";
 }) {
+  const toneClass =
+    tone === "warn"
+      ? "border-[color:var(--color-serious)] text-[color:var(--color-serious)] bg-[color:var(--color-serious)]/8"
+      : tone === "critical"
+        ? "border-[color:var(--color-critical)] text-[color:var(--color-critical)] bg-[color:var(--color-critical)]/10"
+        : tone === "good"
+          ? "border-[color:var(--color-good)] text-[color:var(--color-good)] bg-[color:var(--color-good)]/10"
+          : tone === "accent" || tone === "info"
+            ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)] bg-[color:var(--color-accent-soft)]"
+            : "border-[color:var(--color-hairline)] text-ink-2 bg-[color:var(--color-plane)]";
   return (
     <span
       className={cx(
-        "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-mono text-[10.5px] whitespace-nowrap",
-        tone === "warn"
-          ? "border-[color:var(--color-serious)]/60 bg-[color:var(--color-serious)]/8 text-[#9a3412]"
-          : tone === "good"
-            ? "border-[color:var(--color-good)]/50 bg-[color:var(--color-good)]/8 text-[#065f46]"
-            : tone === "info"
-              ? "border-[color:var(--color-series-1)]/50 bg-[color:var(--color-series-1)]/8 text-[#1e40af]"
-              : "border-[color:var(--color-hairline)] bg-[color:var(--color-plane)] text-ink-2",
+        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 font-mono text-[10.5px] leading-tight",
+        toneClass,
       )}
     >
       {children}
@@ -121,9 +127,7 @@ export function Pill({
   );
 }
 
-/**
- * Warning ribbon displayed when running on synthetic fixture data.
- */
+/** Displayed only when running in synthetic fixture mode (smoke/dev without backend). */
 export function FixtureBanner() {
   if (!USING_FIXTURES) return null;
   return (
@@ -136,15 +140,13 @@ export function FixtureBanner() {
       }}
       role="status"
     >
-      <div className="mx-auto flex max-w-[1440px] items-center gap-2">
-        <span aria-hidden>⚠</span>
-        <span>
-          <strong className="font-semibold text-ink">Synthetic fixture data.</strong> Pipeline has
-          not run — all numbers on screen are deterministic seed fixtures, not experiment results.
-          Set <code className="font-mono">VITE_DATA_SOURCE=http</code> to read from{" "}
-          <code className="font-mono">services/api</code>.
-        </span>
-      </div>
+      <AlertTriangleIcon size={14} style={{ color: "var(--color-warning)" }} />
+      <span>
+        <strong className="font-semibold text-ink">Sandbox fixture mode.</strong> Running on
+        deterministic local fixtures. Connect <code className="font-mono">services/api</code> with{" "}
+        <code className="font-mono">VITE_DATA_SOURCE=http</code> for ClickHouse &amp; PostgreSQL
+        telemetry.
+      </span>
     </div>
   );
 }
@@ -207,7 +209,7 @@ export function StaticSnapshotBanner() {
       className="border-b px-6 py-2 text-[11.5px]"
       style={{
         borderColor: "var(--color-hairline)",
-        background: "color-mix(in srgb, #e8d9b8 28%, var(--color-surface))",
+        background: "color-mix(in srgb, var(--color-warning) 8%, var(--color-surface))",
         color: "var(--color-ink-2)",
       }}
       role="status"
@@ -217,9 +219,9 @@ export function StaticSnapshotBanner() {
           <span
             className="rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wide"
             style={{
-              borderColor: "#b48a3e",
-              color: "#6b4b12",
-              background: "color-mix(in srgb, #ebdcb9 45%, var(--color-surface))",
+              borderColor: "var(--color-warning)",
+              color: "var(--color-ink)",
+              background: "color-mix(in srgb, var(--color-warning) 14%, var(--color-surface))",
             }}
           >
             STATIC BENCHMARK SNAPSHOT
@@ -260,17 +262,28 @@ export function StaticSnapshotBanner() {
   );
 }
 
-export function Loading({ label = "Loading evaluation data…" }: { label?: string }) {
-  return <div className="py-12 text-center text-[12.5px] text-ink-muted">{label}</div>;
+export function Loading({ label = "Loading telemetry…" }: { label?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-[12px] text-ink-muted">
+      <span className="h-2 w-2 rounded-full bg-[color:var(--color-accent)] ops-pulse" />
+      <span>{label}</span>
+    </div>
+  );
 }
 
 export function ErrorBox({ message }: { message: string }) {
   return (
     <div
-      className="rounded-xl border px-4 py-3 text-[12.5px]"
-      style={{ borderColor: "var(--color-critical)", color: "var(--color-critical)" }}
+      className="flex items-center gap-2.5 rounded-xl border px-4 py-3 text-[12px]"
+      style={{
+        borderColor: "var(--color-critical)",
+        background: "color-mix(in srgb, var(--color-critical) 8%, var(--color-surface))",
+        color: "var(--color-critical)",
+      }}
+      role="alert"
     >
-      {message}
+      <AlertTriangleIcon size={16} className="shrink-0" />
+      <span>{message}</span>
     </div>
   );
 }
@@ -279,9 +292,10 @@ export function Empty({ children }: { children: ReactNode }) {
   return <div className="py-12 text-center text-[12.5px] text-ink-muted">{children}</div>;
 }
 
+/** Key-value row for structured operational metadata blocks. */
 export function KV({ k, v }: { k: string; v: ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 py-1.5">
+    <div className="flex items-baseline justify-between gap-3 py-1.5">
       <dt className="text-[11.5px] text-ink-muted">{k}</dt>
       <dd className="text-right text-[12px] tabular-nums text-ink">{v}</dd>
     </div>

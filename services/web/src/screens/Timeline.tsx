@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Bar,
   CartesianGrid,
@@ -13,6 +13,15 @@ import {
 import { api } from "@/api/client";
 import type { Alert, Incident, Verdict } from "@/api/types";
 import { Legend, TooltipRow, TooltipShell, axisProps } from "@/components/charts";
+import {
+  ActivityIcon,
+  FlameIcon,
+  PauseIcon,
+  PlayIcon,
+  RotateCcwIcon,
+  ShieldCheckIcon,
+  SkipForwardIcon,
+} from "@/components/icons";
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, dayUTC, ms, num, pct, policySteps, stampUTC, useAsync } from "@/lib/util";
 import { ink, status, verdictColor, verdictGlyph, verdictLabel, VERDICT_ORDER } from "@/theme/tokens";
@@ -21,16 +30,32 @@ import { pickDefaultRunId, useRuns } from "@/lib/runContext";
 const BUCKET_MINUTES = 10;
 
 type VerdictFilter = Verdict | "ALL";
+type ReplaySpeed = 1 | 3 | 10;
 
 export default function Timeline() {
-  const { runs, runId, setRunId, runsLoading, runsError } = useRuns();
+  const { runs, runId, setRunId, runsLoading, runsError, groundTruthOverlay } = useRuns();
+  const [searchParams] = useSearchParams();
+  const initialService = searchParams.get("service") ?? "ALL";
+  const autoReplay = searchParams.get("replay") === "1";
+
   const [verdict, setVerdict] = useState<VerdictFilter>("ALL");
-  const [service, setService] = useState("ALL");
+  const [service, setService] = useState(initialService);
   const [tab, setTab] = useState<"alerts" | "incidents">("alerts");
+
+  // Interactive Live Stream Replay state: cursor = number of visible buckets (null = full window)
+  const [replayCursor, setReplayCursor] = useState<number | null>(autoReplay ? 1 : null);
+  const [playing, setPlaying] = useState<boolean>(autoReplay);
+  const [speed, setSpeed] = useState<ReplaySpeed>(3);
+
+  useEffect(() => {
+    if (initialService !== "ALL") setService(initialService);
+  }, [initialService]);
 
   const activeRun = runs.find((r) => r.run_id === runId);
   const rcaOnlyRun = Boolean(activeRun && activeRun.alert_count === 0);
-  const defaultPipelineRun = runs.find((r) => r.run_id === pickDefaultRunId(runs) && r.alert_count > 0);
+  const defaultPipelineRun = runs.find(
+    (r) => r.run_id === pickDefaultRunId(runs) && r.alert_count > 0,
+  );
 
   const alertsQ = useAsync(
     () => (runId && !rcaOnlyRun ? api.listAlerts({ runId }) : Promise.resolve<Alert[]>([])),
@@ -42,6 +67,7 @@ export default function Timeline() {
   );
 
   const alerts = alertsQ.data ?? [];
+  const allIncidents = incidentsQ.data ?? [];
 
   const services = useMemo(
     () => ["ALL", ...Array.from(new Set(alerts.map((a) => a.service))).sort()],
@@ -58,75 +84,280 @@ export default function Timeline() {
     [alerts, verdict, service],
   );
 
-  const buckets = useMemo(() => bucketise(filtered), [filtered]);
-  const stats = useMemo(() => summarise(filtered), [filtered]);
+  const allBuckets = useMemo(() => bucketise(filtered), [filtered]);
+  const totalBuckets = allBuckets.length;
 
-  if (runsLoading) return <Loading label="Loading runs…" />;
+  // Advance live replay timer smoothly
+  useEffect(() => {
+    if (!playing || totalBuckets === 0) return;
+    const intervalMs = speed === 10 ? 180 : speed === 3 ? 420 : 900;
+    const id = window.setInterval(() => {
+      setReplayCursor((prev) => {
+        const cur = prev ?? 1;
+        if (cur >= totalBuckets) {
+          setPlaying(false);
+          return totalBuckets;
+        }
+        return cur + 1;
+      });
+    }, intervalMs);
+    return () => window.clearInterval(id);
+  }, [playing, speed, totalBuckets]);
+
+  const inReplay = replayCursor !== null && totalBuckets > 0;
+  const effectiveCursor = inReplay ? Math.min(replayCursor, totalBuckets) : totalBuckets;
+  const visibleBuckets = useMemo(
+    () => (inReplay ? allBuckets.slice(0, effectiveCursor) : allBuckets),
+    [allBuckets, inReplay, effectiveCursor],
+  );
+
+  const replayCutoffMs = useMemo(() => {
+    if (!inReplay || visibleBuckets.length === 0) return null;
+    const last = visibleBuckets[visibleBuckets.length - 1]!;
+    return last.bucketMs + BUCKET_MINUTES * 60_000;
+  }, [inReplay, visibleBuckets]);
+
+  const visibleAlerts = useMemo(() => {
+    if (replayCutoffMs === null) return filtered;
+    return filtered.filter((a) => Date.parse(a.ts) < replayCutoffMs);
+  }, [filtered, replayCutoffMs]);
+
+  const visibleIncidents = useMemo(() => {
+    if (replayCutoffMs === null) return allIncidents;
+    return allIncidents.filter((inc) => Date.parse(inc.start_ts) < replayCutoffMs);
+  }, [allIncidents, replayCutoffMs]);
+
+  const stats = useMemo(() => summarise(visibleAlerts), [visibleAlerts]);
+
+  function startOrToggleReplay() {
+    if (totalBuckets === 0) return;
+    if (!inReplay) {
+      setReplayCursor(1);
+      setPlaying(true);
+      return;
+    }
+    if (effectiveCursor >= totalBuckets) {
+      setReplayCursor(1);
+      setPlaying(true);
+      return;
+    }
+    setPlaying((p) => !p);
+  }
+
+  function jumpToNextConfirmed() {
+    if (totalBuckets === 0) return;
+    const startIdx = inReplay ? effectiveCursor : 0;
+    const nextIdx = allBuckets.findIndex((b, idx) => idx >= startIdx && b.TRUE_ALERT > 0);
+    if (nextIdx >= 0) {
+      setReplayCursor(nextIdx + 1);
+      setPlaying(false);
+    }
+  }
+
+  function exitReplay() {
+    setPlaying(false);
+    setReplayCursor(null);
+  }
+
+  if (runsLoading) return <Loading label="Connecting to telemetry store…" />;
   if (runsError) return <ErrorBox message={runsError} />;
-  if (!runId) return <Empty>No runs have been ingested into the database yet.</Empty>;
-  if (alertsQ.loading) return <Loading label={`Loading alerts for ${runId}…`} />;
+  if (!runId) return <Empty>No telemetry streams have been ingested yet.</Empty>;
+  if (alertsQ.loading) return <Loading label="Loading telemetry stream…" />;
   if (alertsQ.error) return <ErrorBox message={alertsQ.error} />;
+
+  const currentReplayBucket =
+    inReplay && visibleBuckets.length > 0 ? visibleBuckets[visibleBuckets.length - 1] : null;
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-3">
-        <Segmented
-          label="Verdict"
-          value={verdict}
-          onChange={(v) => setVerdict(v as VerdictFilter)}
-          options={[
-            { value: "ALL", label: "All" },
-            ...VERDICT_ORDER.map((v) => ({
-              value: v,
-              label: verdictLabel[v],
-              glyph: verdictGlyph[v],
-              color: verdictColor[v],
-            })),
-          ]}
-        />
-        <label className="flex flex-col gap-1 text-[11px] text-ink-muted">
-          Service
-          <select
-            value={service}
-            onChange={(e) => setService(e.target.value)}
-            className="rounded-md border border-[color:var(--color-hairline)] bg-surface px-2 py-1.5 text-[12px] text-ink"
-          >
-            {services.map((s) => (
-              <option key={s} value={s}>
-                {s === "ALL" ? "All services" : s}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="ml-auto text-[11px] text-ink-muted">
-          {filtered.length} / {alerts.length} alerts · {BUCKET_MINUTES}m buckets
+      {/* Header + Filter Controls */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[19px] font-semibold tracking-tight text-ink">
+            Alert Stream &amp; Live Replay
+          </h1>
+          <p className="mt-0.5 text-[12px] text-ink-muted">
+            Chronological telemetry triage stream with CTAV evidence anchoring and incident
+            correlation
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-end gap-3">
+          <Segmented
+            label="Verdict"
+            value={verdict}
+            onChange={(v) => setVerdict(v as VerdictFilter)}
+            options={[
+              { value: "ALL", label: "All" },
+              ...VERDICT_ORDER.map((v) => ({
+                value: v,
+                label: verdictLabel[v],
+                glyph: verdictGlyph[v],
+                color: verdictColor[v],
+              })),
+            ]}
+          />
+          <label className="flex flex-col gap-1 text-[11px] text-ink-muted">
+            Service
+            <select
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              className="rounded-lg border border-[color:var(--color-hairline)] bg-surface px-2.5 py-1.5 text-[12px] text-ink"
+            >
+              {services.map((s) => (
+                <option key={s} value={s}>
+                  {s === "ALL" ? "All services" : s}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile label="Alerts" value={String(filtered.length)} hint={`of ${alerts.length} in run`} />
+      {/* Live Stream Replay Control Strip */}
+      {!rcaOnlyRun && totalBuckets > 0 && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[color:var(--color-hairline)] bg-surface px-4 py-2.5 shadow-[0_1px_2px_rgb(15_23_42/0.04)]">
+          <button
+            type="button"
+            onClick={startOrToggleReplay}
+            className={cx(
+              "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors",
+              playing
+                ? "bg-[color:var(--color-warning)] text-white"
+                : "bg-[color:var(--color-accent)] text-white hover:opacity-90",
+            )}
+          >
+            {playing ? <PauseIcon size={13} /> : <PlayIcon size={13} />}
+            {playing ? "Pause Replay" : inReplay ? "Resume Replay" : "Simulate Live Replay"}
+          </button>
+
+          <div className="flex items-center gap-1 rounded-lg border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)] p-0.5">
+            {([1, 3, 10] as ReplaySpeed[]).map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSpeed(s)}
+                className={cx(
+                  "rounded px-2 py-0.5 font-mono text-[11px] font-medium transition-colors",
+                  speed === s ? "bg-surface text-ink shadow-xs" : "text-ink-muted hover:text-ink",
+                )}
+              >
+                {s}×
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={jumpToNextConfirmed}
+            className="inline-flex items-center gap-1 rounded-lg border border-[color:var(--color-hairline)] bg-surface px-2.5 py-1.5 text-[11.5px] font-medium text-ink-2 hover:bg-[color:var(--color-plane)] hover:text-ink"
+          >
+            <SkipForwardIcon size={13} />
+            Next Confirmed Alert
+          </button>
+
+          {inReplay && (
+            <button
+              type="button"
+              onClick={exitReplay}
+              className="inline-flex items-center gap-1 rounded-lg border border-[color:var(--color-hairline)] bg-surface px-2.5 py-1.5 text-[11.5px] font-medium text-ink-2 hover:bg-[color:var(--color-plane)] hover:text-ink"
+            >
+              <RotateCcwIcon size={13} />
+              Full Window
+            </button>
+          )}
+
+          <div className="flex min-w-[200px] flex-1 items-center gap-3">
+            <input
+              type="range"
+              aria-label="Telemetry stream replay cursor"
+              min={1}
+              max={totalBuckets}
+              value={effectiveCursor}
+              onChange={(e) => {
+                setPlaying(false);
+                setReplayCursor(Number(e.target.value));
+              }}
+              className="h-1.5 flex-1 accent-[color:var(--color-accent)]"
+            />
+            <span className="font-mono text-[11px] whitespace-nowrap tabular-nums text-ink-2">
+              {inReplay && currentReplayBucket ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <span
+                    className={cx(
+                      "h-2 w-2 rounded-full",
+                      playing ? "bg-[color:var(--color-good)] ops-pulse" : "bg-[color:var(--color-warning)]",
+                    )}
+                  />
+                  {currentReplayBucket.fullLabel} ({effectiveCursor}/{totalBuckets})
+                </span>
+              ) : (
+                `Full window · ${visibleAlerts.length.toLocaleString("en-US")} candidates`
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* KPI Strip: Adapts cleanly between Operations Mode and Ground-Truth Overlay */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatTile
+          label="Ingested Candidates"
+          value={visibleAlerts.length.toLocaleString("en-US")}
+          hint={
+            inReplay
+              ? `of ${filtered.length.toLocaleString("en-US")} in stream · ${BUCKET_MINUTES}m buckets`
+              : `${BUCKET_MINUTES}-minute aggregation buckets`
+          }
+          icon={<ActivityIcon size={16} />}
+        />
         <StatTile
           label="Confirmed Alerts"
-          value={String(stats.tp + stats.fp)}
-          hint={`${stats.tp} matched label · ${stats.fp} FP`}
+          value={String(stats.confirmed)}
+          hint={
+            groundTruthOverlay
+              ? `${stats.tp} matched fault label · ${stats.fp} FP`
+              : `${stats.uncertain} held as uncertain · ${stats.fpRaw} false positive`
+          }
           accent={verdictColor.TRUE_ALERT}
         />
+        {groundTruthOverlay ? (
+          <StatTile
+            label="Precision (Eval Overlay)"
+            value={stats.confirmed ? num(stats.tp / stats.confirmed, 3) : "—"}
+            hint="TRUE_ALERT matching ground-truth fault label"
+            accent="var(--color-accent)"
+          />
+        ) : (
+          <StatTile
+            label="Grouped Incidents"
+            value={String(visibleIncidents.length)}
+            hint={
+              stats.confirmed > 0
+                ? `${pct(Math.max(0, 1 - visibleIncidents.length / stats.confirmed))} alert reduction`
+                : "Correlated via 180s window + call graph"
+            }
+            accent={status.critical}
+            icon={<FlameIcon size={16} />}
+          />
+        )}
         <StatTile
-          label="Precision"
-          value={stats.tp + stats.fp ? num(stats.tp / (stats.tp + stats.fp), 3) : "—"}
-          hint="TRUE_ALERT matching Nezha fault label"
-        />
-        <StatTile
-          label="Downgraded by CTAV (C3)"
-          value={String(stats.anchored)}
-          hint={`total policy downgrades ${stats.policyDowngraded} · Rescue ${stats.rescue}`}
-          accent={status.warning}
+          label="Suppressed by CTAV (C3)"
+          value={stats.anchored.toLocaleString("en-US")}
+          hint={`total policy downgrades ${stats.policyDowngraded.toLocaleString("en-US")} · Rescue ${stats.rescue}`}
+          accent={status.good}
+          icon={<ShieldCheckIcon size={16} />}
         />
       </div>
 
+      {/* Main Stacked Telemetry Chart */}
       <Card
-        title="Alerts over time by verdict"
-        subtitle={`Stacked bars: alerts per ${BUCKET_MINUTES}-minute bucket. Solid line: ground-truth fault windows in Nezha (same unit — window count — shared axis).`}
+        title="Alert validation over time"
+        subtitle={
+          groundTruthOverlay
+            ? `Stacked bars: validated candidates per ${BUCKET_MINUTES}-minute bucket. Solid line: ground-truth fault windows (evaluation overlay active).`
+            : `Stacked bars: validated candidates per ${BUCKET_MINUTES}-minute bucket across CTAV decision verdicts.`
+        }
         right={
           <Legend
             items={[
@@ -136,19 +367,26 @@ export default function Timeline() {
                 color: verdictColor[v],
                 glyph: verdictGlyph[v],
               })),
-              { key: "gt", label: "Ground-truth faults", color: ink.secondary, glyph: "▬" },
+              ...(groundTruthOverlay
+                ? [{ key: "gt", label: "Ground-truth faults", color: ink.secondary, glyph: "▬" }]
+                : []),
             ]}
           />
         }
       >
         <div className="h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={buckets} margin={{ top: 6, right: 8, bottom: 0, left: -18 }}>
-              <CartesianGrid vertical={false} stroke={ink.grid} />
-              <XAxis dataKey="label" {...axisProps} interval="preserveStartEnd" minTickGap={28} />
-              <YAxis {...axisProps} allowDecimals={false} width={40} />
+            <ComposedChart data={visibleBuckets} margin={{ top: 6, right: 8, bottom: 0, left: -18 }}>
+              <CartesianGrid vertical={false} stroke="var(--color-grid)" />
+              <XAxis
+                dataKey="label"
+                {...axisProps}
+                interval="preserveStartEnd"
+                minTickGap={34}
+              />
+              <YAxis {...axisProps} allowDecimals={false} width={42} />
               <Tooltip
-                cursor={{ fill: "rgb(11 11 11 / 0.04)" }}
+                cursor={{ fill: "rgb(37 99 235 / 0.06)" }}
                 content={({ active, payload, label }) => {
                   const fullLabel = (
                     payload?.[0]?.payload as { fullLabel?: string } | undefined
@@ -166,17 +404,19 @@ export default function Timeline() {
                           )}
                         />
                       ))}
-                      <div className="mt-1 border-t border-[color:var(--color-hairline)] pt-1">
-                        <TooltipRow
-                          color={ink.secondary}
-                          glyph="▬"
-                          label="Ground-truth faults"
-                          value={String(
-                            (payload.find((p) => p.dataKey === "ground_truth_faults")
-                              ?.value as number) ?? 0,
-                          )}
-                        />
-                      </div>
+                      {groundTruthOverlay && (
+                        <div className="mt-1 border-t border-[color:var(--color-hairline)] pt-1">
+                          <TooltipRow
+                            color="var(--color-ink-2)"
+                            glyph="▬"
+                            label="Ground-truth faults"
+                            value={String(
+                              (payload.find((p) => p.dataKey === "ground_truth_faults")
+                                ?.value as number) ?? 0,
+                            )}
+                          />
+                        </div>
+                      )}
                     </TooltipShell>
                   ) : null;
                 }}
@@ -187,39 +427,42 @@ export default function Timeline() {
                   dataKey={v}
                   stackId="verdict"
                   fill={verdictColor[v]}
-                  stroke={ink.surface}
-                  strokeWidth={2}
+                  stroke="var(--color-surface)"
+                  strokeWidth={1.5}
                   maxBarSize={18}
                   radius={i === VERDICT_ORDER.length - 1 ? [3, 3, 0, 0] : undefined}
                 />
               ))}
-              <Line
-                type="monotone"
-                dataKey="ground_truth_faults"
-                stroke={ink.secondary}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, stroke: ink.surface, strokeWidth: 2 }}
-              />
+              {groundTruthOverlay && (
+                <Line
+                  type="monotone"
+                  dataKey="ground_truth_faults"
+                  stroke="var(--color-ink-2)"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, stroke: "var(--color-surface)", strokeWidth: 2 }}
+                />
+              )}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
       </Card>
 
+      {/* Backing Table: Alerts / Incidents */}
       <Card
-        title={tab === "alerts" ? "Alert list" : "Grouped incidents"}
+        title={tab === "alerts" ? "Validated Alert Feed" : "Correlated Incidents"}
         subtitle={
           tab === "alerts"
-            ? "Alert-level table backing the chart above. Click a timestamp to inspect Alert Detail."
-            : "Alerts grouped by temporal window and trace dependency edges. Click to open Incident Detail."
+            ? "Alert-level telemetry backing the timeline. Click any timestamp to inspect CTAV evidence and reasoning."
+            : "Confirmed alerts correlated by temporal proximity and service call edges. Click to open RCA investigation."
         }
         right={
           <Segmented
             value={tab}
             onChange={(v) => setTab(v as "alerts" | "incidents")}
             options={[
-              { value: "alerts", label: `Alerts (${filtered.length})` },
-              { value: "incidents", label: `Incidents (${incidentsQ.data?.length ?? 0})` },
+              { value: "alerts", label: `Alerts (${visibleAlerts.length})` },
+              { value: "incidents", label: `Incidents (${visibleIncidents.length})` },
             ]}
           />
         }
@@ -229,33 +472,35 @@ export default function Timeline() {
           rcaOnlyRun ? (
             <div className="space-y-3 rounded-lg border border-[color:var(--color-hairline)] bg-[color:var(--color-plane)] p-4 text-[12.5px] text-ink-2">
               <p>
-                Run <span className="font-mono font-medium text-ink">{runId}</span> is an M9 RCA-only
-                run (0 alerts in ClickHouse; {incidentsQ.data?.length ?? 0} incidents in PostgreSQL).
+                Session <span className="font-mono font-medium text-ink">{runId}</span> contains
+                archived incident records only ({visibleIncidents.length} incidents; no alert-level
+                telemetry stream).
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => setTab("incidents")}
-                  className="rounded border border-[color:var(--color-hairline)] bg-surface px-3 py-1 text-[11.5px] font-medium text-ink hover:bg-[color:var(--color-plane)]"
+                  className="rounded-lg border border-[color:var(--color-hairline)] bg-surface px-3 py-1.5 text-[11.5px] font-medium text-ink hover:bg-[color:var(--color-plane)]"
                 >
-                  View Incidents tab ({incidentsQ.data?.length ?? 0})
+                  View Incidents ({visibleIncidents.length})
                 </button>
                 {defaultPipelineRun && (
                   <button
                     type="button"
                     onClick={() => setRunId(defaultPipelineRun.run_id)}
-                    className="rounded border border-[color:var(--color-hairline)] bg-surface px-3 py-1 text-[11.5px] text-ink-2 hover:text-ink"
+                    className="rounded-lg border border-[color:var(--color-hairline)] bg-surface px-3 py-1.5 text-[11.5px] text-ink-2 hover:text-ink"
                   >
-                    Switch to {defaultPipelineRun.run_id}
+                    Switch to Full Telemetry Stream
                   </button>
                 )}
               </div>
             </div>
           ) : (
             <AlertTable
-              key={`${runId}-${verdict}-${service}-${filtered.length}`}
-              alerts={filtered}
+              key={`${runId}-${verdict}-${service}-${visibleAlerts.length}`}
+              alerts={visibleAlerts}
               runId={runId}
+              showGroundTruth={Boolean(groundTruthOverlay)}
             />
           )
         ) : incidentsQ.loading ? (
@@ -263,7 +508,11 @@ export default function Timeline() {
         ) : incidentsQ.error ? (
           <ErrorBox message={incidentsQ.error} />
         ) : (
-          <IncidentTable incidents={incidentsQ.data ?? []} />
+          <IncidentTable
+            incidents={visibleIncidents}
+            runId={runId}
+            showGroundTruth={Boolean(groundTruthOverlay)}
+          />
         )}
       </Card>
     </div>
@@ -272,7 +521,15 @@ export default function Timeline() {
 
 const ALERT_PAGE_SIZE = 200;
 
-function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
+function AlertTable({
+  alerts,
+  runId,
+  showGroundTruth,
+}: {
+  alerts: Alert[];
+  runId: string;
+  showGroundTruth: boolean;
+}) {
   const [page, setPage] = useState(0);
   if (!alerts.length) return <Empty>No alerts match the current filter.</Empty>;
   const totalPages = Math.max(1, Math.ceil(alerts.length / ALERT_PAGE_SIZE));
@@ -286,7 +543,7 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
         <div className="mb-2 flex items-center justify-between text-[11px] text-ink-muted">
           <span>
             Showing {start + 1}–{Math.min(start + ALERT_PAGE_SIZE, alerts.length)} of{" "}
-            {alerts.length} alerts
+            {alerts.length.toLocaleString("en-US")} alerts
           </span>
           <div className="flex items-center gap-1.5">
             <button
@@ -297,7 +554,7 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
             >
               Prev
             </button>
-            <span className="tabular-nums">
+            <span className="font-mono tabular-nums">
               Page {safePage + 1}/{totalPages}
             </span>
             <button
@@ -313,18 +570,18 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
       )}
       <div className="max-h-[460px] overflow-auto">
         <table className="w-full border-collapse text-[12px]">
-          <thead className="sticky top-0 bg-surface">
+          <thead className="sticky top-0 z-10 bg-surface">
             <tr className="border-b border-[color:var(--color-hairline)] text-left text-[11px] text-ink-muted">
               <th className="py-2 pr-3 font-medium">Timestamp (UTC)</th>
               <th className="py-2 pr-3 font-medium">Service</th>
               <th className="py-2 pr-3 font-medium">Verdict</th>
-              <th className="py-2 pr-3 font-medium">CTAV (tier · origin)</th>
+              <th className="py-2 pr-3 font-medium">CTAV Policy</th>
               <th className="py-2 pr-3 text-right font-medium">Anomaly</th>
               <th className="py-2 pr-3 text-right font-medium">Confidence</th>
-              <th className="py-2 pr-3 font-medium">Label</th>
+              {showGroundTruth && <th className="py-2 pr-3 font-medium">Ground Truth</th>}
               <th className="py-2 pr-3 text-right font-medium">Retrieval</th>
-              <th className="py-2 pr-3 text-right font-medium">LLM</th>
-              <th className="py-2 font-medium">Source</th>
+              <th className="py-2 pr-3 text-right font-medium">Judge</th>
+              <th className="py-2 font-medium">Trigger</th>
             </tr>
           </thead>
           <tbody>
@@ -336,15 +593,15 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
                   key={a.alert_id}
                   className="border-b border-[color:var(--color-hairline)] last:border-0 hover:bg-[color:var(--color-plane)]"
                 >
-                  <td className="py-1.5 pr-3 tabular-nums whitespace-nowrap">
+                  <td className="py-1.5 pr-3 font-mono text-[11.5px] tabular-nums whitespace-nowrap">
                     <Link
                       to={`/alerts/${a.alert_id}?run_id=${encodeURIComponent(targetRunId)}`}
-                      className="hover:underline"
+                      className="text-ink hover:text-[color:var(--color-accent)] hover:underline"
                     >
                       {stampUTC(a.ts)}
                     </Link>
                   </td>
-                  <td className="py-1.5 pr-3 font-mono text-[11px]">{a.service}</td>
+                  <td className="py-1.5 pr-3 font-mono text-[11.5px] text-ink">{a.service}</td>
                   <td className="py-1.5 pr-3">
                     <VerdictBadge verdict={a.verdict} />
                     {a.raw_verdict && a.raw_verdict !== a.verdict && (
@@ -359,27 +616,28 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
                     </div>
                     {steps.shortReason && <Pill tone="warn">{steps.shortReason}</Pill>}
                   </td>
-                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                  <td className="py-1.5 pr-3 text-right font-mono tabular-nums">
                     {num(a.anomaly_score, 2)}
                   </td>
-                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                  <td className="py-1.5 pr-3 text-right font-mono tabular-nums">
                     {num(a.confidence, 2)}
                   </td>
-                  <td className="py-1.5 pr-3">
-                    {a.label.is_fault ? (
-                      <span className="text-[11px]" style={{ color: status.critical }}>
-                        ✱ {a.label.fault_type}
-                      </span>
-                    ) : (
-                      <span className="text-[11px] text-ink-muted">normal</span>
-                    )}
-                  </td>
-                  <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
+                  {showGroundTruth && (
+                    <td className="py-1.5 pr-3">
+                      {a.label.is_fault ? (
+                        <span className="text-[11px] font-medium" style={{ color: status.critical }}>
+                          ● {a.label.fault_type}
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-ink-muted">normal</span>
+                      )}
+                    </td>
+                  )}
+                  <td className="py-1.5 pr-3 text-right font-mono tabular-nums text-ink-2">
                     {ms(a.retrieval_latency_ms)}
                   </td>
-                  <td className="py-1.5 pr-3 text-right tabular-nums text-ink-2">
+                  <td className="py-1.5 pr-3 text-right font-mono tabular-nums text-ink-2">
                     {ms(a.llm_latency_ms)}
-                    {a.cache_hit && <span className="ml-1 text-ink-muted">·cache</span>}
                   </td>
                   <td className="py-1.5">
                     <Pill tone={a.candidate_source === "rescue" ? "warn" : "neutral"}>
@@ -396,53 +654,55 @@ function AlertTable({ alerts, runId }: { alerts: Alert[]; runId: string }) {
   );
 }
 
-function IncidentTable({ incidents }: { incidents: Incident[] }) {
-  if (!incidents.length) return <Empty>No grouped incidents in this run.</Empty>;
+function IncidentTable({
+  incidents,
+  runId,
+  showGroundTruth,
+}: {
+  incidents: Incident[];
+  runId: string;
+  showGroundTruth: boolean;
+}) {
+  if (!incidents.length) return <Empty>No correlated incidents in this window.</Empty>;
   return (
     <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       {incidents.map((i) => {
         const hasGt =
           i.ground_truth_service !== null && i.ground_truth_service !== undefined;
         const correct = hasGt && i.root_cause_service === i.ground_truth_service;
-        const badgeColor = !hasGt
-          ? ink.muted
-          : i.root_cause_service
-            ? correct
-              ? status.good
-              : status.critical
-            : status.warning;
-        const badgeLabel = !hasGt
-          ? "— unlabelled"
-          : i.root_cause_service
-            ? correct
-              ? "✓ root match"
-              : "✗ wrong root"
-            : "⚠ rejected";
+        const isCascade = i.services.length > 1;
         return (
           <li key={i.incident_id}>
             <Link
-              to={`/incidents/${i.incident_id}`}
-              className="block rounded-lg border border-[color:var(--color-hairline)] p-3 transition-colors hover:bg-[color:var(--color-plane)]"
+              to={`/incidents/${i.incident_id}?run_id=${encodeURIComponent(runId)}`}
+              className="block rounded-xl border border-[color:var(--color-hairline)] p-3.5 transition-colors hover:border-[color:var(--color-accent)] hover:bg-[color:var(--color-plane)]"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="font-mono text-[11px] text-ink-muted">{i.incident_id}</span>
-                <span className="text-[11px] font-medium" style={{ color: badgeColor }}>
-                  {badgeLabel}
-                </span>
+                {showGroundTruth ? (
+                  <Pill tone={!hasGt ? "neutral" : correct ? "good" : "critical"}>
+                    {!hasGt
+                      ? "unlabelled"
+                      : correct
+                        ? "✓ root match"
+                        : `✗ gt: ${i.ground_truth_service}`}
+                  </Pill>
+                ) : isCascade ? (
+                  <Pill tone="critical">cascade · {i.services.length} svcs</Pill>
+                ) : (
+                  <Pill>isolated</Pill>
+                )}
               </div>
-              <div className="mt-2 text-[13px] font-semibold text-ink">
-                {i.root_cause_service ?? "—"}
-                <span className="ml-2 text-[11px] font-normal text-ink-muted">
-                  label: {i.ground_truth_service ?? "none (no_fault / ambiguous)"}
-                </span>
+              <div className="mt-2 font-mono text-[13px] font-semibold text-ink">
+                {i.root_cause_service ?? "Inconclusive"}
               </div>
-              <div className="mt-1.5 text-[11px] text-ink-2">
-                {i.services.join("  →  ")}
+              <div className="mt-1 font-mono text-[11px] text-ink-2">
+                {i.services.join(" → ")}
               </div>
-              <dl className="mt-2 border-t border-[color:var(--color-hairline)] pt-1.5">
-                <KV k="Fault type" v={i.fault_type ?? "—"} />
-                <KV k="Window" v={`${clockUTC(i.start_ts)} – ${clockUTC(i.end_ts)}`} />
-                <KV k="Alerts" v={i.alert_ids.length} />
+              <dl className="mt-2.5 border-t border-[color:var(--color-hairline)] pt-1.5">
+                <KV k="Window" v={`${clockUTC(i.start_ts)} – ${clockUTC(i.end_ts)} UTC`} />
+                <KV k="Correlated alerts" v={i.alert_ids.length} />
+                {showGroundTruth && <KV k="Fault label" v={i.fault_type ?? "—"} />}
               </dl>
             </Link>
           </li>
@@ -466,14 +726,14 @@ function Segmented({
   return (
     <div className="flex flex-col gap-1">
       {label && <span className="text-[11px] text-ink-muted">{label}</span>}
-      <div className="flex rounded-md border border-[color:var(--color-hairline)] bg-surface p-0.5">
+      <div className="flex rounded-lg border border-[color:var(--color-hairline)] bg-surface p-0.5">
         {options.map((o) => (
           <button
             key={o.value}
             type="button"
             onClick={() => onChange(o.value)}
             className={cx(
-              "flex items-center gap-1.5 rounded px-2.5 py-1 text-[11.5px] transition-colors",
+              "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11.5px] transition-colors",
               value === o.value
                 ? "bg-[color:var(--color-plane)] font-medium text-ink"
                 : "text-ink-muted hover:text-ink-2",
@@ -517,6 +777,7 @@ function bucketise(alerts: Alert[]) {
     const showDate = day !== prevDay;
     prevDay = day;
     return {
+      bucketMs: ts,
       label: showDate ? `${ddmm} ${hhmm}` : hhmm,
       fullLabel: `${ddmm} ${hhmm} UTC`,
       ...row,
@@ -527,11 +788,22 @@ function bucketise(alerts: Alert[]) {
 function summarise(alerts: Alert[]) {
   let tp = 0;
   let fp = 0;
+  let confirmed = 0;
+  let uncertain = 0;
+  let fpRaw = 0;
   let rescue = 0;
   let anchored = 0;
   let policyDowngraded = 0;
   for (const a of alerts) {
-    if (a.verdict === "TRUE_ALERT") (a.label.is_fault ? tp++ : fp++);
+    if (a.verdict === "TRUE_ALERT") {
+      confirmed++;
+      if (a.label.is_fault) tp++;
+      else fp++;
+    } else if (a.verdict === "UNCERTAIN") {
+      uncertain++;
+    } else {
+      fpRaw++;
+    }
     if (a.candidate_source === "rescue") rescue++;
     const steps = policySteps(a);
     if (steps.anchoring.status === "downgraded") anchored++;
@@ -540,6 +812,9 @@ function summarise(alerts: Alert[]) {
   return {
     tp,
     fp,
+    confirmed,
+    uncertain,
+    fpRaw,
     rescue,
     anchored,
     policyDowngraded,

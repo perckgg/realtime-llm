@@ -1,18 +1,17 @@
 import type { ReactNode } from "react";
-import { ink } from "@/theme/tokens";
 
 /**
- * Vỏ tooltip dùng chung. Recharts vẽ tooltip mặc định khá xấu và không theo
- * token của chúng ta, nên mọi biểu đồ đều truyền `content={<VizTooltip .../>}`.
+ * Shared Recharts tooltip shell using semantic theme CSS variables
+ * so Light Ops and Dark Ops both retain >= 4.5:1 text contrast.
  */
 export function TooltipShell({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div
-      className="pointer-events-none rounded-md border px-3 py-2 shadow-sm"
+      className="pointer-events-none rounded-lg border px-3 py-2 shadow-md"
       style={{
         borderColor: "var(--color-hairline)",
-        background: ink.surface,
-        minWidth: 168,
+        background: "var(--color-surface-elevated)",
+        minWidth: 172,
       }}
     >
       <div className="mb-1.5 text-[11px] font-semibold text-ink">{title}</div>
@@ -42,15 +41,11 @@ export function TooltipRow({
         )}
         {label}
       </span>
-      <span className="tabular-nums text-ink">{value}</span>
+      <span className="font-mono tabular-nums text-ink">{value}</span>
     </div>
   );
 }
 
-/**
- * Legend luôn hiện khi có từ hai series trở lên (một series thì tiêu đề biểu đồ
- * đã gọi tên nó rồi). Mỗi mục có ký hiệu riêng nên danh tính không phụ thuộc màu.
- */
 export function Legend({
   items,
   active,
@@ -85,7 +80,7 @@ export function Legend({
 }
 
 export const axisProps = {
-  tick: { fill: ink.muted, fontSize: 11 },
+  tick: { fill: "var(--color-ink-muted)", fontSize: 11 },
   tickLine: false,
-  axisLine: { stroke: ink.axis },
+  axisLine: { stroke: "var(--color-axis)" },
 } as const;

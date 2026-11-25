@@ -188,3 +188,30 @@ class IncidentDetailResponse(IncidentResponse):
     report: DiagnosticReport | None
     rejected_reason: str | None
     alerts: list[AlertResponse]
+
+
+TopologyStatus = Literal["critical", "degraded", "suppressed", "healthy"]
+
+
+class TopologyNodeResponse(BaseModel):
+    service: str
+    subsystem: Literal["online_boutique", "train_ticket", "other"]
+    status: TopologyStatus
+    confirmed_alerts: int
+    suppressed_alerts: int
+    total_candidates: int
+    incident_count: int
+    root_cause_count: int
+    max_anomaly_score: float
+
+
+class TopologyEdgeResponse(BaseModel):
+    source: str
+    target: str
+    call_count: int
+
+
+class TopologyResponse(BaseModel):
+    run_id: str
+    nodes: list[TopologyNodeResponse]
+    edges: list[TopologyEdgeResponse]
