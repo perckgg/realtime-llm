@@ -49,12 +49,15 @@ Hai sơ đồ Chương 1 vẫn là chữ tiếng Việt (sơ đồ, không phả
 | H5.12 | `ch5/h5.12-recall-by-service-group.png` | Recall của C1 và CTAV theo nhóm service có / không có ngưỡng nền `dev` (Phát hiện 11): (a) `val`, (b) `test`. Số trên cột là TP / số cửa sổ có sự cố của nhóm. Ở nhóm không có ngưỡng nền, C3 hạ mọi TRUE_ALERT nên CTAV không bắt được sự cố nào. | `m8_finding11_val_v1`, `m8_finding11_test_v1` |
 | H5.13 | `ch5/h5.13-f1-vs-budget.png` | F1 theo ngân sách lần gọi LLM, candidate xử lý theo thứ tự thời gian, trên cửa sổ có telemetry: (a) `val`, (b) `test`. "Đủ" là chấm mọi candidate. Vạch đứt là ngân sách 120 lần gọi của H4. | `ctav_final_val_v1`, `ctav_final_test_v1` (`budget_curve`) |
 
-## Đã có từ trước (Chương 6, ảnh chụp)
+## Đã cập nhật giao diện mới (Chương 6, ảnh chụp 300 dpi, 2026-11-25)
 
-Giữ bốn ảnh: `m10-timeline.png` (H6.2), `m10-alert-c3-downgrade.png` (H6.3, đề xuất), `m10-incident-cascade.png`
-(H6.4), `m10-experiment-comparison.png` (H6.5). Caption nằm sẵn trong `ch6-demo-platform.md`. Nháp Ch6 đang dùng
-thêm `m10-alert-topo-rescue.png` (Hình 6.3 của nháp): bỏ ảnh này khi đưa vào Word, hoặc đổi với ảnh C3 nếu bạn muốn
-giữ ca cho thấy C1.
+Năm ảnh chụp giao diện điều hành & đánh giá mới (nền kem ấm, 8 endpoint, có đồ thị phụ thuộc toàn hệ + thẻ giải thích C1 & RCA 3 bước):
+- `m10-overview.png` (`fig:ch6-overview`): Operations Command Center (`/overview`, `pipeline_test_v2`).
+- `m10-timeline.png` (`fig:ch6-timeline`): Alert Stream & Live Replay (`/timeline`, `pipeline_test_v2`, `Eval Overlay: ON`).
+- `m10-alert-c3-downgrade.png` (`fig:ch6-alert`): Alert Detail của `cand-ad327c0b162f6198` (`productcatalogservice`) kèm thẻ `How C1 built this context`.
+- `m10-incident-cascade.png` (`fig:ch6-incident`): Incident Detail của `inc-46289ea526eaa3f3` (`pipeline_sens_test_v1`) kèm thẻ 3 bước RCA và đồ thị lân cận ngang.
+- `m10-experiment-comparison.png` (`fig:ch6-compare`): Benchmark (`/compare`, tập `test`).
+(Lưu kèm `m10-alert-topo-rescue.png` cho ca `cartservice` `network_delay` ở bước 3 kịch bản demo.)
 
 ## Chưa vẽ (9 hình trong phần chính)
 

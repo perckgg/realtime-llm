@@ -158,7 +158,7 @@ pipeline (G-port, G-paper) không phải kiểm định giả thuyết; viết t
 ### 5.1 Hình và bảng
 
 - Mỗi hình, bảng được nhắc trong văn **trước** khi xuất hiện, kèm ít nhất một câu nói người đọc cần nhìn vào đâu.
-- Caption bảng **trên** bảng; caption hình **dưới** hình. Caption tự đủ nghĩa: split, tập cửa sổ, `run\_id` nếu là kết quả chạy.
+- Caption bảng **trên** bảng; caption hình **dưới** hình. Caption hình viết **không quá 1 câu** (không tính ghi chú `(Nguồn: ...)` của sơ đồ tự vẽ) và **phải nêu sơ bộ hình đó thể hiện/làm gì**, kèm định danh tự đủ nghĩa (`split`, tập cửa sổ, `run\_id` nếu là kết quả chạy); không liệt kê dài nhiều mệnh đề trong caption (diễn giải chi tiết đặt ở đoạn văn ngay dưới hình). Trong LaTeX (`main.tex` đặt `aboveskip=-9pt`), luôn chèn `\par\vspace{0.4cm}` trước `\caption` của hình để tránh chữ đè lên mép dưới ảnh.
 - Sơ đồ (kiến trúc, luồng): một bộ màu và kiểu khối thống nhất cả luận văn.
 - Biểu đồ số liệu: sinh bằng script đọc thẳng `eval/results/`, không nhập số tay (`scripts/thesis_figures.py`).
 - Mọi hình xuất **PNG 300 dpi** để chèn vào Word; không xuất PDF.

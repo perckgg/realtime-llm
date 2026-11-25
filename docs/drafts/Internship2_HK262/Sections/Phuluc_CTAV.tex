@@ -25,7 +25,7 @@ Phụ lục này tập hợp các lệnh dòng lệnh vận hành harness thực
     \hline
     Pipeline hợp nhất & \code{py -m services.rca\_agent.pipeline --config ...} & Nạp đồng thời ClickHouse \& PostgreSQL từ cache; kiểm parity 100\% với harness \\
     \hline
-    API \& Dashboard & \code{docker compose --profile dev up -d} (7 endpoint chỉ đọc + 4 màn hình web) & Truy vấn trực tiếp ClickHouse/PostgreSQL; hỗ trợ chạy \code{DEMO\_OFFLINE=1} \\
+    API \& Dashboard & \code{docker compose --profile dev up -d} (8 endpoint chỉ đọc + 5 màn hình web; kèm chế độ tĩnh \code{VITE\_DATA\_SOURCE=static}) & Truy vấn trực tiếp ClickHouse/PostgreSQL; hỗ trợ chạy ngoại tuyến \code{DEMO\_OFFLINE=1} \\
     \hline
     Kiểm thử tự động & \code{py -m pytest}, \code{py -m mypy packages services}, \code{py -m ruff check .} & Kiểm tra đơn vị cho Rescue, Fusion, policy, grouping, propagation, summarizer, API và parity \\
     \hline

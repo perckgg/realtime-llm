@@ -28,7 +28,7 @@ Run [apply_xref.py](./scripts/apply_xref.py) (it automatically discovers every a
 
 The parser automatically skips comments, math environments (`$...$`, `equation`, `align`), `\caption[...]`, `\label`, `\ref`, `\cite`, `\code`, `\texttt`, `\includegraphics`, `\url`, and existing macro arguments.
 
-### Step 2: Run the 6-Point LaTeX Source Audit
+### Step 2: Run the 7-Point LaTeX Source Audit
 Run [audit_tex.py](./scripts/audit_tex.py):
 
 ```powershell
@@ -42,6 +42,7 @@ It checks:
 4. **Style-guide guardrails**: flags forbidden terms (`GĐ1`, `GĐ2`, `Phase 1/2/3`, `kế thừa từ`, `đột phá`, `vượt trội`, `hoàn hảo`, `Crucial finding`).
 5. **PDF bookmark safety**: flags unescaped `$...$` math inside `\section`, `\subsection`, or `\subsubsection` headings (should wrap in `\texorpdfstring`).
 6. **Citation parity**: verifies every `\cite{...}` matches a `\bibitem{...}` in `main.tex` (0 missing, 0 unused).
+7. **Figure captions & spacing**: verifies every `figure` in active chapters has `\vspace` before `\caption` (preventing `aboveskip=-9pt` overlap) and that each figure caption does not exceed 1 sentence (excluding `(Nguồn: ...)`).
 
 ### Step 3: Fix Flagged Issues & Rebuild
 Resolve any findings reported by `audit_tex.py`, then compile and verify the final PDF using the `thesis-latex-build` skill.

@@ -35,6 +35,10 @@ All clickable macros are defined in `docs/drafts/Internship2_HK262/macros_xref.t
 - Never wrap identifiers inside `\label`, `\ref`, `\cite`, `\code`, `\texttt`, `\includegraphics`, or math mode `$...$`.
 - Any math or formatting inside `\section`, `\subsection`, or `\subsubsection` must use `\texorpdfstring{...}{...}` so PDF bookmarks stay warning-free.
 
+### Figure Captions & Layout
+- **At most 1 sentence, stating what the figure shows/does**: Write every figure `\caption{...}` in **no more than 1 concise sentence** (excluding the `\emph{(Nguồn: ...)}` attribution on author-drawn diagrams). That sentence **must briefly state what the figure illustrates or what function the screen/diagram performs** — do not write a bare screen/component name or ID alone, and do not pack multi-sentence walk-throughs or metric lists into the caption (keep detailed explanations in the body paragraph below). Include `split` and `run_id` when showing experimental/replay outputs, and always provide a short `\caption[...]{...}` title for the List of Figures.
+- **Prevent caption overlap (`\par\vspace{0.4cm}`)**: Because `main.tex` sets `\captionsetup[figure]{..., aboveskip=-9pt}`, always place `\par\vspace{0.4cm}` immediately before `\caption{...}` on screenshots and diagrams without built-in bottom whitespace (include `\par` before `\vspace` so TeX exits horizontal mode even when an image is narrower than `\linewidth`). Cap tall screenshots with `width=\linewidth,height=0.72\textheight,keepaspectratio`.
+
 ### Table Typography
 Because `main.tex` uses `\documentclass{article}` (10pt base) with `13pt` body text, `\footnotesize` (8pt) and `\scriptsize` (7pt) render unreadably small.
 

@@ -48,6 +48,7 @@ Run [audit_log.py](./scripts/audit_log.py) after every build:
 - `PDF string warnings` (`Token not allowed in a PDF string`): **0**
 - `Still needs rerun`: **False**
 - `Overfull \hbox in alignment` (table spilling past margin): **0**
+- `Figure–caption overlap`: **0** (`main.tex` sets `aboveskip=-9pt` on `figure`; ensure `\par\vspace{0.4cm}` precedes `\caption` on screenshots and border-flush diagrams so captions never collide with images)
 
 If any table shows `Overfull \hbox` >= 8pt:
 - Widen the narrow `p{...}` column or insert `\allowbreak` inside long `\code{...}` tokens.
