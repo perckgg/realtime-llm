@@ -23,9 +23,9 @@ REPO = Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from packages.graph.service_graph import ServiceGraph, load_graph
-from packages.schemas.models import DiagnosticReport
-from services.api.readers import (
+from packages.graph.service_graph import ServiceGraph, load_graph  # noqa: E402
+from packages.schemas.models import DiagnosticReport  # noqa: E402
+from services.api.readers import (  # noqa: E402
     C1_FUSION_WEIGHTS,
     DEFAULT_DETECTOR_THRESHOLD,
     _edges_used_count,
@@ -37,7 +37,7 @@ from services.api.readers import (
     assemble_topology,
     get_run_metrics,
 )
-from services.api.schemas import (
+from services.api.schemas import (  # noqa: E402
     AlertDetailResponse,
     AlertResponse,
     ContextEventResponse,
@@ -52,7 +52,7 @@ from services.api.schemas import (
     SearchScopeEntryResponse,
     WindowLabelResponse,
 )
-from services.rca_agent.pipeline import (
+from services.rca_agent.pipeline import (  # noqa: E402
     LoadedAlerts,
     load_alerts,
     load_alerts_from_ctav_variant,
@@ -330,8 +330,8 @@ def _build_incidents(
                 continue
             rec = json.loads(line)
             rep_obj = rec.get("report") if isinstance(rec.get("report"), Mapping) else rec
-            report = DiagnosticReport.model_validate(rep_obj)
-            reports_by_inc[report.incident_id] = report
+            parsed_report = DiagnosticReport.model_validate(rep_obj)
+            reports_by_inc[parsed_report.incident_id] = parsed_report
 
     rejected_by_inc: dict[str, str] = {}
     if rej_path.exists():

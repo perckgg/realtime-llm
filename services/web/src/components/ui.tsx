@@ -132,7 +132,7 @@ export function FixtureBanner() {
   if (!USING_FIXTURES) return null;
   return (
     <div
-      className="border-b px-6 py-2 text-[11.5px]"
+      className="flex items-center gap-2 border-b px-6 py-2 text-[11.5px]"
       style={{
         borderColor: "var(--color-hairline)",
         background: "color-mix(in srgb, var(--color-warning) 14%, var(--color-surface))",
@@ -140,7 +140,7 @@ export function FixtureBanner() {
       }}
       role="status"
     >
-      <AlertTriangleIcon size={14} style={{ color: "var(--color-warning)" }} />
+      <AlertTriangleIcon size={14} className="shrink-0" style={{ color: "var(--color-warning)" }} />
       <span>
         <strong className="font-semibold text-ink">Sandbox fixture mode.</strong> Running on
         deterministic local fixtures. Connect <code className="font-mono">services/api</code> with{" "}
@@ -154,41 +154,48 @@ export function FixtureBanner() {
 export const STATIC_DEMO_STEPS = [
   {
     step: "1",
+    label: "Operations",
+    to: "/overview?run_id=pipeline_test_v2",
+    pathMatch: "/overview",
+    title: "Service topology map, active incidents & CTAV noise suppression",
+  },
+  {
+    step: "2",
     label: "Timeline (test)",
     to: "/timeline?run_id=pipeline_test_v2",
     pathMatch: "/timeline",
     title: "13,699 candidates -> 78 TRUE_ALERT -> 38 incidents",
   },
   {
-    step: "2",
+    step: "3",
     label: "C3 downgrade",
-    to: "/alerts/cand-ad327c0b162f6198%3Ahybrid_bm25_graph%3Ar0?run_id=pipeline_test_v2",
+    to: "/alerts/cand-ad327c0b162f6198%3Ahybrid_bm25_graph%3Ar0?run_id=pipeline_test_v2&gt=1",
     pathMatch: "/alerts/cand-ad327c0b162f6198",
     title: "Normal window on productcatalogservice downgraded by C3 anchoring",
   },
   {
-    step: "3",
+    step: "4",
     label: "CTAV network_delay",
-    to: "/alerts/cand-fa85e82f02f08574%3Ahybrid_bm25_graph%3Ar0?run_id=pipeline_test_v2",
+    to: "/alerts/cand-fa85e82f02f08574%3Ahybrid_bm25_graph%3Ar0?run_id=pipeline_test_v2&gt=1",
     pathMatch: "/alerts/cand-fa85e82f02f08574",
     title: "cartservice network_delay caught by C1 + C3 (missed by BM25)",
   },
   {
-    step: "4",
+    step: "5",
     label: "Cascade RCA (sens.)",
-    to: "/incidents/inc-46289ea526eaa3f3?run_id=pipeline_sens_test_v1",
+    to: "/incidents/inc-46289ea526eaa3f3?run_id=pipeline_sens_test_v1&gt=1",
     pathMatch: "/incidents/inc-46289ea526eaa3f3",
     title: "Multi-service cascade on sensitivity line (outside H5 registration)",
   },
   {
-    step: "5",
+    step: "6",
     label: "H0–H5 Results",
     to: "/compare",
     pathMatch: "/compare",
     title: "Pre-registered H0-H5 evaluation table on test and val",
   },
   {
-    step: "6",
+    step: "7",
     label: "Guide",
     to: "/guide",
     pathMatch: "/guide",
@@ -238,7 +245,10 @@ export function StaticSnapshotBanner() {
             Guided Walkthrough:
           </span>
           {STATIC_DEMO_STEPS.map((s) => {
-            const active = pathname === s.pathMatch || pathname.startsWith(`${s.pathMatch}%3A`);
+            const active =
+              pathname === s.pathMatch ||
+              pathname.startsWith(`${s.pathMatch}:`) ||
+              pathname.startsWith(`${s.pathMatch}%3A`);
             return (
               <Link
                 key={s.step}

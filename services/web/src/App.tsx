@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { NavLink, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { api } from "@/api/client";
+import { api, USING_FIXTURES, USING_STATIC_SNAPSHOT } from "@/api/client";
 import {
   ActivityIcon,
   BarChartIcon,
@@ -90,10 +90,13 @@ export default function App() {
   const onCompareRoute =
     location.pathname.startsWith("/compare") || location.pathname.startsWith("/guide");
 
-  // Remember URL-selected run so navigation links without `?run_id=` keep the active run.
+  // Remember URL-selected run (and ?gt=1 overlay) so links keep the active context.
   useEffect(() => {
     if (effectiveRunId && searchParams.get("run_id") === effectiveRunId) {
       setChosenRunId(effectiveRunId);
+    }
+    if (searchParams.get("gt") === "1") {
+      setGroundTruthOverlay(true);
     }
   }, [effectiveRunId, searchParams]);
 
@@ -437,7 +440,12 @@ export default function App() {
           <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--color-hairline)] px-5 py-2.5 text-[11px] text-ink-muted">
             <span>AIOps RCA Platform · CTAV Alert Validation &amp; Topology-Aware Root Cause Analysis</span>
             <span className="font-mono">
-              ClickHouse + PostgreSQL · {groundTruthOverlay ? "Evaluation Overlay" : "Operations Mode"}
+              {USING_STATIC_SNAPSHOT
+                ? "Static Snapshot"
+                : USING_FIXTURES
+                  ? "Sandbox Fixtures"
+                  : "ClickHouse + PostgreSQL"}{" "}
+              · {groundTruthOverlay ? "Evaluation Overlay" : "Operations Mode"}
             </span>
           </footer>
         </div>

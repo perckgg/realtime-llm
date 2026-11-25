@@ -45,7 +45,9 @@ jobs:
         run: npm run build
 
       - name: Verify static API snapshot present
-        run: test -f services/web/dist/static-api/runs.json
+        run: |
+          test -f services/web/dist/static-api/runs.json
+          test -f services/web/dist/static-api/topology/pipeline_test_v2.json
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

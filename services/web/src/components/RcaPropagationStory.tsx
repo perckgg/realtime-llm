@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { IncidentDetail } from "@/api/types";
 import { Card } from "@/components/ui";
 import { clockUTC, cx, num } from "@/lib/util";
-import { ink, status } from "@/theme/tokens";
+import { status } from "@/theme/tokens";
 
 /**
  * "How the RCA agent localized the root cause" — ba bước của RCA mức 1 (QĐ-040..043) kể cho hội đồng:
@@ -15,8 +15,8 @@ import { ink, status } from "@/theme/tokens";
 
 const ROOT = status.critical;
 const AFFECTED = status.serious;
-const HEALTHY = ink.muted;
-const CALL = ink.axis;
+const HEALTHY = "var(--color-ink-muted)";
+const CALL = "var(--color-axis)";
 
 type Vote = { from: string; blames: string[]; reason: string };
 
@@ -137,7 +137,7 @@ export default function RcaPropagationStory({ data }: { data: IncidentDetail }) 
                 <span className="w-[150px] truncate font-mono text-[10.5px] text-ink" title={svc}>
                   {svc}
                 </span>
-                <span className="h-2 flex-1 rounded-full" style={{ background: ink.grid }}>
+                <span className="h-2 flex-1 rounded-full" style={{ background: "var(--color-grid)" }}>
                   <span
                     className="block h-2 rounded-full"
                     style={{ width: `${sc * 100}%`, background: svc === root ? ROOT : AFFECTED }}
@@ -189,7 +189,7 @@ function StepTitle({ n, text }: { n: number; text: string }) {
       <span
         aria-hidden
         className="inline-flex h-4 w-4 items-center justify-center rounded-full border text-[10px]"
-        style={{ borderColor: ink.axis }}
+        style={{ borderColor: "var(--color-axis)" }}
       >
         {n}
       </span>
@@ -227,15 +227,15 @@ function AlertTimeline({
           y={top - 2}
           width={Math.max(x(t1) - x(t0), 2)}
           height={alerted.length * rowH}
-          fill={ink.plane}
-          stroke={ink.grid}
+          fill="var(--color-plane)"
+          stroke="var(--color-grid)"
         />
         {alerted.map((svc, i) => {
           const y = top + i * rowH + rowH / 2;
           return (
             <g key={svc}>
-              <line x1={8} x2={W - 8} y1={y} y2={y} stroke={ink.grid} strokeDasharray="2 4" />
-              <text x={10} y={y - 6} fontSize={9.5} fill={ink.secondary} fontFamily="ui-monospace, monospace">
+              <line x1={8} x2={W - 8} y1={y} y2={y} stroke="var(--color-grid)" strokeDasharray="2 4" />
+              <text x={10} y={y - 6} fontSize={9.5} fill="var(--color-ink-2)" fontFamily="ui-monospace, monospace">
                 {svc}
               </text>
               {alerts
@@ -247,7 +247,7 @@ function AlertTimeline({
                     cy={y + 3}
                     r={4.5}
                     fill={svc === root ? ROOT : AFFECTED}
-                    stroke={ink.surface}
+                    stroke="var(--color-surface)"
                     strokeWidth={1.5}
                   >
                     <title>{`${svc} · ${clockUTC(a.ts)} UTC · score ${num(a.anomaly_score, 2)}`}</title>
@@ -258,15 +258,15 @@ function AlertTimeline({
         })}
         {x(t1) - x(t0) > 90 ? (
           <>
-            <text x={x(t0)} y={H - 8} fontSize={9.5} fill={ink.muted} textAnchor="start">
+            <text x={x(t0)} y={H - 8} fontSize={9.5} fill="var(--color-ink-muted)" textAnchor="start">
               {clockUTC(data.start_ts)}
             </text>
-            <text x={x(t1)} y={H - 8} fontSize={9.5} fill={ink.muted} textAnchor="end">
+            <text x={x(t1)} y={H - 8} fontSize={9.5} fill="var(--color-ink-muted)" textAnchor="end">
               {clockUTC(data.end_ts)}
             </text>
           </>
         ) : (
-          <text x={(x(t0) + x(t1)) / 2} y={H - 8} fontSize={9.5} fill={ink.muted} textAnchor="middle">
+          <text x={(x(t0) + x(t1)) / 2} y={H - 8} fontSize={9.5} fill="var(--color-ink-muted)" textAnchor="middle">
             {clockUTC(data.start_ts) === clockUTC(data.end_ts)
               ? clockUTC(data.start_ts)
               : `${clockUTC(data.start_ts)} – ${clockUTC(data.end_ts)}`}
@@ -337,7 +337,7 @@ function CallDiagram({ data, alerted, root }: { data: IncidentDetail; alerted: s
         return (
           <g key={`${e.source}->${e.target}`}>
             <line x1={x1} y1={y1} x2={x2 - 2} y2={y2} stroke={CALL} strokeWidth={1.2} markerEnd="url(#rca-call)" />
-            <text x={(x1 + x2) / 2} y={Math.min(y1, y2) - 4} fontSize={9} fill={ink.muted} textAnchor="middle">
+            <text x={(x1 + x2) / 2} y={Math.min(y1, y2) - 4} fontSize={9} fill="var(--color-ink-muted)" textAnchor="middle">
               calls ×{e.call_count.toLocaleString("en-US")}
             </text>
             {forward && (
@@ -360,8 +360,8 @@ function CallDiagram({ data, alerted, root }: { data: IncidentDetail; alerted: s
           const y = pad + (H - pad * 2 - healthyH) / 2 + i * (PH + 8);
           return (
             <g key={svc}>
-              <line x1={rootPos.x + BW} y1={rootPos.y + BH / 2} x2={healthyX} y2={y + PH / 2} stroke={ink.grid} />
-              <rect x={healthyX} y={y} width={PW} height={PH} rx={4} fill={ink.surface} stroke={ink.grid} />
+              <line x1={rootPos.x + BW} y1={rootPos.y + BH / 2} x2={healthyX} y2={y + PH / 2} stroke="var(--color-grid)" />
+              <rect x={healthyX} y={y} width={PW} height={PH} rx={4} fill="var(--color-surface)" stroke="var(--color-grid)" />
               <text x={healthyX + PW / 2} y={y + PH / 2 + 3.5} fontSize={9} fill={HEALTHY} textAnchor="middle" fontFamily="ui-monospace, monospace">
                 {svc.length > 20 ? `${svc.slice(0, 19)}…` : svc}
               </text>
@@ -386,11 +386,11 @@ function CallDiagram({ data, alerted, root }: { data: IncidentDetail; alerted: s
               width={BW}
               height={BH}
               rx={6}
-              style={{ fill: `color-mix(in srgb, ${color} ${isRoot ? 12 : 7}%, ${ink.surface})` }}
+              style={{ fill: `color-mix(in srgb, ${color} ${isRoot ? 14 : 8}%, var(--color-surface))` }}
               stroke={color}
               strokeWidth={isRoot ? 2 : 1}
             />
-            <text x={p.x + BW / 2} y={p.y + 16} fontSize={10} fontWeight={600} fill={ink.primary} textAnchor="middle" fontFamily="ui-monospace, monospace">
+            <text x={p.x + BW / 2} y={p.y + 16} fontSize={10} fontWeight={600} fill="var(--color-ink)" textAnchor="middle" fontFamily="ui-monospace, monospace">
               {s.length > 22 ? `${s.slice(0, 21)}…` : s}
             </text>
             <text x={p.x + BW / 2} y={p.y + 30} fontSize={9} fill={color} textAnchor="middle">

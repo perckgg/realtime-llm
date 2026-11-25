@@ -239,7 +239,7 @@ export default function MethodologyGuide() {
         </div>
 
         <div className="flex flex-wrap gap-1.5">
-          {STATIC_DEMO_STEPS.slice(0, 5).map((h) => (
+          {STATIC_DEMO_STEPS.filter((h) => h.pathMatch !== "/guide").map((h) => (
             <Link
               key={h.step}
               to={h.to}

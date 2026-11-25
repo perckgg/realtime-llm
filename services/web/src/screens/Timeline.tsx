@@ -427,8 +427,6 @@ export default function Timeline() {
                   dataKey={v}
                   stackId="verdict"
                   fill={verdictColor[v]}
-                  stroke="var(--color-surface)"
-                  strokeWidth={1.5}
                   maxBarSize={18}
                   radius={i === VERDICT_ORDER.length - 1 ? [3, 3, 0, 0] : undefined}
                 />

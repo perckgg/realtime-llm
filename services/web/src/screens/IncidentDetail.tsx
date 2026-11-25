@@ -21,13 +21,13 @@ import {
 } from "@/lib/graphLayout";
 import { useRuns } from "@/lib/runContext";
 import { clockUTC, cx, num, stampUTC, useAsync } from "@/lib/util";
-import { ink, series, status } from "@/theme/tokens";
+import { series, status } from "@/theme/tokens";
 
 const ROLE: Record<GraphNode["role"], { color: string; glyph: string; label: string }> = {
   root_cause: { color: status.critical, glyph: "◉", label: "Predicted root cause" },
   ground_truth: { color: status.good, glyph: "✓", label: "Ground truth" },
   affected: { color: status.serious, glyph: "◐", label: "Affected" },
-  healthy: { color: ink.muted, glyph: "○", label: "Healthy neighbor" },
+  healthy: { color: "var(--color-ink-muted)", glyph: "○", label: "Healthy neighbor" },
 };
 
 const UPSTREAM_COLOR = "#2563eb";
@@ -232,7 +232,7 @@ export default function IncidentDetail() {
   const badgeColor = !report
     ? status.warning
     : !hasGt
-      ? ink.muted
+      ? "var(--color-ink-muted)"
       : correct
         ? status.good
         : status.critical;
@@ -399,7 +399,8 @@ export default function IncidentDetail() {
               }}
               minimapColor={(n) => {
                 const d = n.data as unknown as ServiceNodeData | undefined;
-                return d ? ROLE[d.node.role].color : "#94a3b8";
+                if (!d || d.node.role === "healthy") return "#94a3b8";
+                return ROLE[d.node.role].color;
               }}
             />
           )}

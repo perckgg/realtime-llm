@@ -15,7 +15,7 @@ import rawExperimentTable from "@/data/experiment_table.json";
 import { Legend, TooltipRow, TooltipShell, axisProps } from "@/components/charts";
 import { Card, Empty, StatTile } from "@/components/ui";
 import { cx, num } from "@/lib/util";
-import { ink, series, status } from "@/theme/tokens";
+import { series, status } from "@/theme/tokens";
 
 type SplitKey = "test" | "val";
 type CiPair = [number, number];
@@ -253,7 +253,7 @@ function statusColor(st: string): string {
   if (st === "accepted") return status.good;
   if (st === "rejected") return status.critical;
   if (st === "partial") return status.warning;
-  return ink.muted;
+  return "var(--color-ink-muted)";
 }
 
 export default function ExperimentComparison() {
@@ -432,11 +432,11 @@ export default function ExperimentComparison() {
         <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={barData} margin={{ top: 8, right: 12, bottom: 0, left: -10 }}>
-              <CartesianGrid vertical={false} stroke={ink.grid} />
+              <CartesianGrid vertical={false} stroke="var(--color-grid)" />
               <XAxis dataKey="name" {...axisProps} />
               <YAxis {...axisProps} domain={[0, "auto"]} width={44} />
               <Tooltip
-                cursor={{ fill: "rgb(11 11 11 / 0.04)" }}
+                cursor={{ fill: "rgb(37 99 235 / 0.06)" }}
                 content={({ active, payload, label }) =>
                   active && payload?.length ? (
                     <TooltipShell title={String(label)}>
@@ -453,16 +453,16 @@ export default function ExperimentComparison() {
                 }
               />
               <Bar dataKey="precision" name="Precision" fill={METRIC_COLORS.precision} radius={[2, 2, 0, 0]}>
-                <ErrorBar dataKey="precision_ci" stroke={ink.secondary} strokeWidth={1.1} width={4} />
+                <ErrorBar dataKey="precision_ci" stroke="var(--color-ink-2)" strokeWidth={1.1} width={4} />
               </Bar>
               <Bar dataKey="recall" name="Recall" fill={METRIC_COLORS.recall} radius={[2, 2, 0, 0]}>
-                <ErrorBar dataKey="recall_ci" stroke={ink.secondary} strokeWidth={1.1} width={4} />
+                <ErrorBar dataKey="recall_ci" stroke="var(--color-ink-2)" strokeWidth={1.1} width={4} />
               </Bar>
               <Bar dataKey="f1" name="F1" fill={METRIC_COLORS.f1} radius={[2, 2, 0, 0]}>
-                <ErrorBar dataKey="f1_ci" stroke={ink.secondary} strokeWidth={1.1} width={4} />
+                <ErrorBar dataKey="f1_ci" stroke="var(--color-ink-2)" strokeWidth={1.1} width={4} />
               </Bar>
               <Bar dataKey="fpr" name="FPR" fill={METRIC_COLORS.fpr} radius={[2, 2, 0, 0]}>
-                <ErrorBar dataKey="fpr_ci" stroke={ink.secondary} strokeWidth={1.1} width={4} />
+                <ErrorBar dataKey="fpr_ci" stroke="var(--color-ink-2)" strokeWidth={1.1} width={4} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -642,7 +642,7 @@ export default function ExperimentComparison() {
         <div className="h-[240px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={budgetRows} margin={{ top: 8, right: 16, bottom: 0, left: -12 }}>
-              <CartesianGrid vertical={false} stroke={ink.grid} />
+              <CartesianGrid vertical={false} stroke="var(--color-grid)" />
               <XAxis dataKey="budget" {...axisProps} />
               <YAxis {...axisProps} domain={[0, "auto"]} width={44} />
               <Tooltip

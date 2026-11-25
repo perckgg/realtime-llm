@@ -164,7 +164,11 @@ def test_score_diagnostic_quality_and_kappa(tmp_path: Path) -> None:
     with blind_path.open(encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.DictReader(handle))
 
-    # Grade first 15 rows synthetically
+    # Reset any already-graded rows in the working copy, then grade first 15 rows synthetically
+    for r in rows:
+        r["root_cause_score"] = ""
+        r["evidence_score"] = ""
+        r["action_score"] = ""
     for idx in range(15):
         rows[idx]["root_cause_score"] = "2" if idx % 3 == 0 else "1"
         rows[idx]["evidence_score"] = "2" if idx % 2 == 0 else "1"

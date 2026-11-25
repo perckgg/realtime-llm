@@ -15,6 +15,7 @@ from services.api.schemas import (
     IncidentResponse,
     RunMetricsResponse,
     RunResponse,
+    TopologyResponse,
 )
 
 REPO = Path(__file__).resolve().parents[1]
@@ -86,6 +87,13 @@ def test_runs_and_metrics_match_chapter6_counts(exported_dir: Path) -> None:
         sample_inc = IncidentDetailResponse.model_validate(next(iter(inc_details_raw.values())))
         assert sample_inc.report is not None
         assert sample_inc.report.llm_backend == "gemini-2.5-flash"
+
+        topo = TopologyResponse.model_validate(
+            json.loads((exported_dir / "topology" / f"{run_id}.json").read_text(encoding="utf-8"))
+        )
+        assert topo.run_id == run_id
+        assert len(topo.nodes) >= 10
+        assert len(topo.edges) >= 10
 
 
 def test_chapter6_demo_cases_have_full_details(exported_dir: Path) -> None:

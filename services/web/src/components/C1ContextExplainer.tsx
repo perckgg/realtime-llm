@@ -1,7 +1,7 @@
 import type { AlertDetail, ContextEvent } from "@/api/types";
 import { Card } from "@/components/ui";
 import { cx, num } from "@/lib/util";
-import { ink, series } from "@/theme/tokens";
+import { series } from "@/theme/tokens";
 
 /**
  * "How C1 built this context" — giải thích cho hội đồng đồ thị service làm gì ở tầng C1.
@@ -15,7 +15,7 @@ import { ink, series } from "@/theme/tokens";
 const PART_COLOR = {
   bm25: series[0],
   time: series[2],
-  graph: ink.muted,
+  graph: "var(--color-ink-muted)",
 } as const;
 const CITED_COLOR = series[1];
 
@@ -108,7 +108,9 @@ export default function C1ContextExplainer({ alert }: { alert: AlertDetail }) {
                   style={{
                     borderColor: b.d === 0 ? series[0] : "var(--color-hairline)",
                     background:
-                      b.d === 0 ? `color-mix(in srgb, ${series[0]} 7%, ${ink.surface})` : ink.surface,
+                      b.d === 0
+                        ? `color-mix(in srgb, ${series[0]} 9%, var(--color-surface))`
+                        : "var(--color-surface)",
                   }}
                 >
                   <div className="text-[10.5px] font-semibold text-ink">d = {b.d}</div>
@@ -117,7 +119,7 @@ export default function C1ContextExplainer({ alert }: { alert: AlertDetail }) {
                   </div>
                   <div
                     className="mt-1 text-[10.5px] font-medium tabular-nums"
-                    style={{ color: b.selected > 0 ? series[0] : ink.muted }}
+                    style={{ color: b.selected > 0 ? series[0] : "var(--color-ink-muted)" }}
                   >
                     {b.selected} of {scored.length} selected
                   </div>
@@ -134,7 +136,10 @@ export default function C1ContextExplainer({ alert }: { alert: AlertDetail }) {
                           )}
                           style={{
                             borderColor: n > 0 ? series[0] : "var(--color-hairline)",
-                            background: n > 0 ? `color-mix(in srgb, ${series[0]} 10%, ${ink.surface})` : undefined,
+                            background:
+                              n > 0
+                                ? `color-mix(in srgb, ${series[0]} 12%, var(--color-surface))`
+                                : undefined,
                           }}
                         >
                           {svc}
@@ -182,7 +187,7 @@ export default function C1ContextExplainer({ alert }: { alert: AlertDetail }) {
                   <div
                     className="relative flex h-[18px] flex-1 overflow-hidden rounded-sm"
                     style={{
-                      background: ink.plane,
+                      background: "var(--color-plane)",
                       outline: s.cited ? `1.5px solid ${CITED_COLOR}` : undefined,
                       outlineOffset: 1,
                     }}

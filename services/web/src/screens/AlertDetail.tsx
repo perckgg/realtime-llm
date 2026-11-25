@@ -18,7 +18,7 @@ import C1ContextExplainer from "@/components/C1ContextExplainer";
 import { Card, Empty, ErrorBox, KV, Loading, Pill, StatTile, VerdictBadge } from "@/components/ui";
 import { clockUTC, cx, ms, num, policySteps, stampUTC, useAsync } from "@/lib/util";
 import { useRuns } from "@/lib/runContext";
-import { ink, sequential, series, status, strategyLabel, verdictLabel } from "@/theme/tokens";
+import { sequential, series, status, strategyLabel, verdictLabel } from "@/theme/tokens";
 
 const MODALITY_GLYPH: Record<ContextEvent["modality"], string> = {
   log: "▤",
@@ -104,7 +104,7 @@ export default function AlertDetail() {
         )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid items-start gap-4 lg:grid-cols-[1.6fr_1fr]">
         <Card
           title={a.metric_name}
           subtitle="Anomaly score series around the alert window. Horizontal dashed line shows detector threshold; highlighted region marks the alerted window."
@@ -121,7 +121,7 @@ export default function AlertDetail() {
                     <stop offset="100%" stopColor={series[0]} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke={ink.grid} />
+                <CartesianGrid vertical={false} stroke="var(--color-grid)" />
                 <XAxis dataKey="t" {...axisProps} minTickGap={24} />
                 <YAxis {...axisProps} domain={[0, 1]} width={40} />
                 <ReferenceArea x1={alertTime} x2={alertTime} fill={series[0]} fillOpacity={0.12} />
@@ -137,7 +137,7 @@ export default function AlertDetail() {
                   }}
                 />
                 <Tooltip
-                  cursor={{ stroke: ink.axis, strokeWidth: 1 }}
+                  cursor={{ stroke: "var(--color-axis)", strokeWidth: 1 }}
                   content={({ active, payload, label }) =>
                     active && payload?.length ? (
                       <TooltipShell title={`${label} UTC`}>
@@ -156,7 +156,7 @@ export default function AlertDetail() {
                   stroke={series[0]}
                   strokeWidth={2}
                   fill="url(#alertFill)"
-                  activeDot={{ r: 4, stroke: ink.surface, strokeWidth: 2 }}
+                  activeDot={{ r: 4, stroke: "var(--color-surface)", strokeWidth: 2 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -189,7 +189,7 @@ export default function AlertDetail() {
                 ).map(([label, v]) => (
                   <div key={label} className="flex items-center gap-3">
                     <span className="w-14 shrink-0 text-[11px] text-ink-2">{label}</span>
-                    <div className="h-2 flex-1 rounded-full" style={{ background: ink.grid }}>
+                    <div className="h-2 flex-1 rounded-full" style={{ background: "var(--color-grid)" }}>
                       <div
                         className="h-2 rounded-full"
                         style={{ width: `${v * 100}%`, background: series[0] }}
@@ -357,7 +357,7 @@ function EventRow({ e, rank, cited }: { e: ContextEvent; rank: number; cited: bo
         )}
         <span className="ml-auto flex items-center gap-2">
           {/* Thanh điểm dùng sắc độ tuần tự của cùng một màu — độ lớn, không phải danh tính. */}
-          <span className="h-1.5 w-24 rounded-full" style={{ background: ink.grid }}>
+          <span className="h-1.5 w-24 rounded-full" style={{ background: "var(--color-grid)" }}>
             <span
               className="block h-1.5 rounded-full"
               style={{ width: `${e.score * 100}%`, background: sequential[1] }}
